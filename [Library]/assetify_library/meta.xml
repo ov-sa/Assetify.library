@@ -14,11 +14,19 @@
     <!--script src="handlers/pedLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/weaponLoader.lua" type="client" cache="false"/-->
 
+    <!-- Files: Assets: Maps -->
+    <!-- Files: Assets: Characters -->
+
+    <!-- Files: Assets: Weapons -->
+    <file src="files/assets/weapons/ak47_gold/config.json"/>
+
+    <!-- Files: Assets: Vehicles -->
+
     <!-- Exports -->
-    <export function="getLoadedMap" type="client"/>
+    <!--export function="getLoadedMap" type="client"/>
     <export function="unloadMap" type="client"/>
     <export function="loadMap" type="client"/>
     <export function="getPedID" type="client"/>
-    <export function="getWeaponID" type="client"/>
+    <export function="getWeaponID" type="client"/-->
 
 </meta>
