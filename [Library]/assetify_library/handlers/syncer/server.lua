@@ -34,17 +34,25 @@ local scheduledPlayers = {}
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
     if isLibraryLoaded then
-        for i, j in imports.pairs(availableAssetPacks) do
-            for k, v in imports.pairs(j.assetPack) do
-                if k ~= "rwDatas" then
-                    imports.triggerLatentClientEvent(source, "onClientRecieveAssets", 100000, false, source, i, k, v)
-                else
-                    for x, y in imports.pairs(v) do
-                        --imports.triggerLatentClientEvent(source, "onClientRecieveAssets", 100000, false, source, i, k, _, x, y)
+        local clientPlayer = source
+        thread:create(function(cThread)
+            for i, j in imports.pairs(availableAssetPacks) do
+                for k, v in imports.pairs(j.assetPack) do
+                    if k ~= "rwDatas" then
+                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 100000, false, clientPlayer, i, k, v)
+                    else
+                        for x, y in imports.pairs(v) do
+                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 100000, false, clientPlayer, i, k, _, x, y)
+                            thread.pause()
+                        end
                     end
+                    thread.pause()
                 end
             end
-        end
+        end):resume({
+            executions = 5,
+            frames = 1
+        })
     else
         scheduledPlayers[source] = true
     end

@@ -76,6 +76,11 @@ function thread:resume(syncRate)
             local status = self:status()
             if status == "suspended" then
                 for i = 1, self.syncRate.executions, 1 do
+                    status = self:status()
+                    if status == "dead" then
+                        self:destroy()
+                        return
+                    end
                     imports.coroutine.resume(self.thread, self)
                 end
             end
@@ -83,7 +88,7 @@ function thread:resume(syncRate)
             if status == "dead" then
                 self:destroy()
             end
-        end, self.syncRate.frames, -1)
+        end, self.syncRate.frames, 1)
     else
         imports.coroutine.resume(self.thread, self)
         if self.timer and imports.isElement(self.timer) then
