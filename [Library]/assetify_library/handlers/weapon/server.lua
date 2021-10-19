@@ -9,13 +9,31 @@
 ----------------------------------------------------------------
 
 
+-----------------
+--[[ Imports ]]--
+-----------------
+
+local imports = {
+    fromJSON = fromJSON,
+    fetchFileData = fetchFileData
+}
+
+
 -------------------
 --[[ Variables ]]--
 -------------------
 
-local assetReference = {
-    relativePath = "files/assets/weapons/",
-    manifestPath = "manifest.json"
+local assetPack = {
+    reference = {
+        packPath = "files/assets/weapons/",
+        manifestPath = "manifest.json",
+        assetPath = "asset.json"
+    },
+
+    datas = {
+        manifestData = false,
+        rwDatas = {}
+    }
 }
 
 
@@ -23,11 +41,40 @@ local assetReference = {
 --[[ Event: On Resource Start ]]--
 ----------------------------------
 
+function loadWeapons()
+
+    assetPack.manifestData = imports.fetchFileData(assetPack.reference.packPath..assetPack.reference.manifestPath)
+    assetPack.manifestData = (assetPack.manifestData and imports.fromJSON(assetPack.manifestData)) or false
+
+    if assetPack.manifestData then
+        for i = 1, #assetPack.manifestData, 1 do
+            local assetPath = assetPack.manifestData[i]
+            local assetData = imports.fetchFileData((assetPack.reference.packPath)..assetPath.."/"..(assetPack.reference.assetPath))
+            assetData = (assetData and imports.fromJSON(assetData)) or false
+            if not assetData then
+                assetPack.datas.rwDatas[assetPath] = false
+            else
+                assetPack.datas.rwDatas[assetPath] = {
+                    rwData = {
+                        txd = false,
+                        dff = false,
+                        col = false
+                    }
+                }
+                print("LOAD FILE..: "..assetPath)
+            end
+        end
+    end
+    return (assetPack.manifestData and true) or false
+
+end
+
 addEventHandler("onResourceStart", resourceRoot, function()
 
-    print("STARTED WEAPON: ASSETIFY 1")
+    loadWeapons()
 
 end)
+
 
 
 --[[
