@@ -18,13 +18,31 @@ local imports = {
 }
 
 
+-------------------
+--[[ Variables ]]--
+-------------------
+
+local availablePacks = {
+
+    {
+        name = "Weapon Pack",
+        builder = buildWeaponPack
+    }
+
+}
+
+
 ----------------------------------
 --[[ Event: On Resource Start ]]--
 ----------------------------------
 imports.addEventHandler("onResourceStart", resourceRoot, function()
 
-    buildWeaponPack(function(buildState)
-        print("WOW LOADED THE PACK!: "..tostring(buildState))
-    end)
+    for i = 1, #availablePacks, 1 do
+        local packReference = availablePacks[i]
+        print("Building Pack: "..packReference.name)
+        packReference.builder(function(buildState)
+            print("WOW LOADED THE PACK!: "..tostring(buildState))
+        end)
+    end
 
 end)

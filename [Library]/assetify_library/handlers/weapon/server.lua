@@ -74,7 +74,7 @@ function buildWeaponPack(callback)
                 thread.pause()
             end
             if callbackReference and imports.type(callbackReference) == "function" then
-                callbackReference(true)
+                callbackReference(assetPack.datas)
             end
         end):resume()
         return true

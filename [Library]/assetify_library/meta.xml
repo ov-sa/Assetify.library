@@ -13,9 +13,9 @@
     <script src="utilities/thread.lua" type="shared" cache="false"/>
 
     <!-- Handlers -->
-    <script src="handlers/loader/server.lua" type="server"/>
     <script src="handlers/weapon/server.lua" type="server"/>
     <script src="handlers/weapon/client.lua" type="client" cache="false"/>
+    <script src="handlers/loader/server.lua" type="server"/>
 
     <!--script src="handlers/mapLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/pedLoader.lua" type="client" cache="false"/-->
