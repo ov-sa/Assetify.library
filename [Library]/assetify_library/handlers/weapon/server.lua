@@ -1,20 +1,30 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: initializer: loader.lua
+     Script: handlers: weapon: server.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
      DOC: 19/10/2021 (OvileAmriam)
-     Desc: Library Syncer ]]--
+     Desc: Weapon Handler ]]--
 ----------------------------------------------------------------
+
+
+-------------------
+--[[ Variables ]]--
+-------------------
+
+local assetReference = {
+    relativePath = "files/assets/weapons/",
+    manifestPath = "manifest.json"
+}
 
 
 ----------------------------------
 --[[ Event: On Resource Start ]]--
 ----------------------------------
 
-addEventHandler("onResourceStart", root, function()
+addEventHandler("onResourceStart", resourceRoot, function()
 
-    print("STARTED ASSETIFY 1")
+    print("STARTED WEAPON: ASSETIFY 1")
 
 end)

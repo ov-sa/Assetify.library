@@ -8,20 +8,17 @@
     <script src="exports/pedExport.lua" type="client" cache="false"/>
     <script src="exports/weaponExport.lua" type="client" cache="false"/-->
 
+    <!-- Settings & Utilities -->
+    <script src="utilities/server.lua" type="server"/>
+
     <!-- Handlers -->
     <script src="handlers/initializer/loader.lua" type="client" cache="false"/>
-    <script src="handlers/initializer/syncer.lua" type="server"/>
+    <script src="handlers/weapon/server.lua" type="server"/>
+    <script src="handlers/weapon/client.lua" type="client" cache="false"/>
+
     <!--script src="handlers/mapLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/pedLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/weaponLoader.lua" type="client" cache="false"/-->
-
-    <!-- Files: Assets: Maps -->
-    <!-- Files: Assets: Characters -->
-
-    <!-- Files: Assets: Weapons -->
-    <weapon src="ak47_gold/config.json"/>
-
-    <!-- Files: Assets: Vehicles -->
 
     <!-- Exports -->
     <!--export function="getLoadedMap" type="client"/>

@@ -1,11 +1,11 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: loader: weapon.lua
+     Script: handlers: weapon: client.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
      DOC: 19/10/2021 (OvileAmriam)
-     Desc: Weapon Loader ]]--
+     Desc: Weapon Handler ]]--
 ----------------------------------------------------------------
 
 
