@@ -45,14 +45,14 @@ local assetPack = {
 
 function buildWeaponPack(callback)
 
-    assetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
-    assetPack.manifestData = (assetPack.manifestData and imports.fromJSON(assetPack.manifestData)) or false
+    assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
+    assetPack.datas.manifestData = (assetPack.datas.manifestData and imports.fromJSON(assetPack.datas.manifestData)) or false
 
-    if assetPack.manifestData then
+    if assetPack.datas.manifestData then
         thread:create(function(cThread)
             local callbackReference = callback
-            for i = 1, #assetPack.manifestData, 1 do
-                local asset = assetPack.manifestData[i]
+            for i = 1, #assetPack.datas.manifestData, 1 do
+                local asset = assetPack.datas.manifestData[i]
                 local assetPath = (assetPack.reference.root)..asset.."/"
                 local assetData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
                 assetData = (assetData and imports.fromJSON(assetData)) or false

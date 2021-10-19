@@ -23,6 +23,7 @@ local imports = {
 -------------------
 
 isLibraryLoaded = false
+builtAssetPacks = {}
 
 
 ----------------------------------
@@ -32,6 +33,7 @@ isLibraryLoaded = false
 imports.addEventHandler("onResourceStart", resourceRoot, function()
 
     buildWeaponPack(function(buildData)
+        builtAssetPacks["weapon"] = buildData
         isLibraryLoaded = true
     end)
 

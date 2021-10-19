@@ -14,21 +14,39 @@
 -----------------
 
 local imports = {
-    addEventHandler = addEventHandler
+    pairs = pairs,
+    addEventHandler = addEventHandler,
+    triggerLatentClientEvent = triggerLatentClientEvent
 }
+
+
+-------------------
+--[[ Variables ]]--
+-------------------
+
+local scheduledPlayers = {}
 
 
 -----------------------------------------
 --[[ Event: On Player Resource Start ]]--
 -----------------------------------------
 
-imports.addEventHandler("onPlayerResourceStart", resourceRoot, function()
+imports.addEventHandler("onPlayerResourceStart", root, function()
 
-    --TODO:...
     if isLibraryLoaded then
-        print("LIBRARY LOADED ALREADY")
+        for i, j in imports.pairs(builtAssetPacks) do
+            for k, v in imports.pairs(j) do
+                if k ~= "rwDatas" then
+                    imports.triggerLatentClientEvent(source, "onClientRecieveAssets", 100000, false, source, i, k, v)
+                else
+                    for x, y in imports.pairs(v) do
+                        --imports.triggerLatentClientEvent(source, "onClientRecieveAssets", 100000, false, source, i, k, _, x, y)
+                    end
+                end
+            end
+        end
     else
-        print("SCHEDULE PLAYER FOR LOADING ASSETS")
+        scheduledPlayers[source] = true
     end
 
 end)
