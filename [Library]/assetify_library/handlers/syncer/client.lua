@@ -26,12 +26,12 @@ local imports = {
 availableAssetPacks = {}
 
 
------------------------------------------------
---[[ Event: On Client Recieve Assset Chunk ]]--
------------------------------------------------
+---------------------------------------------------
+--[[ Event: On Client Recieve Asset Pack Chunk ]]--
+---------------------------------------------------
 
-imports.addEvent("onClientRecieveAssetChunk", true)
-imports.addEventHandler("onClientRecieveAssetChunk", root, function(assetPack, assetType, assetData, chunkIndex, chunkData)
+imports.addEvent("onClientRecieveAssetPackChunk", true)
+imports.addEventHandler("onClientRecieveAssetPackChunk", root, function(assetPack, assetType, assetData, chunkIndex, chunkData)
 
     if not chunkIndex and not chunkData then
         outputChatBox("YOU HAVE RECIEVED SOME ASSETS! "..assetPack..", "..assetType..", "..tostring(assetData))
