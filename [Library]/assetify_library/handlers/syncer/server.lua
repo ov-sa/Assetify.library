@@ -27,6 +27,35 @@ local imports = {
 local scheduledSyncs = {}
 
 
+------------------------------------
+--[[ Function: Syncs Asset Pack ]]--
+------------------------------------
+
+local function syncAssetPack(player)
+
+    thread:create(function(cThread)
+        for i, j in imports.pairs(availableAssetPacks) do
+            for k, v in imports.pairs(j.assetPack) do
+                if k ~= "rwDatas" then
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPackChunk", 125000, false, player, i, k, v)
+                else
+                    for x, y in imports.pairs(v) do
+                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPackChunk", 125000, false, player, i, k, _, x, y)
+                        thread.pause()
+                    end
+                end
+                thread.pause()
+            end
+        end
+    end):resume({
+        executions = 5,
+        frames = 1
+    })
+    return true
+
+end
+
+
 -----------------------------------------------
 --[[ Events: On Player Resource-Start/Quit ]]--
 -----------------------------------------------
@@ -34,25 +63,7 @@ local scheduledSyncs = {}
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
     if isLibraryLoaded then
-        local clientPlayer = source
-        thread:create(function(cThread)
-            for i, j in imports.pairs(availableAssetPacks) do
-                for k, v in imports.pairs(j.assetPack) do
-                    if k ~= "rwDatas" then
-                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssetPackChunk", 125000, false, clientPlayer, i, k, v)
-                    else
-                        for x, y in imports.pairs(v) do
-                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssetPackChunk", 125000, false, clientPlayer, i, k, _, x, y)
-                            thread.pause()
-                        end
-                    end
-                    thread.pause()
-                end
-            end
-        end):resume({
-            executions = 5,
-            frames = 1
-        })
+        syncAssetPack(source)
     else
         scheduledSyncs[source] = true
     end
