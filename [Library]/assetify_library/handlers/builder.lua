@@ -25,9 +25,7 @@ local imports = {
 -------------------
 
 isLibraryLoaded = false
-
 availableAssetPacks = {
-
     ["weapon"] = {
         reference = {
             root = "files/assets/weapons/",
@@ -35,7 +33,6 @@ availableAssetPacks = {
             asset = "asset"
         }
     }
-
 }
 
 
@@ -53,7 +50,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
             end)
             thread.pause()
         end
+        isLibraryLoaded = true
     end):resume()
-    isLibraryLoaded = true
 
 end)
