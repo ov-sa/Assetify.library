@@ -1,11 +1,11 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: loader: client.lua
+     Script: utilities: client.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
      DOC: 19/10/2021 (OvileAmriam)
-     Desc: Library Loader ]]--
+     Desc: Client Sided Utilities ]]--
 ----------------------------------------------------------------
 
 
@@ -29,11 +29,11 @@ local imports = {
 }
 
 
----------------------------------
---[[ Function: Loads Chunk's ]]--
----------------------------------
+---------------------------------------
+--[[ Function: Loads Asset's Chunk ]]--
+---------------------------------------
 
-function loadChunk(chunkData, callback)
+function loadAssetChunk(chunkData, callback)
 
     local loadState = false
     if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then

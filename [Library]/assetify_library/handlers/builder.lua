@@ -1,11 +1,11 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: loader: server.lua
+     Script: handlers: builder.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
      DOC: 19/10/2021 (OvileAmriam)
-     Desc: Library Loader ]]--
+     Desc: Library Builder ]]--
 ----------------------------------------------------------------
 
 
@@ -15,7 +15,8 @@
 
 local imports = {
     pairs = pairs,
-    addEventHandler = addEventHandler
+    addEventHandler = addEventHandler,
+    buildAssetPack = buildAssetPack
 }
 
 
@@ -24,21 +25,18 @@ local imports = {
 -------------------
 
 isLibraryLoaded = false
+
 availableAssetPacks = {
+
     ["weapon"] = {
         reference = {
             root = "files/assets/weapons/",
             manifest = "manifest",
             asset = "asset"
-        },
-    
-        datas = {
-            manifestData = false,
-            rwDatas = {}
         }
     }
+
 }
-builtAssetPacks = {}
 
 
 ----------------------------------
@@ -47,12 +45,15 @@ builtAssetPacks = {}
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
 
-    for i, j in imports.pairs(availableAssetPacks) do
-        buildPack(j, function(buildState)
-            print("LOADED?")
-            builtAssetPacks["weapon"] = buildData
-        end)
-        isLibraryLoaded = true
-    end
+    thread:create(function(cThread)
+        for i, j in imports.pairs(availableAssetPacks) do
+            imports.buildAssetPack(j, function(assetPack)
+                j.assetPack = assetPack
+                cThread:resume()
+            end)
+            thread.pause()
+        end
+    end):resume()
+    isLibraryLoaded = true
 
 end)

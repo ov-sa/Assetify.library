@@ -27,6 +27,12 @@ local imports = {
 
 function buildAssetPack(assetPack, callback)
 
+    if not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
+
+    assetPack.datas = {
+        manifestData = false,
+        rwDatas = {}
+    }
     assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
     assetPack.datas.manifestData = (assetPack.datas.manifestData and imports.fromJSON(assetPack.datas.manifestData)) or false
 
