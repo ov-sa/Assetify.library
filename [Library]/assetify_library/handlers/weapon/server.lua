@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    type = type,
     fromJSON = fromJSON,
     setTimer = setTimer,
     fetchFileData = fetchFileData
@@ -26,9 +27,9 @@ local imports = {
 
 local assetPack = {
     reference = {
-        assetRootPath = "files/assets/weapons/",
-        manifestFileName = "manifest",
-        assetFileName = "asset"
+        root = "files/assets/weapons/",
+        manifest = "manifest",
+        asset = "asset"
     },
 
     datas = {
@@ -38,21 +39,22 @@ local assetPack = {
 }
 
 
-----------------------------------
---[[ Event: On Resource Start ]]--
-----------------------------------
+--------------------------------------
+--[[ Function: Builds Weapon Pack ]]--
+--------------------------------------
 
-function loadWeapons()
+function buildWeaponPack(callback)
 
-    assetPack.manifestData = imports.fetchFileData((assetPack.reference.assetRootPath)..(assetPack.reference.manifestFileName)..".json")
+    assetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
     assetPack.manifestData = (assetPack.manifestData and imports.fromJSON(assetPack.manifestData)) or false
 
     if assetPack.manifestData then
         thread:create(function(cThread)
+            local callbackReference = callback
             for i = 1, #assetPack.manifestData, 1 do
-                local assetReference = assetPack.manifestData[i]
-                local assetPath = (assetPack.reference.assetRootPath)..assetReference.."/"
-                local assetData = imports.fetchFileData(assetPath..(assetPack.reference.assetFileName)..".json")
+                local asset = assetPack.manifestData[i]
+                local assetPath = (assetPack.reference.root)..asset.."/"
+                local assetData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
                 assetData = (assetData and imports.fromJSON(assetData)) or false
                 if not assetData then
                     assetPack.datas.rwDatas[assetPath] = false
@@ -71,15 +73,15 @@ function loadWeapons()
                 end, 1, 1)
                 thread.pause()
             end
-            print("LOADED ASSETS")
+            if callbackReference and imports.type(callbackReference) == "function" then
+                callbackReference(true)
+            end
         end):resume()
+        return true
     end
-    return (assetPack.manifestData and true) or false
+    if callbackReference and imports.type(callbackReference) == "function" then
+        callbackReference(false)
+    end
+    return false
 
 end
-
-addEventHandler("onResourceStart", resourceRoot, function()
-
-    loadWeapons()
-
-end)
