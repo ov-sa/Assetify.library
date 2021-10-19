@@ -10,6 +10,7 @@
 
     <!-- Handlers -->
     <script src="handlers/initializer/loader.lua" type="client" cache="false"/>
+    <script src="handlers/initializer/syncer.lua" type="server"/>
     <!--script src="handlers/mapLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/pedLoader.lua" type="client" cache="false"/-->
     <!--script src="handlers/weaponLoader.lua" type="client" cache="false"/-->
@@ -18,7 +19,7 @@
     <!-- Files: Assets: Characters -->
 
     <!-- Files: Assets: Weapons -->
-    <file src="files/assets/weapons/ak47_gold/config.json"/>
+    <weapon src="ak47_gold/config.json"/>
 
     <!-- Files: Assets: Vehicles -->
 
