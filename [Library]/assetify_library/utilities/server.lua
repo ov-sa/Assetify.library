@@ -17,15 +17,15 @@ local imports = {
     type = type,
     fromJSON = fromJSON,
     setTimer = setTimer,
-    fetchFileData = fetchFileData,
+    fetchFileData = fetchFileData
 }
 
 
---------------------------------------
---[[ Function: Builds Weapon Pack ]]--
---------------------------------------
+-------------------------------------
+--[[ Function: Builds Asset Pack ]]--
+-------------------------------------
 
-function buildPack(assetPack, callback)
+function buildAssetPack(assetPack, callback)
 
     assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
     assetPack.datas.manifestData = (assetPack.datas.manifestData and imports.fromJSON(assetPack.datas.manifestData)) or false
@@ -34,8 +34,8 @@ function buildPack(assetPack, callback)
         thread:create(function(cThread)
             local callbackReference = callback
             for i = 1, #assetPack.datas.manifestData, 1 do
-                local asset = assetPack.datas.manifestData[i]
-                local assetPath = (assetPack.reference.root)..asset.."/"
+                local assetReference = assetPack.datas.manifestData[i]
+                local assetPath = (assetPack.reference.root)..assetReference.."/"
                 local assetData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
                 assetData = (assetData and imports.fromJSON(assetData)) or false
                 if not assetData then
@@ -44,9 +44,9 @@ function buildPack(assetPack, callback)
                     assetPack.datas.rwDatas[assetPath] = {
                         assetData = assetData,
                         rwData = {
-                            txd = imports.fetchFileData(assetPath.."asset.txd"),
-                            dff = imports.fetchFileData(assetPath.."asset.dff"),
-                            col = imports.fetchFileData(assetPath.."asset.col")
+                            txd = imports.fetchFileData(assetPath..assetPack.reference.asset..".txd"),
+                            dff = imports.fetchFileData(assetPath..assetPack.reference.asset..".dff"),
+                            col = imports.fetchFileData(assetPath..assetPack.reference.asset..".col")
                         }
                     }
                 end

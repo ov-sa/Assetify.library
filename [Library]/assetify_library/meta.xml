@@ -14,7 +14,6 @@
     <script src="utilities/server.lua" type="server"/>
 
     <!-- Handlers -->
-    <script src="handlers/weapon/server.lua" type="server"/>
     <!--script src="handlers/weapon/client.lua" type="client" cache="false"/-->
     <script src="handlers/loader/client.lua" type="client" cache="false"/>
     <script src="handlers/loader/server.lua" type="server"/>
