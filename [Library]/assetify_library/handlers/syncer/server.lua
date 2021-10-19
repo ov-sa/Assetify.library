@@ -39,10 +39,10 @@ imports.addEventHandler("onPlayerResourceStart", root, function()
             for i, j in imports.pairs(availableAssetPacks) do
                 for k, v in imports.pairs(j.assetPack) do
                     if k ~= "rwDatas" then
-                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 125000, false, clientPlayer, i, k, v)
+                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssetChunk", 125000, false, clientPlayer, i, k, v)
                     else
                         for x, y in imports.pairs(v) do
-                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 125000, false, clientPlayer, i, k, _, x, y)
+                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssetChunk", 125000, false, clientPlayer, i, k, _, x, y)
                             thread.pause()
                         end
                     end
