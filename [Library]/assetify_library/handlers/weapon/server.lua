@@ -28,3 +28,25 @@ addEventHandler("onResourceStart", resourceRoot, function()
     print("STARTED WEAPON: ASSETIFY 1")
 
 end)
+
+
+--[[
+function callBackTest(threadReference, index)
+
+    print("WOW: "..index)
+    setTimer(function()
+        threadReference:resume()
+    end, 1, 1)
+
+end
+
+threadInstance = thread:create(function(threadReference)
+    for i = 1, 5000 do
+        callBackTest(threadReference, i)
+        thread.pause()
+    end
+    imports.collectgarbage()
+end)
+
+threadInstance:resume()
+]]

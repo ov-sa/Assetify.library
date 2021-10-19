@@ -8,8 +8,9 @@
     <script src="exports/pedExport.lua" type="client" cache="false"/>
     <script src="exports/weaponExport.lua" type="client" cache="false"/-->
 
-    <!-- Settings & Utilities -->
+    <!-- Utilities -->
     <script src="utilities/server.lua" type="server"/>
+    <script src="utilities/thread.lua" type="shared" cache="false"/>
 
     <!-- Handlers -->
     <script src="handlers/initializer/loader.lua" type="client" cache="false"/>
