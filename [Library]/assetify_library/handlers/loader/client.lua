@@ -40,9 +40,9 @@ function loadChunk(chunkData, callback)
         rwModelID = imports.engineRequestModel(chunkData.type, chunkData.id)
         if rwModelID then
             local rwFiles = {}
-            rwFiles.txd = (imports.isElement(chunkData.rwData.txd) or imports.engineLoadTXD(chunkData.rwData.txd)) or false
-            rwFiles.dff = (imports.isElement(chunkData.rwData.dff) or imports.engineLoadDFF(chunkData.rwData.dff)) or false
-            rwFiles.col = (imports.isElement(chunkData.rwData.col) or imports.engineLoadCOL(chunkData.rwData.col)) or false
+            rwFiles.txd = (imports.isElement(chunkData.rwData.txd) and chunkData.rwData.txd) or imports.engineLoadTXD(chunkData.rwData.txd) or false
+            rwFiles.dff = (imports.isElement(chunkData.rwData.dff) and chunkData.rwData.dff) or imports.engineLoadDFF(chunkData.rwData.dff) or false
+            rwFiles.col = (imports.isElement(chunkData.rwData.col) and chunkData.rwData.col) or imports.engineLoadCOL(chunkData.rwData.col) or false
             if rwFiles.dff then
                 if rwFiles.txd then
                     imports.engineImportTXD(rwModelID, rwFiles.txd)
