@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    pairs = pairs,
     addEventHandler = addEventHandler
 }
 
@@ -23,6 +24,20 @@ local imports = {
 -------------------
 
 isLibraryLoaded = false
+availableAssetPacks = {
+    ["weapon"] = {
+        reference = {
+            root = "files/assets/weapons/",
+            manifest = "manifest",
+            asset = "asset"
+        },
+    
+        datas = {
+            manifestData = false,
+            rwDatas = {}
+        }
+    }
+}
 builtAssetPacks = {}
 
 
@@ -32,9 +47,12 @@ builtAssetPacks = {}
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
 
-    buildWeaponPack(function(buildData)
-        builtAssetPacks["weapon"] = buildData
+    for i, j in imports.pairs(availableAssetPacks) do
+        buildPack(j, function(buildState)
+            print("LOADED?")
+            builtAssetPacks["weapon"] = buildData
+        end)
         isLibraryLoaded = true
-    end)
+    end
 
 end)
