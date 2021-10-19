@@ -15,6 +15,7 @@
 
 local imports = {
     fromJSON = fromJSON,
+    setTimer = setTimer,
     fetchFileData = fetchFileData
 }
 
@@ -25,9 +26,9 @@ local imports = {
 
 local assetPack = {
     reference = {
-        packPath = "files/assets/weapons/",
-        manifestPath = "manifest.json",
-        assetPath = "asset.json"
+        assetRootPath = "files/assets/weapons/",
+        manifestFileName = "manifest",
+        assetFileName = "asset"
     },
 
     datas = {
@@ -43,27 +44,35 @@ local assetPack = {
 
 function loadWeapons()
 
-    assetPack.manifestData = imports.fetchFileData(assetPack.reference.packPath..assetPack.reference.manifestPath)
+    assetPack.manifestData = imports.fetchFileData((assetPack.reference.assetRootPath)..(assetPack.reference.manifestFileName)..".json")
     assetPack.manifestData = (assetPack.manifestData and imports.fromJSON(assetPack.manifestData)) or false
 
     if assetPack.manifestData then
-        for i = 1, #assetPack.manifestData, 1 do
-            local assetPath = assetPack.manifestData[i]
-            local assetData = imports.fetchFileData((assetPack.reference.packPath)..assetPath.."/"..(assetPack.reference.assetPath))
-            assetData = (assetData and imports.fromJSON(assetData)) or false
-            if not assetData then
-                assetPack.datas.rwDatas[assetPath] = false
-            else
-                assetPack.datas.rwDatas[assetPath] = {
-                    rwData = {
-                        txd = false,
-                        dff = false,
-                        col = false
+        thread:create(function(cThread)
+            for i = 1, #assetPack.manifestData, 1 do
+                local assetReference = assetPack.manifestData[i]
+                local assetPath = (assetPack.reference.assetRootPath)..assetReference.."/"
+                local assetData = imports.fetchFileData(assetPath..(assetPack.reference.assetFileName)..".json")
+                assetData = (assetData and imports.fromJSON(assetData)) or false
+                if not assetData then
+                    assetPack.datas.rwDatas[assetPath] = false
+                else
+                    assetPack.datas.rwDatas[assetPath] = {
+                        assetData = assetData,
+                        rwData = {
+                            txd = imports.fetchFileData(assetPath.."asset.txd"),
+                            dff = imports.fetchFileData(assetPath.."asset.dff"),
+                            col = imports.fetchFileData(assetPath.."asset.col")
+                        }
                     }
-                }
-                print("LOAD FILE..: "..assetPath)
+                end
+                imports.setTimer(function()
+                    cThread:resume()
+                end, 1, 1)
+                thread.pause()
             end
-        end
+            print("LOADED ASSETS")
+        end):resume()
     end
     return (assetPack.manifestData and true) or false
 
@@ -74,26 +83,3 @@ addEventHandler("onResourceStart", resourceRoot, function()
     loadWeapons()
 
 end)
-
-
-
---[[
-function callBackTest(threadReference, index)
-
-    print("WOW: "..index)
-    setTimer(function()
-        threadReference:resume()
-    end, 1, 1)
-
-end
-
-threadInstance = thread:create(function(threadReference)
-    for i = 1, 5000 do
-        callBackTest(threadReference, i)
-        thread.pause()
-    end
-    imports.collectgarbage()
-end)
-
-threadInstance:resume()
-]]
