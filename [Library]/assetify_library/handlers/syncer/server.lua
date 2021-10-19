@@ -24,12 +24,12 @@ local imports = {
 --[[ Variables ]]--
 -------------------
 
-local scheduledPlayers = {}
+local scheduledSyncs = {}
 
 
------------------------------------------
---[[ Event: On Player Resource Start ]]--
------------------------------------------
+-----------------------------------------------
+--[[ Events: On Player Resource-Start/Quit ]]--
+-----------------------------------------------
 
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
@@ -39,10 +39,10 @@ imports.addEventHandler("onPlayerResourceStart", root, function()
             for i, j in imports.pairs(availableAssetPacks) do
                 for k, v in imports.pairs(j.assetPack) do
                     if k ~= "rwDatas" then
-                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 100000, false, clientPlayer, i, k, v)
+                        imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 125000, false, clientPlayer, i, k, v)
                     else
                         for x, y in imports.pairs(v) do
-                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 100000, false, clientPlayer, i, k, _, x, y)
+                            imports.triggerLatentClientEvent(clientPlayer, "onClientRecieveAssets", 125000, false, clientPlayer, i, k, _, x, y)
                             thread.pause()
                         end
                     end
@@ -54,7 +54,13 @@ imports.addEventHandler("onPlayerResourceStart", root, function()
             frames = 1
         })
     else
-        scheduledPlayers[source] = true
+        scheduledSyncs[source] = true
     end
+
+end)
+
+imports.addEventHandler("onPlayerQuit", root, function()
+
+    scheduledSyncs[source] = nil
 
 end)
