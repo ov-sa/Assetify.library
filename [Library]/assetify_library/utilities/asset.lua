@@ -16,6 +16,10 @@
 local imports = {
     type = type,
     pairs = pairs,
+    split = split,
+    gettok = gettok,
+    tonumber = tonumber,
+    tostring = tostring,
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
@@ -29,7 +33,10 @@ local imports = {
     engineLoadCOL = engineLoadCOL,
     engineImportTXD = engineImportTXD,
     engineReplaceModel = engineReplaceModel,
-    engineReplaceCOL = engineReplaceCOL
+    engineReplaceCOL = engineReplaceCOL,
+    string = {
+        byte = string.byte
+    }
 }
 
 
@@ -37,7 +44,11 @@ local imports = {
 --[[ Class: Asset ]]--
 ----------------------
 
-asset = {}
+asset = {
+    separators = {
+        IPL = imports.string.byte(',')
+    }
+}
 asset.__index = asset
 
 function asset:create(assetType, assetBase, assetTransparency, assetData, callback)
@@ -100,11 +111,6 @@ end
 
 if not localPlayer then
 
-    function asset:parseIPL(IPL)
-        print("Trying to load scene..")
-        print(IPL)
-    end
-
     function asset:buildPack(assetType, assetPack, callback)
 
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
@@ -134,15 +140,28 @@ if not localPlayer then
                             manifestData = assetManifestData
                         }
                         if assetType == "scene" then
-                            local sceneManifestData = imports.fetchFileData(assetPath..(assetPack.reference.scene)..".ipl") or false
-                            sceneManifestData = asset:parseIPL(sceneManifestData) or false
-                            --TODO:PARSE MANIFEST.. 
+                            local sceneManifestData = imports.fetchFileData(assetPath..(assetPack.reference.scene)..".ipl")
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {
                                     txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
-                                    children = {}
+                                    rwDatas = {}
                                 }
-                                --print("Trying to load scene..")
+                                local unparsedDatas = imports.split(sceneManifestData, "\n")
+                                for i = 1, #unparsedDatas, 1 do
+                                    cAssetPack.rwDatas[assetReference].rwData.rwDatas[imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL))] = {
+                                        position = {
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                        },
+                                        rotation = {
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
+                                        }
+                                    }
+                                end
+                                print("Trying to load scene..")
                             end
                         else
                             cAssetPack.rwDatas[assetReference].rwData = {
