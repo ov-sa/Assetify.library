@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    pairs = pairs,
     addEvent = addEvent,
     addEventHandler = addEventHandler
 }
@@ -52,10 +53,26 @@ end)
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
 
-    --TODO: LATER CONNECT THIS
     --print(chunkData.rwData.txd)
     thread:create(function(cThread)
-        
-    end)
+        for i, j in imports.pairs(availableAssetPacks) do
+            if i ~= "map" then
+                loadAssetPack(j, function()
+                    outputChatBox("LOADED A PACK FOR NOW!")
+                end)
+                    --[[
+                    if i ~= "rwDatas" then
+                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, i, v)
+                    else
+                        for k, v in imports.pairs(v) do
+                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, i, _, k, v)
+                            thread.pause()
+                        end
+                    end
+                    ]]
+                thread.pause()
+            end
+        end
+    end):resume()
 
 end)

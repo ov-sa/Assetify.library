@@ -29,12 +29,17 @@ local imports = {
 }
 
 
----------------------------------------
---[[ Function: Loads Asset's Chunk ]]--
----------------------------------------
+------------------------------------
+--[[ Function: Loads Asset Pack ]]--
+------------------------------------
 
-function loadAssetChunk(chunkData, callback)
+function loadAssetPack(assetPack, callback)
 
+    if not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
+
+    --TODO: ..
+    outputChatBox("TRYING TO LOAD ASSET PACK!!")
+    --[[
     local loadState = false
     if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then
         rwModelID = imports.engineRequestModel(chunkData.type, chunkData.id)
@@ -67,6 +72,6 @@ function loadAssetChunk(chunkData, callback)
             end
         end
     end
-    return loadState
+    return loadState]]
 
 end
