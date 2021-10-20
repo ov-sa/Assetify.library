@@ -53,9 +53,8 @@ asset.__index = asset
 
 function asset:create(...)
 
-    local parameters = {...}
     local cAsset = imports.setmetatable({}, {__index = self})
-    if not cAsset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback) then
+    if not cAsset:load(...) then
         cAsset = nil
         return false
     end
