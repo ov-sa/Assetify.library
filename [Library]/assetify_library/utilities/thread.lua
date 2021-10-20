@@ -16,10 +16,10 @@
 local imports = {
     type = type,
     tonumber = tonumber,
-    isElement = isElement,
     setmetatable = setmetatable,
     collectgarbage = collectgarbage,
     setTimer = setTimer,
+    isTimer = isTimer,
     killTimer = killTimer,
     coroutine = {
         create = coroutine.create,
@@ -51,7 +51,7 @@ end
 
 function thread:destroy()
 
-    if self.timer and imports.isElement(self.timer) then
+    if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end
     self.thread = nil
@@ -62,7 +62,11 @@ end
 
 function thread:status()
 
-    return imports.coroutine.status(self.thread)
+    if not self.thread then
+        return "dead"
+    else
+        return imports.coroutine.status(self.thread)
+    end
 
 end
 
@@ -78,6 +82,7 @@ function thread:resume(syncRate)
                 for i = 1, self.syncRate.executions, 1 do
                     status = self:status()
                     if status == "dead" then
+                        print("DESTROYING 1")
                         self:destroy()
                         return
                     end
@@ -86,12 +91,13 @@ function thread:resume(syncRate)
             end
             status = self:status()
             if status == "dead" then
+                print("DESTROYING 2")
                 self:destroy()
             end
         end, self.syncRate.frames, 0)
     else
         imports.coroutine.resume(self.thread, self)
-        if self.timer and imports.isElement(self.timer) then
+        if self.timer and imports.isTimer(self.timer) then
             imports.killTimer(self.timer)
         end
         local status = self:status()
