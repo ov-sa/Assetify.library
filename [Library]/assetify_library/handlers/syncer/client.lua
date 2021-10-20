@@ -57,12 +57,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
                 for k, v in imports.pairs(j.rwDatas) do
-                    local chunkData = {
-                        type = "object",
-                        id = nil,
-                        rwData = v.rwData
-                    }
-                    asset:create(chunkData, function(assetReference)
+                    asset:create(v, function(assetReference)
                         cThread:resume()
                     end)
                     thread.pause()

@@ -29,7 +29,9 @@ availableAssetPacks = {
         reference = {
             root = "files/assets/weapons/",
             manifest = "manifest",
-            asset = "asset"
+            asset = "asset",
+            type = "object",
+            base = 355
         }
     }
 }

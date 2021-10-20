@@ -40,29 +40,29 @@ local imports = {
 asset = {}
 asset.__index = asset
 
-function asset:create(chunkData, callback)
+function asset:create(assetData, callback)
 
-    if not chunkData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local createdAsset = imports.setmetatable({}, {__index = self})
-    chunkData.assetReference = createdAsset
-    createdAsset:load(chunkData, callback)
+    assetData.cAsset = createdAsset
+    createdAsset:load(assetData, callback)
     return createdAsset
 
 end
 
-function asset:load(chunkData, callback)
+function asset:load(assetData, callback)
 
-    if not chunkData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local loadState = false
-    if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then
-        rwModelID = imports.engineRequestModel(chunkData.type, chunkData.id)
+    if assetData.rwData.txd and assetData.rwData.dff then
+        rwModelID = imports.engineRequestModel(assetData.type, assetData.manifestData.assetBase or assetData.base or nil)
         if rwModelID then
             local rwFiles = {}
-            rwFiles.txd = (chunkData.rwData.txd and ((imports.isElement(chunkData.rwData.txd) and chunkData.rwData.txd) or imports.engineLoadTXD(chunkData.rwData.txd))) or false
-            rwFiles.dff = (chunkData.rwData.dff and ((imports.isElement(chunkData.rwData.dff) and chunkData.rwData.dff) or imports.engineLoadDFF(chunkData.rwData.dff))) or false
-            rwFiles.col = (chunkData.rwData.col and ((imports.isElement(chunkData.rwData.col) and chunkData.rwData.col) or imports.engineLoadCOL(chunkData.rwData.col))) or false
+            rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
+            rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
+            rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
             if rwFiles.dff then
                 if rwFiles.txd then
                     imports.engineImportTXD(rwFiles.txd, rwModelID)
@@ -100,6 +100,7 @@ if not localPlayer then
 
         assetPack.datas = {
             manifestData = false,
+            type = assetPack.reference.type,
             rwDatas = {}
         }
         assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
