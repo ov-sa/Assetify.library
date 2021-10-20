@@ -144,11 +144,16 @@ if not localPlayer then
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {
                                     txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
-                                    rwDatas = {}
+                                    children = {}
                                 }
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for i = 1, #unparsedDatas, 1 do
-                                    cAssetPack.rwDatas[assetReference].rwData.rwDatas[imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL))] = {
+                                    local childName = imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL))
+                                    cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
+                                        rwData = {
+                                            dff = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/dff/"..childName..".dff"),
+                                            col = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/col/"..childName..".col")
+                                        },
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
                                             y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
@@ -160,8 +165,11 @@ if not localPlayer then
                                             z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
                                         }
                                     }
+                                    imports.setTimer(function()
+                                        cThread:resume()
+                                    end, 1, 1)
+                                    thread.pause()
                                 end
-                                print("Trying to load scene..")
                             end
                         else
                             cAssetPack.rwDatas[assetReference].rwData = {
