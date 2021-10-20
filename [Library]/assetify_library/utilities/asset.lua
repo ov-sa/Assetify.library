@@ -100,6 +100,11 @@ end
 
 if not localPlayer then
 
+    function asset:parseIPL(IPL)
+        print("Trying to load scene..")
+        print(IPL)
+    end
+
     function asset:buildPack(assetType, assetPack, callback)
 
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
@@ -125,16 +130,25 @@ if not localPlayer then
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
+                        cAssetPack.rwDatas[assetReference] = {
+                            manifestData = assetManifestData
+                        }
                         if assetType == "scene" then
-                            print("Trying to load scene..")
-                        else
-                            cAssetPack.rwDatas[assetReference] = {
-                                manifestData = assetManifestData,
-                                rwData = {
+                            local sceneManifestData = imports.fetchFileData(assetPath..(assetPack.reference.scene)..".ipl") or false
+                            sceneManifestData = asset:parseIPL(sceneManifestData) or false
+                            --TODO:PARSE MANIFEST.. 
+                            if sceneManifestData then
+                                cAssetPack.rwDatas[assetReference].rwData = {
                                     txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
-                                    dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
-                                    col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
+                                    children = {}
                                 }
+                                --print("Trying to load scene..")
+                            end
+                        else
+                            cAssetPack.rwDatas[assetReference].rwData = {
+                                txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
+                                dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
+                                col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
                             }
                         end
                     end
