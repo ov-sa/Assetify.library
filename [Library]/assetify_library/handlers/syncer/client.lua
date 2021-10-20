@@ -18,6 +18,7 @@ local imports = {
     setTimer = setTimer,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
+    triggerEvent = triggerEvent
 }
 
 
@@ -27,6 +28,8 @@ local imports = {
 
 isLibraryLoaded = false
 availableAssetPacks = {}
+imports.addEvent("onAssetifyLoad", false)
+imports.addEvent("onAssetifyUnLoad", false)
 
 
 ---------------------------------------------------
@@ -35,12 +38,10 @@ availableAssetPacks = {}
 
 imports.addEvent("onClientRecieveAssetPack", true)
 imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, chunkIndex, chunkData)
-
     if not assetPack or not dataIndex then return false end
     if not availableAssetPacks[assetPack] then
         availableAssetPacks[assetPack] = {}
     end
-
     if dataIndex then
         if not chunkIndex and not chunkData then
             availableAssetPacks[assetPack][dataIndex] = indexData
@@ -49,13 +50,10 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
             availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
         end
     end
-
 end)
-
 
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
-
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
@@ -73,7 +71,10 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
                 end
             end
         end
-        isLibraryLoaded = true
+        onLibraryLoaded()
     end):resume()
+end)
 
+imports.addEventHandler("onClientResourceStop", resourceRoot, function()
+    imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
 end)
