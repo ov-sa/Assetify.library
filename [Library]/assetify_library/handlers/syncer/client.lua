@@ -41,13 +41,13 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
         availableAssetPacks[assetPack] = {}
     end
 
-    if not chunkIndex and not chunkData then
-        if dataIndex then
+    if dataIndex then
+        if not chunkIndex and not chunkData then
             availableAssetPacks[assetPack][dataIndex] = indexData
+        else
+            availableAssetPacks[assetPack][dataIndex] = {}
+            availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
         end
-    else
-        availableAssetPacks[assetPack][dataIndex] = {}
-        availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
     end
 
 end)
