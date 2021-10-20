@@ -82,7 +82,6 @@ function thread:resume(syncRate)
                 for i = 1, self.syncRate.executions, 1 do
                     status = self:status()
                     if status == "dead" then
-                        print("DESTROYING 1")
                         self:destroy()
                         return
                     end
@@ -91,7 +90,6 @@ function thread:resume(syncRate)
             end
             status = self:status()
             if status == "dead" then
-                print("DESTROYING 2")
                 self:destroy()
             end
         end, self.syncRate.frames, 0)

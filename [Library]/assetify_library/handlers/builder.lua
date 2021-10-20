@@ -31,7 +31,8 @@ availableAssetPacks = {
             manifest = "manifest",
             asset = "asset",
             type = "object",
-            base = 355
+            base = 1337,
+            transparency = false
         }
     }
 }

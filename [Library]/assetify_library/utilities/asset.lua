@@ -40,24 +40,24 @@ local imports = {
 asset = {}
 asset.__index = asset
 
-function asset:create(assetType, assetData, callback)
+function asset:create(assetType, assetBase, assetTransparency, assetData, callback)
 
     if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local createdAsset = imports.setmetatable({}, {__index = self})
     assetData.cAsset = createdAsset
-    createdAsset:load(assetType, assetData, callback)
+    createdAsset:load(assetType, assetBase, assetTransparency, assetData, callback)
     return createdAsset
 
 end
 
-function asset:load(assetType, assetData, callback)
+function asset:load(assetType, assetBase, assetTransparency, assetData, callback)
 
     if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local loadState = false
     if assetData.rwData.txd and assetData.rwData.dff then
-        local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetData.base or nil)
+        local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
         if modelID then
             local rwFiles = {}
             rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
@@ -67,7 +67,7 @@ function asset:load(assetType, assetData, callback)
                 if rwFiles.txd then
                     imports.engineImportTXD(rwFiles.txd, modelID)
                 end
-                imports.engineReplaceModel(rwFiles.dff, modelID)
+                imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetTransparency)
                 if rwFiles.col then
                     imports.engineReplaceCOL(rwFiles.col, modelID)
                 end
@@ -84,6 +84,7 @@ function asset:load(assetType, assetData, callback)
                 self.modelID = modelID
                 self.rwFiles = rwFiles
                 loadState = true
+                outputChatBox("LOADED MODEL!")
             end
         end
     end
@@ -101,6 +102,8 @@ if not localPlayer then
         assetPack.datas = {
             manifestData = false,
             type = assetPack.reference.type,
+            base = assetPack.reference.base,
+            transparency = assetPack.reference.transparency,
             rwDatas = {}
         }
         assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
