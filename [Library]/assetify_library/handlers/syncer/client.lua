@@ -61,14 +61,14 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
                     if v then
                         if i == "scene" then
                             for x, y in imports.pairs(v.rwData.children) do
-                                asset:create(i, j.type, j.base, j.transparency, y, function(cAsset)
+                                asset:create(i, j.type, j.base, j.transparency, y, v.rwData, function(cAsset)
                                     imports.setTimer(function()
                                         cThread:resume()
                                     end, 1, 1)
                                 end)
                             end
                         else
-                            asset:create(i, j.type, j.base, j.transparency, v, function(cAsset)
+                            asset:create(i, j.type, j.base, j.transparency, v, nil, function(cAsset)
                                 imports.setTimer(function()
                                     cThread:resume()
                                 end, 1, 1)

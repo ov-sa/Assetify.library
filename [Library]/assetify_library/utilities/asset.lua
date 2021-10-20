@@ -62,53 +62,60 @@ function asset:create(...)
 
 end
 
-function asset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
+function asset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, sceneReference, callback)
 
     if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
-    local loadState = false
-    if assetPackType == "scene" then
-        print("Trying to load scene")
-    else
-        if assetData.rwData.txd and assetData.rwData.dff then
-            local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
-            if modelID then
-                local rwFiles = {}
-                rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
-                rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
-                rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
-                if rwFiles.dff then
-                    if rwFiles.txd then
-                        imports.engineImportTXD(rwFiles.txd, modelID)
+    local primary_rwFiles, secondary_rwFiles = nil, nil
+    local modelID = false
+    if assetData.rwData.dff then
+        modelID = imports.engineRequestModel(assetType, (sceneReference and sceneReference.manifestData and sceneReference.manifestData.assetBase and (imports.type(sceneReference.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
+        if modelID then
+            primary_rwFiles = {}
+            primary_rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
+            primary_rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
+            if not primary_rwFiles.dff then
+                imports.engineFreeModel(modelID)
+                for i, j in imports.pairs(primary_rwFiles) do
+                    if j and imports.isElement(j) then
+                        imports.destroyElement(j)
                     end
-                    imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetTransparency)
-                    if rwFiles.col then
-                        imports.engineReplaceCOL(rwFiles.col, modelID)
-                    end
-                else
-                    imports.engineFreeModel(modelID)
-                    for i, j in imports.pairs(rwFiles) do
-                        if j and imports.isElement(j) then
-                            imports.destroyElement(j)
-                        end
-                    end
-                    rwFiles = nil
                 end
-                if rwFiles then
-                    assetData.cAsset = self
-                    self.cData = assetData
-                    self.syncedData = {
-                        modelID = modelID
-                    }
-                    self.unsyncedData = {
-                        rwFiles = rwFiles
-                    }
-                    assetData.cData = syncedData
-                    loadState = true
-                end
+                primary_rwFiles = nil
             end
         end
     end
+
+    if primary_rwFiles then
+        if assetPackType == "scene" then
+            secondary_rwFiles = {}
+            secondary_rwFiles.txd = (sceneReference and sceneReference.txd and ((imports.isElement(sceneReference.txd) and sceneReference.txd) or imports.engineLoadTXD(sceneReference.txd))) or false
+            if secondary_rwFiles.txd then
+                imports.engineImportTXD(secondary_rwFiles.txd, modelID)
+            end
+        else
+            primary_rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
+            if primary_rwFiles.txd then
+                imports.engineImportTXD(primary_rwFiles.txd, modelID)
+            end
+        end
+        imports.engineReplaceModel(primary_rwFiles.dff, modelID, (sceneReference and sceneReference.manifestData.assetTransparency and true) or (assetData.manifestData.assetTransparency and true) or assetTransparency)
+        if primary_rwFiles.col then
+            imports.engineReplaceCOL(primary_rwFiles.col, modelID)
+        end
+
+        assetData.cAsset = self
+        self.cData = assetData
+        self.syncedData = {
+            modelID = modelID
+        }
+        self.unsyncedData = {
+            primary_rwFiles = primary_rwFiles
+        }
+        assetData.cData = syncedData
+        loadState = true
+    end
+    local loadState = (primary_rwFiles and true) or false
     callback(loadState)
     return loadState
 
