@@ -27,16 +27,32 @@ availableAssetPacks = {}
 
 
 ---------------------------------------------------
---[[ Event: On Client Recieve Asset Pack Chunk ]]--
+--[[ Events: On Client Recieve/Load Asset Pack ]]--
 ---------------------------------------------------
 
-imports.addEvent("onClientRecieveAssetPackChunk", true)
-imports.addEventHandler("onClientRecieveAssetPackChunk", root, function(assetPack, assetType, assetData, chunkIndex, chunkData)
+imports.addEvent("onClientRecieveAssetPack", true)
+imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, chunkIndex, chunkData)
+
+    if not assetPack or not dataIndex then return false end
+    if not availableAssetPacks[assetPack] then
+        availableAssetPacks[assetPack] = {}
+    end
 
     if not chunkIndex and not chunkData then
-        outputChatBox("YOU HAVE RECIEVED SOME ASSETS! "..assetPack..", "..assetType..", "..tostring(assetData))
+        if dataIndex then
+            availableAssetPacks[assetPack][dataIndex] = indexData
+        end
     else
-        outputChatBox("YOU HAVE RECIEVED ASSET CHUNK! "..assetPack..", "..assetType..", "..chunkIndex)
+        availableAssetPacks[assetPack][dataIndex] = {}
+        availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
+        print(chunkData.rwData.txd)
     end
+
+end)
+
+imports.addEvent("onClientLoadAssetPack", true)
+imports.addEventHandler("onClientLoadAssetPack", root, function()
+
+    outputChatBox("LOADED ALL ASSET PACKS..")
 
 end)

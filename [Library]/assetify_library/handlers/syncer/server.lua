@@ -37,16 +37,17 @@ local function syncAssetPack(player)
         for i, j in imports.pairs(availableAssetPacks) do
             for k, v in imports.pairs(j.assetPack) do
                 if k ~= "rwDatas" then
-                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPackChunk", 125000, false, player, i, k, v)
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, v)
                 else
                     for x, y in imports.pairs(v) do
-                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPackChunk", 125000, false, player, i, k, _, x, y)
+                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, _, x, y)
                         thread.pause()
                     end
                 end
                 thread.pause()
             end
         end
+        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", 125000, false, player)
     end):resume({
         executions = 5,
         frames = 1
