@@ -117,6 +117,7 @@ if not localPlayer then
         if cAssetPack.manifestData then
             if assetType == "scene" then
                 --TODO: BUILDING SCENE
+                print("Trying to load scene")
             else
                 thread:create(function(cThread)
                     local callbackReference = callback
