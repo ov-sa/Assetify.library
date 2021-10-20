@@ -45,8 +45,6 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
     else
         availableAssetPacks[assetPack][dataIndex] = {}
         availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
-        --TODO: LATER CONNECT THIS
-        --print(chunkData.rwData.txd)
     end
 
 end)
@@ -54,6 +52,10 @@ end)
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
 
-    outputChatBox("LOADED ALL ASSET PACKS..")
+    --TODO: LATER CONNECT THIS
+    --print(chunkData.rwData.txd)
+    thread:create(function(cThread)
+        
+    end)
 
 end)
