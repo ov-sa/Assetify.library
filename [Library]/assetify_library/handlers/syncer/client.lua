@@ -57,7 +57,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
                 for k, v in imports.pairs(j.rwDatas) do
-                    asset:create(v, function(assetReference)
+                    asset:create(j.type, v, function(assetReference)
                         cThread:resume()
                     end)
                     thread.pause()

@@ -40,24 +40,24 @@ local imports = {
 asset = {}
 asset.__index = asset
 
-function asset:create(assetData, callback)
+function asset:create(assetType, assetData, callback)
 
-    if not assetData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local createdAsset = imports.setmetatable({}, {__index = self})
     assetData.cAsset = createdAsset
-    createdAsset:load(assetData, callback)
+    createdAsset:load(assetType, assetData, callback)
     return createdAsset
 
 end
 
-function asset:load(assetData, callback)
+function asset:load(assetType, assetData, callback)
 
-    if not assetData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local loadState = false
     if assetData.rwData.txd and assetData.rwData.dff then
-        local modelID = imports.engineRequestModel(assetData.type, ((imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetData.base or nil)
+        local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetData.base or nil)
         if modelID then
             local rwFiles = {}
             rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
@@ -105,20 +105,20 @@ if not localPlayer then
         }
         assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
         assetPack.datas.manifestData = (assetPack.datas.manifestData and imports.fromJSON(assetPack.datas.manifestData)) or false
-
+    
         if assetPack.datas.manifestData then
             thread:create(function(cThread)
                 local callbackReference = callback
                 for i = 1, #assetPack.datas.manifestData, 1 do
                     local assetReference = assetPack.datas.manifestData[i]
                     local assetPath = (assetPack.reference.root)..assetReference.."/"
-                    local assetData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
-                    assetData = (assetData and imports.fromJSON(assetData)) or false
-                    if not assetData then
+                    local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
+                    assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
+                    if not assetManifestData then
                         assetPack.datas.rwDatas[assetPath] = false
                     else
                         assetPack.datas.rwDatas[assetReference] = {
-                            assetData = assetData,
+                            manifestData = assetManifestData,
                             rwData = {
                                 txd = imports.fetchFileData(assetPath..assetPack.reference.asset..".txd"),
                                 dff = imports.fetchFileData(assetPath..assetPack.reference.asset..".dff"),
