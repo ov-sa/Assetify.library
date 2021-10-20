@@ -147,22 +147,22 @@ if not localPlayer then
                                     children = {}
                                 }
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
-                                for i = 1, #unparsedDatas, 1 do
-                                    local childName = imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL))
+                                for k = 1, #unparsedDatas, 1 do
+                                    local childName = imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL))
                                     cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
                                         rwData = {
                                             dff = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/dff/"..childName..".dff"),
                                             col = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/col/"..childName..".col")
                                         },
                                         position = {
-                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
-                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
-                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[k], 5, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[k], 6, asset.separators.IPL))
                                         },
                                         rotation = {
-                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
-                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
-                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[k], 7, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[k], 8, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[k], 9, asset.separators.IPL))
                                         }
                                     }
                                     imports.setTimer(function()
