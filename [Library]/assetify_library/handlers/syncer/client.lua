@@ -63,7 +63,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
                         id = nil,
                         rwData = v.rwData
                     }
-                    imports.loadAsset(chunkData, function()
+                    imports.loadAsset(chunkData, function(state)
                         cThread:resume()
                     end)
                     thread.pause()
