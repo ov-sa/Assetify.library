@@ -60,7 +60,6 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
                 if j.rwDatas then
-                    print(i.." : "..tostring(j))
                     for k, v in imports.pairs(j.rwDatas) do
                         if v then
                             asset:create(j.type, j.base, j.transparency, v, function(cAsset)
@@ -75,10 +74,6 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             end
         end
         isLibraryLoaded = true
-        local cAsset = getAssetData("weapon", "ak47_gold")
-        if cAsset then
-
-        end
     end):resume()
 
 end)

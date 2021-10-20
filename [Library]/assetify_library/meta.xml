@@ -13,6 +13,7 @@
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
+    <script src="handlers/bundler.lua" type="server"/>
     <script src="handlers/syncer/client.lua" type="client" cache="false"/>
     <script src="handlers/syncer/server.lua" type="server"/>
     <!--script src="handlers/mapLoader.lua" type="client" cache="false"/-->

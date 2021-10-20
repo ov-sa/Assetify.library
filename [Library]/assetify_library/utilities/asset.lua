@@ -82,8 +82,13 @@ function asset:load(assetType, assetBase, assetTransparency, assetData, callback
                 rwFiles = nil
             end
             if rwFiles then
-                self.modelID = modelID
-                self.rwFiles = rwFiles
+                self.syncedData = {
+                    modelID = modelID
+                }
+                self.unsyncedData = {
+                    rwFiles = rwFiles
+                }
+                assetData.cData = syncedData
                 loadState = true
             end
         end
