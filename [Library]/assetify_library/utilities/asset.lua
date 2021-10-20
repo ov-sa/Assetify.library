@@ -100,54 +100,58 @@ end
 
 if not localPlayer then
 
-    function asset:buildPack(assetPack, callback)
+    function asset:buildPack(assetType, assetPack, callback)
 
-        if not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
+        if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
-        local cAssetPack = {
-            manifestData = false,
-            type = assetPack.reference.type,
-            base = assetPack.reference.base,
-            transparency = assetPack.reference.transparency,
-            rwDatas = {}
-        }
-        cAssetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
-        cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
-    
-        if cAssetPack.manifestData then
-            thread:create(function(cThread)
-                local callbackReference = callback
-                for i = 1, #cAssetPack.manifestData, 1 do
-                    local assetReference = cAssetPack.manifestData[i]
-                    local assetPath = (assetPack.reference.root)..assetReference.."/"
-                    local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
-                    assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
-                    if not assetManifestData then
-                        cAssetPack.rwDatas[assetPath] = false
-                    else
-                        cAssetPack.rwDatas[assetReference] = {
-                            manifestData = assetManifestData,
-                            rwData = {
-                                txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
-                                dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
-                                col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
+        if assetType == "scene" then
+            --TODO: BUILDING SCENE
+        else
+            local cAssetPack = {
+                manifestData = false,
+                type = assetPack.reference.type,
+                base = assetPack.reference.base,
+                transparency = assetPack.reference.transparency,
+                rwDatas = {}
+            }
+            cAssetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
+            cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
+        
+            if cAssetPack.manifestData then
+                thread:create(function(cThread)
+                    local callbackReference = callback
+                    for i = 1, #cAssetPack.manifestData, 1 do
+                        local assetReference = cAssetPack.manifestData[i]
+                        local assetPath = (assetPack.reference.root)..assetReference.."/"
+                        local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
+                        assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
+                        if not assetManifestData then
+                            cAssetPack.rwDatas[assetPath] = false
+                        else
+                            cAssetPack.rwDatas[assetReference] = {
+                                manifestData = assetManifestData,
+                                rwData = {
+                                    txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
+                                    dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
+                                    col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
+                                }
                             }
-                        }
+                        end
+                        imports.setTimer(function()
+                            cThread:resume()
+                        end, 1, 1)
+                        thread.pause()
                     end
-                    imports.setTimer(function()
-                        cThread:resume()
-                    end, 1, 1)
-                    thread.pause()
-                end
-                assetPack.assetPack = cAssetPack
-                if callbackReference and (imports.type(callbackReference) == "function") then
-                    callbackReference(true)
-                end
-            end):resume()
-            return true
-        end
-        if callbackReference and (imports.type(callbackReference) == "function") then
-            callbackReference(false)
+                    assetPack.assetPack = cAssetPack
+                    if callbackReference and (imports.type(callbackReference) == "function") then
+                        callbackReference(true)
+                    end
+                end):resume()
+                return true
+            end
+            if callbackReference and (imports.type(callbackReference) == "function") then
+                callbackReference(false)
+            end
         end
         return false
 
