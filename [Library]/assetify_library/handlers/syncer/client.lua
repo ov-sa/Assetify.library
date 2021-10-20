@@ -75,9 +75,10 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             end
         end
         isLibraryLoaded = true
-        --TODO: MARK LIBRARY AS STARTED..
-        --outputChatBox("Final Call")
-        --getAsset("weapon", "ak47_gold")
+        local cAsset = getAssetData("weapon", "ak47_gold")
+        if cAsset then
+
+        end
     end):resume()
 
 end)

@@ -46,6 +46,7 @@ function asset:create(assetType, assetBase, assetTransparency, assetData, callba
 
     local cAsset = imports.setmetatable({}, {__index = self})
     assetData.cAsset = cAsset
+    cAsset.cData = assetData
     cAsset:load(assetType, assetBase, assetTransparency, assetData, callback)
     return cAsset
 
@@ -122,9 +123,9 @@ if not localPlayer then
                         cAssetPack.rwDatas[assetReference] = {
                             manifestData = assetManifestData,
                             rwData = {
-                                txd = imports.fetchFileData(assetPath..assetPack.reference.asset..".txd"),
-                                dff = imports.fetchFileData(assetPath..assetPack.reference.asset..".dff"),
-                                col = imports.fetchFileData(assetPath..assetPack.reference.asset..".col")
+                                txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
+                                dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
+                                col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
                             }
                         }
                     end
