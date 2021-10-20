@@ -26,6 +26,18 @@ local imports = {
 
 isLibraryLoaded = false
 availableAssetPacks = {
+    ["scene"] = {
+        reference = {
+            root = "files/assets/scenes/",
+            manifest = "manifest",
+            asset = "asset",
+            scene = "scene",
+            type = "object",
+            base = 1337,
+            transparency = false
+        }
+    },
+
     ["character"] = {
         reference = {
             root = "files/assets/characters/",

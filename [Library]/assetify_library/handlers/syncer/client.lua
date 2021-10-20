@@ -56,7 +56,7 @@ imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
-            if i ~= "map" then
+            if i ~= "scene" then
                 if j.rwDatas then
                     for k, v in imports.pairs(j.rwDatas) do
                         if v then
