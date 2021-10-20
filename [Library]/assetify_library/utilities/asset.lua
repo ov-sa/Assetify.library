@@ -56,10 +56,14 @@ function asset:create(assetPackType, assetType, assetBase, assetTransparency, as
     if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local cAsset = imports.setmetatable({}, {__index = self})
-    assetData.cAsset = cAsset
-    cAsset.cData = assetData
-    cAsset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
-    return cAsset
+    if not cAsset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback) then
+        cAsset = nil
+        return false
+    else
+        assetData.cAsset = cAsset
+        cAsset.cData = assetData
+        return cAsset
+    end
 
 end
 
