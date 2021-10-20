@@ -39,6 +39,7 @@ local function syncAssetPack(player)
                 if k ~= "rwDatas" then
                     imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, v)
                 else
+                    --TODO: NEEDS MODIFICATION..
                     for x, y in imports.pairs(v) do
                         imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, _, x, y)
                         thread.pause()
