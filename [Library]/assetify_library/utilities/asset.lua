@@ -51,19 +51,15 @@ asset = {
 }
 asset.__index = asset
 
-function asset:create(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
+function asset:create(...)
 
-    if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
-
+    local parameters = {...}
     local cAsset = imports.setmetatable({}, {__index = self})
     if not cAsset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback) then
         cAsset = nil
         return false
-    else
-        assetData.cAsset = cAsset
-        cAsset.cData = assetData
-        return cAsset
     end
+    return cAsset
 
 end
 
@@ -100,6 +96,8 @@ function asset:load(assetPackType, assetType, assetBase, assetTransparency, asse
                     rwFiles = nil
                 end
                 if rwFiles then
+                    assetData.cAsset = self
+                    self.cData = assetData
                     self.syncedData = {
                         modelID = modelID
                     }
