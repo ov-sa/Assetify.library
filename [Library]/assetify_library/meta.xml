@@ -11,8 +11,7 @@
     <!-- Utilities -->
     <script src="utilities/shared.lua" type="shared" cache="false"/>
     <script src="utilities/thread.lua" type="shared" cache="false"/>
-    <script src="utilities/client.lua" type="client" cache="false"/>
-    <script src="utilities/server.lua" type="server"/>
+    <script src="utilities/asset.lua" type="shared" cache="false"/>
 
     <!-- Handlers -->
     <!--script src="handlers/weapon/client.lua" type="client" cache="false"/-->

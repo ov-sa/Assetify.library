@@ -15,8 +15,7 @@
 
 local imports = {
     pairs = pairs,
-    addEventHandler = addEventHandler,
-    buildAssetPack = buildAssetPack
+    addEventHandler = addEventHandler
 }
 
 
@@ -44,7 +43,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
 
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
-            imports.buildAssetPack(j, function(assetPack)
+            asset:buildPack(j, function(assetPack)
                 j.assetPack = assetPack
                 cThread:resume()
             end)

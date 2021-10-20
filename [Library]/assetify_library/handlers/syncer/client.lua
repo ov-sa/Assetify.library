@@ -16,8 +16,7 @@
 local imports = {
     pairs = pairs,
     addEvent = addEvent,
-    addEventHandler = addEventHandler,
-    loadAsset = loadAsset
+    addEventHandler = addEventHandler
 }
 
 
@@ -63,7 +62,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
                         id = nil,
                         rwData = v.rwData
                     }
-                    imports.loadAsset(chunkData, function(state)
+                    asset:create(chunkData, function(assetReference)
                         cThread:resume()
                     end)
                     thread.pause()
