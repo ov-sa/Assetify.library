@@ -45,7 +45,8 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
     else
         availableAssetPacks[assetPack][dataIndex] = {}
         availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
-        print(chunkData.rwData.txd)
+        --TODO: LATER CONNECT THIS
+        --print(chunkData.rwData.txd)
     end
 
 end)
