@@ -47,7 +47,7 @@ function buildAssetPack(assetPack, callback)
                 if not assetData then
                     assetPack.datas.rwDatas[assetPath] = false
                 else
-                    assetPack.datas.rwDatas[assetPath] = {
+                    assetPack.datas.rwDatas[assetReference] = {
                         assetData = assetData,
                         rwData = {
                             txd = imports.fetchFileData(assetPath..assetPack.reference.asset..".txd"),

@@ -14,7 +14,6 @@
 -----------------
 
 local imports = {
-    type = type,
     pairs = pairs,
     isElement = isElement,
     destroyElement = destroyElement,
@@ -29,32 +28,27 @@ local imports = {
 }
 
 
-------------------------------------
---[[ Function: Loads Asset Pack ]]--
-------------------------------------
+--------------------------------------------
+--[[ Function: Loads Asset Pack's Chunk ]]--
+--------------------------------------------
 
-function loadAssetPack(assetPack, callback)
+function loadAssetPackChunk(chunkData)
 
-    if not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
-
-    --TODO: ..
-    outputChatBox("TRYING TO LOAD ASSET PACK!!")
-    --[[
     local loadState = false
     if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then
         rwModelID = imports.engineRequestModel(chunkData.type, chunkData.id)
         if rwModelID then
             local rwFiles = {}
-            rwFiles.txd = (imports.isElement(chunkData.rwData.txd) and chunkData.rwData.txd) or imports.engineLoadTXD(chunkData.rwData.txd) or false
-            rwFiles.dff = (imports.isElement(chunkData.rwData.dff) and chunkData.rwData.dff) or imports.engineLoadDFF(chunkData.rwData.dff) or false
-            rwFiles.col = (imports.isElement(chunkData.rwData.col) and chunkData.rwData.col) or imports.engineLoadCOL(chunkData.rwData.col) or false
+            rwFiles.txd = (chunkData.rwData.txd and ((imports.isElement(chunkData.rwData.txd) and chunkData.rwData.txd) or imports.engineLoadTXD(chunkData.rwData.txd))) or false
+            rwFiles.dff = (chunkData.rwData.dff and ((imports.isElement(chunkData.rwData.dff) and chunkData.rwData.dff) or imports.engineLoadDFF(chunkData.rwData.dff))) or false
+            rwFiles.col = (chunkData.rwData.col and ((imports.isElement(chunkData.rwData.col) and chunkData.rwData.col) or imports.engineLoadCOL(chunkData.rwData.col))) or false
             if rwFiles.dff then
                 if rwFiles.txd then
-                    imports.engineImportTXD(rwModelID, rwFiles.txd)
+                    imports.engineImportTXD(rwFiles.txd, rwModelID)
                 end
-                imports.engineReplaceModel(rwModelID, rwFiles.dff)
+                imports.engineReplaceModel(rwFiles.dff, rwModelID)
                 if rwFiles.col then
-                    imports.engineReplaceCOL(rwModelID, rwFiles.col)
+                    imports.engineReplaceCOL(rwFiles.col, rwModelID)
                 end
             else
                 imports.engineFreeModel(rwModelID)
@@ -66,12 +60,13 @@ function loadAssetPack(assetPack, callback)
                 rwFiles = nil
             end
             if rwFiles then
+                outputChatBox("LOADED MODEL ID: "..rwModelID)
                 chunkData.rwData.modelID = rwModelID
                 chunkData.rwData.rwFiles = rwFiles
                 loadState = true
             end
         end
     end
-    return loadState]]
+    return loadState
 
 end
