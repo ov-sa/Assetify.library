@@ -84,7 +84,6 @@ function asset:load(assetType, assetBase, assetTransparency, assetData, callback
                 self.modelID = modelID
                 self.rwFiles = rwFiles
                 loadState = true
-                outputChatBox("LOADED MODEL!")
             end
         end
     end
