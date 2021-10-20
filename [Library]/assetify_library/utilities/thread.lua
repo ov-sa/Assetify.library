@@ -88,7 +88,7 @@ function thread:resume(syncRate)
             if status == "dead" then
                 self:destroy()
             end
-        end, self.syncRate.frames, 1)
+        end, self.syncRate.frames, 0)
     else
         imports.coroutine.resume(self.thread, self)
         if self.timer and imports.isElement(self.timer) then
