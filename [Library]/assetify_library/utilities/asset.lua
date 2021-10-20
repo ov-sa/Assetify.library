@@ -57,22 +57,22 @@ function asset:load(assetData, callback)
 
     local loadState = false
     if assetData.rwData.txd and assetData.rwData.dff then
-        rwModelID = imports.engineRequestModel(assetData.type, assetData.manifestData.assetBase or assetData.base or nil)
-        if rwModelID then
+        local modelID = imports.engineRequestModel(assetData.type, ((imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetData.base or nil)
+        if modelID then
             local rwFiles = {}
             rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
             rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
             rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
             if rwFiles.dff then
                 if rwFiles.txd then
-                    imports.engineImportTXD(rwFiles.txd, rwModelID)
+                    imports.engineImportTXD(rwFiles.txd, modelID)
                 end
-                imports.engineReplaceModel(rwFiles.dff, rwModelID)
+                imports.engineReplaceModel(rwFiles.dff, modelID)
                 if rwFiles.col then
-                    imports.engineReplaceCOL(rwFiles.col, rwModelID)
+                    imports.engineReplaceCOL(rwFiles.col, modelID)
                 end
             else
-                imports.engineFreeModel(rwModelID)
+                imports.engineFreeModel(modelID)
                 for i, j in imports.pairs(rwFiles) do
                     if j and imports.isElement(j) then
                         imports.destroyElement(j)
@@ -81,7 +81,7 @@ function asset:load(assetData, callback)
                 rwFiles = nil
             end
             if rwFiles then
-                self.modelID = rwModelID
+                self.modelID = modelID
                 self.rwFiles = rwFiles
                 loadState = true
             end
