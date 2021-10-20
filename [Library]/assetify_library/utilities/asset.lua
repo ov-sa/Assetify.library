@@ -51,56 +51,60 @@ asset = {
 }
 asset.__index = asset
 
-function asset:create(assetType, assetBase, assetTransparency, assetData, callback)
+function asset:create(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
 
-    if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local cAsset = imports.setmetatable({}, {__index = self})
     assetData.cAsset = cAsset
     cAsset.cData = assetData
-    cAsset:load(assetType, assetBase, assetTransparency, assetData, callback)
+    cAsset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
     return cAsset
 
 end
 
-function asset:load(assetType, assetBase, assetTransparency, assetData, callback)
+function asset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, callback)
 
-    if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
+    if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local loadState = false
-    if assetData.rwData.txd and assetData.rwData.dff then
-        local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
-        if modelID then
-            local rwFiles = {}
-            rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
-            rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
-            rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
-            if rwFiles.dff then
-                if rwFiles.txd then
-                    imports.engineImportTXD(rwFiles.txd, modelID)
-                end
-                imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetTransparency)
-                if rwFiles.col then
-                    imports.engineReplaceCOL(rwFiles.col, modelID)
-                end
-            else
-                imports.engineFreeModel(modelID)
-                for i, j in imports.pairs(rwFiles) do
-                    if j and imports.isElement(j) then
-                        imports.destroyElement(j)
+    if assetPackType == "scene" then
+        print("Trying to load scene")
+    else
+        if assetData.rwData.txd and assetData.rwData.dff then
+            local modelID = imports.engineRequestModel(assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
+            if modelID then
+                local rwFiles = {}
+                rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
+                rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
+                rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
+                if rwFiles.dff then
+                    if rwFiles.txd then
+                        imports.engineImportTXD(rwFiles.txd, modelID)
                     end
+                    imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetTransparency)
+                    if rwFiles.col then
+                        imports.engineReplaceCOL(rwFiles.col, modelID)
+                    end
+                else
+                    imports.engineFreeModel(modelID)
+                    for i, j in imports.pairs(rwFiles) do
+                        if j and imports.isElement(j) then
+                            imports.destroyElement(j)
+                        end
+                    end
+                    rwFiles = nil
                 end
-                rwFiles = nil
-            end
-            if rwFiles then
-                self.syncedData = {
-                    modelID = modelID
-                }
-                self.unsyncedData = {
-                    rwFiles = rwFiles
-                }
-                assetData.cData = syncedData
-                loadState = true
+                if rwFiles then
+                    self.syncedData = {
+                        modelID = modelID
+                    }
+                    self.unsyncedData = {
+                        rwFiles = rwFiles
+                    }
+                    assetData.cData = syncedData
+                    loadState = true
+                end
             end
         end
     end
@@ -111,9 +115,9 @@ end
 
 if not localPlayer then
 
-    function asset:buildPack(assetType, assetPack, callback)
+    function asset:buildPack(assetPackType, assetPack, callback)
 
-        if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
+        if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
         local cAssetPack = {
             manifestData = false,
@@ -139,7 +143,7 @@ if not localPlayer then
                         cAssetPack.rwDatas[assetReference] = {
                             manifestData = assetManifestData
                         }
-                        if assetType == "scene" then
+                        if assetPackType == "scene" then
                             local sceneManifestData = imports.fetchFileData(assetPath..(assetPack.reference.scene)..".ipl")
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {
