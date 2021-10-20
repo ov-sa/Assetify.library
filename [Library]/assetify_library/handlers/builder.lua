@@ -15,6 +15,7 @@
 
 local imports = {
     pairs = pairs,
+    setTimer = setTimer,
     addEventHandler = addEventHandler
 }
 
@@ -25,6 +26,28 @@ local imports = {
 
 isLibraryLoaded = false
 availableAssetPacks = {
+    ["character"] = {
+        reference = {
+            root = "files/assets/characters/",
+            manifest = "manifest",
+            asset = "asset",
+            type = "ped",
+            base = 7,
+            transparency = false
+        }
+    },
+
+    ["vehicle"] = {
+        reference = {
+            root = "files/assets/vehicles/",
+            manifest = "manifest",
+            asset = "asset",
+            type = "vehicle",
+            base = 400 ,
+            transparency = false
+        }
+    },
+
     ["weapon"] = {
         reference = {
             root = "files/assets/weapons/",
@@ -48,7 +71,9 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
         for i, j in imports.pairs(availableAssetPacks) do
             asset:buildPack(j, function(assetPack)
                 j.assetPack = assetPack
-                cThread:resume()
+                imports.setTimer(function()
+                    cThread:resume()
+                end, 1, 1)
             end)
             thread.pause()
         end

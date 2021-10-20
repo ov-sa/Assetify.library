@@ -4,9 +4,7 @@
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
 	<!-- Exports -->
-    <!--script src="exports/mapExport.lua" type="client" cache="false"/>
-    <script src="exports/pedExport.lua" type="client" cache="false"/>
-    <script src="exports/weaponExport.lua" type="client" cache="false"/-->
+    <script src="exports/essential.lua" type="client" cache="false"/>
 
     <!-- Utilities -->
     <script src="utilities/shared.lua" type="shared" cache="false"/>

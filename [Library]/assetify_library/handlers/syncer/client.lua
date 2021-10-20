@@ -15,8 +15,9 @@
 
 local imports = {
     pairs = pairs,
+    setTimer = setTimer,
     addEvent = addEvent,
-    addEventHandler = addEventHandler
+    addEventHandler = addEventHandler,
 }
 
 
@@ -24,6 +25,7 @@ local imports = {
 --[[ Variables ]]--
 -------------------
 
+isLibraryLoaded = false
 availableAssetPacks = {}
 
 
@@ -50,6 +52,7 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
 
 end)
 
+
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
 
@@ -57,13 +60,22 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
                 for k, v in imports.pairs(j.rwDatas) do
-                    asset:create(j.type, j.base, j.transparency, v, function(assetReference)
-                        cThread:resume()
-                    end)
-                    thread.pause()
+                    if v then
+                        asset:create(j.type, j.base, j.transparency, v, function(assetReference)
+                            imports.setTimer(function()
+                                cThread:resume()
+                            end, 1, 1)
+                        end)
+                        thread.pause()
+                    end
                 end
             end
         end
+        isLibraryLoaded = true
+        --TODO: MARK LIBRARY AS STARTED..
+        --outputChatBox("Final Call")
+        --getAsset("weapon", "ak47_gold")
     end):resume()
+    --getAsset("weapon", "ak47_gold")
 
 end)
