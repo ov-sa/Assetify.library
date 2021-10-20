@@ -44,10 +44,10 @@ function asset:create(assetType, assetBase, assetTransparency, assetData, callba
 
     if not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
-    local createdAsset = imports.setmetatable({}, {__index = self})
-    assetData.cAsset = createdAsset
-    createdAsset:load(assetType, assetBase, assetTransparency, assetData, callback)
-    return createdAsset
+    local cAsset = imports.setmetatable({}, {__index = self})
+    assetData.cAsset = cAsset
+    cAsset:load(assetType, assetBase, assetTransparency, assetData, callback)
+    return cAsset
 
 end
 
@@ -98,28 +98,28 @@ if not localPlayer then
 
         if not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
-        assetPack.datas = {
+        local cAssetPack = {
             manifestData = false,
             type = assetPack.reference.type,
             base = assetPack.reference.base,
             transparency = assetPack.reference.transparency,
             rwDatas = {}
         }
-        assetPack.datas.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
-        assetPack.datas.manifestData = (assetPack.datas.manifestData and imports.fromJSON(assetPack.datas.manifestData)) or false
+        cAssetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
+        cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
     
-        if assetPack.datas.manifestData then
+        if cAssetPack.manifestData then
             thread:create(function(cThread)
                 local callbackReference = callback
-                for i = 1, #assetPack.datas.manifestData, 1 do
-                    local assetReference = assetPack.datas.manifestData[i]
+                for i = 1, #cAssetPack.manifestData, 1 do
+                    local assetReference = cAssetPack.manifestData[i]
                     local assetPath = (assetPack.reference.root)..assetReference.."/"
                     local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
-                        assetPack.datas.rwDatas[assetPath] = false
+                        cAssetPack.rwDatas[assetPath] = false
                     else
-                        assetPack.datas.rwDatas[assetReference] = {
+                        cAssetPack.rwDatas[assetReference] = {
                             manifestData = assetManifestData,
                             rwData = {
                                 txd = imports.fetchFileData(assetPath..assetPack.reference.asset..".txd"),
@@ -133,13 +133,14 @@ if not localPlayer then
                     end, 1, 1)
                     thread.pause()
                 end
-                if callbackReference and imports.type(callbackReference) == "function" then
-                    callbackReference(assetPack.datas)
+                assetPack.assetPack = cAssetPack
+                if callbackReference and (imports.type(callbackReference) == "function") then
+                    callbackReference(true)
                 end
             end):resume()
             return true
         end
-        if callbackReference and imports.type(callbackReference) == "function" then
+        if callbackReference and (imports.type(callbackReference) == "function") then
             callbackReference(false)
         end
         return false

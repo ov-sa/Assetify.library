@@ -69,8 +69,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
 
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
-            asset:buildPack(j, function(assetPack)
-                j.assetPack = assetPack
+            asset:buildPack(j, function(state)
                 imports.setTimer(function()
                     cThread:resume()
                 end, 1, 1)

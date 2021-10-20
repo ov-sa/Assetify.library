@@ -59,14 +59,17 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
-                for k, v in imports.pairs(j.rwDatas) do
-                    if v then
-                        asset:create(j.type, j.base, j.transparency, v, function(assetReference)
-                            imports.setTimer(function()
-                                cThread:resume()
-                            end, 1, 1)
-                        end)
-                        thread.pause()
+                if j.rwDatas then
+                    print(i.." : "..tostring(j))
+                    for k, v in imports.pairs(j.rwDatas) do
+                        if v then
+                            asset:create(j.type, j.base, j.transparency, v, function(cAsset)
+                                imports.setTimer(function()
+                                    cThread:resume()
+                                end, 1, 1)
+                            end)
+                            thread.pause()
+                        end
                     end
                 end
             end
@@ -76,6 +79,5 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         --outputChatBox("Final Call")
         --getAsset("weapon", "ak47_gold")
     end):resume()
-    --getAsset("weapon", "ak47_gold")
 
 end)
