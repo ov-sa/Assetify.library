@@ -17,7 +17,7 @@ local imports = {
     pairs = pairs,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
-    loadAssetPackChunk = loadAssetPackChunk
+    loadAsset = loadAsset
 }
 
 
@@ -59,7 +59,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             if i ~= "map" then
                 for k, v in imports.pairs(j.rwDatas) do
                     --TODO: ADD CALLBACK AND RESUME THREAD...
-                    imports.loadAssetPackChunk({
+                    imports.loadAsset({
                         type = "object",
                         id = nil,
                         rwData = v.rwData

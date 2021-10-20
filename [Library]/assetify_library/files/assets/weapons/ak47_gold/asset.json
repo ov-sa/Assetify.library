@@ -4,7 +4,7 @@
     "weaponAmmo": "Assault",
     "weaponMAG": 3,
     "weaponDamage": 500,
-    "virtualWeapon": "m4",
+    "weaponBase": "m4",
     "weaponMaps": {
         "control": {},
         "specular": {},

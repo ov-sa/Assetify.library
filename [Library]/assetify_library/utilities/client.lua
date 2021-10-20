@@ -28,11 +28,11 @@ local imports = {
 }
 
 
---------------------------------------------
---[[ Function: Loads Asset Pack's Chunk ]]--
---------------------------------------------
+-------------------------------
+--[[ Function: Loads Asset ]]--
+-------------------------------
 
-function loadAssetPackChunk(chunkData)
+function loadAsset(chunkData)
 
     local loadState = false
     if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then
