@@ -58,12 +58,14 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
         for i, j in imports.pairs(availableAssetPacks) do
             if i ~= "map" then
                 for k, v in imports.pairs(j.rwDatas) do
-                    --TODO: ADD CALLBACK AND RESUME THREAD...
-                    imports.loadAsset({
+                    local chunkData = {
                         type = "object",
                         id = nil,
                         rwData = v.rwData
-                    })
+                    }
+                    imports.loadAsset(chunkData, function()
+                        cThread:resume()
+                    end)
                     thread.pause()
                 end
             end

@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     isElement = isElement,
     destroyElement = destroyElement,
@@ -32,7 +33,9 @@ local imports = {
 --[[ Function: Loads Asset ]]--
 -------------------------------
 
-function loadAsset(chunkData)
+function loadAsset(chunkData, callback)
+
+    if not chunkData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local loadState = false
     if chunkData and chunkData.type and chunkData.rwData.txd and chunkData.rwData.dff then
@@ -60,13 +63,13 @@ function loadAsset(chunkData)
                 rwFiles = nil
             end
             if rwFiles then
-                outputChatBox("LOADED MODEL ID: "..rwModelID)
                 chunkData.rwData.modelID = rwModelID
                 chunkData.rwData.rwFiles = rwFiles
                 loadState = true
             end
         end
     end
+    callback(loadState)
     return loadState
 
 end
