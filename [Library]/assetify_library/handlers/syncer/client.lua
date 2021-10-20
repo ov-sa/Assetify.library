@@ -56,8 +56,10 @@ imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
-            if i ~= "scene" then
-                if j.rwDatas then
+            if j.rwDatas then
+                if i == "scene" then
+                    print("TRYING TO LOAD A SCENE")
+                else
                     for k, v in imports.pairs(j.rwDatas) do
                         if v then
                             asset:create(j.type, j.base, j.transparency, v, function(cAsset)
