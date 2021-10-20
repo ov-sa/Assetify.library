@@ -115,19 +115,18 @@ if not localPlayer then
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
 
         if cAssetPack.manifestData then
-            if assetType == "scene" then
-                --TODO: BUILDING SCENE
-                print("Trying to load scene")
-            else
-                thread:create(function(cThread)
-                    local callbackReference = callback
-                    for i = 1, #cAssetPack.manifestData, 1 do
-                        local assetReference = cAssetPack.manifestData[i]
-                        local assetPath = (assetPack.reference.root)..assetReference.."/"
-                        local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
-                        assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
-                        if not assetManifestData then
-                            cAssetPack.rwDatas[assetPath] = false
+            thread:create(function(cThread)
+                local callbackReference = callback
+                for i = 1, #cAssetPack.manifestData, 1 do
+                    local assetReference = cAssetPack.manifestData[i]
+                    local assetPath = (assetPack.reference.root)..assetReference.."/"
+                    local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
+                    assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
+                    if not assetManifestData then
+                        cAssetPack.rwDatas[assetPath] = false
+                    else
+                        if assetType == "scene" then
+                            print("Trying to load scene..")
                         else
                             cAssetPack.rwDatas[assetReference] = {
                                 manifestData = assetManifestData,
@@ -138,18 +137,18 @@ if not localPlayer then
                                 }
                             }
                         end
-                        imports.setTimer(function()
-                            cThread:resume()
-                        end, 1, 1)
-                        thread.pause()
                     end
-                    assetPack.assetPack = cAssetPack
-                    if callbackReference and (imports.type(callbackReference) == "function") then
-                        callbackReference(true)
-                    end
-                end):resume()
-                return true
-            end
+                    imports.setTimer(function()
+                        cThread:resume()
+                    end, 1, 1)
+                    thread.pause()
+                end
+                assetPack.assetPack = cAssetPack
+                if callbackReference and (imports.type(callbackReference) == "function") then
+                    callbackReference(true)
+                end
+            end):resume()
+            return true
         end
         if callbackReference and (imports.type(callbackReference) == "function") then
             callbackReference(false)
