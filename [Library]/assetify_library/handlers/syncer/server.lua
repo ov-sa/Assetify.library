@@ -60,6 +60,16 @@ end
 --[[ Events: On Player Resource-Start/Quit ]]--
 -----------------------------------------------
 
+function onLibraryLoaded()
+
+    isLibraryLoaded = true
+    for i, j in imports.pairs(scheduledSyncs) do
+        syncAssetPack(i)
+        scheduledSyncs[i] = nil
+    end
+    
+end
+
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
     if isLibraryLoaded then

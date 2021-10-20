@@ -50,7 +50,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
             end)
             thread.pause()
         end
-        isLibraryLoaded = true
+        onLibraryLoaded()
     end):resume()
 
 end)
