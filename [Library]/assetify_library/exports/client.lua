@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     setTimer = setTimer
 }
@@ -86,7 +87,13 @@ function loadAsset(assetType, assetName, callback)
                             end, 1, 1)
                         end)
                     end
+                    assetReference.cAsset = true
+                    assetReference.cScene = scene:create(assetReference)
+                    if callback and (imports.type(callback) == "function") then
+                        callback(true)
+                    end
                 end):resume()
+                return true
             else
                 return asset:create(assetType, packReference, assetReference, nil, callback)
             end
@@ -105,7 +112,29 @@ function unloadAsset(assetType, assetName, callback)
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and assetReference.cAsset then
-            return assetReference.cAsset:destroy(callback)
+            if assetType == "scene" then
+                thread:create(function(cThread)
+                    for i, j in imports.pairs(assetReference.rwData.children) do
+                        if j.cAsset then
+                            j.cAsset:destroy(function()
+                                imports.setTimer(function()
+                                    cThread:resume()
+                                end, 1, 1)
+                            end)
+                        end
+                    end
+                    assetReference.cAsset = false
+                    if assetReference.cScene then
+                        assetReference.cScene:destroy()
+                    end
+                    if callback and (imports.type(callback) == "function") then
+                        callback(true)
+                    end
+                end):resume()
+                return true
+            else
+                return assetReference.cAsset:destroy(callback)
+            end
         end
     end
     return false

@@ -10,6 +10,7 @@
     <script src="utilities/shared.lua" type="shared"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
+    <script src="utilities/scene.lua" type="client"/>
     <script src="settings/server.lua" type="server"/>
 
     <!-- Handlers -->
