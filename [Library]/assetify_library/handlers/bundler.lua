@@ -77,6 +77,18 @@ function onLibraryLoaded()
                     return false
                 end,
 
+                isAssetLoaded = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isAssetLoaded", ...)
+                end,
+
+                loadAsset = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
+                end,
+
+                unloadAsset = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
+                end,
+
                 getAssetID = function(...)
                     local _, cData = assetify.getAsset(...)
                     if cData then
