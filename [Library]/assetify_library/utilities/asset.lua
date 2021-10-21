@@ -40,7 +40,8 @@ local imports = {
     },
     string = {
         byte = string.byte,
-        lower = string.lower
+        lower = string.lower,
+        gsub = string.gsub
     }
 }
 
@@ -57,7 +58,7 @@ asset = {
         scene = "scene"
     },
     separators = {
-        IPL = imports.string.byte(" ,")
+        IPL = imports.string.byte(", ")
     }
 }
 asset.__index = asset
@@ -86,7 +87,7 @@ if localPlayer then
     
         if not self or (self == asset) then return false end
         if not assetPackType or not assetPack.assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
-    
+
         local primary_rwFiles, secondary_rwFiles = nil, nil
         local modelID = false
         if assetData.rwData.dff then
@@ -111,7 +112,7 @@ if localPlayer then
         if primary_rwFiles then
             if assetPackType == "scene" then
                 secondary_rwFiles = {}
-                secondary_rwFiles.txd = (assetScene and assetScene.txd and ((imports.isElement(assetScene.txd) and assetScene.txd) or imports.engineLoadTXD(assetScene.txd))) or false
+                secondary_rwFiles.txd = (assetScene and assetScene.rwData.txd and ((imports.isElement(assetScene.rwData.txd) and assetScene.rwData.txd) or imports.engineLoadTXD(assetScene.rwData.txd))) or false
                 if secondary_rwFiles.txd then
                     imports.engineImportTXD(secondary_rwFiles.txd, modelID)
                 end
@@ -121,7 +122,7 @@ if localPlayer then
                     imports.engineImportTXD(primary_rwFiles.txd, modelID)
                 end
             end
-            imports.engineReplaceModel(primary_rwFiles.dff, modelID, (assetScene and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
+            imports.engineReplaceModel(primary_rwFiles.dff, modelID, (assetScene and assetScene.manifestData and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData and assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
             if primary_rwFiles.col then
                 imports.engineReplaceCOL(primary_rwFiles.col, modelID)
             end
@@ -203,11 +204,11 @@ else
                                 }
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
-                                    local childName = imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL))
+                                    local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
                                     cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
                                         rwData = {
-                                            dff = imports.fetchFileData(assetPath.."/dff/"..childName..".dff"),
-                                            col = imports.fetchFileData(assetPath.."/col/"..childName..".col")
+                                            dff = imports.fetchFileData(assetPath.."dff/"..childName..".dff"),
+                                            col = imports.fetchFileData(assetPath.."col/"..childName..".col")
                                         },
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),

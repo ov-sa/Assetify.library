@@ -74,7 +74,6 @@ imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
 
     thread:create(function(cThread)
-        print("LOADED...")
         onLibraryLoaded()
         for i, j in imports.pairs(availableAssetPacks) do
             if j.autoLoad and j.rwDatas then
