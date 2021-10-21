@@ -55,20 +55,13 @@ end)
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
     thread:create(function(cThread)
+        onLibraryLoaded()
         for i, j in imports.pairs(availableAssetPacks) do
             if j.rwDatas then
                 for k, v in imports.pairs(j.rwDatas) do
                     if v then
-                        if i == "scene" then
-                            for x, y in imports.pairs(v.rwData.children) do
-                                asset:create(i, j.type, j.base, j.transparency, y, v.rwData, function(cAsset)
-                                    imports.setTimer(function()
-                                        cThread:resume()
-                                    end, 1, 1)
-                                end)
-                            end
-                        else
-                            asset:create(i, j.type, j.base, j.transparency, v, nil, function(cAsset)
+                        if i ~= "scene" then
+                            loadSceneAsset(i, k, function(cAsset)
                                 imports.setTimer(function()
                                     cThread:resume()
                                 end, 1, 1)
@@ -82,7 +75,6 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
                 end
             end
         end
-        onLibraryLoaded()
     end):resume()
 end)
 

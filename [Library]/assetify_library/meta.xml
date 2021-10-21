@@ -21,7 +21,7 @@
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
     <export function="getAssetData" type="client"/>
-    <!--export function="unloadMap" type="client"/>
-    <export function="loadMap" type="client"/-->
+    <export function="loadAsset" type="client"/>
+    <export function="unloadAsset" type="client"/>
 
 </meta>
