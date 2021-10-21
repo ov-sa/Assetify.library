@@ -69,7 +69,7 @@ function asset:load(assetPackType, assetType, assetBase, assetTransparency, asse
     local primary_rwFiles, secondary_rwFiles = nil, nil
     local modelID = false
     if assetData.rwData.dff then
-        modelID = imports.engineRequestModel(assetType, (sceneReference and sceneReference.manifestData and sceneReference.manifestData.assetBase and (imports.type(sceneReference.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
+        modelID = imports.engineRequestModel(assetType, (sceneReference and sceneReference.manifestData and sceneReference.manifestData.assetBase and (imports.type(sceneReference.manifestData.assetBase) == "number") and sceneReference.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
         if modelID then
             primary_rwFiles = {}
             primary_rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
@@ -86,6 +86,7 @@ function asset:load(assetPackType, assetType, assetBase, assetTransparency, asse
         end
     end
 
+    local loadState = false
     if primary_rwFiles then
         if assetPackType == "scene" then
             secondary_rwFiles = {}
@@ -110,12 +111,12 @@ function asset:load(assetPackType, assetType, assetBase, assetTransparency, asse
             modelID = modelID
         }
         self.unsyncedData = {
-            primary_rwFiles = primary_rwFiles
+            primary_rwFiles = primary_rwFiles,
+            secondary_rwFiles = secondary_rwFiles
         }
         assetData.cData = syncedData
         loadState = true
     end
-    local loadState = (primary_rwFiles and true) or false
     callback(loadState)
     return loadState
 
