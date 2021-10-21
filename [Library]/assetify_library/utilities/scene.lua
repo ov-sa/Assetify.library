@@ -15,7 +15,12 @@
 
 local imports = {
     type = type,
-    pairs = pairs
+    pairs = pairs,
+    isElement = isElement,
+    destroyElement = destroyElement,
+    setmetatable = setmetatable,
+    collectgarbage = collectgarbage,
+    createObject = createObject
 }
 
 
@@ -23,66 +28,48 @@ local imports = {
 --[[ Class: Scene ]]--
 ----------------------
 
-scene = {
-    loadedScenes = {}
-}
+scene = {}
 scene.__index = scene
 
-function scene:create(assetName)
-
-    local cState, cAsset = isAssetLoaded("scene", assetName)
-    if not cState or not cAsset then return false end
+function scene:create(...)
 
     local cScene = imports.setmetatable({}, {__index = self})
-    cScene.cAsset = cAsset
-    if not cScene:load() then
+    if not cScene:load(...) then
         cScene = nil
         return false
     end
-    scene.loadedScenes[assetName] = cScene
     return cScene
 
 end
 
-function scene:load(callback)
-
+function scene:destroy(...)
+    
     if not self or (self == scene) then return false end
 
-    --[[
-    local loadState = false
-    if callback and imports.type(callback) == "function" then
-        callback(loadState)
-    end
-    return loadState]]
+    return self:unload(...)
 
 end
 
---[[
-function scene:unload(callback)
+function scene:load(cAsset)
 
     if not self or (self == scene) then return false end
-    if not callback or (imports.type(callback) ~= "function") then return false end
+    if not cAsset then return false end
 
-    imports.engineFreeModel(self.syncedData.modelID)
-    if self.unsyncedData.primary_rwFiles then
-        for i, j in imports.pairs(self.unsyncedData.primary_rwFiles) do
-            if j and imports.isElement(j) then
-                imports.destroyElement(j)
-            end
-        end
-    end
-    if self.unsyncedData.secondary_rwFiles then
-        for i, j in imports.pairs(self.unsyncedData.secondary_rwFiles) do
-            if j and imports.isElement(j) then
-                imports.destroyElement(j)
-            end
-        end
-    end
-    self.cData.cScene = nil
-    self = nil
-    imports.collectgarbage()
-    callback(true)
+    self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
     return true
 
 end
-]]
+
+function scene:unload(cAsset)
+
+    if not self or (self == scene) then return false end
+    if not cAsset then return false end
+
+    if imports.isElement(self.cObject) then
+        imports.destroyElement(self.cObject)
+    end
+    self = nil
+    imports.collectgarbage()
+    return true
+
+end

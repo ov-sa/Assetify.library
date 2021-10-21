@@ -15,7 +15,7 @@
 
 downloadSettings = {
     speed = 1250000,
-    syncRate = 5
+    syncRate = 50
 }
 
 availableAssetPacks = {

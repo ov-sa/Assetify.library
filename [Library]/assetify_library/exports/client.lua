@@ -82,13 +82,13 @@ function loadAsset(assetType, assetName, callback)
                 thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
+                            scene:create(j.cAsset)
                             imports.setTimer(function()
                                 cThread:resume()
                             end, 1, 1)
                         end)
                     end
                     assetReference.cAsset = true
-                    assetReference.cScene = scene:create(assetReference)
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
                     end
@@ -115,6 +115,9 @@ function unloadAsset(assetType, assetName, callback)
             if assetType == "scene" then
                 thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
+                        if j.cScene then
+                            j.cScene:destroy()
+                        end
                         if j.cAsset then
                             j.cAsset:destroy(function()
                                 imports.setTimer(function()
@@ -124,9 +127,6 @@ function unloadAsset(assetType, assetName, callback)
                         end
                     end
                     assetReference.cAsset = false
-                    if assetReference.cScene then
-                        assetReference.cScene:destroy()
-                    end
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
                     end
