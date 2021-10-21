@@ -62,8 +62,17 @@ function asset:create(...)
 
 end
 
+function asset:destroy(...)
+
+    if not self or (self == asset) then return false end
+
+    return self:unload()
+
+end
+
 function asset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, sceneReference, callback)
 
+    if not self or (self == asset) then return false end
     if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
 
     local primary_rwFiles, secondary_rwFiles = nil, nil

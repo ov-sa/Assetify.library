@@ -51,16 +51,21 @@ end
 
 function thread:destroy()
 
+    if not self or (self == thread) then return false end
+
     if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end
     self.thread = nil
+    self = nil
     imports.collectgarbage()
     return true
 
 end
 
 function thread:status()
+
+    if not self or (self == thread) then return false end
 
     if not self.thread then
         return "dead"
@@ -71,6 +76,8 @@ function thread:status()
 end
 
 function thread:resume(syncRate)
+
+    if not self or (self == thread) then return false end
 
     self.syncRate.executions = (syncRate and imports.tonumber(syncRate.executions)) or false
     self.syncRate.frames = (self.syncRate.executions and syncRate and imports.tonumber(syncRate.frames)) or false
