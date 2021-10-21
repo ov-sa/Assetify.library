@@ -59,7 +59,7 @@ function loadAsset(assetType, assetName, callback)
             if assetType == "scene" then
                 thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
-                        asset:create(assetType, packReference.type, packReference.base, packReference.transparency, j, assetReference.rwData, function(cAsset)
+                        asset:create(assetType, packReference.assetType, packReference.assetBase, packReference.assetTransparency, j, assetReference.rwData, function(cAsset)
                             imports.setTimer(function()
                                 cThread:resume()
                             end, 1, 1)
@@ -67,7 +67,7 @@ function loadAsset(assetType, assetName, callback)
                     end
                 end):resume()
             else
-                return asset:create(assetType, packReference.type, packReference.base, packReference.transparency, assetReference, nil, callback)
+                return asset:create(assetType, packReference.assetType, packReference.assetBase, packReference.assetTransparency, assetReference, nil, callback)
             end
         end
     end

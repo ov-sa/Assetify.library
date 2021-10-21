@@ -21,9 +21,9 @@ availableAssetPacks = {
             manifest = "manifest",
             asset = "asset",
             scene = "scene",
-            type = "object",
-            base = 1337,
-            transparency = false,
+            assetType = "object",
+            assetBase = 1337,
+            assetTransparency = false,
             autoLoad = true
         }
     },
@@ -33,9 +33,9 @@ availableAssetPacks = {
             root = "files/assets/characters/",
             manifest = "manifest",
             asset = "asset",
-            type = "ped",
-            base = 7,
-            transparency = false,
+            assetType = "ped",
+            assetBase = 7,
+            assetTransparency = false,
             autoLoad = true
         }
     },
@@ -45,9 +45,9 @@ availableAssetPacks = {
             root = "files/assets/vehicles/",
             manifest = "manifest",
             asset = "asset",
-            type = "vehicle",
-            base = 400 ,
-            transparency = false,
+            assetType = "vehicle",
+            assetBase = 400 ,
+            assetTransparency = false,
             autoLoad = true
         }
     },
@@ -57,9 +57,9 @@ availableAssetPacks = {
             root = "files/assets/weapons/",
             manifest = "manifest",
             asset = "asset",
-            type = "object",
-            base = 1337,
-            transparency = false,
+            assetType = "object",
+            assetBase = 1337,
+            assetTransparency = false,
             autoLoad = true
         }
     }
