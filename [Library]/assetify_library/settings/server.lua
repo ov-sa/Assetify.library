@@ -13,6 +13,7 @@
 --[[ Settings ]]--
 ------------------
 
+downloadSpeed = 125000
 availableAssetPacks = {
 
     ["scene"] = {

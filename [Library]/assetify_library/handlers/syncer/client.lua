@@ -39,18 +39,29 @@ imports.addEvent("onAssetifyLoad", false)
 imports.addEvent("onAssetifyUnLoad", false)
 
 imports.addEvent("onClientRecieveAssetPack", true)
-imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, chunkIndex, chunkData)
+imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, dataIndexes, subIndexData)
     
     if not assetPack or not dataIndex then return false end
+
     if not availableAssetPacks[assetPack] then
         availableAssetPacks[assetPack] = {}
     end
     if dataIndex then
-        if not chunkIndex and not chunkData then
+        if not dataIndexes then
             availableAssetPacks[assetPack][dataIndex] = indexData
         else
-            availableAssetPacks[assetPack][dataIndex] = {}
-            availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
+            if not availableAssetPacks[assetPack][dataIndex] then
+                availableAssetPacks[assetPack][dataIndex] = {}
+            end
+            local indexPointer = availableAssetPacks[assetPack][dataIndex]
+            for i = 1, #dataIndexes, 1 do
+                local indexReference = dataIndexes[i]
+                if not indexPointer[indexReference] then
+                    indexPointer[indexReference] = {}
+                    indexPointer = indexPointer[indexReference]
+                end
+            end
+            indexPointer = subIndexData
         end
     end
 

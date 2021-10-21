@@ -38,18 +38,31 @@ local function syncAssetPack(player)
         for i, j in imports.pairs(availableAssetPacks) do
             for k, v in imports.pairs(j.assetPack) do
                 if k ~= "rwDatas" then
-                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, v)
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, v)
                 else
-                    --TODO: NEEDS MODIFICATION..
-                    for x, y in imports.pairs(v) do
-                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", 125000, false, player, i, k, _, x, y)
-                        thread.pause()
+                    if i == "scene" then
+                        --TODO: ..
+                    else
+                        for m, n in imports.pairs(v) do
+                            for x, y in imports.pairs(n) do
+                                if x ~= "rwData" then
+                                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x}, y)
+                                else
+                                    for o, p in imports.pairs(y) do
+                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o}, p)
+                                        thread.pause()
+                                    end
+                                end
+                                thread.pause()
+                            end
+                            thread.pause()
+                        end
                     end
                 end
                 thread.pause()
             end
         end
-        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", 125000, false, player)
+        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSpeed, false, player)
     end):resume({
         executions = 5,
         frames = 1
