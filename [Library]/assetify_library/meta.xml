@@ -6,10 +6,11 @@
 	<!-- Exports -->
     <script src="exports/client.lua" type="client"/>
 
-    <!-- Utilities -->
+    <!-- Settings & Utilities -->
     <script src="utilities/shared.lua" type="shared"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
+    <script src="settings/server.lua" type="server"/>
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>

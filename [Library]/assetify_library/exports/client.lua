@@ -14,7 +14,8 @@
 -----------------
 
 local imports = {
-    pairs = pairs
+    pairs = pairs,
+    setTimer = setTimer
 }
 
 

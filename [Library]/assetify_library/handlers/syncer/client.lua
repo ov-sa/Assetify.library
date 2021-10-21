@@ -18,7 +18,8 @@ local imports = {
     setTimer = setTimer,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
-    triggerEvent = triggerEvent
+    triggerEvent = triggerEvent,
+    loadAsset = loadAsset
 }
 
 
@@ -57,16 +58,14 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
     thread:create(function(cThread)
         onLibraryLoaded()
         for i, j in imports.pairs(availableAssetPacks) do
-            if j.rwDatas then
+            if j.autoLoad and j.rwDatas then
                 for k, v in imports.pairs(j.rwDatas) do
                     if v then
-                        if i ~= "scene" then
-                            loadSceneAsset(i, k, function(cAsset)
-                                imports.setTimer(function()
-                                    cThread:resume()
-                                end, 1, 1)
-                            end)
-                        end
+                        imports.loadAsset(i, k, function(cAsset)
+                            imports.setTimer(function()
+                                cThread:resume()
+                            end, 1, 1)
+                        end)
                     end
                     imports.setTimer(function()
                         cThread:resume()

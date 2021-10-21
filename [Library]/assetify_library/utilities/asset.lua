@@ -165,7 +165,9 @@ else
 
         if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
+        print("STATE: "..tostring(assetPack.reference.autoLoad))
         local cAssetPack = {
+            autoLoad = assetPack.reference.autoLoad,
             manifestData = false,
             type = assetPack.reference.type,
             base = assetPack.reference.base,

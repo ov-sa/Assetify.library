@@ -24,6 +24,7 @@ local imports = {
 --[[ Variables ]]--
 -------------------
 
+isLibraryLoaded = false
 local scheduledSyncs = {}
 
 
