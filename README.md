@@ -6,7 +6,11 @@
 
 **Assetify Library** is a open-source custom asset loading library made by **Aviril** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/).
 
-**Assetify** powered by [Graphify](https://raw.githubusercontent.com/ov-sa/Graphify-Library) combines custom asset loading/unloading, rendering techniques towards gamemode perspective for efficient & faster asset manipulation, giving you the full capabilities to customize the environment without stressing about performances issues, since the library is developed with '**Performance-First**' in mind! *Tired of replacing objects?* Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones. *Don't need default map, Doing complete custom map?* That's what the library is crafted for! (Unlimited `Scenes`, `Characters`, `Vehicles`, `Weapons` asset-packs & Custom Graphics!)
+**Assetify** powered by [Graphify](https://raw.githubusercontent.com/ov-sa/Graphify-Library) combines custom asset loading/unloading, rendering techniques towards gamemode perspective for efficient & faster asset manipulation, giving you the full capabilities to customize the environment without stressing about performances issues, since the library is developed with '**Performance-First**' in mind!
+
+**Tired of replacing objects?** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones. 
+
+**Don't need default map, Doing complete custom map?** That's what the library is crafted for! (Unlimited `Scenes`, `Characters`, `Vehicles`, `Weapons` asset-packs & Custom Graphics!)
 
 ## ━ Features
 
