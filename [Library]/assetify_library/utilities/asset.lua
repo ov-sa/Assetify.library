@@ -35,6 +35,9 @@ local imports = {
     engineImportTXD = engineImportTXD,
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
+    table = {
+        clone = table.clone
+    },
     string = {
         byte = string.byte,
         lower = string.lower
@@ -172,18 +175,12 @@ else
 
         if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
-        local cAssetPack = {
-            autoLoad = assetPack.reference.autoLoad,
-            manifestData = false,
-            assetType = assetPack.reference.assetType,
-            assetBase = assetPack.reference.assetBase,
-            assetTransparency = assetPack.reference.assetTransparency,
-            rwDatas = {}
-        }
+        local cAssetPack = imports.table.clone(assetPack, true)
         cAssetPack.manifestData = imports.fetchFileData((asset.references.root)..imports.string.lower(assetPackType).."/"..(asset.references.manifest)..".json")
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
 
         if cAssetPack.manifestData then
+            cAssetPack.rwDatas = {}
             thread:create(function(cThread)
                 local callbackReference = callback
                 for i = 1, #cAssetPack.manifestData, 1 do

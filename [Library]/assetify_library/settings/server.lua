@@ -16,39 +16,31 @@
 availableAssetPacks = {
 
     ["scene"] = {
-        reference = {
-            autoLoad = true,
-            assetType = "object",
-            assetBase = 1337,
-            assetTransparency = false
-        }
+        autoLoad = true,
+        assetType = "object",
+        assetBase = 1337,
+        assetTransparency = false
     },
 
     ["character"] = {
-        reference = {
-            autoLoad = true,
-            assetType = "ped",
-            assetBase = 7,
-            assetTransparency = false
-        }
+        autoLoad = true,
+        assetType = "ped",
+        assetBase = 7,
+        assetTransparency = false
     },
 
     ["vehicle"] = {
-        reference = {
-            autoLoad = true,
-            assetType = "vehicle",
-            assetBase = 400 ,
-            assetTransparency = false
-        }
+        autoLoad = true,
+        assetType = "vehicle",
+        assetBase = 400 ,
+        assetTransparency = false
     },
 
     ["weapon"] = {
-        reference = {
-            autoLoad = true,
-            assetType = "object",
-            assetBase = 1337,
-            assetTransparency = false
-        }
+        autoLoad = true,
+        assetType = "object",
+        assetBase = 1337,
+        assetTransparency = false
     }
 
 }

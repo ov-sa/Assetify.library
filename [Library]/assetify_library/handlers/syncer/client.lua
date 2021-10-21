@@ -29,16 +29,18 @@ local imports = {
 
 isLibraryLoaded = false
 availableAssetPacks = {}
-imports.addEvent("onAssetifyLoad", false)
-imports.addEvent("onAssetifyUnLoad", false)
 
 
 ---------------------------------------------------
 --[[ Events: On Client Recieve/Load Asset Pack ]]--
 ---------------------------------------------------
 
+imports.addEvent("onAssetifyLoad", false)
+imports.addEvent("onAssetifyUnLoad", false)
+
 imports.addEvent("onClientRecieveAssetPack", true)
 imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, chunkIndex, chunkData)
+    
     if not assetPack or not dataIndex then return false end
     if not availableAssetPacks[assetPack] then
         availableAssetPacks[assetPack] = {}
@@ -51,10 +53,12 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
             availableAssetPacks[assetPack][dataIndex][chunkIndex] = chunkData
         end
     end
+
 end)
 
 imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
+
     thread:create(function(cThread)
         onLibraryLoaded()
         for i, j in imports.pairs(availableAssetPacks) do
@@ -75,8 +79,11 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             end
         end
     end):resume()
+
 end)
 
 imports.addEventHandler("onClientResourceStop", resourceRoot, function()
+
     imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
+
 end)
