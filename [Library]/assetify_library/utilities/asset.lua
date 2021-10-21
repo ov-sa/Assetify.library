@@ -57,7 +57,7 @@ asset = {
         scene = "scene"
     },
     separators = {
-        IPL = imports.string.byte(',')
+        IPL = imports.string.byte(" ,")
     }
 }
 asset.__index = asset
@@ -206,8 +206,8 @@ else
                                     local childName = imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL))
                                     cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
                                         rwData = {
-                                            dff = imports.fetchFileData(assetPath..(asset.references.asset).."/dff/"..childName..".dff"),
-                                            col = imports.fetchFileData(assetPath..(asset.references.asset).."/col/"..childName..".col")
+                                            dff = imports.fetchFileData(assetPath.."/dff/"..childName..".dff"),
+                                            col = imports.fetchFileData(assetPath.."/col/"..childName..".col")
                                         },
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),
