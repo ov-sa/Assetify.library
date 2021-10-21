@@ -43,9 +43,30 @@ function getAssetData(assetType, assetName)
 end
 
 
-----------------------------------------------
---[[ Functions: Laods/Unloads Scene Asset ]]--
-----------------------------------------------
+------------------------------------------------
+--[[ Function: Retrieves Asset's Load State ]]--
+------------------------------------------------
+
+function isAssetLoaded(assetType, assetName)
+
+    if not isLibraryLoaded then return false end
+    if not assetType or not assetName then return false end
+
+    local packReference = availableAssetPacks[assetType]
+    if packReference then
+        local assetReference = packReference.rwDatas[assetName]
+        if assetReference and assetReference.cAsset then
+            return true
+        end
+    end
+    return false
+
+end
+
+
+----------------------------------------
+--[[ Functions: Loads/Unloads Asset ]]--
+----------------------------------------
 
 function loadAsset(assetType, assetName, callback)
 

@@ -17,11 +17,11 @@
     <script src="handlers/syncer/client.lua" type="client"/>
     <script src="handlers/syncer/server.lua" type="server"/>
     <script src="handlers/bundler.lua" type="client"/>
-    <!--script src="handlers/mapLoader.lua" type="client"/-->
 
     <!-- Exports -->
-    <export function="fetchImports" type="shared"/>
+    <export function="fetchImports" type="client"/>
     <export function="getAssetData" type="client"/>
+    <export function="isAssetLoaded" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
 
