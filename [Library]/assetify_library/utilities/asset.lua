@@ -36,7 +36,8 @@ local imports = {
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
     string = {
-        byte = string.byte
+        byte = string.byte,
+        lower = string.lower
     }
 }
 
@@ -46,6 +47,12 @@ local imports = {
 ----------------------
 
 asset = {
+    references = {
+        root = "files/assets/",
+        manifest = "manifest",
+        asset = "asset",
+        scene = "scene"
+    },
     separators = {
         IPL = imports.string.byte(',')
     }
@@ -72,15 +79,15 @@ if localPlayer then
     
     end
     
-    function asset:load(assetPackType, assetType, assetBase, assetTransparency, assetData, sceneReference, callback)
+    function asset:load(assetPackType, assetPack, assetData, assetScene, callback)
     
         if not self or (self == asset) then return false end
-        if not assetPackType or not assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
+        if not assetPackType or not assetPack.assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
     
         local primary_rwFiles, secondary_rwFiles = nil, nil
         local modelID = false
         if assetData.rwData.dff then
-            modelID = imports.engineRequestModel(assetType, (sceneReference and sceneReference.manifestData and sceneReference.manifestData.assetBase and (imports.type(sceneReference.manifestData.assetBase) == "number") and sceneReference.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetBase or nil)
+            modelID = imports.engineRequestModel(assetPack.assetType, (assetScene and assetScene.manifestData and assetScene.manifestData.assetBase and (imports.type(assetScene.manifestData.assetBase) == "number") and assetScene.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 primary_rwFiles = {}
                 primary_rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
@@ -101,7 +108,7 @@ if localPlayer then
         if primary_rwFiles then
             if assetPackType == "scene" then
                 secondary_rwFiles = {}
-                secondary_rwFiles.txd = (sceneReference and sceneReference.txd and ((imports.isElement(sceneReference.txd) and sceneReference.txd) or imports.engineLoadTXD(sceneReference.txd))) or false
+                secondary_rwFiles.txd = (assetScene and assetScene.txd and ((imports.isElement(assetScene.txd) and assetScene.txd) or imports.engineLoadTXD(assetScene.txd))) or false
                 if secondary_rwFiles.txd then
                     imports.engineImportTXD(secondary_rwFiles.txd, modelID)
                 end
@@ -111,7 +118,7 @@ if localPlayer then
                     imports.engineImportTXD(primary_rwFiles.txd, modelID)
                 end
             end
-            imports.engineReplaceModel(primary_rwFiles.dff, modelID, (sceneReference and sceneReference.manifestData.assetTransparency and true) or (assetData.manifestData.assetTransparency and true) or assetTransparency)
+            imports.engineReplaceModel(primary_rwFiles.dff, modelID, (assetScene and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
             if primary_rwFiles.col then
                 imports.engineReplaceCOL(primary_rwFiles.col, modelID)
             end
@@ -173,7 +180,7 @@ else
             assetTransparency = assetPack.reference.assetTransparency,
             rwDatas = {}
         }
-        cAssetPack.manifestData = imports.fetchFileData((assetPack.reference.root)..(assetPack.reference.manifest)..".json")
+        cAssetPack.manifestData = imports.fetchFileData((asset.references.root)..imports.string.lower(assetPackType).."/"..(asset.references.manifest)..".json")
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
 
         if cAssetPack.manifestData then
@@ -181,8 +188,8 @@ else
                 local callbackReference = callback
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetReference = cAssetPack.manifestData[i]
-                    local assetPath = (assetPack.reference.root)..assetReference.."/"
-                    local assetManifestData = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".json")
+                    local assetPath = (asset.references.root)..imports.string.lower(assetPackType).."/"..assetReference.."/"
+                    local assetManifestData = imports.fetchFileData(assetPath..(asset.references.asset)..".json")
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
@@ -191,10 +198,10 @@ else
                             manifestData = assetManifestData
                         }
                         if assetPackType == "scene" then
-                            local sceneManifestData = imports.fetchFileData(assetPath..(assetPack.reference.scene)..".ipl")
+                            local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {
-                                    txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
+                                    txd = imports.fetchFileData(assetPath..(asset.references.asset)..".txd"),
                                     children = {}
                                 }
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
@@ -202,8 +209,8 @@ else
                                     local childName = imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL))
                                     cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
                                         rwData = {
-                                            dff = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/dff/"..childName..".dff"),
-                                            col = imports.fetchFileData(assetPath..(assetPack.reference.asset).."/col/"..childName..".col")
+                                            dff = imports.fetchFileData(assetPath..(asset.references.asset).."/dff/"..childName..".dff"),
+                                            col = imports.fetchFileData(assetPath..(asset.references.asset).."/col/"..childName..".col")
                                         },
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),
@@ -224,9 +231,9 @@ else
                             end
                         else
                             cAssetPack.rwDatas[assetReference].rwData = {
-                                txd = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".txd"),
-                                dff = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".dff"),
-                                col = imports.fetchFileData(assetPath..(assetPack.reference.asset)..".col")
+                                txd = imports.fetchFileData(assetPath..(asset.references.asset)..".txd"),
+                                dff = imports.fetchFileData(assetPath..(asset.references.asset)..".dff"),
+                                col = imports.fetchFileData(assetPath..(asset.references.asset)..".col")
                             }
                         end
                     end

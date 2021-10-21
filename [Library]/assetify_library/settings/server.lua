@@ -17,50 +17,37 @@ availableAssetPacks = {
 
     ["scene"] = {
         reference = {
-            root = "files/assets/scenes/",
-            manifest = "manifest",
-            asset = "asset",
-            scene = "scene",
+            autoLoad = true,
             assetType = "object",
             assetBase = 1337,
-            assetTransparency = false,
-            autoLoad = true
+            assetTransparency = false
         }
     },
 
     ["character"] = {
         reference = {
-            root = "files/assets/characters/",
-            manifest = "manifest",
-            asset = "asset",
+            autoLoad = true,
             assetType = "ped",
             assetBase = 7,
-            assetTransparency = false,
-            autoLoad = true
+            assetTransparency = false
         }
     },
 
     ["vehicle"] = {
         reference = {
-            root = "files/assets/vehicles/",
-            manifest = "manifest",
-            asset = "asset",
+            autoLoad = true,
             assetType = "vehicle",
             assetBase = 400 ,
-            assetTransparency = false,
-            autoLoad = true
+            assetTransparency = false
         }
     },
 
     ["weapon"] = {
         reference = {
-            root = "files/assets/weapons/",
-            manifest = "manifest",
-            asset = "asset",
+            autoLoad = true,
             assetType = "object",
             assetBase = 1337,
-            assetTransparency = false,
-            autoLoad = true
+            assetTransparency = false
         }
     }
 
