@@ -32,7 +32,7 @@ availableAssetPacks = {
     ["vehicle"] = {
         autoLoad = true,
         assetType = "vehicle",
-        assetBase = 400 ,
+        assetBase = 400,
         assetTransparency = false
     },
 
