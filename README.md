@@ -21,9 +21,9 @@
 * Completely Performance-Friendly
 * Gamemode Perspective
 * Graphify Integration 🎨
-* UE Inspired Unlimited configurable Asset Packs
+* UE inspired Unlimited & Configurable Asset Packs
 * Custom Downloader & Syncer (No more `meta.xml` boredom!)
-* Supports IPL Map format (No more annoying janky conversions!)
+* Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Scene Asset-Pack (Supports multiple instances)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
