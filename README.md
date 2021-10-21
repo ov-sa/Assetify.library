@@ -39,6 +39,7 @@
 * Graphify Maps support for Asset-Packs
 * Custom Scene Dimension & Interior
 * Custom Bone Attachment Handler
+* Virtul LODs
 * Asset-Pack Cache (MD5 Hash Layer)
 * UE based Weapon Asset-Pack (Fully functional w/ customizable reload, magazine & damage)
 
