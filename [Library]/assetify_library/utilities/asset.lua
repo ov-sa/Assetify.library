@@ -28,6 +28,7 @@ local imports = {
     fetchFileData = fetchFileData,
     setTimer = setTimer,
     engineRequestModel = engineRequestModel,
+    engineSetModelLODDistance = engineSetModelLODDistance,
     engineFreeModel = engineFreeModel,
     engineLoadTXD = engineLoadTXD,
     engineLoadDFF = engineLoadDFF,
@@ -93,6 +94,7 @@ if localPlayer then
         if assetData.rwData.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetScene and assetScene.manifestData and assetScene.manifestData.assetBase and (imports.type(assetScene.manifestData.assetBase) == "number") and assetScene.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
             if modelID then
+                imports.engineSetModelLODDistance(modelID, 300)
                 primary_rwFiles = {}
                 primary_rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
                 primary_rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false

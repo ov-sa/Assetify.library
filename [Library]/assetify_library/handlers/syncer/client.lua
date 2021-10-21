@@ -19,7 +19,10 @@ local imports = {
     addEvent = addEvent,
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
-    loadAsset = loadAsset
+    loadAsset = loadAsset,
+    removeWorldModel = removeWorldModel,
+    setOcclusionsEnabled = setOcclusionsEnabled,
+    setWaterLevel = setWaterLevel
 }
 
 
@@ -93,6 +96,22 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             end
         end
     end):resume()
+
+end)
+
+
+-----------------------------------------------
+--[[ Events: On Client Resource Start/Stop ]]--
+-----------------------------------------------
+
+imports.addEventHandler("onClientResourceStart", resourceRoot, function()
+
+    --TODO: Integrate w/ Asset's Manifest soon
+    for i = 550, 19999, 1 do
+        imports.removeWorldModel(i, 100000, 0, 0, 0)
+    end
+    imports.setOcclusionsEnabled(false)
+    imports.setWaterLevel(-50000)
 
 end)
 

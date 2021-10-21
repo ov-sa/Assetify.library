@@ -20,7 +20,10 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     collectgarbage = collectgarbage,
-    createObject = createObject
+    createObject = createObject,
+    setElementDoubleSided = setElementDoubleSided,
+    setElementDimension = setElementDimension,
+    setElementInterior = setElementInterior
 }
 
 
@@ -56,6 +59,10 @@ function scene:load(cAsset)
     if not cAsset then return false end
 
     self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
+    imports.setElementDoubleSided(self.cObject, true)
+    --TODO: Integrate w/ Asset's Manifest soon
+    imports.setElementDimension(self.cObject, 0)
+    imports.setElementInterior(self.cObject, 0)
     return true
 
 end
