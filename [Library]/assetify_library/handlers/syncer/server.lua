@@ -40,23 +40,43 @@ local function syncAssetPack(player)
                 if k ~= "rwDatas" then
                     imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, v)
                 else
-                    if i == "scene" then
-                        --TODO: ..
-                    else
-                        for m, n in imports.pairs(v) do
-                            for x, y in imports.pairs(n) do
-                                if x ~= "rwData" then
-                                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x}, y)
+                    for m, n in imports.pairs(v) do
+                        for x, y in imports.pairs(n) do
+                            if x ~= "rwData" then
+                                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x}, y)
+                            else
+                                if i == "scene" then
+                                    for o, p in imports.pairs(y) do
+                                        if o ~= "children" then
+                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o}, p)
+                                        else
+                                            for a, b in imports.pairs(p) do
+                                                for c, d in imports.pairs(b) do
+                                                    if c ~= "rwData" then
+                                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o, a, c}, d)
+                                                    else
+                                                        for e, f in imports.pairs(d) do
+                                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o, a, c, e}, f)
+                                                            thread.pause()
+                                                        end
+                                                    end
+                                                    thread.pause()
+                                                end
+                                                thread.pause()
+                                            end
+                                        end
+                                        thread.pause()
+                                    end
                                 else
                                     for o, p in imports.pairs(y) do
                                         imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o}, p)
                                         thread.pause()
                                     end
                                 end
-                                thread.pause()
                             end
                             thread.pause()
                         end
+                        thread.pause()
                     end
                 end
                 thread.pause()

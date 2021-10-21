@@ -53,15 +53,18 @@ imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, da
             if not availableAssetPacks[assetPack][dataIndex] then
                 availableAssetPacks[assetPack][dataIndex] = {}
             end
+            local totalIndexes = #dataIndexes
             local indexPointer = availableAssetPacks[assetPack][dataIndex]
-            for i = 1, #dataIndexes, 1 do
-                local indexReference = dataIndexes[i]
-                if not indexPointer[indexReference] then
-                    indexPointer[indexReference] = {}
+            if totalIndexes > 1 then
+                for i = 1, totalIndexes - 1, 1 do
+                    local indexReference = dataIndexes[i]
+                    if not indexPointer[indexReference] then
+                        indexPointer[indexReference] = {}
+                    end
                     indexPointer = indexPointer[indexReference]
                 end
             end
-            indexPointer = subIndexData
+            indexPointer[(dataIndexes[totalIndexes])] = subIndexData
         end
     end
 
@@ -71,6 +74,7 @@ imports.addEvent("onClientLoadAssetPack", true)
 imports.addEventHandler("onClientLoadAssetPack", root, function()
 
     thread:create(function(cThread)
+        print("LOADED...")
         onLibraryLoaded()
         for i, j in imports.pairs(availableAssetPacks) do
             if j.autoLoad and j.rwDatas then
