@@ -38,25 +38,25 @@ local function syncAssetPack(player)
         for i, j in imports.pairs(availableAssetPacks) do
             for k, v in imports.pairs(j.assetPack) do
                 if k ~= "rwDatas" then
-                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, v)
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, v)
                 else
                     for m, n in imports.pairs(v) do
                         for x, y in imports.pairs(n) do
                             if x ~= "rwData" then
-                                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x}, y)
+                                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x}, y)
                             else
                                 if i == "scene" then
                                     for o, p in imports.pairs(y) do
                                         if o ~= "children" then
-                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o}, p)
+                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o}, p)
                                         else
                                             for a, b in imports.pairs(p) do
                                                 for c, d in imports.pairs(b) do
                                                     if c ~= "rwData" then
-                                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o, a, c}, d)
+                                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o, a, c}, d)
                                                     else
                                                         for e, f in imports.pairs(d) do
-                                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o, a, c, e}, f)
+                                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o, a, c, e}, f)
                                                             thread.pause()
                                                         end
                                                     end
@@ -69,7 +69,7 @@ local function syncAssetPack(player)
                                     end
                                 else
                                     for o, p in imports.pairs(y) do
-                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSpeed, false, player, i, k, nil, {m, x, o}, p)
+                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o}, p)
                                         thread.pause()
                                     end
                                 end
@@ -82,9 +82,9 @@ local function syncAssetPack(player)
                 thread.pause()
             end
         end
-        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSpeed, false, player)
+        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
     end):resume({
-        executions = 5,
+        executions = downloadSettings.syncRate,
         frames = 1
     })
     return true

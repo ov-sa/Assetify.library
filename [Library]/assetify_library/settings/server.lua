@@ -13,9 +13,12 @@
 --[[ Settings ]]--
 ------------------
 
-downloadSpeed = 1250000
-availableAssetPacks = {
+downloadSettings = {
+    speed = 1250000,
+    syncRate = 5
+}
 
+availableAssetPacks = {
     ["scene"] = {
         autoLoad = true,
         assetType = "object",
@@ -43,5 +46,4 @@ availableAssetPacks = {
         assetBase = 1337,
         assetTransparency = false
     }
-
 }
