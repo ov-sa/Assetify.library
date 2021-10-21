@@ -56,7 +56,6 @@ function thread:destroy()
     if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end
-    self.thread = nil
     self = nil
     imports.collectgarbage()
     return true
