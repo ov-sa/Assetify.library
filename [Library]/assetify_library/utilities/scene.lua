@@ -59,10 +59,15 @@ function scene:load(cAsset)
     if not cAsset then return false end
 
     self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
+    self.cLODObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z, true)
+    --TODO: Add config for LODs
     imports.setElementDoubleSided(self.cObject, true)
+    imports.setElementDoubleSided(self.cLODObject, true)
     --TODO: Integrate w/ Asset's Manifest soon
     imports.setElementDimension(self.cObject, 0)
     imports.setElementInterior(self.cObject, 0)
+    imports.setElementDimension(self.cLODObject, 0)
+    imports.setElementInterior(self.cLODObject, 0)
     return true
 
 end
@@ -74,6 +79,9 @@ function scene:unload(cAsset)
 
     if imports.isElement(self.cObject) then
         imports.destroyElement(self.cObject)
+    end
+    if imports.isElement(self.cLODObject) then
+        imports.destroyElement(self.cLODObject)
     end
     self = nil
     imports.collectgarbage()
