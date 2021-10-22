@@ -16,12 +16,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    tonumber = tonumber,
-    setTimer = setTimer,
-    math = {
-        min = math.min,
-        max = math.max
-    }
+    setTimer = setTimer
 }
 
 
@@ -88,12 +83,10 @@ function loadAsset(assetType, assetName, callback)
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.cAsset then
             if assetType == "scene" then
-                thread:create(function(cThread)
-                    local sceneDimension = imports.math.max(scene.ranges.dimension[1], imports.math.min(scene.ranges.dimension[2], imports.tonumber(assetReference.manifestData.sceneDimension) or 0))
-                    local sceneInterior = imports.math.max(scene.ranges.interior[1], imports.math.min(scene.ranges.interior[2], imports.tonumber(assetReference.manifestData.sceneInterior) or 0))
+                thread:create(function(cThread)                    
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
-                            scene:create(j.cAsset, sceneDimension, sceneInterior)
+                            scene:create(j.cAsset, assetReference.manifestData.sceneDimension, assetReference.manifestData.sceneInterior)
                             imports.setTimer(function()
                                 cThread:resume()
                             end, 1, 1)

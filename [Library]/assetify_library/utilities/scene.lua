@@ -31,12 +31,7 @@ local imports = {
 --[[ Class: Scene ]]--
 ----------------------
 
-scene = {
-    ranges = {
-        dimension = {-1, 65535},
-        interior = {0, 255}
-    }
-}
+scene = {}
 scene.__index = scene
 
 function scene:create(...)

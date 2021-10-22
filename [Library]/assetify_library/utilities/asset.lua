@@ -43,6 +43,10 @@ local imports = {
         byte = string.byte,
         lower = string.lower,
         gsub = string.gsub
+    },
+    math = {
+        min = math.min,
+        max = math.max
     }
 }
 
@@ -60,6 +64,10 @@ asset = {
     },
     separators = {
         IPL = imports.string.byte(", ")
+    },
+    ranges = {
+        dimension = {-1, 65535},
+        interior = {0, 255}
     }
 }
 asset.__index = asset
@@ -199,6 +207,8 @@ else
                             manifestData = assetManifestData
                         }
                         if assetPackType == "scene" then
+                            assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
+                            assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
                             local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {
