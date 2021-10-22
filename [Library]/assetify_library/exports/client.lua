@@ -89,8 +89,8 @@ function loadAsset(assetType, assetName, callback)
         if assetReference and not assetReference.cAsset then
             if assetType == "scene" then
                 thread:create(function(cThread)
-                    local sceneDimension = imports.math.max(-1, imports.math.min(65535, imports.tonumber(assetReference.manifestData.sceneDimension) or 0))
-                    local sceneInterior = imports.math.max(0, imports.math.min(255, imports.tonumber(assetReference.manifestData.sceneInterior) or 0))
+                    local sceneDimension = imports.math.max(scene.ranges.dimension[1], imports.math.min(scene.ranges.dimension[2], imports.tonumber(assetReference.manifestData.sceneDimension) or 0))
+                    local sceneInterior = imports.math.max(scene.ranges.interior[1], imports.math.min(scene.ranges.interior[2], imports.tonumber(assetReference.manifestData.sceneInterior) or 0))
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
                             scene:create(j.cAsset, sceneDimension, sceneInterior)
