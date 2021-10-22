@@ -131,11 +131,11 @@ if localPlayer then
     
             assetData.cAsset = self
             self.cData = assetData
+            self.cScene = assetScene
             self.syncedData = {
                 modelID = modelID
             }
             self.unsyncedData = {
-                sceneReference = assetScene or nil,
                 primary_rwFiles = primary_rwFiles,
                 secondary_rwFiles = secondary_rwFiles
             }
