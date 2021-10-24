@@ -227,6 +227,28 @@ if localPlayer then
 
     end
 else
+    function asset:buildShader(assetPath, cThread, shaderMaps, shaderPack)
+
+        if not assetPath or not cThread or not shaderMaps or not shaderPack then return false end
+    
+        for i, j in imports.pairs(shaderMaps) do
+            if j and (imports.type(j) == "table") then
+                shaderPack.rwMap[i] = {}
+                for k, v in imports.pairs(j) do
+                    if v and (imports.type(v) == "table") then
+                        shaderPack.rwMap[i][k] = (v.map and imports.fetchFileData(assetPath.."map/"..v.map)) or false
+                    end
+                    imports.setTimer(function()
+                        cThread:resume()
+                    end, 1, 1)
+                    thread.pause()
+                end
+            end
+        end
+        return true
+
+    end
+
     function asset:buildPack(assetPackType, assetPack, callback)
 
         if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
@@ -252,20 +274,7 @@ else
                         }
                         if assetManifestData.shaderMaps then
                             cAssetPack.rwDatas[assetReference].rwMap = {}
-                            for k, v in imports.pairs(assetManifestData.shaderMaps) do
-                                if v and (imports.type(v) == "table") then
-                                    cAssetPack.rwDatas[assetReference].rwMap[k] = {}
-                                    for m, n in imports.pairs(v) do
-                                        if n and (imports.type(n) == "table") then
-                                            cAssetPack.rwDatas[assetReference].rwMap[k][m] = (n.map and imports.fetchFileData(assetPath.."map/"..n.map)) or false
-                                        end
-                                        imports.setTimer(function()
-                                            cThread:resume()
-                                        end, 1, 1)
-                                        thread.pause()
-                                    end
-                                end
-                            end
+                            asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference])
                         end
                         if assetPackType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
