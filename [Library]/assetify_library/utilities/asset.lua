@@ -197,7 +197,7 @@ if localPlayer then
                         if mapType == "bump" then
                         --TODO: CREATE THE MAP HERE & CACHE IT
                         --local createdTexture = dxCreateTexture()
-                        --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
+                        --asset.cMaps[i] = {map = createdTexture, shader = createdShader}
                         elseif mapType == "control" then
                             
                         end
@@ -207,8 +207,8 @@ if localPlayer then
                         if imports.isElement(asset.cMaps[i].shader) then
                             imports.destroyElement(asset.cMaps[i].shader)
                         end
-                        if imports.isElement(asset.cMaps[i].texture) then
-                            imports.destroyElement(asset.cMaps[i].texture)
+                        if imports.isElement(asset.cMaps[i].map) then
+                            imports.destroyElement(asset.cMaps[i].map)
                         end
                         asset.cMaps[i] = nil
                     end
@@ -250,6 +250,28 @@ else
                         cAssetPack.rwDatas[assetReference] = {
                             manifestData = assetManifestData
                         }
+                        if assetManifestData.shaderMaps then
+                            for k, v in imports.pairs(assetManifestData.shaderMaps) do
+                                if v and (imports.type(v) == "table") then
+                                    for m, n in imports.pairs(v) do
+                                        if n and (imports.type(n) == "table") then
+                                            if n.map then
+                                                local mapData = imports.fetchFileData(assetPath.."maps/"..n.map)
+                                                if mapData then
+                                                    print("EXISTS!")
+                                                else
+                                                    print("DOESN'T EXISTS!")
+                                                end
+                                            end
+                                        end
+                                        imports.setTimer(function()
+                                            cThread:resume()
+                                        end, 1, 1)
+                                        thread.pause()
+                                    end
+                                end
+                            end
+                        end
                         if assetPackType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
@@ -261,16 +283,6 @@ else
                                     for i, j in imports.pairs(assetManifestData.sceneOffset) do
                                         assetManifestData.sceneOffset[i] = imports.tonumber(j)
                                     end
-                                end
-                            end
-                            if assetManifestData.shaderMaps then
-                                for k, v in imports.pairs(assetManifestData.shaderMaps) do
-                                    --if i ~= 
-                                    --[[
-                                    for m, n in imports.pairs(j) do
-
-                                    end]]
-                                    print(k)
                                 end
                             end
                             local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
