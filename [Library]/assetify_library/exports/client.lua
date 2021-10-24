@@ -83,7 +83,7 @@ function loadAsset(assetType, assetName, callback)
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.cAsset then
             if assetType == "scene" then
-                thread:create(function(cThread)                    
+                thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
                             scene:create(j.cAsset, assetReference.manifestData.sceneDimension, assetReference.manifestData.sceneInterior)
@@ -92,6 +92,7 @@ function loadAsset(assetType, assetName, callback)
                             end, 1, 1)
                         end)
                     end
+                    asset:loadShaders(assetReference.manifestData.sceneMaps)
                     assetReference.cAsset = true
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
@@ -130,6 +131,7 @@ function unloadAsset(assetType, assetName, callback)
                             end)
                         end
                     end
+                    asset:unloadShaders(assetReference.manifestData.sceneMaps)
                     assetReference.cAsset = false
                     if callback and (imports.type(callback) == "function") then
                         callback(true)

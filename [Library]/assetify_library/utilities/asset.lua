@@ -182,6 +182,23 @@ if localPlayer then
         return true
 
     end
+
+    function asset:loadShaders(cMaps)
+
+        print(type(cMaps))
+        if not cMaps then return false end
+
+        print("Trying to load asset maps")
+
+    end
+
+    function asset:unloadShaders(cMaps)
+
+        if not cMaps then return false end
+
+        print("Trying to unload asset maps")
+
+    end
 else
     function asset:buildPack(assetPackType, assetPack, callback)
 
