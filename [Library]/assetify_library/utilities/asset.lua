@@ -36,6 +36,7 @@ local imports = {
     engineImportTXD = engineImportTXD,
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
+    dxCreateTexture = dxCreateTexture,
     table = {
         clone = table.clone
     },
@@ -184,31 +185,34 @@ if localPlayer then
 
     end
 
-    function asset:refreshMaps(refreshState, mapData, mapType)
+    function asset:refreshMaps(refreshState, mapPack, mapData, mapType)
 
-        if not mapData or (imports.type(mapData) ~= "table") then return false end
+        if not mapPack or (refreshState and not mapData) or (imports.type(mapData) ~= "table") then return false end
 
         for i, j in imports.pairs(mapData) do
             if not mapType then
-                asset:refreshMaps(refreshState, j, i)
+                asset:refreshMaps(refreshState, mapPack, j, i)
             else
                 if refreshState then
                     if not asset.cMaps[i] then
                         if mapType == "bump" then
-                        --TODO: CREATE THE MAP HERE & CACHE IT
-                        --local createdTexture = dxCreateTexture()
-                        --asset.cMaps[i] = {map = createdTexture, shader = createdShader}
+                            for k, v in imports.pairs(mapData) do
+                                if v.map then
+                                    local createdMap = imports.dxCreateTexture(v.map)
+                                    local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
+                                    asset.cMaps[k] = {map = createdMap, shader = createdBumpMap}
+                                end
+                            end
                         elseif mapType == "control" then
                             
                         end
                     end
                 else
                     if asset.cMaps[i] then
-                        if imports.isElement(asset.cMaps[i].shader) then
-                            imports.destroyElement(asset.cMaps[i].shader)
-                        end
-                        if imports.isElement(asset.cMaps[i].map) then
-                            imports.destroyElement(asset.cMaps[i].map)
+                        for k, v in imports.pairs(asset.cMaps[i]) do
+                            if v and imports.isElement(v) then
+                                imports.destroyElement(v)
+                            end
                         end
                         asset.cMaps[i] = nil
                     end
