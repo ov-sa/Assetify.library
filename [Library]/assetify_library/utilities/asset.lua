@@ -208,13 +208,13 @@ if localPlayer then
 
     end
 
-    function asset:unloadMaps(mapData)
+    function asset:unloadMaps(mapData, isSecondaryStage)
 
-        if not mapData then return false end
+        if not mapData or (imports.type(mapData) ~= "table") then return false end
 
         for i, j in imports.pairs(mapData) do
-            if imports.type(j) == "table" then
-                asset:unloadMaps(j)
+            if not isSecondaryStage then
+                asset:unloadMaps(j, true)
             else
                 if asset.cMaps[i] then
                     if imports.isElement(asset.cMaps[i].shader) then
