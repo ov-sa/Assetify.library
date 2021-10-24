@@ -184,15 +184,16 @@ if localPlayer then
 
     end
 
-    function asset:loadMaps(mapData)
+    function asset:loadMaps(mapData, isSecondaryStage)
 
-        if not mapData then return false end
+        if not mapData or (imports.type(mapData) ~= "table") then return false end
 
-        for i, j in pairs(mapData) do
-            if imports.type(j) == "table" then
-                asset:loadMaps(j)
+        for i, j in imports.pairs(mapData) do
+            if not isSecondaryStage then
+                asset:loadMaps(j, true)
             else
                 if not asset.cMaps[i] then
+                    --TODO: CREATE THE MAP HERE & CACHE IT
                     --local createdTexture = dxCreateTexture()
                     --[[
                     if imports.isElement(asset.cMaps[i]) then
@@ -202,9 +203,8 @@ if localPlayer then
                     ]]
                 end
             end
-            --asset.cMaps =
-            --TODO: CREATE MAPS :)
         end
+        return true
 
     end
 
