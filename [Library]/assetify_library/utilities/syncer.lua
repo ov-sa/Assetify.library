@@ -32,7 +32,7 @@ syncer = {}
 syncer.__index = syncer
 
 if localPlayer then
-    --TODO: ..
+    
 else
     syncer.scheduledClients = {}
     function syncer:syncData(player, assetType, assetName, dataIndexes, data)
