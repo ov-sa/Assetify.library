@@ -69,6 +69,34 @@ CSyncer = {
             return true
         end,
 
+        syncSceneRWData = function(player, assetType, assetName, dataIndexes, rwData)
+            if not rwData then return false end
+            for i, j in imports.pairs(rwData) do
+                local clonedDataIndex = imports.table.clone(dataIndexes, false)
+                imports.table.insert(clonedDataIndex, i)
+                if i ~= "children" then
+                    CSyncer.methods.syncData(player, assetType, assetName, clonedDataIndex, j)
+                else
+                    for k, v in imports.pairs(j) do
+                        imports.table.insert(clonedDataIndex, k)
+                        for m, n in imports.pairs(v) do
+                            local reclonedDataIndex = imports.table.clone(clonedDataIndex, false)
+                            imports.table.insert(reclonedDataIndex, m)
+                            if m ~= "rwData" then
+                                CSyncer.methods.syncData(player, assetType, assetName, reclonedDataIndex, v)
+                            else
+                                CSyncer.methods.syncRWData(player, assetType, assetName, reclonedDataIndex, v)
+                            end
+                            thread.pause()
+                        end
+                        thread.pause()
+                    end
+                end
+                thread.pause()
+            end
+            return true
+        end,
+
         syncPack = function(player)
             thread:create(function(cThread)
                 for i, j in imports.pairs(availableAssetPacks) do
@@ -78,36 +106,19 @@ CSyncer = {
                         else
                             for m, n in imports.pairs(v) do
                                 for x, y in imports.pairs(n) do
-                                    if (x ~= "rwMap") and (x ~= "rwData") then
-                                        CSyncer.methods.syncData(player, i, k, {m, x}, y)
+                                    local syncerFunction = false
+                                    if x == "rwMap" then
+                                        syncerFunction = CSyncer.methods.syncRWMap
+                                    elseif x ~= "rwData" then
+                                        syncerFunction = CSyncer.methods.syncData
                                     else
-                                        if x == "rwMap" then
-                                            CSyncer.methods.syncRWMap(player, i, k, {m, x}, y)
+                                        if i == "scene" then
+                                            syncerFunction = CSyncer.methods.syncSceneRWData
                                         else
-                                            if i == "scene" then
-                                                for o, p in imports.pairs(y) do
-                                                    if o ~= "children" then
-                                                        CSyncer.methods.syncData(player, i, k, {m, x, o}, p)
-                                                    else
-                                                        for a, b in imports.pairs(p) do
-                                                            for c, d in imports.pairs(b) do
-                                                                if c ~= "rwData" then
-                                                                    CSyncer.methods.syncData(player, i, k, {m, x, o, a, c}, d)
-                                                                else
-                                                                    CSyncer.methods.syncRWData(player, i, k, {m, x, o, a, c}, d)
-                                                                end
-                                                                thread.pause()
-                                                            end
-                                                            thread.pause()
-                                                        end
-                                                    end
-                                                    thread.pause()
-                                                end
-                                            else
-                                                CSyncer.methods.syncRWData(player, i, k, {m, x}, y)
-                                            end
+                                            syncerFunction = CSyncer.methods.syncRWData
                                         end
                                     end
+                                    syncerFunction(player, i, k, {m, x}, y)
                                     thread.pause()
                                 end
                                 thread.pause()
