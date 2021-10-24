@@ -194,7 +194,7 @@ if localPlayer then
             else
                 if refreshState then
                     if not asset.cMaps[i] then
-                        elseif mapType == "bump" then
+                        if mapType == "bump" then
                         --TODO: CREATE THE MAP HERE & CACHE IT
                         --local createdTexture = dxCreateTexture()
                         --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
