@@ -184,15 +184,22 @@ if localPlayer then
 
     end
 
-    function asset:loadMaps(mapData, isSecondaryStage)
+    function asset:loadMaps(mapData, mapType)
 
         if not mapData or (imports.type(mapData) ~= "table") then return false end
 
         for i, j in imports.pairs(mapData) do
-            if not isSecondaryStage then
-                asset:loadMaps(j, true)
+            if not mapType then
+                asset:loadMaps(j, i)
             else
                 if not asset.cMaps[i] then
+                    if mapType == "emissive" then
+
+                    elseif mapType == "bump" then
+                        
+                    elseif mapType == "control" then
+
+                    end
                     --TODO: CREATE THE MAP HERE & CACHE IT
                     --local createdTexture = dxCreateTexture()
                     --[[
@@ -208,13 +215,13 @@ if localPlayer then
 
     end
 
-    function asset:unloadMaps(mapData, isSecondaryStage)
+    function asset:unloadMaps(mapData, mapType)
 
         if not mapData or (imports.type(mapData) ~= "table") then return false end
 
         for i, j in imports.pairs(mapData) do
-            if not isSecondaryStage then
-                asset:unloadMaps(j, true)
+            if not mapType then
+                asset:unloadMaps(j, i)
             else
                 if asset.cMaps[i] then
                     if imports.isElement(asset.cMaps[i].shader) then
