@@ -16,7 +16,11 @@
 local imports = {
     pairs = pairs,
     addEventHandler = addEventHandler,
-    triggerLatentClientEvent = triggerLatentClientEvent
+    triggerLatentClientEvent = triggerLatentClientEvent,
+    table = {
+        clone = table.clone,
+        insert = table.insert
+    }
 }
 
 
@@ -25,71 +29,100 @@ local imports = {
 -------------------
 
 isLibraryLoaded = false
-local scheduledSyncs = {}
+CSyncer = {
+    scheduled = {},
+    methods = {
+        syncData = function(player, assetType, assetName, dataIndexes, data)
+            if not data then return false end
+            if not dataIndexes then
+                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, data)
+            else
+                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, dataIndexes, data)
+            end
+            return true
+        end,
 
+        syncRWMap = function(player, assetType, assetName, dataIndexes, rwMap)
+            if not rwMap then return false end
+            for i, j in imports.pairs(rwMap) do
+                for k, v in imports.pairs(j) do
+                    local clonedDataIndex = imports.table.clone(dataIndexes, false)
+                    imports.table.insert(clonedDataIndex, i)
+                    imports.table.insert(clonedDataIndex, k)
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, v)
+                    thread.pause()
+                end
+            end
+            return true
+        end,
 
-------------------------------------
---[[ Function: Syncs Asset Pack ]]--
-------------------------------------
+        syncRWData = function(player, assetType, assetName, dataIndexes, rwData)
+            if not rwData then return false end
+            for i, j in imports.pairs(rwData) do
+                local clonedDataIndex = imports.table.clone(dataIndexes, false)
+                imports.table.insert(clonedDataIndex, i)
+                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
+                thread.pause()
+            end
+            return true
+        end,
 
-local function syncAssetPack(player)
-
-    thread:create(function(cThread)
-        for i, j in imports.pairs(availableAssetPacks) do
-            for k, v in imports.pairs(j.assetPack) do
-                if k ~= "rwDatas" then
-                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, v)
-                else
-                    for m, n in imports.pairs(v) do
-                        for x, y in imports.pairs(n) do
-                            if x ~= "rwData" then
-                                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x}, y)
-                            else
-                                if i == "scene" then
-                                    for o, p in imports.pairs(y) do
-                                        if o ~= "children" then
-                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o}, p)
+        syncPack = function(player)
+            thread:create(function(cThread)
+                for i, j in imports.pairs(availableAssetPacks) do
+                    for k, v in imports.pairs(j.assetPack) do
+                        if k ~= "rwDatas" then
+                            CSyncer.methods.syncData(player, i, k, nil, v)
+                        else
+                            for m, n in imports.pairs(v) do
+                                for x, y in imports.pairs(n) do
+                                    if (x ~= "rwMap") and (x ~= "rwData") then
+                                        CSyncer.methods.syncData(player, i, k, {m, x}, y)
+                                    else
+                                        if x == "rwMap" then
+                                            CSyncer.methods.syncRWMap(player, i, k, {m, x}, y)
                                         else
-                                            for a, b in imports.pairs(p) do
-                                                for c, d in imports.pairs(b) do
-                                                    if c ~= "rwData" then
-                                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o, a, c}, d)
+                                            if i == "scene" then
+                                                for o, p in imports.pairs(y) do
+                                                    if o ~= "children" then
+                                                        CSyncer.methods.syncData(player, i, k, {m, x, o}, p)
                                                     else
-                                                        for e, f in imports.pairs(d) do
-                                                            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o, a, c, e}, f)
+                                                        for a, b in imports.pairs(p) do
+                                                            for c, d in imports.pairs(b) do
+                                                                if c ~= "rwData" then
+                                                                    CSyncer.methods.syncData(player, i, k, {m, x, o, a, c}, d)
+                                                                else
+                                                                    CSyncer.methods.syncRWData(player, i, k, {m, x, o, a, c}, d)
+                                                                end
+                                                                thread.pause()
+                                                            end
                                                             thread.pause()
                                                         end
                                                     end
                                                     thread.pause()
                                                 end
-                                                thread.pause()
+                                            else
+                                                CSyncer.methods.syncRWData(player, i, k, {m, x}, y)
                                             end
                                         end
-                                        thread.pause()
                                     end
-                                else
-                                    for o, p in imports.pairs(y) do
-                                        imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, i, k, nil, {m, x, o}, p)
-                                        thread.pause()
-                                    end
+                                    thread.pause()
                                 end
+                                thread.pause()
                             end
-                            thread.pause()
                         end
                         thread.pause()
                     end
                 end
-                thread.pause()
-            end
+                imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+            return true
         end
-        imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
-    end):resume({
-        executions = downloadSettings.syncRate,
-        frames = 1
-    })
-    return true
-
-end
+    }
+}
 
 
 -----------------------------------------------
@@ -99,9 +132,9 @@ end
 function onLibraryLoaded()
 
     isLibraryLoaded = true
-    for i, j in imports.pairs(scheduledSyncs) do
-        syncAssetPack(i)
-        scheduledSyncs[i] = nil
+    for i, j in imports.pairs(CSyncer.scheduled) do
+        CSyncer.methods.syncPack(i)
+        CSyncer.scheduled[i] = nil
     end
     
 end
@@ -109,15 +142,15 @@ end
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
     if isLibraryLoaded then
-        syncAssetPack(source)
+        CSyncer.methods.syncPack(source)
     else
-        scheduledSyncs[source] = true
+        CSyncer.scheduled[source] = true
     end
 
 end)
 
 imports.addEventHandler("onPlayerQuit", root, function()
 
-    scheduledSyncs[source] = nil
+    CSyncer.scheduled[source] = nil
 
 end)
