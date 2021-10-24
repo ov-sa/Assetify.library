@@ -16,6 +16,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
@@ -53,20 +54,21 @@ function scene:destroy(...)
 
 end
 
-function scene:load(cAsset, sceneDimension, sceneInterior)
+function scene:load(cAsset, sceneManifest)
 
     if not self or (self == scene) then return false end
-    if not cAsset or not sceneDimension or not sceneInterior then return false end
+    if not cAsset or not sceneManifest then return false end
 
-    self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
-    self.cLODObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x, cAsset.cData.position.y, cAsset.cData.position.z, cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z, true)
-    --TODO: Add config for LODs
+    self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.x) or 0), cAsset.cData.position.y + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.y) or 0), cAsset.cData.position.z + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.z) or 0), cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
     imports.setElementDoubleSided(self.cObject, true)
-    imports.setElementDoubleSided(self.cLODObject, true)
-    imports.setElementDimension(self.cObject, sceneDimension)
-    imports.setElementInterior(self.cObject, sceneInterior)
-    imports.setElementDimension(self.cLODObject, sceneDimension)
-    imports.setElementInterior(self.cLODObject, sceneInterior)
+    imports.setElementDimension(self.cObject, sceneManifest.sceneDimension)
+    imports.setElementInterior(self.cObject, sceneManifest.sceneInterior)
+    if sceneManifest.sceneLODs then
+        self.cLODObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.x) or 0), cAsset.cData.position.y + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.y) or 0), cAsset.cData.position.z + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.z) or 0), cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z, true)
+        imports.setElementDoubleSided(self.cLODObject, true)
+        imports.setElementDimension(self.cLODObject, sceneManifest.sceneDimension)
+        imports.setElementInterior(self.cLODObject, sceneManifest.sceneInterior)
+    end
     return true
 
 end

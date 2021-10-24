@@ -265,6 +265,15 @@ else
                         if assetPackType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
+                            if assetManifestData.sceneOffset then
+                                if imports.type(assetManifestData.sceneOffset) ~= "table" then
+                                    assetManifestData.sceneOffset = false
+                                else
+                                    for i, j in imports.pairs(assetManifestData.sceneOffset) do
+                                        assetManifestData.sceneOffset[i] = imports.tonumber(j)
+                                    end
+                                end
+                            end
                             local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
                             if sceneManifestData then
                                 cAssetPack.rwDatas[assetReference].rwData = {

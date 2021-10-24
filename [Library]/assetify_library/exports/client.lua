@@ -86,7 +86,7 @@ function loadAsset(assetType, assetName, callback)
                 thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
-                            scene:create(j.cAsset, assetReference.manifestData.sceneDimension, assetReference.manifestData.sceneInterior)
+                            scene:create(j.cAsset, assetReference.manifestData)
                             imports.setTimer(function()
                                 cThread:resume()
                             end, 1, 1)
