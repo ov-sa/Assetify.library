@@ -199,7 +199,7 @@ if localPlayer then
                         --local createdTexture = dxCreateTexture()
                         --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
                         elseif mapType == "control" then
-    
+                            
                         end
                     end
                 else
