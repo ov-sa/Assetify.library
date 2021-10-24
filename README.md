@@ -24,7 +24,7 @@
 * UE inspired Unlimited & Configurable Asset Packs
 * Custom Downloader & Syncer (No more `meta.xml` boredom!)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
-* Supports Scene Asset-Pack (Supports multiple instances)
+* Supports Scene Asset-Pack (Supports multiple instances & mass movement!)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
