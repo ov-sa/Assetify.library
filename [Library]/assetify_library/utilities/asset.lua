@@ -194,20 +194,14 @@ if localPlayer then
             else
                 if not asset.cMaps[i] then
                     if mapType == "emissive" then
-
+                        exports.graphify_library:setTextureEmissiveState(i, "world", true)
                     elseif mapType == "bump" then
-                        
+                    --TODO: CREATE THE MAP HERE & CACHE IT
+                    --local createdTexture = dxCreateTexture()
+                    --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
                     elseif mapType == "control" then
 
                     end
-                    --TODO: CREATE THE MAP HERE & CACHE IT
-                    --local createdTexture = dxCreateTexture()
-                    --[[
-                    if imports.isElement(asset.cMaps[i]) then
-                        imports.destroyElement(asset.cMaps[i])
-                    end
-                    asset.cMaps[i] = nil
-                    ]]
                 end
             end
         end
@@ -231,6 +225,9 @@ if localPlayer then
                         imports.destroyElement(asset.cMaps[i].texture)
                     end
                     asset.cMaps[i] = nil
+                end
+                if mapType == "emissive" then
+                    exports.graphify_library:setTextureEmissiveState(i, "world", false)
                 end
             end
         end
