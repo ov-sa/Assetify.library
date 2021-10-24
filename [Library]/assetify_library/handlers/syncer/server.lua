@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     addEventHandler = addEventHandler,
     triggerLatentClientEvent = triggerLatentClientEvent,
@@ -45,11 +46,12 @@ CSyncer = {
         syncRWMap = function(player, assetType, assetName, dataIndexes, rwMap)
             if not rwMap then return false end
             for i, j in imports.pairs(rwMap) do
-                for k, v in imports.pairs(j) do
+                if j and imports.type(j) == "table" then
                     local clonedDataIndex = imports.table.clone(dataIndexes, false)
                     imports.table.insert(clonedDataIndex, i)
-                    imports.table.insert(clonedDataIndex, k)
-                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, v)
+                    CSyncer.methods.syncRWMap(player, assetType, assetName, clonedDataIndex, rwMap[i])
+                else
+                    imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, dataIndexes, i)
                     thread.pause()
                 end
             end

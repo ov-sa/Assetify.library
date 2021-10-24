@@ -231,24 +231,17 @@ else
 
         if not assetPath or not cThread or not shaderMaps or not shaderPack then return false end
 
-        local isThreadResumed = false
         for i, j in imports.pairs(shaderMaps) do
             if j and (imports.type(j) == "table") then
                 shaderPack[i] = {}
                 asset:buildShader(assetPath, cThread, j, shaderPack[i])
             else
                 shaderPack[i] = ((i == "map") and imports.fetchFileData(assetPath.."map/"..j)) or j
-                isThreadResumed = true
-                imports.setTimer(function()
-                    cThread:resume()
-                end, 1, 1)
             end
-            thread.pause()
-        end
-        if not isThreadResumed then
             imports.setTimer(function()
                 cThread:resume()
             end, 1, 1)
+            thread.pause()
         end
         return true
 
