@@ -230,20 +230,25 @@ else
     function asset:buildShader(assetPath, cThread, shaderMaps, shaderPack)
 
         if not assetPath or not cThread or not shaderMaps or not shaderPack then return false end
-    
+
+        local isThreadResumed = false
         for i, j in imports.pairs(shaderMaps) do
             if j and (imports.type(j) == "table") then
-                shaderPack.rwMap[i] = {}
-                for k, v in imports.pairs(j) do
-                    if v and (imports.type(v) == "table") then
-                        shaderPack.rwMap[i][k] = (v.map and imports.fetchFileData(assetPath.."map/"..v.map)) or false
-                    end
-                    imports.setTimer(function()
-                        cThread:resume()
-                    end, 1, 1)
-                    thread.pause()
-                end
+                shaderPack[i] = {}
+                asset:buildShader(assetPath, cThread, j, shaderPack[i])
+            else
+                shaderPack[i] = ((i == "map") and imports.fetchFileData(assetPath.."map/"..j)) or j
+                isThreadResumed = true
+                imports.setTimer(function()
+                    cThread:resume()
+                end, 1, 1)
             end
+            thread.pause()
+        end
+        if not isThreadResumed then
+            imports.setTimer(function()
+                cThread:resume()
+            end, 1, 1)
         end
         return true
 
@@ -274,7 +279,7 @@ else
                         }
                         if assetManifestData.shaderMaps then
                             cAssetPack.rwDatas[assetReference].rwMap = {}
-                            asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference])
+                            asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
                         if assetPackType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
