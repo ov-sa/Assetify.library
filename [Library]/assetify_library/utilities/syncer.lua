@@ -91,14 +91,15 @@ else
                 syncer.syncData(player, assetType, assetName, clonedDataIndex, j)
             else
                 for k, v in imports.pairs(j) do
-                    imports.table.insert(clonedDataIndex, k)
+                    local reclonedDataIndex = imports.table.clone(clonedDataIndex, false)
+                    imports.table.insert(reclonedDataIndex, k)
                     for m, n in imports.pairs(v) do
-                        local reclonedDataIndex = imports.table.clone(clonedDataIndex, false)
-                        imports.table.insert(reclonedDataIndex, m)
+                        local subclonedDataIndex = imports.table.clone(reclonedDataIndex, false)
+                        imports.table.insert(subclonedDataIndex, m)
                         if m ~= "rwData" then
-                            syncer.syncData(player, assetType, assetName, reclonedDataIndex, v)
+                            syncer.syncData(player, assetType, assetName, subclonedDataIndex, n)
                         else
-                            syncer.syncRWData(player, assetType, assetName, reclonedDataIndex, v)
+                            syncer.syncRWData(player, assetType, assetName, subclonedDataIndex, n)
                         end
                         thread.pause()
                     end
