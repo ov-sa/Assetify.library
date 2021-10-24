@@ -184,54 +184,45 @@ if localPlayer then
 
     end
 
-    function asset:loadMaps(mapData, mapType)
+    function asset:refreshMaps(refreshState, mapData, mapType)
 
         if not mapData or (imports.type(mapData) ~= "table") then return false end
 
         for i, j in imports.pairs(mapData) do
             if not mapType then
-                asset:loadMaps(j, i)
+                asset:refreshMaps(refreshState, j, i)
             else
-                if not asset.cMaps[i] then
-                    if mapType == "emissive" then
-                        exports.graphify_library:setTextureEmissiveState(i, "world", true)
-                    elseif mapType == "bump" then
-                    --TODO: CREATE THE MAP HERE & CACHE IT
-                    --local createdTexture = dxCreateTexture()
-                    --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
-                    elseif mapType == "control" then
-
+                if refreshState then
+                    if not asset.cMaps[i] then
+                        elseif mapType == "bump" then
+                        --TODO: CREATE THE MAP HERE & CACHE IT
+                        --local createdTexture = dxCreateTexture()
+                        --asset.cMaps[i] = {texture = createdTexture, shader = createdShader}
+                        elseif mapType == "control" then
+    
+                        end
                     end
-                end
-            end
-        end
-        return true
-
-    end
-
-    function asset:unloadMaps(mapData, mapType)
-
-        if not mapData or (imports.type(mapData) ~= "table") then return false end
-
-        for i, j in imports.pairs(mapData) do
-            if not mapType then
-                asset:unloadMaps(j, i)
-            else
-                if asset.cMaps[i] then
-                    if imports.isElement(asset.cMaps[i].shader) then
-                        imports.destroyElement(asset.cMaps[i].shader)
+                else
+                    if asset.cMaps[i] then
+                        if imports.isElement(asset.cMaps[i].shader) then
+                            imports.destroyElement(asset.cMaps[i].shader)
+                        end
+                        if imports.isElement(asset.cMaps[i].texture) then
+                            imports.destroyElement(asset.cMaps[i].texture)
+                        end
+                        asset.cMaps[i] = nil
                     end
-                    if imports.isElement(asset.cMaps[i].texture) then
-                        imports.destroyElement(asset.cMaps[i].texture)
-                    end
-                    asset.cMaps[i] = nil
                 end
                 if mapType == "emissive" then
-                    exports.graphify_library:setTextureEmissiveState(i, "world", false)
+                    if j then
+                        exports.graphify_library:setTextureEmissiveState(i, "world", refreshState)
+                    end
                 end
             end
         end
-        imports.collectgarbage()
+        if not mapType and not refreshMaps then
+            imports.collectgarbage()
+        end
         return true
 
     end
