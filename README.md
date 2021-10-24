@@ -25,7 +25,7 @@
 * Custom Downloader & Syncer (No more `meta.xml` boredom!)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene Dimension, Interior, Offsets (Useful for mass movement!) 
+* Supports Scene Dimension, Interior & Offsets (Useful for mass movement!) 
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
