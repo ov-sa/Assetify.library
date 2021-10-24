@@ -53,12 +53,12 @@ else
         if not rwMap then return false end
 
         for i, j in imports.pairs(rwMap) do
+            local clonedDataIndex = imports.table.clone(dataIndexes, false)
+            imports.table.insert(clonedDataIndex, i)
             if j and imports.type(j) == "table" then
-                local clonedDataIndex = imports.table.clone(dataIndexes, false)
-                imports.table.insert(clonedDataIndex, i)
-                syncer:syncRWMap(player, assetType, assetName, clonedDataIndex, rwMap[i])
+                syncer:syncRWMap(player, assetType, assetName, clonedDataIndex, j)
             else
-                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, dataIndexes, i)
+                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
                 thread.pause()
             end
         end
@@ -121,19 +121,17 @@ else
                     else
                         for m, n in imports.pairs(v) do
                             for x, y in imports.pairs(n) do
-                                local syncerFunction = false
                                 if x == "rwMap" then
-                                    syncerFunction = syncer.syncRWMap
+                                    syncer:syncRWMap(player, i, k, {m, x}, y)
                                 elseif x ~= "rwData" then
-                                    syncerFunction = syncer.syncData
+                                    syncer:syncData(player, i, k, {m, x}, y)
                                 else
                                     if i == "scene" then
-                                        syncerFunction = syncer.syncSceneRWData
+                                        syncer:syncSceneRWData(player, i, k, {m, x}, y)
                                     else
-                                        syncerFunction = syncer.syncRWData
+                                        syncer:syncRWData(player, i, k, {m, x}, y)
                                     end
                                 end
-                                syncerFunction(player, i, k, {m, x}, y)
                                 thread.pause()
                             end
                             thread.pause()

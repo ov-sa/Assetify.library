@@ -92,7 +92,7 @@ function loadAsset(assetType, assetName, callback)
                             end, 1, 1)
                         end)
                     end
-                    asset:refreshMaps(true, assetReference.manifestData.shaderMaps)
+                    asset:refreshMaps(true, assetReference.manifestData.shaderMaps, assetReference.rwMap)
                     assetReference.cAsset = true
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
