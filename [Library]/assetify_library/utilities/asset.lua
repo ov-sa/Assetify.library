@@ -16,6 +16,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    ipairs = ipairs,
     split = split,
     gettok = gettok,
     tonumber = tonumber,
@@ -69,12 +70,17 @@ asset = {
     ranges = {
         dimension = {-1, 65535},
         interior = {0, 255}
-    },
-    cMaps = {}
+    }
 }
 asset.__index = asset
 
 if localPlayer then
+    asset.shaders = {
+        controlMap = {
+            validControls = {"red", "green", "blue"}
+        }
+    }
+    asset.cMaps = {}
     function asset:create(...)
 
         local cAsset = imports.setmetatable({}, {__index = self})
@@ -195,16 +201,38 @@ if localPlayer then
             else
                 if refreshState then
                     if not asset.cMaps[i] then
-                        if mapType == "bump" then
-                            for k, v in imports.pairs(mapData) do
+                        for k, v in imports.pairs(mapData) do
+                            if mapType == "bump" then
                                 if v.map then
                                     local createdMap = imports.dxCreateTexture(v.map)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
                                     asset.cMaps[k] = {map = createdMap, shader = createdBumpMap}
                                 end
+                            elseif mapType == "control" then
+                                local isControlValid = true
+                                for m, n in imports.ipairs(asset.shaders.controlMap.validControls) do
+                                    if not v[n] or not v[n].map or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
+                                        isControlValid = false
+                                        break
+                                    end
+                                end
+                                if isControlValid then
+                                    local redControl = imports.dxCreateTexture(v.red.map)
+                                    local greenControl = imports.dxCreateTexture(v.green.map)
+                                    local blueControl = imports.dxCreateTexture(v.blue.map)
+                                    local createdControlMap = exports.graphify_library:createControlMap(i, "world", {
+                                        red = {texture = redControl, scale = v.red.scale},
+                                        green = {texture = greenControl, scale = v.green.scale},
+                                        blue = {texture = blueControl, scale = v.blue.scale}
+                                    })
+                                    asset.cMaps[k] = {
+                                        shader = createdControlMap,
+                                        redControl = redControl,
+                                        greenControl = greenControl,
+                                        blueControl = blueControl
+                                    }
+                                end
                             end
-                        elseif mapType == "control" then
-                            
                         end
                     end
                 else
