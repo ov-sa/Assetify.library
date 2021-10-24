@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: syncer: server.lua
+     Script: handlers: syncer. server.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
@@ -34,7 +34,7 @@ function onLibraryLoaded()
 
     isLibraryLoaded = true
     for i, j in imports.pairs(syncer.scheduledClients) do
-        syncer:syncPack(i)
+        syncer.syncPack(i)
         syncer.scheduledClients[i] = nil
     end
     
@@ -43,7 +43,7 @@ end
 imports.addEventHandler("onPlayerResourceStart", root, function()
 
     if isLibraryLoaded then
-        syncer:syncPack(source)
+        syncer.syncPack(source)
     else
         syncer.scheduledClients[source] = true
     end

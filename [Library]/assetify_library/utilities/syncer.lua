@@ -35,7 +35,7 @@ if localPlayer then
     
 else
     syncer.scheduledClients = {}
-    function syncer:syncData(player, assetType, assetName, dataIndexes, data)
+    function syncer.syncData(player, assetType, assetName, dataIndexes, data)
 
         if not data then return false end
 
@@ -48,7 +48,7 @@ else
 
     end
 
-    function syncer:syncRWMap(player, assetType, assetName, dataIndexes, rwMap)
+    function syncer.syncRWMap(player, assetType, assetName, dataIndexes, rwMap)
 
         if not rwMap then return false end
 
@@ -56,7 +56,7 @@ else
             local clonedDataIndex = imports.table.clone(dataIndexes, false)
             imports.table.insert(clonedDataIndex, i)
             if j and imports.type(j) == "table" then
-                syncer:syncRWMap(player, assetType, assetName, clonedDataIndex, j)
+                syncer.syncRWMap(player, assetType, assetName, clonedDataIndex, j)
             else
                 imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
                 thread.pause()
@@ -66,7 +66,7 @@ else
 
     end
 
-    function syncer:syncRWData(player, assetType, assetName, dataIndexes, rwData)
+    function syncer.syncRWData(player, assetType, assetName, dataIndexes, rwData)
 
         if not rwData then return false end
 
@@ -80,7 +80,7 @@ else
 
     end
 
-    function syncer:syncSceneRWData(player, assetType, assetName, dataIndexes, rwData)
+    function syncer.syncSceneRWData(player, assetType, assetName, dataIndexes, rwData)
 
         if not rwData then return false end
 
@@ -88,7 +88,7 @@ else
             local clonedDataIndex = imports.table.clone(dataIndexes, false)
             imports.table.insert(clonedDataIndex, i)
             if i ~= "children" then
-                syncer:syncData(player, assetType, assetName, clonedDataIndex, j)
+                syncer.syncData(player, assetType, assetName, clonedDataIndex, j)
             else
                 for k, v in imports.pairs(j) do
                     imports.table.insert(clonedDataIndex, k)
@@ -96,9 +96,9 @@ else
                         local reclonedDataIndex = imports.table.clone(clonedDataIndex, false)
                         imports.table.insert(reclonedDataIndex, m)
                         if m ~= "rwData" then
-                            syncer:syncData(player, assetType, assetName, reclonedDataIndex, v)
+                            syncer.syncData(player, assetType, assetName, reclonedDataIndex, v)
                         else
-                            syncer:syncRWData(player, assetType, assetName, reclonedDataIndex, v)
+                            syncer.syncRWData(player, assetType, assetName, reclonedDataIndex, v)
                         end
                         thread.pause()
                     end
@@ -111,26 +111,30 @@ else
 
     end
 
-    function syncer:syncPack(player)
+    function syncer.syncPack(player)
 
         thread:create(function(cThread)
             for i, j in imports.pairs(availableAssetPacks) do
                 for k, v in imports.pairs(j.assetPack) do
                     if k ~= "rwDatas" then
-                        syncer:syncData(player, i, k, nil, v)
+                        syncer.syncData(player, i, k, nil, v)
                     else
                         for m, n in imports.pairs(v) do
                             for x, y in imports.pairs(n) do
+                                local setterFunction = false
                                 if x == "rwMap" then
-                                    syncer:syncRWMap(player, i, k, {m, x}, y)
+                                    setterFunction = syncer.syncRWMap
                                 elseif x ~= "rwData" then
-                                    syncer:syncData(player, i, k, {m, x}, y)
+                                    setterFunction = syncer.syncData
                                 else
                                     if i == "scene" then
-                                        syncer:syncSceneRWData(player, i, k, {m, x}, y)
+                                        setterFunction = syncer.syncSceneRWData
                                     else
-                                        syncer:syncRWData(player, i, k, {m, x}, y)
+                                        setterFunction = syncer.syncRWData
                                     end
+                                end
+                                if setterFunction then
+                                    setterFunction(player, i, k, {m, x}, y)
                                 end
                                 thread.pause()
                             end

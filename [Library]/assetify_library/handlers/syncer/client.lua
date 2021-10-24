@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: syncer: client.lua
+     Script: handlers: syncer. client.lua
      Server: -
      Author: OvileAmriam
      Developer: Aviril
