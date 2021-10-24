@@ -251,18 +251,13 @@ else
                             manifestData = assetManifestData
                         }
                         if assetManifestData.shaderMaps then
+                            cAssetPack.rwDatas[assetReference].rwMap = {}
                             for k, v in imports.pairs(assetManifestData.shaderMaps) do
                                 if v and (imports.type(v) == "table") then
+                                    cAssetPack.rwDatas[assetReference].rwMap[k] = {}
                                     for m, n in imports.pairs(v) do
                                         if n and (imports.type(n) == "table") then
-                                            if n.map then
-                                                local mapData = imports.fetchFileData(assetPath.."maps/"..n.map)
-                                                if mapData then
-                                                    print("EXISTS!")
-                                                else
-                                                    print("DOESN'T EXISTS!")
-                                                end
-                                            end
+                                            cAssetPack.rwDatas[assetReference].rwMap[k][m] = (n.map and imports.fetchFileData(assetPath.."map/"..n.map)) or false
                                         end
                                         imports.setTimer(function()
                                             cThread:resume()

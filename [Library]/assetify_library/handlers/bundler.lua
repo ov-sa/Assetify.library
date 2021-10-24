@@ -71,8 +71,8 @@ function onLibraryLoaded()
                 getAsset = function(...)
                     local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
                     if cAsset then
-                        cAsset.rwData = nil
-                        return cAsset, cData                        
+                        cAsset.rwMap, cAsset.rwData = nil, nil
+                        return cAsset, cData
                     end
                     return false
                 end,
