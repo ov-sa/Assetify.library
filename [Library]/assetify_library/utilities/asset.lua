@@ -253,6 +253,7 @@ else
                         if assetPackType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
+                            assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                             if assetManifestData.sceneOffset then
                                 if imports.type(assetManifestData.sceneOffset) ~= "table" then
                                     assetManifestData.sceneOffset = false
@@ -260,6 +261,16 @@ else
                                     for i, j in imports.pairs(assetManifestData.sceneOffset) do
                                         assetManifestData.sceneOffset[i] = imports.tonumber(j)
                                     end
+                                end
+                            end
+                            if assetManifestData.shaderMaps then
+                                for k, v in imports.pairs(assetManifestData.shaderMaps) do
+                                    --if i ~= 
+                                    --[[
+                                    for m, n in imports.pairs(j) do
+
+                                    end]]
+                                    print(k)
                                 end
                             end
                             local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
