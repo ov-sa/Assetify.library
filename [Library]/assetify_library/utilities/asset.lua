@@ -68,7 +68,8 @@ asset = {
     ranges = {
         dimension = {-1, 65535},
         interior = {0, 255}
-    }
+    },
+    cMaps = {}
 }
 asset.__index = asset
 
@@ -183,20 +184,51 @@ if localPlayer then
 
     end
 
-    function asset:loadShaders(cMaps)
+    function asset:loadMaps(mapData)
 
-        print(type(cMaps))
-        if not cMaps then return false end
+        if not mapData then return false end
 
-        print("Trying to load asset maps")
+        for i, j in pairs(mapData) do
+            if imports.type(j) == "table" then
+                asset:loadMaps(j)
+            else
+                if not asset.cMaps[i] then
+                    --local createdTexture = dxCreateTexture()
+                    --[[
+                    if imports.isElement(asset.cMaps[i]) then
+                        imports.destroyElement(asset.cMaps[i])
+                    end
+                    asset.cMaps[i] = nil
+                    ]]
+                end
+            end
+            --asset.cMaps =
+            --TODO: CREATE MAPS :)
+        end
 
     end
 
-    function asset:unloadShaders(cMaps)
+    function asset:unloadMaps(mapData)
 
-        if not cMaps then return false end
+        if not mapData then return false end
 
-        print("Trying to unload asset maps")
+        for i, j in imports.pairs(mapData) do
+            if imports.type(j) == "table" then
+                asset:unloadMaps(j)
+            else
+                if asset.cMaps[i] then
+                    if imports.isElement(asset.cMaps[i].shader) then
+                        imports.destroyElement(asset.cMaps[i].shader)
+                    end
+                    if imports.isElement(asset.cMaps[i].texture) then
+                        imports.destroyElement(asset.cMaps[i].texture)
+                    end
+                    asset.cMaps[i] = nil
+                end
+            end
+        end
+        imports.collectgarbage()
+        return true
 
     end
 else
