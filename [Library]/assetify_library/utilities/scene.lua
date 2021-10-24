@@ -63,7 +63,7 @@ function scene:load(cAsset, sceneManifest)
     imports.setElementDoubleSided(self.cObject, true)
     imports.setElementDimension(self.cObject, sceneManifest.sceneDimension)
     imports.setElementInterior(self.cObject, sceneManifest.sceneInterior)
-    if sceneManifest.sceneLODs then
+    if sceneManifest.defaultLODs then
         self.cLODObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.x) or 0), cAsset.cData.position.y + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.y) or 0), cAsset.cData.position.z + ((assetManifestData.sceneManifest.sceneOffset and assetManifestData.sceneManifest.sceneOffset.z) or 0), cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z, true)
         imports.setElementDoubleSided(self.cLODObject, true)
         imports.setElementDimension(self.cLODObject, sceneManifest.sceneDimension)
