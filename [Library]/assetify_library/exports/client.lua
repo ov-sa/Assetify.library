@@ -92,11 +92,12 @@ function loadAsset(assetType, assetName, callback)
                             end, 1, 1)
                         end)
                     end
-                    asset:refreshMaps(true, assetReference.manifestData.shaderMaps, assetReference.rwMap)
+                    asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
                     assetReference.cAsset = true
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
                     end
+                    print("[LOADED] ASSET: "..assetName)
                 end):resume()
                 return true
             else
@@ -131,7 +132,7 @@ function unloadAsset(assetType, assetName, callback)
                             end)
                         end
                     end
-                    asset:refreshMaps(false, assetReference.manifestData.shaderMaps)
+                    asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
                     assetReference.cAsset = false
                     if callback and (imports.type(callback) == "function") then
                         callback(true)

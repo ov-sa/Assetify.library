@@ -191,22 +191,28 @@ if localPlayer then
 
     end
 
-    function asset:refreshMaps(refreshState, mapPack, mapData, mapType)
+    function asset:refreshMaps(refreshState, assetType, assetName, mapPack, mapData, mapType)
 
-        if not mapPack or (refreshState and not mapData) or (imports.type(mapData) ~= "table") then return false end
+        if not assetType or not assetName or not mapPack or (refreshState and not mapData) or (imports.type(mapData) ~= "table") then return false end
 
-        for i, j in imports.pairs(mapData) do
+        for i, j in imports.pairs(mapPack) do
             if not mapType then
-                asset:refreshMaps(refreshState, mapPack, j, i)
-            else
                 if refreshState then
-                    if not asset.cMaps[i] then
-                        for k, v in imports.pairs(mapData) do
+                    asset.cMaps[assetType] = asset.cMaps[assetType] or {}
+                    asset.cMaps[assetType][assetName] = asset.cMaps[assetType][assetName] or {}
+                    asset.cMaps[assetType][assetName][i] = asset.cMaps[assetType][assetName][i] or {}
+                end
+                asset:refreshMaps(refreshState, assetType, assetName, j, mapData[i], i)
+            else
+                for k, v in imports.pairs(mapData) do
+                    if refreshState then
+                        if not asset.cMaps[assetType][assetName][mapType][k] then
+                            asset.cMaps[assetType][assetName][mapType][k] = {}
                             if mapType == "bump" then
                                 if v.map then
                                     local createdMap = imports.dxCreateTexture(v.map)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
-                                    asset.cMaps[k] = {map = createdMap, shader = createdBumpMap}
+                                    asset.cMaps[assetType][assetName][mapType][k] = {map = createdMap, shader = createdBumpMap}
                                 end
                             elseif mapType == "control" then
                                 local isControlValid = true
@@ -225,7 +231,7 @@ if localPlayer then
                                         green = {texture = greenControl, scale = v.green.scale},
                                         blue = {texture = blueControl, scale = v.blue.scale}
                                     })
-                                    asset.cMaps[k] = {
+                                    asset.cMaps[assetType][assetName][mapType][k] = {
                                         shader = createdControlMap,
                                         redControl = redControl,
                                         greenControl = greenControl,
@@ -234,15 +240,15 @@ if localPlayer then
                                 end
                             end
                         end
-                    end
-                else
-                    if asset.cMaps[i] then
-                        for k, v in imports.pairs(asset.cMaps[i]) do
-                            if v and imports.isElement(v) then
-                                imports.destroyElement(v)
+                    else
+                        if asset.cMaps[assetType][assetName][mapType][k] then
+                            for k, v in imports.pairs(asset.cMaps[assetType][assetName][mapType][k]) do
+                                if v and imports.isElement(v) then
+                                    imports.destroyElement(v)
+                                end
                             end
+                            asset.cMaps[assetType][assetName][mapType][k] = nil
                         end
-                        asset.cMaps[i] = nil
                     end
                 end
                 if mapType == "emissive" then
