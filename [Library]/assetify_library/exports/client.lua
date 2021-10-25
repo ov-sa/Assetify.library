@@ -97,7 +97,7 @@ function loadAsset(assetType, assetName, callback)
                     if callback and (imports.type(callback) == "function") then
                         callback(true)
                     end
-                    print("[LOADED] ASSET: "..assetName)
+                    print("[Loaded "..assetType.."] : "..assetName)
                 end):resume()
                 return true
             else

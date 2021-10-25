@@ -274,7 +274,11 @@ else
                 shaderPack[i] = {}
                 asset:buildShader(assetPath, cThread, j, shaderPack[i])
             else
-                shaderPack[i] = ((i == "map") and imports.fetchFileData(assetPath.."map/"..j)) or j
+                if i ~= "map" then
+                    shaderPack[i] = j
+                else
+                    shaderPack[i] = imports.fetchFileData(assetPath.."map/"..j)
+                end
             end
             imports.setTimer(function()
                 cThread:resume()

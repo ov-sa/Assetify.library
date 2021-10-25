@@ -82,7 +82,7 @@ imports.addEventHandler("onClientLoadAssetPack", root, function()
             if j.autoLoad and j.rwDatas then
                 for k, v in imports.pairs(j.rwDatas) do
                     if v then
-                        print("[LOADING] ASSET: "..k)
+                        print("[Loading "..i.."] : "..k)
                         imports.loadAsset(i, k, function(cAsset)
                             imports.setTimer(function()
                                 cThread:resume()
