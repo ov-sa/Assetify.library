@@ -21,8 +21,11 @@ local imports = {
     triggerEvent = triggerEvent,
     loadAsset = loadAsset,
     removeWorldModel = removeWorldModel,
+    restoreAllWorldModels = restoreAllWorldModels,
+    createWater = createWater,
+    setWaterLevel = setWaterLevel,
     setOcclusionsEnabled = setOcclusionsEnabled,
-    setWaterLevel = setWaterLevel
+    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled
 }
 
 
@@ -107,17 +110,32 @@ end)
 
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
 
-    --TODO: Integrate w/ Asset's Manifest soon
-    for i = 550, 19999, 1 do
-        imports.removeWorldModel(i, 100000, 0, 0, 0)
+    if not GTAWorldSettings.removeWorld then
+        imports.restoreAllWorldModels()
+    else
+        for i = 550, 19999, 1 do
+            imports.removeWorldModel(i, 100000, 0, 0, 0)
+        end
+        local createdWater = imports.createWater(-3000, -3000, 0, 3000, -3000, 0, -3000, 3000, 0, 3000, 3000, 0, false)
+        imports.setWaterLevel(createdWater, GTAWorldSettings.waterLevel)
     end
-    imports.setOcclusionsEnabled(false)
-    imports.setWaterLevel(-50000)
+    imports.setWaterLevel(GTAWorldSettings.waterLevel, true, true, true, true)
+    imports.setOcclusionsEnabled(not GTAWorldSettings.removeWorld)
+    imports.setWorldSpecialPropertyEnabled("randomfoliage", not GTAWorldSettings.removeWorld)
 
 end)
 
 imports.addEventHandler("onClientResourceStop", resourceRoot, function()
 
+    for i, j in imports.pairs(availableAssetPacks) do
+        if j.autoLoad and j.rwDatas then
+            for k, v in imports.pairs(j.rwDatas) do
+                if v then
+                    asset:refreshMaps(false, i, k, v.manifestData.shaderMaps, v.rwMap)
+                end
+            end
+        end
+    end
     imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
 
 end)

@@ -16,6 +16,7 @@
     <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
     <script src="settings/server.lua" type="server"/>
+    <script src="settings/client.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
