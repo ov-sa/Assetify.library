@@ -15,7 +15,8 @@
 
 local imports = {
     pairs = pairs,
-    addEventHandler = addEventHandler
+    addEventHandler = addEventHandler,
+    getResourceRootElement = getResourceRootElement
 }
 
 
@@ -40,12 +41,14 @@ function onLibraryLoaded()
     
 end
 
-imports.addEventHandler("onPlayerResourceStart", root, function()
+imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
 
-    if isLibraryLoaded then
-        syncer.syncPack(source)
-    else
-        syncer.scheduledClients[source] = true
+    if imports.getResourceRootElement(resourceElement) == resourceRoot then
+        if isLibraryLoaded then
+            syncer.syncPack(source)
+        else
+            syncer.scheduledClients[source] = true
+        end
     end
 
 end)
