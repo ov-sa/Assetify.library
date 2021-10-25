@@ -24,6 +24,7 @@
 * UE inspired Unlimited & Configurable Asset Packs
 * Custom Downloader & Syncer (No more `meta.xml` boredom!)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
+* Supports Graphify-Maps for Asset-Packs (As easy as modifying config!)
 * Supports Scene Asset-Pack (Supports multiple instances!)
 * Supports Scene Dimension, Interior & Offsets (Useful for mass movement!) 
 * Supports Character Asset-Pack
@@ -37,7 +38,6 @@
 
 ## ━ Roadmap
 
-* Graphify Maps support for Asset-Packs
 * Custom Bone Attachment Handler
 * Virtual LODs
 * Asset-Pack Cache (MD5 Hash Layer)
