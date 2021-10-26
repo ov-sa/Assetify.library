@@ -7,7 +7,7 @@
     "shaderMaps": {
         "emissive": {},
         "bump": {
-            "sand_terrain": {"map": "bump/sand_terrain.png"}
+            "sand_terrain": {"map": "bump/sand_terrain.jpg"}
         },
         "control": {
             "sand_terrain": {
