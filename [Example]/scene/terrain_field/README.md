@@ -1,52 +1,9 @@
-# ━ S Y N O P S I S
+## ━ Asset: Scene: Terrain Field
 
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Documentation/assets/assetify_banner.png)
+##### ━ Author(s): [Aviril](https://github.com/Aviril)
 
-##### ━ Maintainer(s): [Aviril](https://github.com/Aviril)
+**Terrain Field** is a simple vast low-poly terrain (**~15k Poly**) showcasing how to achieve higher poly results without adding more polygons to your base model & simplifying blending methodology via **Control & Bump maps**. It also further more demonstrates how you can achieve greater draw-distance for your terrains w/o any LODs (**400 Chunks**). Thus simulating open-world scenes efficiently.
 
-**Assetify Library** is a open-source custom asset loading library made by **Aviril** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/).
+## ━ Sneak Peaks
 
-**Assetify** powered by [Graphify](https://raw.githubusercontent.com/ov-sa/Graphify-Library) combines custom asset loading/unloading, rendering techniques towards gamemode perspective for efficient & faster asset manipulation, giving you the full capabilities to customize the environment without stressing about performances issues, since the library is developed with '**Performance-First**' in mind!
-
-**"Tired of replacing objects?"** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones! 
-
-**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Scenes`, `Characters`, `Vehicles`, `Weapons` asset-packs & Custom Graphics!)
-
-## ━ Features
-
-💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovileamriam) **US TO SUPPORT THE DEVELOPMENT.**
-
-* Completely Open-Source
-* Procedure Oriented Programming
-* Completely Performance-Friendly
-* Gamemode Perspective
-* Graphify Integration 🎨
-* UE inspired Unlimited & Configurable Asset Packs
-* Custom Downloader & Syncer (No more `meta.xml` boredom!)
-* Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
-* Supports Graphify-Maps for Asset-Packs (As easy as modifying the config!)
-* Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene Dimension, Interior & Offsets (Useful for mass movement!) 
-* Supports Character Asset-Pack
-* Supports Vehicle Asset-Pack
-* Supports Weapon Asset-Pack
-* Necessary Integration APIs
-
-## ━ Dependencies
-
-* [**Graphify Library**](https://github.com/OvileAmriam/MTA-Graphify-Library)
-
-## ━ Roadmap
-
-* Custom Bone Attachment Handler
-* Virtual LODs
-* Asset-Pack Cache (MD5 Hash Layer)
-* UE based Weapon Asset-Pack (Fully functional w/ customizable reload, magazine & damage)
-
-## ━ Contents
-
-* [**Official Releases**](https://github.com/OvileAmriam/MTA-Assetify-Library/releases)
-* [**Installation Guide**](#)
-* [**Documentations**](#)
-* [**Discord Community**](http://discord.gg/sVCnxPW)
-
+[](https://github.com/Aviril)
