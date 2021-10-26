@@ -47,7 +47,6 @@
 
 * [**Official Releases**](https://github.com/OvileAmriam/MTA-Assetify-Library/releases)
 * [**Installation Guide**](#)
-* [**Documentations**](#)
 * [**Example Assets**](https://github.com/ov-sa/Assetify-Library/tree/Example)
 * [**Discord Community**](http://discord.gg/sVCnxPW)
 
