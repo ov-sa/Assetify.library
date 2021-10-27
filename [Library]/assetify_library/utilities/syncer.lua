@@ -114,6 +114,7 @@ else
 
     function syncer.syncPack(player)
 
+        print("["..getPlayerName(player).." Requested Assets]")
         thread:create(function(cThread)
             for i, j in imports.pairs(availableAssetPacks) do
                 for k, v in imports.pairs(j.assetPack) do
@@ -121,6 +122,7 @@ else
                         syncer.syncData(player, i, k, nil, v)
                     else
                         for m, n in imports.pairs(v) do
+                            print("[Requested Asset] : "..getPlayerName(player).." : "..m)
                             for x, y in imports.pairs(n) do
                                 local setterFunction = false
                                 if x == "rwMap" then

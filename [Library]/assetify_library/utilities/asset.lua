@@ -242,9 +242,13 @@ if localPlayer then
                         end
                     else
                         if asset.cMaps[assetType][assetName][mapType][k] then
-                            for k, v in imports.pairs(asset.cMaps[assetType][assetName][mapType][k]) do
-                                if v and imports.isElement(v) then
-                                    imports.destroyElement(v)
+                            for m, n in imports.pairs(asset.cMaps[assetType][assetName][mapType][k]) do
+                                if n and imports.isElement(n) then
+                                    if (m == "shader") and (mapType == "control") then
+                                        exports.graphify_library:destroyControlMap(n, true)
+                                    else
+                                        imports.destroyElement(n)
+                                    end
                                 end
                             end
                             asset.cMaps[assetType][assetName][mapType][k] = nil
