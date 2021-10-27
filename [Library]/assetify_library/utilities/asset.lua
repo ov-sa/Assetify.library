@@ -210,7 +210,7 @@ if localPlayer then
                             asset.cMaps[assetType][assetName][mapType][k] = {}
                             if mapType == "bump" then
                                 if v.map then
-                                    local createdMap = imports.dxCreateTexture(v.map)
+                                    local createdMap = imports.dxCreateTexture(v.map, "dxt5", true)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
                                     asset.cMaps[assetType][assetName][mapType][k] = {map = createdMap, shader = createdBumpMap}
                                 end
@@ -223,9 +223,9 @@ if localPlayer then
                                     end
                                 end
                                 if isControlValid then
-                                    local redControl = imports.dxCreateTexture(v.red.map)
-                                    local greenControl = imports.dxCreateTexture(v.green.map)
-                                    local blueControl = imports.dxCreateTexture(v.blue.map)
+                                    local redControl = imports.dxCreateTexture(v.red.map, "dxt5", true)
+                                    local greenControl = imports.dxCreateTexture(v.green.map, "dxt5", true)
+                                    local blueControl = imports.dxCreateTexture(v.blue.map, "dxt5", true)
                                     local createdControlMap = exports.graphify_library:createControlMap(i, "world", {
                                         red = {texture = redControl, scale = v.red.scale},
                                         green = {texture = greenControl, scale = v.green.scale},
