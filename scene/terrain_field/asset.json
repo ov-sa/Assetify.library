@@ -9,6 +9,9 @@
         "bump": {
             "sand_terrain": {"map": "bump/sand_terrain.jpg"}
         },
+        "normal": {
+            "sand_terrain": {"map": "normal/sand_terrain.jpg"}
+        },
         "control": {
             "sand_terrain": {
                 "red": {"map": "control/grass.jpg", "scale": 70},
