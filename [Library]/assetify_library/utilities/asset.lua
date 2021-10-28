@@ -329,15 +329,15 @@ else
                         cAssetPack.rwDatas[assetPath] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
-                            manifestData = assetManifestData,
-                            rwFileList = {},
-                            rwFileData = {}
+                            fileList = {},
+                            fileData = {}
                         }
                         if assetManifestData.shaderMaps then
                             cAssetPack.rwDatas[assetReference].rwMap = {}
-                            asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
+                            --asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
                         if assetPackType == "scene" then
+                            --[[
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
                             assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
@@ -349,16 +349,16 @@ else
                                         assetManifestData.sceneOffset[i] = imports.tonumber(j)
                                     end
                                 end
-                            end
+                            end]]
                             local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
                             local sceneManifestData = imports.fetchFileData(sceneIPLPath)
                             if sceneManifestData then
-                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
                                 cAssetPack.rwDatas[assetReference].rwLinks = {
                                     txd = assetPath..(asset.references.asset)..".txd",
                                     children = {}
                                 }
-                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
@@ -366,11 +366,8 @@ else
                                         dff = assetPath.."dff/"..childName..".dff",
                                         col = assetPath.."col/"..childName..".col"
                                     }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                                    imports.setTimer(function()
-                                        cThread:resume()
-                                    end, 1, 1)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
                                     thread.pause()
                                 end
                             end
@@ -380,21 +377,21 @@ else
                                 dff = assetPath..(asset.references.asset)..".dff",
                                 col = assetPath..(asset.references.asset)..".col"
                             }
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                            thread.pause()
                         end
                     end
-                    imports.setTimer(function()
-                        cThread:resume()
-                    end, 1, 1)
-                    thread.pause()
                 end
                 assetPack.assetPack = cAssetPack
                 if callbackReference and (imports.type(callbackReference) == "function") then
                     callbackReference(true)
                 end
-            end):resume()
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
             return true
         end
         if callbackReference and (imports.type(callbackReference) == "function") then
