@@ -15,17 +15,23 @@
 
 local imports = {
     pairs = pairs,
+    collectgarbage = collectgarbage,
     setTimer = setTimer,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
+    triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
     removeWorldModel = removeWorldModel,
     restoreAllWorldModels = restoreAllWorldModels,
     createWater = createWater,
     setWaterLevel = setWaterLevel,
     setOcclusionsEnabled = setOcclusionsEnabled,
-    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled
+    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled,
+    fetchFileData = fetchFileData,
+    table = {
+        insert = table.insert
+    }
 }
 
 
@@ -45,33 +51,48 @@ imports.addEvent("onAssetifyLoad", false)
 imports.addEvent("onAssetifyUnLoad", false)
 
 imports.addEvent("onClientVerifyAssetHash", true)
-imports.addEventHandler("onClientVerifyAssetHash", root, function(assetPack, assetName, rwHash)
+imports.addEventHandler("onClientVerifyAssetHash", root, function(assetType, assetName, rwHash)
 
-    if not assetPack or not assetName or not dataIndex then return false end
+    if not assetType or not assetName or not rwHash then return false end
 
     if rwHash then
-        print("YO RECEIEVED HASHES")
+        thread:create(function(cThread)
+            local fetchFiles = {}
+            for i, j in imports.pairs(rwHash) do
+                local fileData = imports.fetchFileData(i)
+                if not fileData or (md5(fileData) ~= j) then
+                    imports.table.insert(fetchFiles, i)
+                end
+                fileData = nil
+                thread.pause()
+            end
+            imports.triggerLatentServerEvent("onClientRequestAssetFiles", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
+            imports.collectgarbage()
+        end):resume({
+            executions = downloadSettings.buildRate,
+            frames = 1
+        })
     end
 
 end)
 
 imports.addEvent("onClientRecieveAssetPack", true)
-imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, dataIndexes, subIndexData)
+imports.addEventHandler("onClientRecieveAssetPack", root, function(assetType, dataIndex, indexData, dataIndexes, subIndexData)
     
-    if not assetPack or not dataIndex then return false end
+    if not assetType or not dataIndex then return false end
 
-    if not availableAssetPacks[assetPack] then
-        availableAssetPacks[assetPack] = {}
+    if not availableAssetPacks[assetType] then
+        availableAssetPacks[assetType] = {}
     end
     if dataIndex then
         if not dataIndexes then
-            availableAssetPacks[assetPack][dataIndex] = indexData
+            availableAssetPacks[assetType][dataIndex] = indexData
         else
-            if not availableAssetPacks[assetPack][dataIndex] then
-                availableAssetPacks[assetPack][dataIndex] = {}
+            if not availableAssetPacks[assetType][dataIndex] then
+                availableAssetPacks[assetType][dataIndex] = {}
             end
             local totalIndexes = #dataIndexes
-            local indexPointer = availableAssetPacks[assetPack][dataIndex]
+            local indexPointer = availableAssetPacks[assetType][dataIndex]
             if totalIndexes > 1 then
                 for i = 1, totalIndexes - 1, 1 do
                     local indexReference = dataIndexes[i]

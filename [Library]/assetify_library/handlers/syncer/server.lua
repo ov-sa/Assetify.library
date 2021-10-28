@@ -15,6 +15,7 @@
 
 local imports = {
     pairs = pairs,
+    addEvent = addEvent,
     addEventHandler = addEventHandler,
     getResourceRootElement = getResourceRootElement
 }
@@ -56,5 +57,15 @@ end)
 imports.addEventHandler("onPlayerQuit", root, function()
 
     syncer.scheduledClients[source] = nil
+
+end)
+
+imports.addEvent("onClientRequestAssetFiles", true)
+imports.addEventHandler("onClientRequestAssetFiles", root, function(assetType, assetName, fileList)
+
+    if not fileList then return false end
+
+    print(assetType.." : "..assetName)
+    print("YO?: "..#fileList)
 
 end)

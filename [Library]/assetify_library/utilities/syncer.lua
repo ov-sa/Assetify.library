@@ -131,7 +131,7 @@ else
                         syncer.syncData(player, i, k, nil, v)
                     else
                         for m, n in imports.pairs(v) do
-                            --print("[Requested Asset] : "..getPlayerName(player).." : "..m)
+                            print("[Requested Asset] : "..getPlayerName(player).." : "..m)
                             syncer.syncHash(player, i, m, n.fileHash)
                             --[[
                             for x, y in imports.pairs(n) do
