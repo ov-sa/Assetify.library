@@ -314,7 +314,9 @@ else
                         cAssetPack.rwDatas[assetPath] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
-                            manifestData = assetManifestData
+                            manifestData = assetManifestData,
+                            rwFileList = {},
+                            rwFileData = {}
                         }
                         if assetManifestData.shaderMaps then
                             cAssetPack.rwDatas[assetReference].rwMap = {}
@@ -333,19 +335,27 @@ else
                                     end
                                 end
                             end
-                            local sceneManifestData = imports.fetchFileData(assetPath..(asset.references.scene)..".ipl")
+                            local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
+                            local sceneManifestData = imports.fetchFileData(sceneIPLPath)
                             if sceneManifestData then
+                                cAssetPack.rwDatas[assetReference].rwFileList[sceneIPLPath] = true
+                                local assetTXDPath = assetPath..(asset.references.asset)..".txd"
                                 cAssetPack.rwDatas[assetReference].rwData = {
-                                    txd = imports.fetchFileData(assetPath..(asset.references.asset)..".txd"),
+                                    txd = imports.fetchFileData(assetTXDPath),
                                     children = {}
                                 }
+                                if cAssetPack.rwDatas[assetReference].rwData.txd then
+                                    cAssetPack.rwDatas[assetReference].rwFileList[assetTXDPath] = true
+                                end
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
+                                    local assetDFFPath = assetPath.."dff/"..childName..".dff"
+                                    local assetCOLPath = assetPath.."col/"..childName..".col"
                                     cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
                                         rwData = {
-                                            dff = imports.fetchFileData(assetPath.."dff/"..childName..".dff"),
-                                            col = imports.fetchFileData(assetPath.."col/"..childName..".col")
+                                            dff = imports.fetchFileData(assetDFFPath),
+                                            col = imports.fetchFileData(assetCOLPath)
                                         },
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),
@@ -358,6 +368,12 @@ else
                                             z = imports.tonumber(imports.gettok(unparsedDatas[k], 9, asset.separators.IPL))
                                         }
                                     }
+                                    if cAssetPack.rwDatas[assetReference].rwData.children[childName].rwData.dff then
+                                        cAssetPack.rwDatas[assetReference].rwFileList[assetDFFPath] = true
+                                    end
+                                    if cAssetPack.rwDatas[assetReference].rwData.children[childName].rwData.col then
+                                        cAssetPack.rwDatas[assetReference].rwFileList[assetCOLPath] = true
+                                    end
                                     imports.setTimer(function()
                                         cThread:resume()
                                     end, 1, 1)
@@ -365,11 +381,23 @@ else
                                 end
                             end
                         else
+                            local assetTXDPath = assetPath..(asset.references.asset)..".txd"
+                            local assetDFFPath = assetPath..(asset.references.asset)..".dff"
+                            local assetCOLPath = assetPath..(asset.references.asset)..".col"
                             cAssetPack.rwDatas[assetReference].rwData = {
-                                txd = imports.fetchFileData(assetPath..(asset.references.asset)..".txd"),
-                                dff = imports.fetchFileData(assetPath..(asset.references.asset)..".dff"),
-                                col = imports.fetchFileData(assetPath..(asset.references.asset)..".col")
+                                txd = imports.fetchFileData(assetTXDPath),
+                                dff = imports.fetchFileData(assetDFFPath),
+                                col = imports.fetchFileData(assetCOLPath)
                             }
+                            if cAssetPack.rwDatas[assetReference].rwData.txd then
+                                cAssetPack.rwDatas[assetReference].rwFileList[assetTXDPath] = true
+                            end
+                            if cAssetPack.rwDatas[assetReference].rwData.dff then
+                                cAssetPack.rwDatas[assetReference].rwFileList[assetDFFPath] = true
+                            end
+                            if cAssetPack.rwDatas[assetReference].rwData.col then
+                                cAssetPack.rwDatas[assetReference].rwFileList[assetCOLPath] = true
+                            end
                         end
                     end
                     imports.setTimer(function()
