@@ -65,7 +65,10 @@ imports.addEventHandler("onClientRequestAssetFiles", root, function(assetType, a
 
     if not fileList then return false end
 
-    print(assetType.." : "..assetName)
-    print("YO?: "..#fileList)
+    syncer.syncPack(source, {
+        type = assetType,
+        name = assetName,
+        fileList = fileList
+    })
 
 end)
