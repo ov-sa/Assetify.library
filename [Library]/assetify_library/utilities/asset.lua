@@ -354,16 +354,16 @@ else
                             local sceneManifestData = imports.fetchFileData(sceneIPLPath)
                             if sceneManifestData then
                                 asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                                cAssetPack.rwDatas[assetReference].rwData = {
+                                cAssetPack.rwDatas[assetReference].rwLinks = {
                                     txd = assetPath..(asset.references.asset)..".txd",
                                     children = {}
                                 }
-                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    cAssetPack.rwDatas[assetReference].rwData.children[childName] = {
-                                        rwData = {
+                                    cAssetPack.rwDatas[assetReference].rwLinks.children[childName] = {
+                                        rwLinks = {
                                             dff = assetPath.."dff/"..childName..".dff",
                                             col = assetPath.."col/"..childName..".col"
                                         },
@@ -378,8 +378,8 @@ else
                                             z = imports.tonumber(imports.gettok(unparsedDatas[k], 9, asset.separators.IPL))
                                         }
                                     }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwData.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwData.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwLinks.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwLinks.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
                                     imports.setTimer(function()
                                         cThread:resume()
                                     end, 1, 1)
@@ -387,14 +387,14 @@ else
                                 end
                             end
                         else
-                            cAssetPack.rwDatas[assetReference].rwData = {
+                            cAssetPack.rwDatas[assetReference].rwLinks = {
                                 txd = assetPath..(asset.references.asset)..".txd",
                                 dff = assetPath..(asset.references.asset)..".dff",
                                 col = assetPath..(asset.references.asset)..".col"
                             }
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
                         end
                     end
                     imports.setTimer(function()
