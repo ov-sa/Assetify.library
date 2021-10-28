@@ -35,6 +35,15 @@ if localPlayer then
     
 else
     syncer.scheduledClients = {}
+    function syncer.syncHash(player, assetType, assetName, rwHash)
+
+        if not rwHash then return false end
+
+        imports.triggerLatentClientEvent(player, "onClientVerifyAssetHash", downloadSettings.speed, false, player, assetType, assetName, rwHash)
+        return true
+    
+    end
+
     function syncer.syncData(player, assetType, assetName, dataIndexes, data)
 
         if not data then return false end
@@ -114,7 +123,7 @@ else
 
     function syncer.syncPack(player)
 
-        print("["..getPlayerName(player).." Requested Assets]")
+        --print("["..getPlayerName(player).." Requested Assets]")
         thread:create(function(cThread)
             for i, j in imports.pairs(availableAssetPacks) do
                 for k, v in imports.pairs(j.assetPack) do
@@ -122,32 +131,37 @@ else
                         syncer.syncData(player, i, k, nil, v)
                     else
                         for m, n in imports.pairs(v) do
-                            print("[Requested Asset] : "..getPlayerName(player).." : "..m)
+                            --print("[Requested Asset] : "..getPlayerName(player).." : "..m)
+                            syncer.syncHash(player, i, m, n.fileHash)
+                            --[[
                             for x, y in imports.pairs(n) do
-                                local setterFunction = false
-                                if x == "rwMap" then
-                                    setterFunction = syncer.syncRWMap
-                                elseif x ~= "rwData" then
-                                    setterFunction = syncer.syncData
-                                else
-                                    if i == "scene" then
-                                        setterFunction = syncer.syncSceneRWData
+                                if x ~= "fileData" then
+                                    local setterFunction = false
+                                    if x == "rwMap" then
+                                        setterFunction = syncer.syncRWMap
+                                    elseif x ~= "rwData" then
+                                        setterFunction = syncer.syncData
                                     else
-                                        setterFunction = syncer.syncRWData
+                                        if i == "scene" then
+                                            setterFunction = syncer.syncSceneRWData
+                                        else
+                                            setterFunction = syncer.syncRWData
+                                        end
                                     end
-                                end
-                                if setterFunction then
-                                    setterFunction(player, i, k, {m, x}, y)
+                                    if setterFunction then
+                                        setterFunction(player, i, k, {m, x}, y)
+                                    end
                                 end
                                 thread.pause()
                             end
+                            ]]
                             thread.pause()
                         end
                     end
                     thread.pause()
                 end
             end
-            imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
+            --imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
         end):resume({
             executions = downloadSettings.syncRate,
             frames = 1

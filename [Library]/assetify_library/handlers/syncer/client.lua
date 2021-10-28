@@ -44,6 +44,17 @@ availableAssetPacks = {}
 imports.addEvent("onAssetifyLoad", false)
 imports.addEvent("onAssetifyUnLoad", false)
 
+imports.addEvent("onClientVerifyAssetHash", true)
+imports.addEventHandler("onClientVerifyAssetHash", root, function(assetPack, assetName, rwHash)
+
+    if not assetPack or not assetName or not dataIndex then return false end
+
+    if rwHash then
+        print("YO RECEIEVED HASHES")
+    end
+
+end)
+
 imports.addEvent("onClientRecieveAssetPack", true)
 imports.addEventHandler("onClientRecieveAssetPack", root, function(assetPack, dataIndex, indexData, dataIndexes, subIndexData)
     

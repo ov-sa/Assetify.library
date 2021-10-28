@@ -17,6 +17,7 @@ local imports = {
     type = type,
     pairs = pairs,
     ipairs = ipairs,
+    md5 = md5,
     split = split,
     gettok = gettok,
     tonumber = tonumber,
@@ -269,15 +270,16 @@ if localPlayer then
 
     end
 else
-    function asset:buildFile(filePath, fileList, filePack)
+    function asset:buildFile(filePath, filePointer)
 
-        if not filePath or not fileList or not filePack then return false end
+        if not filePath or not filePointer then return false end
 
-        if not fileList[filePath] then
+        if not filePointer.fileList[filePath] then
             local builtFileData = imports.fetchFileData(filePath)
             if builtFileData then
-                fileList[filePath] = true
-                filePack[filePath] = builtFileData
+                filePointer.fileList[filePath] = true
+                filePointer.fileData[filePath] = builtFileData
+                filePointer.fileHash[filePath] = imports.md5(builtFileData)
             end
         end
         return true
@@ -323,17 +325,19 @@ else
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetReference = cAssetPack.manifestData[i]
                     local assetPath = (asset.references.root)..imports.string.lower(assetPackType).."/"..assetReference.."/"
-                    local assetManifestData = imports.fetchFileData(assetPath..(asset.references.asset)..".json")
+                    local assetManifestPath = assetPath..(asset.references.asset)..".json"
+                    local assetManifestData = imports.fetchFileData(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
                             fileList = {},
-                            fileData = {}
+                            fileData = {},
+                            fileHash = {}
                         }
                         if assetManifestData.shaderMaps then
-                            cAssetPack.rwDatas[assetReference].rwMap = {}
+                            --cAssetPack.rwDatas[assetReference].rwMap = {}
                             --asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
                         if assetPackType == "scene" then
@@ -353,12 +357,12 @@ else
                             local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
                             local sceneManifestData = imports.fetchFileData(sceneIPLPath)
                             if sceneManifestData then
-                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference])
                                 cAssetPack.rwDatas[assetReference].rwLinks = {
                                     txd = assetPath..(asset.references.asset)..".txd",
                                     children = {}
                                 }
-                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference])
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
@@ -366,8 +370,8 @@ else
                                         dff = assetPath.."dff/"..childName..".dff",
                                         col = assetPath.."col/"..childName..".col"
                                     }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference])
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference])
                                     thread.pause()
                                 end
                             end
@@ -377,9 +381,9 @@ else
                                 dff = assetPath..(asset.references.asset)..".dff",
                                 col = assetPath..(asset.references.asset)..".col"
                             }
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].fileList, cAssetPack.rwDatas[assetReference].fileData)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference])
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference])
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference])
                             thread.pause()
                         end
                     end
