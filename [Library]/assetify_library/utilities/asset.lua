@@ -363,23 +363,11 @@ else
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
                                     cAssetPack.rwDatas[assetReference].rwLinks.children[childName] = {
-                                        rwLinks = {
-                                            dff = assetPath.."dff/"..childName..".dff",
-                                            col = assetPath.."col/"..childName..".col"
-                                        },
-                                        position = {
-                                            x = imports.tonumber(imports.gettok(unparsedDatas[k], 4, asset.separators.IPL)),
-                                            y = imports.tonumber(imports.gettok(unparsedDatas[k], 5, asset.separators.IPL)),
-                                            z = imports.tonumber(imports.gettok(unparsedDatas[k], 6, asset.separators.IPL))
-                                        },
-                                        rotation = {
-                                            x = imports.tonumber(imports.gettok(unparsedDatas[k], 7, asset.separators.IPL)),
-                                            y = imports.tonumber(imports.gettok(unparsedDatas[k], 8, asset.separators.IPL)),
-                                            z = imports.tonumber(imports.gettok(unparsedDatas[k], 9, asset.separators.IPL))
-                                        }
+                                        dff = assetPath.."dff/"..childName..".dff",
+                                        col = assetPath.."col/"..childName..".col"
                                     }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwLinks.dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwData.children[childName].rwLinks.col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].rwFileList, cAssetPack.rwDatas[assetReference].rwFileData)
                                     imports.setTimer(function()
                                         cThread:resume()
                                     end, 1, 1)
