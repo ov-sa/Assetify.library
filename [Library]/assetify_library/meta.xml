@@ -6,11 +6,9 @@
     <!-- Imports -->
     <include resource="graphify_library"/>
 
-	<!-- Exports -->
-    <script src="exports/client.lua" type="client"/>
-
-    <!-- Settings & Utilities -->
+    <!-- Exports,Settings & Utilities -->
     <script src="utilities/shared.lua" type="shared"/>
+    <script src="exports/client.lua" type="client"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>

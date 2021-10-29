@@ -52,7 +52,8 @@ addEventHandler("onClientResourceStop", resourceRoot, function()
         if j.autoLoad and j.rwDatas then
             for k, v in pairs(j.rwDatas) do
                 if v then
-                    asset:refreshMaps(false, i, k, v.manifestData.shaderMaps, v.rwMap)
+                    --TODO: ...
+                    --asset:refreshMaps(false, i, k, v.manifestData.shaderMaps, v.rwMap)
                 end
             end
         end

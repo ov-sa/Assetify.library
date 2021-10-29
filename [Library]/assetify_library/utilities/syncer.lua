@@ -54,7 +54,7 @@ if localPlayer then
         thread:create(function(cThread)
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
-                local fileData = imports.file.read("@"..i)
+                local fileData = imports.file.read(i)
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 end
@@ -91,7 +91,7 @@ if localPlayer then
 
     imports.addEvent("Assetify:onRecieveContent", true)
     imports.addEventHandler("Assetify:onRecieveContent", root, function(contentPath, ...)
-        imports.file.write("@"..contentPath, ...)
+        imports.file.write(contentPath, ...)
     end)
 
     imports.addEvent("Assetify:onRecieveState", true)

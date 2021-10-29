@@ -16,7 +16,16 @@
 local imports = {
     type = type,
     pairs = pairs,
-    setTimer = setTimer
+    split = split,
+    gettok = gettok,
+    tostring = tostring,
+    setTimer = setTimer,
+    file = {
+        read = file.read
+    },
+    string = {
+        gsub = string.gsub
+    }
 }
 
 
@@ -82,25 +91,61 @@ function loadAsset(assetType, assetName)
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.cAsset then
+            local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
             if assetType == "scene" then
                 thread:create(function(cThread)
-                    --[[
-                    for i, j in imports.pairs(assetReference.rwData.children) do
-                        asset:create(assetType, packReference, j, assetReference, function(cAsset)
-                            scene:create(j.cAsset, assetReference.manifestData)
+                    local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
+                    if sceneManifestData then
+                        local unparsedDatas = imports.split(sceneManifestData, "\n")
+                        for i = 1, #unparsedDatas, 1 do
+                            local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
+                            local childData = {
+                                position = {
+                                    x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
+                                    y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
+                                    z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                },
+                                rotation = {
+                                    x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
+                                    y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
+                                    z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
+                                }
+                            }
+                            asset:create(assetType, packReference, assetReference, {
+                                txd = assetPath..(asset.references.asset)..".txd",
+                                dff = assetPath.."dff/"..childName..".dff",
+                                col = assetPath.."col/"..childName..".col"
+                            }, function(state)
+                                if state then
+                                    print("CREATED..")
+                                    --[[
+                                    scene:create(j.cAsset, assetReference.manifestData)
+                                    imports.setTimer(function()
+                                        cThread:resume()
+                                    end, 1, 1)
+                                    ]]
+                                end
+                            end)
                             imports.setTimer(function()
                                 cThread:resume()
                             end, 1, 1)
-                        end)
+                            thread.pause()
+                        end
+                        --asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
+                        assetReference.cAsset = true
                     end
-                    asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
-                    ]]
-                    assetReference.cAsset = true
                     print("[Loaded "..assetType.."] : "..assetName)
-                end):resume()
+                end):resume({
+                    executions = downloadSettings.buildRate,
+                    frames = 1
+                })
                 return true
             else
-                return asset:create(assetType, packReference, assetReference, nil)
+                return asset:create(assetType, packReference, assetReference, {
+                    txd = assetPath..(asset.references.asset)..".txd",
+                    dff = assetPath..(asset.references.asset)..".dff",
+                    col = assetPath..(asset.references.asset)..".col"
+                })
             end
         end
     end

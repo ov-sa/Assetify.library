@@ -62,7 +62,7 @@ local imports = {
 
 asset = {
     references = {
-        root = "files/assets/",
+        root = "@files/assets/",
         manifest = "manifest",
         asset = "asset",
         scene = "scene"
@@ -101,16 +101,16 @@ if localPlayer then
     
     function asset:load(assetType, assetPack, assetData, assetPath, callback)
         if not self or (self == asset) then return false end
-        if not assetType or not assetPack.assetType or not assetData or not assetPath or not callback or (imports.type(callback) ~= "function") then return false end
+        if not assetType or not assetPack or not assetPack.assetType or not assetData or not assetPath then return false end
         local rwFiles = nil
         local modelID = false
         if assetPath.dff then
-            modelID = imports.engineRequestModel(assetPack.assetType, (assetScene and assetScene.manifestData and assetScene.manifestData.assetBase and (imports.type(assetScene.manifestData.assetBase) == "number") and assetScene.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
+            modelID = imports.engineRequestModel(assetPack.assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
                 rwFiles = {}
                 rwFiles.dff = imports.engineLoadDFF(assetPath.dff)
-                rwFiles.col = imports.engineLoadDFF(assetPath.col)
+                rwFiles.col = imports.engineLoadCOL(assetPath.col)
                 if not rwFiles.dff then
                     imports.engineFreeModel(modelID)
                     for i, j in imports.pairs(rwFiles) do
@@ -128,13 +128,12 @@ if localPlayer then
             if rwFiles.txd then
                 imports.engineImportTXD(rwFiles.txd, modelID)
             end
-            imports.engineReplaceModel(rwFiles.dff, modelID, (assetScene and assetScene.manifestData and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData and assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
+            imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
             if rwFiles.col then
                 imports.engineReplaceCOL(rwFiles.col, modelID)
             end
             assetData.cAsset = self
             self.cData = assetData
-            self.cScene = assetScene
             self.syncedData = {
                 modelID = modelID
             }
@@ -144,13 +143,14 @@ if localPlayer then
             assetData.cData = syncedData
             loadState = true
         end
-        callback(loadState)
+        if callback and (imports.type(callback) == "function") then
+            callback(loadState)
+        end
         return loadState
     end
 
     function asset:unload(callback)
         if not self or (self == asset) then return false end
-        if not callback or (imports.type(callback) ~= "function") then return false end
         imports.engineFreeModel(self.syncedData.modelID)
         if self.unsyncedData.rwFiles then
             for i, j in imports.pairs(self.unsyncedData.rwFiles) do
@@ -162,7 +162,9 @@ if localPlayer then
         self.cData.cAsset = nil
         self = nil
         imports.collectgarbage()
-        callback(true)
+        if callback and (imports.type(callback) == "function") then
+            callback(true)
+        end
         return true
     end
 
