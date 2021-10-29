@@ -36,29 +36,22 @@ scene = {}
 scene.__index = scene
 
 function scene:create(...)
-
     local cScene = imports.setmetatable({}, {__index = self})
     if not cScene:load(...) then
         cScene = nil
         return false
     end
     return cScene
-
 end
 
 function scene:destroy(...)
-    
     if not self or (self == scene) then return false end
-
     return self:unload(...)
-
 end
 
 function scene:load(cAsset, sceneManifest)
-
     if not self or (self == scene) then return false end
     if not cAsset or not sceneManifest then return false end
-
     self.cObject = imports.createObject(cAsset.syncedData.modelID, cAsset.cData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), cAsset.cData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), cAsset.cData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), cAsset.cData.rotation.x, cAsset.cData.rotation.y, cAsset.cData.rotation.z)
     imports.setElementDoubleSided(self.cObject, true)
     imports.setElementDimension(self.cObject, sceneManifest.sceneDimension)
@@ -70,14 +63,11 @@ function scene:load(cAsset, sceneManifest)
         imports.setElementInterior(self.cLODObject, sceneManifest.sceneInterior)
     end
     return true
-
 end
 
 function scene:unload(cAsset)
-
     if not self or (self == scene) then return false end
     if not cAsset then return false end
-
     if imports.isElement(self.cObject) then
         imports.destroyElement(self.cObject)
     end
@@ -87,5 +77,4 @@ function scene:unload(cAsset)
     self = nil
     imports.collectgarbage()
     return true
-
 end
