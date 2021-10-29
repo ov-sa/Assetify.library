@@ -73,7 +73,7 @@ end
 --[[ Functions: Loads/Unloads Asset ]]--
 ----------------------------------------
 
-function loadAsset(assetType, assetName, callback)
+function loadAsset(assetType, assetName)
 
     if not isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
@@ -82,10 +82,9 @@ function loadAsset(assetType, assetName, callback)
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.cAsset then
-            print("TRYING TO LOAD: "..assetName)
             if assetType == "scene" then
-                --[[
                 thread:create(function(cThread)
+                    --[[
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
                             scene:create(j.cAsset, assetReference.manifestData)
@@ -95,16 +94,13 @@ function loadAsset(assetType, assetName, callback)
                         end)
                     end
                     asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
+                    ]]
                     assetReference.cAsset = true
-                    if callback and (imports.type(callback) == "function") then
-                        callback(true)
-                    end
                     print("[Loaded "..assetType.."] : "..assetName)
                 end):resume()
-                ]]
                 return true
             else
-                return asset:create(assetType, packReference, assetReference, nil, callback)
+                return asset:create(assetType, packReference, assetReference, nil)
             end
         end
     end
@@ -112,7 +108,7 @@ function loadAsset(assetType, assetName, callback)
 
 end
 
-function unloadAsset(assetType, assetName, callback)
+function unloadAsset(assetType, assetName)
 
     if not isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
@@ -137,13 +133,10 @@ function unloadAsset(assetType, assetName, callback)
                     end
                     asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
                     assetReference.cAsset = false
-                    if callback and (imports.type(callback) == "function") then
-                        callback(true)
-                    end
                 end):resume()
                 return true
             else
-                return assetReference.cAsset:destroy(callback)
+                return assetReference.cAsset:destroy()
             end
         end
     end
