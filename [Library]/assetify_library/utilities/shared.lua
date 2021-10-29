@@ -31,7 +31,6 @@ local imports = {
 ---------------------
 
 file = {
-
     read = function(path)
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
@@ -51,7 +50,6 @@ file = {
         imports.fileClose(cFile)    
         return true
     end
-
 }
 
 
@@ -60,9 +58,7 @@ file = {
 ----------------------
 
 function table.clone(baseTable, isRecursive)
-
     if not baseTable or imports.type(baseTable) ~= "table" then return false end
-
     local clonedTable = {}
     for i, j in imports.pairs(baseTable) do
         if imports.type(j) == "table" and isRecursive then
@@ -72,5 +68,4 @@ function table.clone(baseTable, isRecursive)
         end
     end
     return clonedTable
-
 end
