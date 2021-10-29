@@ -364,32 +364,19 @@ else
                             local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
                                 asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced)
-                                cAssetPack.rwDatas[assetReference].rwLinks = {
-                                    txd = assetPath..(asset.references.asset)..".txd",
-                                    children = {}
-                                }
-                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].unSynced)
+                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    cAssetPack.rwDatas[assetReference].rwLinks.children[childName] = {
-                                        dff = assetPath.."dff/"..childName..".dff",
-                                        col = assetPath.."col/"..childName..".col"
-                                    }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].unSynced)
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
                                     thread.pause()
                                 end
                             end
                         else
-                            cAssetPack.rwDatas[assetReference].rwLinks = {
-                                txd = assetPath..(asset.references.asset)..".txd",
-                                dff = assetPath..(asset.references.asset)..".dff",
-                                col = assetPath..(asset.references.asset)..".col"
-                            }
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
                             thread.pause()
                         end
                     end
