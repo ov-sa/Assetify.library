@@ -36,7 +36,7 @@ function onLibraryLoaded()
 
     isLibraryLoaded = true
     for i, j in imports.pairs(syncer.scheduledClients) do
-        syncer.syncPack(i)
+        syncer:syncPack(i)
         syncer.scheduledClients[i] = nil
     end
     
@@ -46,7 +46,7 @@ imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
 
     if imports.getResourceRootElement(resourceElement) == resourceRoot then
         if isLibraryLoaded then
-            syncer.syncPack(source)
+            syncer:syncPack(source)
         else
             syncer.scheduledClients[source] = true
         end
@@ -65,7 +65,7 @@ imports.addEventHandler("onClientRequestAssetFiles", root, function(assetType, a
 
     if not fileList then return false end
 
-    syncer.syncPack(source, {
+    syncer:syncPack(source, {
         type = assetType,
         name = assetName,
         fileList = fileList

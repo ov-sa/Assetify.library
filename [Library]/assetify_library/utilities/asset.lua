@@ -27,7 +27,6 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     collectgarbage = collectgarbage,
-    fetchFileData = fetchFileData,
     setTimer = setTimer,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
@@ -39,6 +38,9 @@ local imports = {
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
     dxCreateTexture = dxCreateTexture,
+    file = {
+        read = file.read
+    },
     table = {
         clone = table.clone
     },
@@ -274,10 +276,10 @@ else
 
         if not filePath or not filePointer then return false end
 
-        if not filePointer.fileList[filePath] then
-            local builtFileData = imports.fetchFileData(filePath)
+        if not filePointer[filePath] then
+            local builtFileData = imports.file.read(filePath)
             if builtFileData then
-                filePointer.fileList[filePath] = true
+                filePointer[filePath] = true
                 filePointer.fileData[filePath] = builtFileData
                 filePointer.fileHash[filePath] = imports.md5(builtFileData)
             end
@@ -298,7 +300,7 @@ else
                 if i ~= "map" then
                     shaderPack[i] = j
                 else
-                    shaderPack[i] = imports.fetchFileData(assetPath.."map/"..j)
+                    shaderPack[i] = imports.file.read(assetPath.."map/"..j)
                 end
             end
             imports.setTimer(function()
@@ -315,7 +317,7 @@ else
         if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
 
         local cAssetPack = imports.table.clone(assetPack, true)
-        cAssetPack.manifestData = imports.fetchFileData((asset.references.root)..imports.string.lower(assetPackType).."/"..(asset.references.manifest)..".json")
+        cAssetPack.manifestData = imports.file.read((asset.references.root)..imports.string.lower(assetPackType).."/"..(asset.references.manifest)..".json")
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
 
         if cAssetPack.manifestData then
@@ -326,25 +328,29 @@ else
                     local assetReference = cAssetPack.manifestData[i]
                     local assetPath = (asset.references.root)..imports.string.lower(assetPackType).."/"..assetReference.."/"
                     local assetManifestPath = assetPath..(asset.references.asset)..".json"
-                    local assetManifestData = imports.fetchFileData(assetManifestPath)
+                    local assetManifestData = imports.file.read(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
-                            fileList = {},
-                            fileData = {},
-                            fileHash = {}
+                            synced = {
+                                manifestData = assetManifestData,
+                            },
+                            unSynced = {
+                                fileList = {},
+                                fileData = {},
+                                fileHash = {}
+                            }
                         }
                         if assetManifestData.shaderMaps then
                             --cAssetPack.rwDatas[assetReference].rwMap = {}
                             --asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
                         if assetPackType == "scene" then
-                            --[[
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
-                            assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
+                            --assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                             if assetManifestData.sceneOffset then
                                 if imports.type(assetManifestData.sceneOffset) ~= "table" then
                                     assetManifestData.sceneOffset = false
@@ -353,16 +359,16 @@ else
                                         assetManifestData.sceneOffset[i] = imports.tonumber(j)
                                     end
                                 end
-                            end]]
+                            end
                             local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
-                            local sceneManifestData = imports.fetchFileData(sceneIPLPath)
+                            local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
-                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference])
+                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced)
                                 cAssetPack.rwDatas[assetReference].rwLinks = {
                                     txd = assetPath..(asset.references.asset)..".txd",
                                     children = {}
                                 }
-                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference])
+                                asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].unSynced)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
@@ -370,8 +376,8 @@ else
                                         dff = assetPath.."dff/"..childName..".dff",
                                         col = assetPath.."col/"..childName..".col"
                                     }
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference])
-                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference])
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].dff, cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.children[childName].col, cAssetPack.rwDatas[assetReference].unSynced)
                                     thread.pause()
                                 end
                             end
@@ -381,9 +387,9 @@ else
                                 dff = assetPath..(asset.references.asset)..".dff",
                                 col = assetPath..(asset.references.asset)..".col"
                             }
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference])
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference])
-                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference])
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.txd, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.dff, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(cAssetPack.rwDatas[assetReference].rwLinks.col, cAssetPack.rwDatas[assetReference].unSynced)
                             thread.pause()
                         end
                     end

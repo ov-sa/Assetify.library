@@ -82,7 +82,9 @@ function loadAsset(assetType, assetName, callback)
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.cAsset then
+            print("TRYING TO LOAD: "..assetName)
             if assetType == "scene" then
+                --[[
                 thread:create(function(cThread)
                     for i, j in imports.pairs(assetReference.rwData.children) do
                         asset:create(assetType, packReference, j, assetReference, function(cAsset)
@@ -99,6 +101,7 @@ function loadAsset(assetType, assetName, callback)
                     end
                     print("[Loaded "..assetType.."] : "..assetName)
                 end):resume()
+                ]]
                 return true
             else
                 return asset:create(assetType, packReference, assetReference, nil, callback)

@@ -17,41 +17,55 @@ local imports = {
     type = type,
     pairs = pairs,
     fileExists = fileExists,
+    fileCreate = fileCreate,
     fileOpen = fileOpen,
     fileRead = fileRead,
+    fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose
 }
 
 
----------------------------------------
---[[ Function: Fetches File's Data ]]--
----------------------------------------
+---------------------
+--[[ Class: File ]]--
+---------------------
 
-function fetchFileData(filePath)
+file = {
 
-    if not filePath or not imports.fileExists(filePath) then return false end
-    local file = imports.fileOpen(filePath, true)
-    if not file then return false end
+    read = function(path)
+        if not path or not imports.fileExists(path) then return false end
+        local cFile = imports.fileOpen(path, true)
+        if not cFile then return false end
 
-    local fileData = imports.fileRead(file, imports.fileGetSize(file))
-    imports.fileClose(file)
-    return fileData
+        local data = imports.fileRead(cFile, imports.fileGetSize(cFile))
+        imports.fileClose(cFile)
+        return data
+    end,
 
-end
+    write = function(path, data)
+        if not path or not data then return false end
+        local cFile = imports.fileCreate(path)
+        if not cFile then return false end
+    
+        imports.fileWrite(cFile, data)
+        imports.fileClose(cFile)    
+        return true
+    end
+
+}
 
 
----------------------------------
---[[ Functions: Clones Table ]]--
----------------------------------
+----------------------
+--[[ Class: Table ]]--
+----------------------
 
-function table.clone(recievedTable, isRecursiveMode)
+function table.clone(baseTable, isRecursive)
 
-    if not recievedTable or imports.type(recievedTable) ~= "table" then return false end
+    if not baseTable or imports.type(baseTable) ~= "table" then return false end
 
     local clonedTable = {}
-    for i, j in imports.pairs(recievedTable) do
-        if imports.type(j) == "table" and isRecursiveMode then
+    for i, j in imports.pairs(baseTable) do
+        if imports.type(j) == "table" and isRecursive then
             clonedTable[i] = table.clone(j, true)
         else
             clonedTable[i] = j

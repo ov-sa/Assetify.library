@@ -16,164 +16,159 @@
 local imports = {
     type = type,
     pairs = pairs,
+    md5 = md5,
+    collectgarbage = collectgarbage,
+    addEvent = addEvent,
+    addEventHandler = addEventHandler,
     triggerLatentClientEvent = triggerLatentClientEvent,
+    triggerLatentServerEvent = triggerLatentServerEvent,
+    loadAsset = loadAsset,
+    file = {
+        read = file.read,
+        write = file.write
+    },
     table = {
-        clone = table.clone,
-        insert = table.insert
+        clone = table.clone
     }
 }
 
 
-----------------------
+-----------------------
 --[[ Class: Syncer ]]--
-----------------------
+-----------------------
 
 syncer = {}
 syncer.__index = syncer
 
 if localPlayer then
-    
-else
-    syncer.scheduledClients = {}
-    function syncer.syncHash(player, assetType, assetName, rwHash)
+    syncer.scheduledAssets = {}
+    isLibraryLoaded = false
+    availableAssetPacks = {}
+    imports.addEvent("onAssetifyLoad", false)
+    imports.addEvent("onAssetifyUnLoad", false)
 
-        if not rwHash then return false end
-
-        imports.triggerLatentClientEvent(player, "onClientVerifyAssetHash", downloadSettings.speed, false, player, assetType, assetName, rwHash)
-        return true
-    
-    end
-
-    function syncer.syncData(player, assetType, assetName, dataIndexes, data)
-
-        if not data then return false end
-
-        if not dataIndexes then
-            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, data)
-        else
-            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, dataIndexes, data)
-        end
-        return true
-
-    end
-
-    function syncer.syncRWMap(player, assetType, assetName, dataIndexes, rwMap)
-
-        if not rwMap then return false end
-
-        for i, j in imports.pairs(rwMap) do
-            local clonedDataIndex = imports.table.clone(dataIndexes, false)
-            imports.table.insert(clonedDataIndex, i)
-            if j and imports.type(j) == "table" then
-                syncer.syncRWMap(player, assetType, assetName, clonedDataIndex, j)
-            else
-                imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
+    imports.addEvent("Assetify:onRecieveHash", true)
+    imports.addEventHandler("Assetify:onRecieveHash", root, function(assetType, assetName, hashes)
+        if not syncer.scheduledAssets[assetType] then syncer.scheduledAssets[assetType] = {} end
+        syncer.scheduledAssets[assetType][assetName] = true
+        thread:create(function(cThread)
+            local fetchFiles = {}
+            for i, j in imports.pairs(hashes) do
+                local fileData = imports.file.read("@"..i)
+                if not fileData or (imports.md5(fileData) ~= j) then
+                    fetchFiles[i] = true
+                end
+                fileData = nil
                 thread.pause()
             end
-        end
-        return true
+            imports.triggerLatentServerEvent("onClientRequestAssetFiles", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
+            imports.collectgarbage()
+        end):resume({
+            executions = downloadSettings.buildRate,
+            frames = 1
+        })
+    end)
 
-    end
-
-    function syncer.syncRWData(player, assetType, assetName, rwData)
-
-        if not rwData then return false end
-
-        imports.triggerLatentClientEvent(player, "onClientRecieveAssetFile", downloadSettings.speed, false, player, assetType, assetName, rwData)
-        return true
-
-    end
-
-    --[[
-    function syncer.syncRWData(player, assetType, assetName, dataIndexes, rwData)
-
-        if not rwData then return false end
-
-        for i, j in imports.pairs(rwData) do
-            local clonedDataIndex = imports.table.clone(dataIndexes, false)
-            imports.table.insert(clonedDataIndex, i)
-            imports.triggerLatentClientEvent(player, "onClientRecieveAssetPack", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
-            thread.pause()
-        end
-        return true
-
-    end
-    ]]--
-
-    function syncer.syncSceneRWData(player, assetType, assetName, dataIndexes, rwData)
-
-        if not rwData then return false end
-
-        for i, j in imports.pairs(rwData) do
-            local clonedDataIndex = imports.table.clone(dataIndexes, false)
-            imports.table.insert(clonedDataIndex, i)
-            if i ~= "children" then
-                syncer.syncData(player, assetType, assetName, clonedDataIndex, j)
-            else
-                for k, v in imports.pairs(j) do
-                    local reclonedDataIndex = imports.table.clone(clonedDataIndex, false)
-                    imports.table.insert(reclonedDataIndex, k)
-                    for m, n in imports.pairs(v) do
-                        local subclonedDataIndex = imports.table.clone(reclonedDataIndex, false)
-                        imports.table.insert(subclonedDataIndex, m)
-                        if m ~= "rwData" then
-                            syncer.syncData(player, assetType, assetName, subclonedDataIndex, n)
-                        else
-                            syncer.syncRWData(player, assetType, assetName, subclonedDataIndex, n)
-                        end
-                        thread.pause()
-                    end
-                    thread.pause()
+    imports.addEvent("Assetify:onRecieveData", true)
+    imports.addEventHandler("Assetify:onRecieveData", root, function(assetType, baseIndex, subIndexes, indexData)
+        if not availableAssetPacks[assetType] then availableAssetPacks[assetType] = {} end
+        if not subIndexes then
+            availableAssetPacks[assetType][baseIndex] = indexData
+        else
+            if not availableAssetPacks[assetType][baseIndex] then availableAssetPacks[assetType][baseIndex] = {} end
+            local totalIndexes = #subIndexes
+            local indexPointer = availableAssetPacks[assetType][baseIndex]
+            if totalIndexes > 1 then
+                for i = 1, totalIndexes - 1, 1 do
+                    local indexReference = subIndexes[i]
+                    if not indexPointer[indexReference] then indexPointer[indexReference] = {} end
+                    indexPointer = indexPointer[indexReference]
                 end
             end
-            thread.pause()
+            indexPointer[(subIndexes[totalIndexes])] = indexData
         end
-        return true
+    end)
 
+    imports.addEvent("Assetify:onRecieveContent", true)
+    imports.addEventHandler("Assetify:onRecieveContent", root, function(contentPath, ...)
+        imports.file.write("@"..contentPath, ...)
+    end)
+
+    imports.addEvent("Assetify:onRecieveState", true)
+    imports.addEventHandler("Assetify:onRecieveState", root, function(assetType, assetName)
+        local isTypeVoid = true
+        syncer.scheduledAssets[assetType][assetName] = nil
+        for i, j in imports.pairs(syncer.scheduledAssets[assetType]) do
+            if j then
+                isTypeVoid = false
+                break
+            end
+        end
+        if isTypeVoid then
+            local isSyncDone = true
+            syncer.scheduledAssets[assetType] = nil
+            for i, j in imports.pairs(syncer.scheduledAssets) do
+                if j then
+                    isSyncDone = false
+                    break
+                end
+            end
+            if isSyncDone then
+                syncer.scheduledAssets = nil
+                onLibraryLoaded()
+                thread:create(function(cThread)
+                    for i, j in imports.pairs(availableAssetPacks) do
+                        if j.autoLoad and j.rwDatas then
+                            for k, v in imports.pairs(j.rwDatas) do
+                                if v then
+                                    imports.loadAsset(i, k)
+                                end
+                                thread.pause()
+                            end
+                        end
+                    end
+                end):resume({
+                    executions = downloadSettings.buildRate,
+                    frames = 1
+                })
+            end
+        end
+    end)
+else
+    syncer.scheduledClients = {}
+
+    function syncer:syncHash(player, ...)
+        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)
     end
 
-    function syncer.syncPack(player, assetDatas)
+    function syncer:syncData(player, ...)
+        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveData", downloadSettings.speed, false, player, ...)
+    end
 
-        print("["..getPlayerName(player).." Requested Assets]")
+    function syncer:syncContent(player, ...)
+        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveContent", downloadSettings.speed, false, player, ...)
+    end
+
+    function syncer:syncState(player, ...)
+        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
+    end
+
+    function syncer:syncPack(player, assetDatas)
         if not assetDatas then
             thread:create(function(cThread)
                 for i, j in imports.pairs(availableAssetPacks) do
                     for k, v in imports.pairs(j.assetPack) do
                         if k ~= "rwDatas" then
-                            syncer.syncData(player, i, k, nil, v)
+                            syncer:syncData(player, i, k, nil, v)
                         else
                             for m, n in imports.pairs(v) do
-                                print("[Requested Asset] : "..getPlayerName(player).." : "..m)
-                                syncer.syncHash(player, i, m, n.fileHash)
-                                --[[
-                                for x, y in imports.pairs(n) do
-                                    if x ~= "fileData" then
-                                        local setterFunction = false
-                                        if x == "rwMap" then
-                                            setterFunction = syncer.syncRWMap
-                                        elseif x ~= "rwData" then
-                                            setterFunction = syncer.syncData
-                                        else
-                                            if i == "scene" then
-                                                setterFunction = syncer.syncSceneRWData
-                                            else
-                                                setterFunction = syncer.syncRWData
-                                            end
-                                        end
-                                        if setterFunction then
-                                            setterFunction(player, i, k, {m, x}, y)
-                                        end
-                                    end
-                                    thread.pause()
-                                end
-                                ]]
+                                syncer:syncHash(player, i, m, n.unSynced.fileHash)
                                 thread.pause()
                             end
                         end
                         thread.pause()
                     end
                 end
-                --imports.triggerLatentClientEvent(player, "onClientLoadAssetPack", downloadSettings.speed, false, player)
             end):resume({
                 executions = downloadSettings.syncRate,
                 frames = 1
@@ -182,16 +177,39 @@ else
             thread:create(function(cThread)
                 local assetReference = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(assetDatas.fileList) do
-                    syncer.syncRWData(player, assetDatas.type, assetDatas.name, {dataIndexes}, assetReference.fileData[j])
+                    syncer:syncContent(player, j, assetReference.unSynced.fileData[j])
                     thread.pause()
                 end
-                --TODO: SEND OTHER FILE DATAS NOW !!
+                for i, j in imports.pairs(assetReference.synced) do
+                    syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                    thread.pause()
+                end
+                syncer:syncState(player, assetDatas.type, assetDatas.name)
             end):resume({
                 executions = downloadSettings.syncRate,
                 frames = 1
             })
         end
         return true
+    end
+
+    --[[
+    function syncer.syncRWMap(player, assetType, assetName, subIndexes, rwMap)
+
+        if not rwMap then return false end
+
+        for i, j in imports.pairs(rwMap) do
+            local clonedDataIndex = imports.table.clone(subIndexes, false)
+            imports.table.insert(clonedDataIndex, i)
+            if j and imports.type(j) == "table" then
+                syncer.syncRWMap(player, assetType, assetName, clonedDataIndex, j)
+            else
+                imports.triggerLatentClientEvent(player, "Assetify:onRecieveData", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
+                thread.pause()
+            end
+        end
+        return true
 
     end
+    ]]--
 end
