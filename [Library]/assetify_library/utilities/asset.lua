@@ -84,70 +84,54 @@ if localPlayer then
         }
     }
     asset.cMaps = {}
-    function asset:create(...)
 
+    function asset:create(...)
         local cAsset = imports.setmetatable({}, {__index = self})
         if not cAsset:load(...) then
             cAsset = nil
             return false
         end
         return cAsset
-    
     end
     
     function asset:destroy(...)
-    
         if not self or (self == asset) then return false end
-    
         return self:unload(...)
-    
     end
     
-    function asset:load(assetPackType, assetPack, assetData, assetScene, callback)
-    
+    function asset:load(assetType, assetPack, assetData, assetPath, callback)
         if not self or (self == asset) then return false end
-        if not assetPackType or not assetPack.assetType or not assetData or not callback or (imports.type(callback) ~= "function") then return false end
-
-        local primary_rwFiles, secondary_rwFiles = nil, nil
+        if not assetType or not assetPack.assetType or not assetData or not assetPath or not callback or (imports.type(callback) ~= "function") then return false end
+        local rwFiles = nil
         local modelID = false
-        if assetData.rwData.dff then
+        if assetPath.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetScene and assetScene.manifestData and assetScene.manifestData.assetBase and (imports.type(assetScene.manifestData.assetBase) == "number") and assetScene.manifestData.assetBase) or (assetData.manifestData and assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
-                primary_rwFiles = {}
-                primary_rwFiles.dff = (assetData.rwData.dff and ((imports.isElement(assetData.rwData.dff) and assetData.rwData.dff) or imports.engineLoadDFF(assetData.rwData.dff))) or false
-                primary_rwFiles.col = (assetData.rwData.col and ((imports.isElement(assetData.rwData.col) and assetData.rwData.col) or imports.engineLoadCOL(assetData.rwData.col))) or false
-                if not primary_rwFiles.dff then
+                rwFiles = {}
+                rwFiles.dff = imports.engineLoadDFF(assetPath.dff)
+                rwFiles.col = imports.engineLoadDFF(assetPath.col)
+                if not rwFiles.dff then
                     imports.engineFreeModel(modelID)
-                    for i, j in imports.pairs(primary_rwFiles) do
+                    for i, j in imports.pairs(rwFiles) do
                         if j and imports.isElement(j) then
                             imports.destroyElement(j)
                         end
                     end
-                    primary_rwFiles = nil
+                    rwFiles = nil
                 end
             end
         end
-    
         local loadState = false
-        if primary_rwFiles then
-            if assetPackType == "scene" then
-                secondary_rwFiles = {}
-                secondary_rwFiles.txd = (assetScene and assetScene.rwData.txd and ((imports.isElement(assetScene.rwData.txd) and assetScene.rwData.txd) or imports.engineLoadTXD(assetScene.rwData.txd))) or false
-                if secondary_rwFiles.txd then
-                    imports.engineImportTXD(secondary_rwFiles.txd, modelID)
-                end
-            else
-                primary_rwFiles.txd = (assetData.rwData.txd and ((imports.isElement(assetData.rwData.txd) and assetData.rwData.txd) or imports.engineLoadTXD(assetData.rwData.txd))) or false
-                if primary_rwFiles.txd then
-                    imports.engineImportTXD(primary_rwFiles.txd, modelID)
-                end
+        if rwFiles then
+            rwFiles.txd = imports.engineLoadTXD(assetPath.txd)
+            if rwFiles.txd then
+                imports.engineImportTXD(rwFiles.txd, modelID)
             end
-            imports.engineReplaceModel(primary_rwFiles.dff, modelID, (assetScene and assetScene.manifestData and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData and assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
-            if primary_rwFiles.col then
-                imports.engineReplaceCOL(primary_rwFiles.col, modelID)
+            imports.engineReplaceModel(rwFiles.dff, modelID, (assetScene and assetScene.manifestData and assetScene.manifestData.assetTransparency and true) or (assetData.manifestData and assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
+            if rwFiles.col then
+                imports.engineReplaceCOL(rwFiles.col, modelID)
             end
-    
             assetData.cAsset = self
             self.cData = assetData
             self.cScene = assetScene
@@ -155,32 +139,21 @@ if localPlayer then
                 modelID = modelID
             }
             self.unsyncedData = {
-                primary_rwFiles = primary_rwFiles,
-                secondary_rwFiles = secondary_rwFiles
+                rwFiles = rwFiles
             }
             assetData.cData = syncedData
             loadState = true
         end
         callback(loadState)
         return loadState
-    
     end
 
     function asset:unload(callback)
-
         if not self or (self == asset) then return false end
         if not callback or (imports.type(callback) ~= "function") then return false end
-
         imports.engineFreeModel(self.syncedData.modelID)
-        if self.unsyncedData.primary_rwFiles then
-            for i, j in imports.pairs(self.unsyncedData.primary_rwFiles) do
-                if j and imports.isElement(j) then
-                    imports.destroyElement(j)
-                end
-            end
-        end
-        if self.unsyncedData.secondary_rwFiles then
-            for i, j in imports.pairs(self.unsyncedData.secondary_rwFiles) do
+        if self.unsyncedData.rwFiles then
+            for i, j in imports.pairs(self.unsyncedData.rwFiles) do
                 if j and imports.isElement(j) then
                     imports.destroyElement(j)
                 end
@@ -191,9 +164,9 @@ if localPlayer then
         imports.collectgarbage()
         callback(true)
         return true
-
     end
 
+    --[[
     function asset:refreshMaps(refreshState, assetType, assetName, mapPack, mapData, mapType)
 
         if not assetType or not assetName or not mapPack or (refreshState and not mapData) or (imports.type(mapData) ~= "table") then return false end
@@ -271,11 +244,10 @@ if localPlayer then
         return true
 
     end
+    ]]
 else
     function asset:buildFile(filePath, filePointer)
-
         if not filePath or not filePointer then return false end
-
         if not filePointer[filePath] then
             local builtFileData = imports.file.read(filePath)
             if builtFileData then
@@ -285,9 +257,9 @@ else
             end
         end
         return true
-
     end
 
+    --[[
     function asset:buildShader(assetPath, cThread, shaderMaps, shaderPack)
 
         if not assetPath or not cThread or not shaderMaps or not shaderPack then return false end
@@ -311,22 +283,20 @@ else
         return true
 
     end
+    ]]
 
-    function asset:buildPack(assetPackType, assetPack, callback)
-
-        if not assetPackType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
-
+    function asset:buildPack(assetType, assetPack, callback)
+        if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
         local cAssetPack = imports.table.clone(assetPack, true)
-        cAssetPack.manifestData = imports.file.read((asset.references.root)..imports.string.lower(assetPackType).."/"..(asset.references.manifest)..".json")
+        cAssetPack.manifestData = imports.file.read((asset.references.root)..imports.string.lower(assetType).."/"..(asset.references.manifest)..".json")
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
-
         if cAssetPack.manifestData then
             cAssetPack.rwDatas = {}
             thread:create(function(cThread)
                 local callbackReference = callback
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetReference = cAssetPack.manifestData[i]
-                    local assetPath = (asset.references.root)..imports.string.lower(assetPackType).."/"..assetReference.."/"
+                    local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetReference.."/"
                     local assetManifestPath = assetPath..(asset.references.asset)..".json"
                     local assetManifestData = imports.file.read(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
@@ -347,7 +317,7 @@ else
                             --cAssetPack.rwDatas[assetReference].rwMap = {}
                             --asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
-                        if assetPackType == "scene" then
+                        if assetType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
                             --assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
@@ -395,6 +365,5 @@ else
             callbackReference(false)
         end
         return false
-
     end
 end
