@@ -64,6 +64,7 @@ function onLibraryLoaded()
             assetify = {
                 imports = {
                     resourceName = ]]..imports.resourceName..[[,
+                    type = type,
                     call = call,
                     getResourceFromName = getResourceFromName
                 },
@@ -71,7 +72,7 @@ function onLibraryLoaded()
                 getAsset = function(...)
                     local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
                     if cAsset then
-                        cAsset.rwMap, cAsset.rwData = nil, nil
+                        cAsset.unsyncedData = nil
                         return cAsset, cData
                     end
                     return false
@@ -91,7 +92,7 @@ function onLibraryLoaded()
 
                 getAssetID = function(...)
                     local _, cData = assetify.getAsset(...)
-                    if cData then
+                    if cData and (imports.type(cData) == "table") then
                        return cData.modelID or false
                     end
                 end

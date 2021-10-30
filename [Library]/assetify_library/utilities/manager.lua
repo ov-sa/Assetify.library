@@ -39,11 +39,25 @@ local imports = {
 manager = {}
 manager.__index = manager
 
-function manager:isAssetLoaded(assetType, assetName)
-
+function manager:getData(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
+    if availableAssetPacks[assetType] then
+        local assetReference = availableAssetPacks[assetType].rwDatas[assetName]
+        if assetReference then
+            if assetType == "scene" then
+                return assetReference, (assetReference.unsyncedData and true) or false
+            else
+                return assetReference, (assetReference.unsyncedData and assetReference.unsyncedData.cAsset and assetReference.unsyncedData.cAsset.syncedData) or false
+            end
+        end
+    end
+    return false
+end
 
+function manager:isLoaded(assetType, assetName)
+    if not syncer.isLibraryLoaded then return false end
+    if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
@@ -52,10 +66,9 @@ function manager:isAssetLoaded(assetType, assetName)
         end
     end
     return false
-
 end
 
-function manager:loadAsset(assetType, assetName)
+function manager:load(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
@@ -121,7 +134,7 @@ function manager:loadAsset(assetType, assetName)
     return false
 end
 
-function manager:unloadAsset(assetType, assetName)
+function manager:unload(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
