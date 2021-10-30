@@ -6,23 +6,22 @@
     <!-- Imports -->
     <include resource="graphify_library"/>
 
-	<!-- Exports -->
-    <script src="exports/client.lua" type="client"/>
-
-    <!-- Settings & Utilities -->
+    <!-- Exports,Settings & Utilities -->
     <script src="utilities/shared.lua" type="shared"/>
+    <script src="exports/client.lua" type="client"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
+    <script src="utilities/manager.lua" type="client"/>
+    <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
     <script src="settings/client.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
-    <script src="handlers/syncer/client.lua" type="client"/>
-    <script src="handlers/syncer/server.lua" type="server"/>
     <script src="handlers/bundler.lua" type="client"/>
+    <script src="handlers/loader.lua" type="client"/>
 
     <!-- Exports -->
     <export function="fetchImports" type="client"/>

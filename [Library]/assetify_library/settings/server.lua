@@ -13,11 +13,6 @@
 --[[ Settings ]]--
 ------------------
 
-downloadSettings = {
-    speed = 1250000,
-    syncRate = 50
-}
-
 availableAssetPacks = {
     ["scene"] = {
         autoLoad = true,

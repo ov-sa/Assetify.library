@@ -16,13 +16,24 @@
 local imports = {
     pairs = pairs,
     setTimer = setTimer,
-    addEventHandler = addEventHandler
+    addEventHandler = addEventHandler,
+    getResourceRootElement = getResourceRootElement
 }
 
 
 ----------------------------------
 --[[ Event: On Resource Start ]]--
 ----------------------------------
+
+local function onLibraryLoaded()
+
+    syncer.isLibraryLoaded = true
+    for i, j in imports.pairs(syncer.scheduledClients) do
+        syncer:syncPack(i)
+        syncer.scheduledClients[i] = nil
+    end
+    
+end
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
 
@@ -37,5 +48,28 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
         end
         onLibraryLoaded()
     end):resume()
+
+end)
+
+
+-----------------------------------------------
+--[[ Events: On Player Resource-Start/Quit ]]--
+-----------------------------------------------
+
+imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
+
+    if imports.getResourceRootElement(resourceElement) == resourceRoot then
+        if syncer.isLibraryLoaded then
+            syncer:syncPack(source)
+        else
+            syncer.scheduledClients[source] = true
+        end
+    end
+
+end)
+
+imports.addEventHandler("onPlayerQuit", root, function()
+
+    syncer.scheduledClients[source] = nil
 
 end)
