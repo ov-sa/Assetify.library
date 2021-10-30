@@ -40,9 +40,9 @@ local imports = {
 syncer = {}
 syncer.__index = syncer
 
+syncer.isLibraryLoaded = false
 if localPlayer then
     syncer.scheduledAssets = {}
-    isLibraryLoaded = false
     availableAssetPacks = {}
     imports.addEvent("onAssetifyLoad", false)
     imports.addEvent("onAssetifyUnLoad", false)
@@ -136,7 +136,6 @@ if localPlayer then
     end)
 else
     syncer.scheduledClients = {}
-    isLibraryLoaded = false
 
     function syncer:syncHash(player, ...)
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)

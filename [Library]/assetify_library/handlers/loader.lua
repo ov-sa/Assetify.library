@@ -22,7 +22,7 @@ local imports = {
     createWater = createWater,
     setWaterLevel = setWaterLevel,
     setOcclusionsEnabled = setOcclusionsEnabled,
-    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled,
+    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled
 }
 
 

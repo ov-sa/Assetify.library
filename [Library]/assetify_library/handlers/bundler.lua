@@ -36,7 +36,7 @@ local bundlerData = false
 
 function fetchImports(recieveData)
 
-    if not isLibraryLoaded or not bundlerData then return false end
+    if not syncer.isLibraryLoaded or not bundlerData then return false end
 
     if recieveData == true then
         return bundlerData
@@ -58,7 +58,7 @@ end
 
 function onLibraryLoaded()
 
-    isLibraryLoaded = true
+    syncer.isLibraryLoaded = true
     local importedModules = {
         bundler = [[
             assetify = {
