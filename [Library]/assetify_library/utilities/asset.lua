@@ -3,7 +3,7 @@
      Script: utilities: asset.lua
      Server: -
      Author: OvileAmriam
-     Developer: Aviril
+     Developer(s): Aviril, Tron
      DOC: 19/10/2021 (OvileAmriam)
      Desc: Asset Utilities ]]--
 ----------------------------------------------------------------
@@ -16,7 +16,6 @@
 local imports = {
     type = type,
     pairs = pairs,
-    ipairs = ipairs,
     md5 = md5,
     split = split,
     gettok = gettok,
@@ -182,7 +181,8 @@ if localPlayer then
                                 end
                             elseif mapType == "control" then
                                 local isControlValid = true
-                                for m, n in imports.ipairs(asset.shaders.controlMap.validControls) do
+                                for m = 1, #asset.shaders.controlMap.validControls, 1 do
+                                    local n = asset.shaders.controlMap.validControls[m]
                                     if not v[n] or not v[n].map or not imports.fileExists(v[n].map) or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
                                         isControlValid = false
                                         break

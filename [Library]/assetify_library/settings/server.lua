@@ -3,7 +3,7 @@
      Script: settings: server.lua
      Server: -
      Author: OvileAmriam
-     Developer: Aviril
+     Developer(s): Aviril, Tron
      DOC: 19/10/2021 (OvileAmriam)
      Desc: Server Sided Settings ]]--
 ----------------------------------------------------------------

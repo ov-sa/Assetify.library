@@ -3,7 +3,7 @@
      Script: handlers: builder.lua
      Server: -
      Author: OvileAmriam
-     Developer: Aviril
+     Developer(s): Aviril, Tron
      DOC: 19/10/2021 (OvileAmriam)
      Desc: Builder Handler ]]--
 ----------------------------------------------------------------
@@ -30,6 +30,7 @@ local function onLibraryLoaded()
     syncer.isLibraryLoaded = true
     for i, j in imports.pairs(syncer.scheduledClients) do
         syncer:syncPack(i)
+        syncer.loadedClients[i] = true
         syncer.scheduledClients[i] = nil
     end
     
@@ -60,6 +61,7 @@ imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
 
     if imports.getResourceRootElement(resourceElement) == resourceRoot then
         if syncer.isLibraryLoaded then
+            syncer.loadedClients[source] = true
             syncer:syncPack(source)
         else
             syncer.scheduledClients[source] = true
@@ -70,6 +72,7 @@ end)
 
 imports.addEventHandler("onPlayerQuit", root, function()
 
+    syncer.loadedClients[source] = nil
     syncer.scheduledClients[source] = nil
 
 end)

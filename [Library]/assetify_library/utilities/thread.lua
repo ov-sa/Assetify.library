@@ -3,7 +3,7 @@
      Script: utilities: thread.lua
      Server: -
      Author: OvileAmriam
-     Developer: Aviril
+     Developer(s): Aviril, Tron
      DOC: 19/10/2021 (OvileAmriam)
      Desc: Thread Utilities ]]--
 ----------------------------------------------------------------

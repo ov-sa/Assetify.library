@@ -3,7 +3,7 @@
      Script: utilities: syncer.lua
      Server: -
      Author: OvileAmriam
-     Developer: Aviril
+     Developer(s): Aviril, Tron
      DOC: 19/10/2021 (OvileAmriam)
      Desc: Syncer Utilities ]]--
 ----------------------------------------------------------------
@@ -18,6 +18,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     isElement = isElement,
+    getElementsByType = getElementsByType,
     collectgarbage = collectgarbage,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
@@ -138,6 +139,7 @@ if localPlayer then
         end
     end)
 else
+    syncer.loadedClients = {}
     syncer.scheduledClients = {}
 
     function syncer:syncHash(player, ...)
@@ -159,6 +161,15 @@ else
     function syncer.syncModel(element, assetType, assetName)
         if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType][assetName] then return false end
         syncer.syncedElements[element] = {type = assetType, name = assetName}
+        thread:create(function(cThread)
+            for i, j in imports.pairs(syncer.loadedClients) do
+                imports.triggerClientEvent(i, "Assetify:onRecieveModel", i, element, assetType, assetName)
+                thread.pause()
+            end
+        end):resume({
+            executions = downloadSettings.syncRate,
+            frames = 1
+        })
         return true
     end
 
