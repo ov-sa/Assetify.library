@@ -148,8 +148,10 @@ if localPlayer then
     imports.addEvent("Assetify:onRecieveElementModel", true)
     imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName)
         if not element or not imports.isElement(element) then return false end
+        print("HUH 1")
         local modelID = manager:getID(assetType, assetName)
         if modelID then
+            print("MODEL ID: "..tostring(modelID))
             imports.setElementModel(element, modelID)
         end
     end)
