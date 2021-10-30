@@ -24,6 +24,7 @@ local imports = {
     addEvent = addEvent,
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
+    triggerClientEvent = triggerClientEvent,
     triggerLatentClientEvent = triggerLatentClientEvent,
     triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
@@ -148,10 +149,8 @@ if localPlayer then
     imports.addEvent("Assetify:onRecieveElementModel", true)
     imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName)
         if not element or not imports.isElement(element) then return false end
-        print("HUH 1")
         local modelID = manager:getID(assetType, assetName)
         if modelID then
-            print("MODEL ID: "..tostring(modelID))
             imports.setElementModel(element, modelID)
         end
     end)
@@ -176,7 +175,7 @@ else
     end
 
     function syncer:syncElementModel(element, assetType, assetName)
-        if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType][assetName] then return false end
+        if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetPack.rwDatas[assetName] then return false end
         syncer.syncedElements[element] = {type = assetType, name = assetName}
         thread:create(function(cThread)
             for i, j in imports.pairs(syncer.loadedClients) do

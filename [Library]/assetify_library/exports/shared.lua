@@ -32,3 +32,11 @@ function setCharacterAsset(ped, ...)
     return syncer:syncElementModel(ped, "character", ...)
 
 end
+
+function setVehicleAsset(vehicle, ...)
+
+    if not vehicle or not imports.isElement(vehicle) or (imports.getElementType(vehicle) ~= "vehicle") then return false end
+
+    return syncer:syncElementModel(vehicle, "vehicle", ...)
+
+end

@@ -26,6 +26,7 @@
 
     <!-- Exports -->
     <export function="setCharacterAsset" type="shared"/>
+    <export function="setVehicleAsset" type="shared"/>
     <export function="fetchImports" type="client"/>
     <export function="getAssetData" type="client"/>
     <export function="getAssetID" type="client"/>

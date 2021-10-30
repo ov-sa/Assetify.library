@@ -67,33 +67,42 @@ function onLibraryLoaded()
                     type = type,
                     call = call,
                     getResourceFromName = getResourceFromName
-                },
-
-                getAsset = function(...)
+                }
+            }
+            if localPlayer then
+                assetify.getAsset = function(...)
                     local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
                     if cAsset then
                         cAsset.unsyncedData = nil
                         return cAsset, cData
                     end
                     return false
-                end,
+                end
 
-                getAssetID = function(...)
+                assetify.getAssetID = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetID", ...)
-                end,
+                end
 
-                isAssetLoaded = function(...)
+                assetify.isAssetLoaded = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isAssetLoaded", ...)
-                end,
+                end
 
-                loadAsset = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
-                end,
-
-                unloadAsset = function(...)
+                assetify.loadAsset = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
                 end
-            }
+
+                assetify.unloadAsset = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
+                end
+            end
+
+            assetify.setCharacter = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setCharacterAsset", ...)
+            end
+
+            assetify.setVehicle = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setVehicleAsset", ...)
+            end
         ]]
     }
 
