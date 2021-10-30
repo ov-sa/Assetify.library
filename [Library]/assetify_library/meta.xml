@@ -21,13 +21,13 @@
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
-    <script src="handlers/bundler.lua" type="client"/>
+    <script src="handlers/bundler.lua" type="shared"/>
     <script src="handlers/loader.lua" type="client"/>
 
     <!-- Exports -->
+    <export function="fetchImports" type="shared"/>
     <export function="setCharacterAsset" type="shared"/>
     <export function="setVehicleAsset" type="shared"/>
-    <export function="fetchImports" type="client"/>
     <export function="getAssetData" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="isAssetLoaded" type="client"/>

@@ -52,13 +52,12 @@ function fetchImports(recieveData)
 end
 
 
----------------------------------
---[[ Function: Loads Library ]]--
----------------------------------
+-----------------------------------
+--[[ Function: Bundles Library ]]--
+-----------------------------------
 
-function onLibraryLoaded()
+function onBundleLibrary()
 
-    syncer.isLibraryLoaded = true
     local importedModules = {
         bundler = [[
             assetify = {
@@ -106,8 +105,8 @@ function onLibraryLoaded()
         ]]
     }
 
-    bundlerData = {}
     imports.table.insert(bundlerData, importedModules.bundler)
-    imports.triggerEvent("onAssetifyLoad", root)
+    bundlerData = {}
 
 end
+onBundleLibrary()
