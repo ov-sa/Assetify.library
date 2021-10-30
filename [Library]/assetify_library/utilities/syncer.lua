@@ -158,8 +158,7 @@ else
 
     function syncer.syncModel(element, assetType, assetName)
         if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType][assetName] then return false end
-        if not syncer.syncedElements[assetType] then syncer.syncedElements[assetType] = {} end
-        syncer.syncedElements[assetType][element] = assetName
+        syncer.syncedElements[element] = {type = assetType, name = assetName}
         return true
     end
 
