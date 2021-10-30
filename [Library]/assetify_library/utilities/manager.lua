@@ -83,7 +83,8 @@ function manager:load(assetType, assetName)
                         rwCache = {
                             txd = {},
                             dff = {},
-                            col = {}
+                            col = {},
+                            map = {}
                         }
                     }
                     local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
@@ -114,8 +115,7 @@ function manager:load(assetType, assetName)
                             end)
                             thread.pause()
                         end
-                        --TODO: LOAD SHADERS
-                        --asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
+                        asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, true)
                     end
                 end):resume({
                     executions = downloadSettings.buildRate,
@@ -158,8 +158,7 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
-                    --TODO: UNLOAD SHADERS
-                    --asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
+                    asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, false)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
                 end):resume({

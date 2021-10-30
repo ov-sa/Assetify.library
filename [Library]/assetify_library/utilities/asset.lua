@@ -27,6 +27,7 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     setTimer = setTimer,
+    fileExists = fileExists,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
     engineFreeModel = engineFreeModel,
@@ -82,7 +83,6 @@ if localPlayer then
             validControls = {"red", "green", "blue"}
         }
     }
-    asset.cMaps = {}
 
     function asset:create(...)
         local cAsset = imports.setmetatable({}, {__index = self})
@@ -161,35 +161,29 @@ if localPlayer then
         return true
     end
 
-    --TODO: ..
-    --[[
-    function asset:refreshMaps(refreshState, assetType, assetName, mapPack, mapData, mapType)
-
-        if not assetType or not assetName or not mapPack or (refreshState and not mapData) or (imports.type(mapData) ~= "table") then return false end
-
-        for i, j in imports.pairs(mapPack) do
+    function asset:refreshShaderPack(assetType, assetName, shaderPack, mapType, rwCache, state)
+        if not assetType or not assetName or not shaderPack or not rwCache then return false end
+        for i, j in imports.pairs(shaderPack) do
             if not mapType then
-                if refreshState then
-                    asset.cMaps[assetType] = asset.cMaps[assetType] or {}
-                    asset.cMaps[assetType][assetName] = asset.cMaps[assetType][assetName] or {}
-                    asset.cMaps[assetType][assetName][i] = asset.cMaps[assetType][assetName][i] or {}
+                if state then
+                    rwCache[i] = {}
                 end
-                asset:refreshMaps(refreshState, assetType, assetName, j, mapData[i], i)
+                asset:refreshShaderPack(assetType, assetName, j, i, rwCache, state)
             else
-                for k, v in imports.pairs(mapData) do
-                    if refreshState then
-                        if not asset.cMaps[assetType][assetName][mapType][k] then
-                            asset.cMaps[assetType][assetName][mapType][k] = {}
+                for k, v in imports.pairs(shaderPack) do
+                    if state then
+                        if not rwCache[mapType][k] then
+                            rwCache[mapType][k] = {}
                             if mapType == "bump" then
-                                if v.map then
+                                if v.map and imports.fileExists(v.map) then
                                     local createdMap = imports.dxCreateTexture(v.map, "dxt5", true)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
-                                    asset.cMaps[assetType][assetName][mapType][k] = {map = createdMap, shader = createdBumpMap}
+                                    rwCache[mapType][k] = {map = createdMap, shader = createdBumpMap}
                                 end
                             elseif mapType == "control" then
                                 local isControlValid = true
                                 for m, n in imports.ipairs(asset.shaders.controlMap.validControls) do
-                                    if not v[n] or not v[n].map or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
+                                    if not v[n] or not v[n].map or not imports.fileExists(v[n].map) or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
                                         isControlValid = false
                                         break
                                     end
@@ -203,7 +197,7 @@ if localPlayer then
                                         green = {texture = greenControl, scale = v.green.scale},
                                         blue = {texture = blueControl, scale = v.blue.scale}
                                     })
-                                    asset.cMaps[assetType][assetName][mapType][k] = {
+                                    rwCache[mapType][k] = {
                                         shader = createdControlMap,
                                         redControl = redControl,
                                         greenControl = greenControl,
@@ -213,8 +207,8 @@ if localPlayer then
                             end
                         end
                     else
-                        if asset.cMaps[assetType][assetName][mapType][k] then
-                            for m, n in imports.pairs(asset.cMaps[assetType][assetName][mapType][k]) do
+                        if rwCache[mapType][k] then
+                            for m, n in imports.pairs(rwCache[mapType][k]) do
                                 if n and imports.isElement(n) then
                                     if (m == "shader") and (mapType == "control") then
                                         exports.graphify_library:destroyControlMap(n, true)
@@ -223,21 +217,19 @@ if localPlayer then
                                     end
                                 end
                             end
-                            asset.cMaps[assetType][assetName][mapType][k] = nil
+                            rwCache[mapType][k] = nil
                         end
                     end
                 end
                 if mapType == "emissive" then
                     if j then
-                        exports.graphify_library:setTextureEmissiveState(i, "world", refreshState)
+                        exports.graphify_library:setTextureEmissiveState(i, "world", state)
                     end
                 end
             end
         end
         return true
-
     end
-    ]]
 else
     function asset:buildFile(filePath, filePointer)
         if not filePath or not filePointer then return false end
@@ -252,17 +244,14 @@ else
         return true
     end
 
-    function asset:buildShader(assetPath, shaderPack, shaderMapData, assetFiles)
+    function asset:buildShader(assetPath, shaderPack, assetFiles)
         for i, j in imports.pairs(shaderPack) do
             if j and (imports.type(j) == "table") then
-                shaderMapData[i] = {}
-                asset:buildShader(assetPath, j, shaderMapData[i], assetFiles)
+                asset:buildShader(assetPath, j, assetFiles)
             else
-                if i ~= "map" then
-                    shaderMapData[i] = j
-                else
-                    shaderMapData[i] = assetPath.."map/"..j
-                    asset:buildFile(shaderMapData[i], assetFiles)
+                if i == "map" then
+                    shaderPack[i] = assetPath.."map/"..j
+                    asset:buildFile(shaderPack[i], assetFiles)
                 end
             end
             thread.pause()
@@ -290,8 +279,7 @@ else
                     else
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
-                                manifestData = assetManifestData,
-                                shaderMapData = {}
+                                manifestData = assetManifestData
                             },
                             unSynced = {
                                 fileList = {},
@@ -332,7 +320,7 @@ else
                             thread.pause()
                         end
                         if assetManifestData.shaderMaps then
-                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].synced.shaderMapData, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced)
                         end
                     end
                 end
