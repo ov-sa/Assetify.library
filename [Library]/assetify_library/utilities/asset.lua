@@ -252,32 +252,23 @@ else
         return true
     end
 
-    --TODO: ..
-    --[[
-    function asset:buildShader(rwPaths, cThread, shaderMaps, shaderPack)
-
-        if not rwPaths or not cThread or not shaderMaps or not shaderPack then return false end
-
-        for i, j in imports.pairs(shaderMaps) do
+    function asset:buildShader(assetPath, shaderPack, shaderData, assetFiles)
+        for i, j in imports.pairs(shaderPack) do
             if j and (imports.type(j) == "table") then
-                shaderPack[i] = {}
-                asset:buildShader(rwPaths, cThread, j, shaderPack[i])
+                shaderData[i] = {}
+                asset:buildShader(assetPath, j, shaderData[i], assetFiles)
             else
                 if i ~= "map" then
-                    shaderPack[i] = j
+                    shaderData[i] = j
                 else
-                    shaderPack[i] = imports.file.read(rwPaths.."map/"..j)
+                    shaderData[i] = assetPath.."map/"..j
+                    asset:buildFile(shaderData[i], assetFiles)
                 end
             end
-            imports.setTimer(function()
-                cThread:resume()
-            end, 1, 1)
             thread.pause()
         end
         return true
-
     end
-    ]]
 
     function asset:buildPack(assetType, assetPack, callback)
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
@@ -290,16 +281,17 @@ else
                 local callbackReference = callback
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetReference = cAssetPack.manifestData[i]
-                    local rwPaths = (asset.references.root)..imports.string.lower(assetType).."/"..assetReference.."/"
-                    local assetManifestPath = rwPaths..(asset.references.asset)..".json"
+                    local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetReference.."/"
+                    local assetManifestPath = assetPath..(asset.references.asset)..".json"
                     local assetManifestData = imports.file.read(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
-                        cAssetPack.rwDatas[rwPaths] = false
+                        cAssetPack.rwDatas[assetPath] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
                                 manifestData = assetManifestData,
+                                shaderData = {}
                             },
                             unSynced = {
                                 fileList = {},
@@ -307,14 +299,10 @@ else
                                 fileHash = {}
                             }
                         }
-                        if assetManifestData.shaderMaps then
-                            --cAssetPack.rwDatas[assetReference].rwMap = {}
-                            --asset:buildShader(rwPaths, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
-                        end
+                        assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                         if assetType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
-                            --assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                             if assetManifestData.sceneOffset then
                                 if imports.type(assetManifestData.sceneOffset) ~= "table" then
                                     assetManifestData.sceneOffset = false
@@ -324,24 +312,27 @@ else
                                     end
                                 end
                             end
-                            local sceneIPLPath = rwPaths..(asset.references.scene)..".ipl"
+                            local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
                             local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
                                 asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced)
-                                asset:buildFile(rwPaths..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    asset:buildFile(rwPaths.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                                    asset:buildFile(rwPaths.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
                                     thread.pause()
                                 end
                             end
                         else
-                            asset:buildFile(rwPaths..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(rwPaths..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(rwPaths..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
                             thread.pause()
+                        end
+                        if assetManifestData.shaderMaps then
+                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].synced.shaderData, cAssetPack.rwDatas[assetReference].unSynced)
                         end
                     end
                 end
