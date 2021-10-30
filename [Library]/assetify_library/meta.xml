@@ -19,8 +19,8 @@
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
-    <script src="handlers/syncer/client.lua" type="client"/>
     <script src="handlers/bundler.lua" type="client"/>
+    <script src="handlers/loader.lua" type="client"/>
 
     <!-- Exports -->
     <export function="fetchImports" type="client"/>

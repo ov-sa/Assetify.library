@@ -164,6 +164,7 @@ if localPlayer then
         return true
     end
 
+    --TODO: ..
     --[[
     function asset:refreshMaps(refreshState, assetType, assetName, mapPack, mapData, mapType)
 
@@ -257,6 +258,7 @@ else
         return true
     end
 
+    --TODO: ..
     --[[
     function asset:buildShader(rwPaths, cThread, shaderMaps, shaderPack)
 
