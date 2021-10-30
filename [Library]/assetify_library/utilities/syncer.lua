@@ -61,11 +61,20 @@ if localPlayer then
                 fileData = nil
                 thread.pause()
             end
-            imports.triggerLatentServerEvent("onClientRequestAssetFiles", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
+            imports.triggerLatentServerEvent("Assetify:onSendHash", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
             imports.collectgarbage()
         end):resume({
             executions = downloadSettings.buildRate,
             frames = 1
+        })
+    end)
+
+    imports.addEvent("Assetify:onSendHash", true)
+    imports.addEventHandler("Assetify:onSendHash", root, function(assetType, assetName, hashes)
+        syncer:syncPack(source, {
+            type = assetType,
+            name = assetName,
+            hashes = hashes
         })
     end)
 
@@ -176,7 +185,7 @@ else
         else
             thread:create(function(cThread)
                 local assetReference = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
-                for i, j in imports.pairs(assetDatas.fileList) do
+                for i, j in imports.pairs(assetDatas.hashes) do
                     syncer:syncContent(player, i, assetReference.unSynced.fileData[i])
                     thread.pause()
                 end

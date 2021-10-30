@@ -134,7 +134,6 @@ function loadAsset(assetType, assetName)
                         --asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
                         assetReference.cAsset = true
                     end
-                    print("[Loaded "..assetType.."] : "..assetName)
                 end):resume({
                     executions = downloadSettings.buildRate,
                     frames = 1
