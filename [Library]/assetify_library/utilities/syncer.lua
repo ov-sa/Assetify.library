@@ -25,6 +25,7 @@ local imports = {
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
     triggerClientEvent = triggerClientEvent,
+    triggerServerEvent = triggerServerEvent,
     triggerLatentClientEvent = triggerLatentClientEvent,
     triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
@@ -52,10 +53,14 @@ if localPlayer then
     availableAssetPacks = {}
     imports.addEvent("onAssetifyLoad", false)
     imports.addEvent("onAssetifyUnLoad", false)
-
+    
     function syncer:syncElementModel(...)        
         return imports.triggerEvent("Assetify:onRecieveElementModel", localPlayer, ...)
     end
+
+    imports.addEventHandler("onAssetifyLoad", root, function()
+        imports.triggerServerEvent("Assetify:onRequestElementModels", localPlayer)
+    end)
 
     imports.addEvent("Assetify:onRecieveHash", true)
     imports.addEventHandler("Assetify:onRecieveHash", root, function(assetType, assetName, hashes)
@@ -174,18 +179,24 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
-    function syncer:syncElementModel(element, assetType, assetName)
-        if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetPack.rwDatas[assetName] then return false end
-        syncer.syncedElements[element] = {type = assetType, name = assetName}
-        thread:create(function(cThread)
-            for i, j in imports.pairs(syncer.loadedClients) do
-                imports.triggerClientEvent(i, "Assetify:onRecieveElementModel", i, element, assetType, assetName)
-                thread.pause()
-            end
-        end):resume({
-            executions = downloadSettings.syncRate,
-            frames = 1
-        })
+    function syncer:syncElementModel(element, assetType, assetName, targetPlayer, skipCaching)
+        if not skipCaching then
+            if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetPack.rwDatas[assetName] then return false end
+            syncer.syncedElements[element] = {type = assetType, name = assetName}
+        end
+        if not targetPlayer then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncElementModel(element, assetType, assetName, i, true)
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveElementModel", targetPlayer, element, assetType, assetName)
+        end
         return true
     end
 
@@ -238,4 +249,18 @@ else
         })
     end)
 
+    imports.addEvent("Assetify:onRequestElementModels", true)
+    imports.addEventHandler("Assetify:onRequestElementModels", root, function()
+        thread:create(function(cThread)
+            for i, j in imports.pairs(syncer.syncedElements) do
+                if j then
+                    syncer:syncElementModel(i, j.type, j.name, source)
+                end
+                thread.pause()
+            end
+        end):resume({
+            executions = downloadSettings.syncRate,
+            frames = 1
+        })
+    end)
 end
