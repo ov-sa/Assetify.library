@@ -20,7 +20,6 @@ local imports = {
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
-    collectgarbage = collectgarbage,
     createObject = createObject,
     setElementDoubleSided = setElementDoubleSided,
     setElementDimension = setElementDimension,
@@ -62,6 +61,7 @@ function scene:load(cAsset, sceneManifest, sceneData)
         imports.setElementDimension(self.cLODObject, sceneManifest.sceneDimension)
         imports.setElementInterior(self.cLODObject, sceneManifest.sceneInterior)
     end
+    cAsset.cScene = self
     return true
 end
 
@@ -75,6 +75,5 @@ function scene:unload(cAsset)
         imports.destroyElement(self.cLODObject)
     end
     self = nil
-    imports.collectgarbage()
     return true
 end

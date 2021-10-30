@@ -92,6 +92,7 @@ if localPlayer then
     imports.addEvent("Assetify:onRecieveContent", true)
     imports.addEventHandler("Assetify:onRecieveContent", root, function(contentPath, ...)
         imports.file.write(contentPath, ...)
+        imports.collectgarbage()
     end)
 
     imports.addEvent("Assetify:onRecieveState", true)

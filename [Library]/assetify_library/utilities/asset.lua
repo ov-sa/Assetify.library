@@ -26,7 +26,6 @@ local imports = {
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
-    collectgarbage = collectgarbage,
     setTimer = setTimer,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
@@ -157,7 +156,6 @@ if localPlayer then
             end
         end
         self = nil
-        imports.collectgarbage()
         if callback and (imports.type(callback) == "function") then
             callback(true)
         end
@@ -236,9 +234,6 @@ if localPlayer then
                     end
                 end
             end
-        end
-        if not mapType and not refreshMaps then
-            imports.collectgarbage()
         end
         return true
 

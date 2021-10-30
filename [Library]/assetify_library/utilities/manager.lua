@@ -19,6 +19,9 @@ local imports = {
     gettok = gettok,
     tonumber = tonumber,
     tostring = tostring,
+    isElement = isElement,
+    destroyElement = destroyElement,
+    collectgarbage = collectgarbage,
     setTimer = setTimer,
     file = {
         read = file.read
@@ -44,7 +47,7 @@ function manager:isAssetLoaded(assetType, assetName)
     local packReference = availableAssetPacks[assetType]
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
-        if assetReference and assetReference.cAsset then
+        if assetReference and assetReference.unsyncedData then
             return true
         end
     end
@@ -52,16 +55,13 @@ function manager:isAssetLoaded(assetType, assetName)
 
 end
 
-
 function manager:loadAsset(assetType, assetName)
-
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
-
     local packReference = availableAssetPacks[assetType]
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
-        if assetReference and not assetReference.cAsset then
+        if assetReference and not assetReference.unsyncedData then
             local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
             if assetType == "scene" then
                 thread:create(function(cThread)
@@ -101,8 +101,8 @@ function manager:loadAsset(assetType, assetName)
                             end)
                             thread.pause()
                         end
+                        --TODO: LOAD SHADERS
                         --asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
-                        assetReference.cAsset = true
                     end
                 end):resume({
                     executions = downloadSettings.buildRate,
@@ -110,7 +110,7 @@ function manager:loadAsset(assetType, assetName)
                 })
                 return true
             else
-                return asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference, {
+                return asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
                     txd = assetPath..(asset.references.asset)..".txd",
                     dff = assetPath..(asset.references.asset)..".dff",
                     col = assetPath..(asset.references.asset)..".col"
@@ -119,38 +119,41 @@ function manager:loadAsset(assetType, assetName)
         end
     end
     return false
-
 end
 
 function manager:unloadAsset(assetType, assetName)
-
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
-
     local packReference = availableAssetPacks[assetType]
     if packReference then
         local assetReference = packReference.rwDatas[assetName]
-        if assetReference and assetReference.cAsset then
+        if assetReference and assetReference.unsyncedData then
             if assetType == "scene" then
                 thread:create(function(cThread)
-                    for i, j in imports.pairs(assetReference.rwData.children) do
-                        if j.cScene then
-                            j.cScene:destroy()
-                        end
+                    for i, j in imports.pairs(assetReference.unsyncedData.assetCache) do
                         if j.cAsset then
-                            j.cAsset:destroy(function()
-                                imports.setTimer(function()
-                                    cThread:resume()
-                                end, 1, 1)
-                            end)
+                            if j.cAsset.cScene then
+                                j.cAsset.cScene:destroy()
+                            end
+                            j.cAsset:destroy()
                         end
+                        thread.pause()
                     end
-                    asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
-                    assetReference.cAsset = false
-                end):resume()
-                return true
+                    for i, j in imports.pairs(assetReference.unsyncedData.rwCache) do
+                        if j and imports.isElement(j) then
+                            imports.destroyElement(j)
+                        end
+                        thread.pause()
+                    end
+                    --asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
+                    assetReference.unsyncedData = nil
+                    imports.collectgarbage()
+                end):resume({
+                    executions = downloadSettings.buildRate,
+                    frames = 1
+                })
             else
-                return assetReference.cAsset:destroy()
+                assetReference.cAsset:destroy()
             end
         end
     end
