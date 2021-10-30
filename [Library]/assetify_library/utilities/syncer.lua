@@ -202,25 +202,4 @@ else
             hashes = hashes
         })
     end)
-
-    --TODO: ..
-    --[[
-    function syncer.syncRWMap(player, assetType, assetName, subIndexes, rwMap)
-
-        if not rwMap then return false end
-
-        for i, j in imports.pairs(rwMap) do
-            local clonedDataIndex = imports.table.clone(subIndexes, false)
-            imports.table.insert(clonedDataIndex, i)
-            if j and imports.type(j) == "table" then
-                syncer.syncRWMap(player, assetType, assetName, clonedDataIndex, j)
-            else
-                imports.triggerLatentClientEvent(player, "Assetify:onRecieveData", downloadSettings.speed, false, player, assetType, assetName, nil, clonedDataIndex, j)
-                thread.pause()
-            end
-        end
-        return true
-
-    end
-    ]]--
 end
