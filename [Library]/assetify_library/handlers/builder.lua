@@ -15,7 +15,8 @@
 
 local imports = {
     pairs = pairs,
-    setTimer = setTimer
+    setTimer = setTimer,
+    addEventHandler = addEventHandler
 }
 
 

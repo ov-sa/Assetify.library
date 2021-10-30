@@ -29,6 +29,7 @@ function setCharacterAsset(ped, ...)
     local elementType = imports.getElementType(ped)
     if (elementType ~= "ped") and (elementType ~= "player") then return false end
 
+    local arguments = {...}
     return syncer:syncElementModel(ped, "character", arguments[1], arguments[2], arguments[3])
 
 end
