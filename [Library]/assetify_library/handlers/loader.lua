@@ -30,13 +30,6 @@ local imports = {
 --[[ Events: On Client Resource Start/Stop ]]--
 -----------------------------------------------
 
-local function onLibraryLoaded()
-
-    syncer.isLibraryLoaded = true
-    imports.triggerEvent("onAssetifyLoad", root)
-
-end
-
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
 
     if not GTAWorldSettings.removeWorld then

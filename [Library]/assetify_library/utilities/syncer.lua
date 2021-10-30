@@ -131,7 +131,8 @@ if localPlayer then
             end
             if isSyncDone then
                 syncer.scheduledAssets = nil
-                onLibraryLoaded()
+                syncer.isLibraryLoaded = true
+                imports.triggerEvent("onAssetifyLoad", resourceRoot)
                 thread:create(function(cThread)
                     for i, j in imports.pairs(availableAssetPacks) do
                         if j.autoLoad and j.rwDatas then
