@@ -252,17 +252,17 @@ else
         return true
     end
 
-    function asset:buildShader(assetPath, shaderPack, shaderData, assetFiles)
+    function asset:buildShader(assetPath, shaderPack, shaderMapData, assetFiles)
         for i, j in imports.pairs(shaderPack) do
             if j and (imports.type(j) == "table") then
-                shaderData[i] = {}
-                asset:buildShader(assetPath, j, shaderData[i], assetFiles)
+                shaderMapData[i] = {}
+                asset:buildShader(assetPath, j, shaderMapData[i], assetFiles)
             else
                 if i ~= "map" then
-                    shaderData[i] = j
+                    shaderMapData[i] = j
                 else
-                    shaderData[i] = assetPath.."map/"..j
-                    asset:buildFile(shaderData[i], assetFiles)
+                    shaderMapData[i] = assetPath.."map/"..j
+                    asset:buildFile(shaderMapData[i], assetFiles)
                 end
             end
             thread.pause()
@@ -291,7 +291,7 @@ else
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
                                 manifestData = assetManifestData,
-                                shaderData = {}
+                                shaderMapData = {}
                             },
                             unSynced = {
                                 fileList = {},
@@ -332,7 +332,7 @@ else
                             thread.pause()
                         end
                         if assetManifestData.shaderMaps then
-                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].synced.shaderData, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].synced.shaderMapData, cAssetPack.rwDatas[assetReference].unSynced)
                         end
                     end
                 end
