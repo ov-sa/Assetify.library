@@ -105,8 +105,8 @@ function onBundleLibrary()
         ]]
     }
 
-    imports.table.insert(bundlerData, importedModules.bundler)
     bundlerData = {}
+    imports.table.insert(bundlerData, importedModules.bundler)
 
 end
 onBundleLibrary()
