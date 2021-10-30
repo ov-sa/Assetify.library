@@ -2,7 +2,7 @@
 
 ![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Documentation/assets/assetify_banner.png)
 
-##### ━ Maintainer(s): [Aviril](https://github.com/Aviril)
+##### ━ Maintainer(s): [Aviril](https://github.com/Aviril), [Tron](https://github.com/OvileAmriam)
 
 **Assetify Library** is a open-source custom asset loading library made by **Aviril** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/).
 
@@ -26,7 +26,8 @@
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Graphify-Maps for Asset-Packs (As easy as modifying the config!)
 * Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene Dimension, Interior & Offsets (Useful for mass movement!) 
+* Supports Scene Dimension, Interior & Offsets (Useful for mass movement!)
+* Supports Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
@@ -40,7 +41,6 @@
 
 * Custom Bone Attachment Handler
 * Virtual LODs
-* Asset-Pack Cache (MD5 Hash Layer)
 * UE based Weapon Asset-Pack (Fully functional w/ customizable reload, magazine & damage)
 
 ## ━ Contents
@@ -49,4 +49,3 @@
 * [**Installation Guide**](#)
 * [**Example Assets**](https://github.com/ov-sa/Assetify-Library/tree/Example)
 * [**Discord Community**](http://discord.gg/sVCnxPW)
-
