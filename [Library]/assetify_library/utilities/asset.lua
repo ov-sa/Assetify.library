@@ -126,7 +126,7 @@ if localPlayer then
             imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
         end
         imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
-        if rwCache.col then
+        if rwCache.col[(rwPaths.col)] then
             imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
         end
         assetData.cAsset = self
