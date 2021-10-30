@@ -99,50 +99,44 @@ if localPlayer then
         return self:unload(...)
     end
     
-    function asset:load(assetType, assetPack, assetData, assetPath, callback)
+    function asset:load(assetType, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
-        if not assetType or not assetPack or not assetPack.assetType or not assetData or not assetPath then return false end
-        local rwFiles = nil
+        if not assetType or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local modelID = false
-        if assetPath.dff then
-            modelID = imports.engineRequestModel(assetPack.assetType, (assetData.manifestData.assetBase and (imports.type(assetData.manifestData.assetBase) == "number") and assetData.manifestData.assetBase) or assetPack.assetBase or nil)
+        if rwPaths.dff then
+            modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
-                rwFiles = {}
-                rwFiles.dff = imports.engineLoadDFF(assetPath.dff)
-                rwFiles.col = imports.engineLoadCOL(assetPath.col)
-                if not rwFiles.dff then
+                if not rwCache.dff[(rwPaths.dff)] then
+                    rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF(rwPaths.dff)
+                end
+                if not rwCache.dff[(rwPaths.dff)] then
                     imports.engineFreeModel(modelID)
-                    for i, j in imports.pairs(rwFiles) do
-                        if j and imports.isElement(j) then
-                            imports.destroyElement(j)
-                        end
+                    return false
+                else
+                    if not rwCache.col[(rwPaths.col)] then
+                        rwCache.col[(rwPaths.col)] = imports.engineLoadCOL(rwPaths.col)
                     end
-                    rwFiles = nil
                 end
             end
         end
         local loadState = false
-        if rwFiles then
-            rwFiles.txd = imports.engineLoadTXD(assetPath.txd)
-            if rwFiles.txd then
-                imports.engineImportTXD(rwFiles.txd, modelID)
-            end
-            imports.engineReplaceModel(rwFiles.dff, modelID, (assetData.manifestData.assetTransparency and true) or assetPack.assetTransparency)
-            if rwFiles.col then
-                imports.engineReplaceCOL(rwFiles.col, modelID)
-            end
-            assetData.cAsset = self
-            self.cData = assetData
-            self.syncedData = {
-                modelID = modelID
-            }
-            self.unsyncedData = {
-                rwFiles = rwFiles
-            }
-            assetData.cData = syncedData
-            loadState = true
+        if not rwCache.txd[(rwPaths.txd)] then
+            rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD(rwPaths.txd)
         end
+        if rwCache.txd[(rwPaths.txd)] then
+            imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
+        end
+        imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
+        if rwCache.col then
+            imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
+        end
+        assetData.cAsset = self
+        self.rwPaths = rwPaths
+        self.syncedData = {
+            modelID = modelID
+        }
+        loadState = true
         if callback and (imports.type(callback) == "function") then
             callback(loadState)
         end
@@ -152,14 +146,16 @@ if localPlayer then
     function asset:unload(callback)
         if not self or (self == asset) then return false end
         imports.engineFreeModel(self.syncedData.modelID)
-        if self.unsyncedData.rwFiles then
-            for i, j in imports.pairs(self.unsyncedData.rwFiles) do
+        if self.rwPaths then
+            for i, j in imports.pairs(self.rwPaths) do
+                --TODO: CHECK IF THE FILE EXISTS IN ASSET REFERENCE'S CACHE THEN DESTROY!
+                --[[
                 if j and imports.isElement(j) then
                     imports.destroyElement(j)
                 end
+                ]]
             end
         end
-        self.cData.cAsset = nil
         self = nil
         imports.collectgarbage()
         if callback and (imports.type(callback) == "function") then
@@ -262,19 +258,19 @@ else
     end
 
     --[[
-    function asset:buildShader(assetPath, cThread, shaderMaps, shaderPack)
+    function asset:buildShader(rwPaths, cThread, shaderMaps, shaderPack)
 
-        if not assetPath or not cThread or not shaderMaps or not shaderPack then return false end
+        if not rwPaths or not cThread or not shaderMaps or not shaderPack then return false end
 
         for i, j in imports.pairs(shaderMaps) do
             if j and (imports.type(j) == "table") then
                 shaderPack[i] = {}
-                asset:buildShader(assetPath, cThread, j, shaderPack[i])
+                asset:buildShader(rwPaths, cThread, j, shaderPack[i])
             else
                 if i ~= "map" then
                     shaderPack[i] = j
                 else
-                    shaderPack[i] = imports.file.read(assetPath.."map/"..j)
+                    shaderPack[i] = imports.file.read(rwPaths.."map/"..j)
                 end
             end
             imports.setTimer(function()
@@ -298,12 +294,12 @@ else
                 local callbackReference = callback
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetReference = cAssetPack.manifestData[i]
-                    local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetReference.."/"
-                    local assetManifestPath = assetPath..(asset.references.asset)..".json"
+                    local rwPaths = (asset.references.root)..imports.string.lower(assetType).."/"..assetReference.."/"
+                    local assetManifestPath = rwPaths..(asset.references.asset)..".json"
                     local assetManifestData = imports.file.read(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
                     if not assetManifestData then
-                        cAssetPack.rwDatas[assetPath] = false
+                        cAssetPack.rwDatas[rwPaths] = false
                     else
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
@@ -317,7 +313,7 @@ else
                         }
                         if assetManifestData.shaderMaps then
                             --cAssetPack.rwDatas[assetReference].rwMap = {}
-                            --asset:buildShader(assetPath, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
+                            --asset:buildShader(rwPaths, cThread, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].rwMap)
                         end
                         if assetType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
@@ -332,23 +328,23 @@ else
                                     end
                                 end
                             end
-                            local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
+                            local sceneIPLPath = rwPaths..(asset.references.scene)..".ipl"
                             local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
                                 asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced)
-                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                                asset:buildFile(rwPaths..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(rwPaths.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(rwPaths.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
                                     thread.pause()
                                 end
                             end
                         else
-                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(rwPaths..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(rwPaths..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(rwPaths..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
                             thread.pause()
                         end
                     end

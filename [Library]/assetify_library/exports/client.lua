@@ -18,6 +18,7 @@ local imports = {
     pairs = pairs,
     split = split,
     gettok = gettok,
+    tonumber = tonumber,
     tostring = tostring,
     setTimer = setTimer,
     file = {
@@ -94,41 +95,40 @@ function loadAsset(assetType, assetName)
             local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
             if assetType == "scene" then
                 thread:create(function(cThread)
+                    assetReference.unsyncedData = {
+                        assetCache = {},
+                        rwCache = {
+                            txd = {},
+                            dff = {},
+                            col = {}
+                        }
+                    }
                     local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
                     if sceneManifestData then
                         local unparsedDatas = imports.split(sceneManifestData, "\n")
                         for i = 1, #unparsedDatas, 1 do
                             local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
-                            local childData = {
-                                position = {
-                                    x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
-                                    y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
-                                    z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
-                                },
-                                rotation = {
-                                    x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
-                                    y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
-                                    z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
-                                }
-                            }
-                            asset:create(assetType, packReference, assetReference, {
+                            assetReference.unsyncedData.assetCache[i] = {}
+                            asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
                                 txd = assetPath..(asset.references.asset)..".txd",
                                 dff = assetPath.."dff/"..childName..".dff",
                                 col = assetPath.."col/"..childName..".col"
                             }, function(state)
                                 if state then
-                                    print("CREATED..")
-                                    --[[
-                                    scene:create(j.cAsset, assetReference.manifestData)
-                                    imports.setTimer(function()
-                                        cThread:resume()
-                                    end, 1, 1)
-                                    ]]
+                                    scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, {
+                                        position = {
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                        },
+                                        rotation = {
+                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
+                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
+                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
+                                        }
+                                    })
                                 end
                             end)
-                            imports.setTimer(function()
-                                cThread:resume()
-                            end, 1, 1)
                             thread.pause()
                         end
                         --asset:refreshMaps(true, assetType, assetName, assetReference.manifestData.shaderMaps, assetReference.rwMap)
@@ -141,7 +141,7 @@ function loadAsset(assetType, assetName)
                 })
                 return true
             else
-                return asset:create(assetType, packReference, assetReference, {
+                return asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference, {
                     txd = assetPath..(asset.references.asset)..".txd",
                     dff = assetPath..(asset.references.asset)..".dff",
                     col = assetPath..(asset.references.asset)..".col"
