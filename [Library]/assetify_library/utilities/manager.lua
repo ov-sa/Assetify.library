@@ -68,7 +68,7 @@ function manager:isLoaded(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
-    if packReference then
+    if packReference and packReference.rwDatas then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and assetReference.unsyncedData then
             return true
@@ -81,7 +81,7 @@ function manager:load(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
-    if packReference then
+    if packReference and packReference.rwDatas then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.unsyncedData then
             local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
@@ -147,7 +147,7 @@ function manager:unload(assetType, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not assetType or not assetName then return false end
     local packReference = availableAssetPacks[assetType]
-    if packReference then
+    if packReference and packReference.rwDatas then
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and assetReference.unsyncedData then
             if assetType == "scene" then
