@@ -105,21 +105,21 @@ if localPlayer then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
-                if not rwCache.dff[(rwPaths.dff)] then
+                if not rwCache.dff[(rwPaths.dff)] and imports.fileExists(rwPaths.dff) then
                     rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF(rwPaths.dff)
                 end
                 if not rwCache.dff[(rwPaths.dff)] then
                     imports.engineFreeModel(modelID)
                     return false
                 else
-                    if not rwCache.col[(rwPaths.col)] then
+                    if not rwCache.col[(rwPaths.col)] and imports.fileExists(rwPaths.col) then
                         rwCache.col[(rwPaths.col)] = imports.engineLoadCOL(rwPaths.col)
                     end
                 end
             end
         end
         local loadState = false
-        if not rwCache.txd[(rwPaths.txd)] then
+        if not rwCache.txd[(rwPaths.txd)] and imports.fileExists(rwPaths.txd) then
             rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD(rwPaths.txd)
         end
         if rwCache.txd[(rwPaths.txd)] then

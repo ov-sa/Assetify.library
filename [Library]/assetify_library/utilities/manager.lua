@@ -85,17 +85,17 @@ function manager:load(assetType, assetName)
         local assetReference = packReference.rwDatas[assetName]
         if assetReference and not assetReference.unsyncedData then
             local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
+            assetReference.unsyncedData = {
+                assetCache = {},
+                rwCache = {
+                    txd = {},
+                    dff = {},
+                    col = {},
+                    map = {}
+                }
+            }
             if assetType == "scene" then
                 thread:create(function(cThread)
-                    assetReference.unsyncedData = {
-                        assetCache = {},
-                        rwCache = {
-                            txd = {},
-                            dff = {},
-                            col = {},
-                            map = {}
-                        }
-                    }
                     local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
                     if sceneManifestData then
                         local unparsedDatas = imports.split(sceneManifestData, "\n")
