@@ -148,7 +148,7 @@ function manager:unload(assetType, assetName)
                             if j.cAsset.cScene then
                                 j.cAsset.cScene:destroy()
                             end
-                            j.cAsset:destroy()
+                            j.cAsset:destroy(assetReference.unsyncedData.rwCache)
                         end
                         thread.pause()
                     end
@@ -158,6 +158,7 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
+                    --TODO: UNLOAD SHADERS
                     --asset:refreshMaps(false, assetType, assetName, assetReference.manifestData.shaderMaps)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()

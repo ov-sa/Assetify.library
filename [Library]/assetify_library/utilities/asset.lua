@@ -142,17 +142,16 @@ if localPlayer then
         return loadState
     end
 
-    function asset:unload(callback)
+    function asset:unload(rwCache, callback)
         if not self or (self == asset) then return false end
+        if not rwCache then return false end
         imports.engineFreeModel(self.syncedData.modelID)
         if self.rwPaths then
             for i, j in imports.pairs(self.rwPaths) do
-                --TODO: CHECK IF THE FILE EXISTS IN ASSET REFERENCE'S CACHE THEN DESTROY!
-                --[[
-                if j and imports.isElement(j) then
-                    imports.destroyElement(j)
+                if rwCache[i] and rwCache[i][j] and imports.isElement(rwCache[i][j]) then
+                    imports.destroyElement(rwCache[i][j])
+                    rwCache[i][j] = nil
                 end
-                ]]
             end
         end
         self = nil

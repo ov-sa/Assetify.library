@@ -65,9 +65,8 @@ function scene:load(cAsset, sceneManifest, sceneData)
     return true
 end
 
-function scene:unload(cAsset)
+function scene:unload()
     if not self or (self == scene) then return false end
-    if not cAsset then return false end
     if imports.isElement(self.cObject) then
         imports.destroyElement(self.cObject)
     end
