@@ -17,6 +17,7 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
+    isElement = isElement,
     collectgarbage = collectgarbage,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
@@ -41,6 +42,7 @@ syncer = {}
 syncer.__index = syncer
 
 syncer.isLibraryLoaded = false
+syncer.syncedElements = {}
 if localPlayer then
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
@@ -154,6 +156,13 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
+    function syncer.syncModel(element, assetType, assetName)
+        if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType][assetName] then return false end
+        if not syncer.syncedElements[assetType] then syncer.syncedElements[assetType] = {} end
+        syncer.syncedElements[assetType][element] = assetName
+        return true
+    end
+
     function syncer:syncPack(player, assetDatas)
         if not assetDatas then
             thread:create(function(cThread)
@@ -202,4 +211,5 @@ else
             hashes = hashes
         })
     end)
+
 end
