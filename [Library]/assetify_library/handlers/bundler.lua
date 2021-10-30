@@ -53,7 +53,7 @@ end
 
 
 ---------------------------------
---[[ Event: On Assetify Load ]]--
+--[[ Function: Loads Library ]]--
 ---------------------------------
 
 function onLibraryLoaded()

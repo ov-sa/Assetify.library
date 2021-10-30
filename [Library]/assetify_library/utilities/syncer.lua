@@ -136,6 +136,7 @@ if localPlayer then
     end)
 else
     syncer.scheduledClients = {}
+    isLibraryLoaded = false
 
     function syncer:syncHash(player, ...)
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)
