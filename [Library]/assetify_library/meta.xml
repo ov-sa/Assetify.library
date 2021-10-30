@@ -8,6 +8,7 @@
 
     <!-- Exports,Settings & Utilities -->
     <script src="utilities/shared.lua" type="shared"/>
+    <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
@@ -24,6 +25,7 @@
     <script src="handlers/loader.lua" type="client"/>
 
     <!-- Exports -->
+    <export function="setCharacterAsset" type="shared"/>
     <export function="fetchImports" type="client"/>
     <export function="getAssetData" type="client"/>
     <export function="getAssetID" type="client"/>
