@@ -37,20 +37,15 @@ function getAssetData(assetType, assetName)
 end
 
 
-------------------------------------------------
---[[ Function: Retrieves Asset's Load State ]]--
-------------------------------------------------
+---------------------------------
+--[[ Functions: Asset's APIs ]]--
+---------------------------------
 
 function isAssetLoaded(...)
 
     return manager:isAssetLoaded(...)
 
 end
-
-
-----------------------------------------
---[[ Functions: Loads/Unloads Asset ]]--
-----------------------------------------
 
 function loadAsset(...)
 
