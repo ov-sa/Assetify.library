@@ -19,6 +19,7 @@ local imports = {
     md5 = md5,
     isElement = isElement,
     getElementsByType = getElementsByType,
+    setElementModel = setElementModel,
     collectgarbage = collectgarbage,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
@@ -138,6 +139,15 @@ if localPlayer then
             end
         end
     end)
+
+    imports.addEvent("Assetify:onRecieveElementModel", true)
+    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName)
+        if not element or not imports.isElement(element) then return false end
+        local modelID = manager:getID(assetType, assetName)
+        if modelID then
+            imports.setElementModel(element, modelID)
+        end
+    end)
 else
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
@@ -158,12 +168,12 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
-    function syncer.syncModel(element, assetType, assetName)
+    function syncer:syncElementModel(element, assetType, assetName)
         if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType][assetName] then return false end
         syncer.syncedElements[element] = {type = assetType, name = assetName}
         thread:create(function(cThread)
             for i, j in imports.pairs(syncer.loadedClients) do
-                imports.triggerClientEvent(i, "Assetify:onRecieveModel", i, element, assetType, assetName)
+                imports.triggerClientEvent(i, "Assetify:onRecieveElementModel", i, element, assetType, assetName)
                 thread.pause()
             end
         end):resume({

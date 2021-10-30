@@ -29,6 +29,12 @@ function getAssetData(...)
 
 end
 
+function getAssetID(...)
+
+    return manager:getID(...)
+
+end
+
 function isAssetLoaded(...)
 
     return manager:isLoaded(...)
@@ -59,6 +65,6 @@ function setCharacter(ped, characterName)
     if (elementType ~= "ped") and (elementType ~= "player") or not availableAssetPacks["characters"][assetName] then return false end
     syncer.syncedElements[ped] = assetName
     return true
-    syncer.syncModel(ped, "character", characterName)
+    syncer:syncElementModel(ped, "character", characterName)
 
 end

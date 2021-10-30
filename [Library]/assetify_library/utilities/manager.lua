@@ -14,6 +14,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     split = split,
     gettok = gettok,
@@ -53,6 +54,14 @@ function manager:getData(assetType, assetName)
         end
     end
     return false
+end
+
+function manager:getID(assetType, assetName)
+    if not manager:isLoaded(assetType, assetName) then return false end
+    local packReference = availableAssetPacks[assetType]
+    local assetReference = packReference.rwDatas[assetName]
+    if (imports.type(assetReference.unsyncedData) ~= "table") or not assetReference.unsyncedData.cAsset then return false end
+    return assetReference.unsyncedData.cAsset.syncedData.modelID or false
 end
 
 function manager:isLoaded(assetType, assetName)

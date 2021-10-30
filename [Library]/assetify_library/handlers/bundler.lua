@@ -78,6 +78,10 @@ function onLibraryLoaded()
                     return false
                 end,
 
+                getAssetID = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetID", ...)
+                end,
+
                 isAssetLoaded = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isAssetLoaded", ...)
                 end,
@@ -88,13 +92,6 @@ function onLibraryLoaded()
 
                 unloadAsset = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
-                end,
-
-                getAssetID = function(...)
-                    local _, cData = assetify.getAsset(...)
-                    if cData and (imports.type(cData) == "table") then
-                       return cData.modelID or false
-                    end
                 end
             }
         ]]
