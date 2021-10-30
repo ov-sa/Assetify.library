@@ -23,6 +23,7 @@ local imports = {
     collectgarbage = collectgarbage,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
+    getResourceRootElement = getResourceRootElement,
     triggerEvent = triggerEvent,
     triggerClientEvent = triggerClientEvent,
     triggerServerEvent = triggerServerEvent,
@@ -47,7 +48,6 @@ syncer = {}
 syncer.__index = syncer
 
 syncer.isLibraryLoaded = false
-syncer.syncedElements = {}
 if localPlayer then
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
@@ -162,6 +162,7 @@ if localPlayer then
 else
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
+    syncer.syncedElements = {}
 
     function syncer:syncHash(player, ...)
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)
@@ -262,5 +263,26 @@ else
             executions = downloadSettings.syncRate,
             frames = 1
         })
+    end)
+
+    imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
+        if imports.getResourceRootElement(resourceElement) == resourceRoot then
+            if syncer.isLibraryLoaded then
+                syncer.loadedClients[source] = true
+                syncer:syncPack(source)
+            else
+                syncer.scheduledClients[source] = true
+            end
+        end
+    end)
+
+    imports.addEventHandler("onElementDestroy", root, function()
+        syncer.syncedElements[source] = nil
+    end)
+    
+    imports.addEventHandler("onPlayerQuit", root, function()
+        syncer.loadedClients[source] = nil
+        syncer.scheduledClients[source] = nil
+        syncer.syncedElements[source] = nil
     end)
 end
