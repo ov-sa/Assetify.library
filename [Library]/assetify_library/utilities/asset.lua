@@ -176,7 +176,7 @@ if localPlayer then
                             if mapType == "bump" then
                                 if v.map and imports.fileExists(v.map) then
                                     local createdMap = imports.dxCreateTexture(v.map, "dxt5", true)
-                                    local createdBumpMap = exports.graphify_library:createBumpMap(i, "world", createdMap)
+                                    local createdBumpMap = exports.graphify_library:createBumpMap(k, "world", createdMap)
                                     rwCache[mapType][k] = {map = createdMap, shader = createdBumpMap}
                                 end
                             elseif mapType == "control" then
@@ -192,7 +192,7 @@ if localPlayer then
                                     local redControl = imports.dxCreateTexture(v.red.map, "dxt5", true)
                                     local greenControl = imports.dxCreateTexture(v.green.map, "dxt5", true)
                                     local blueControl = imports.dxCreateTexture(v.blue.map, "dxt5", true)
-                                    local createdControlMap = exports.graphify_library:createControlMap(i, "world", {
+                                    local createdControlMap = exports.graphify_library:createControlMap(k, "world", {
                                         red = {texture = redControl, scale = v.red.scale},
                                         green = {texture = greenControl, scale = v.green.scale},
                                         blue = {texture = blueControl, scale = v.blue.scale}
