@@ -31,7 +31,7 @@ local imports = {
         gsub = string.gsub
     },
     quat = {
-        convertToEuler = quat.convertToEuler
+        toEuler = quat.toEuler
     }
 }
 
@@ -123,7 +123,7 @@ function manager:load(assetType, assetName)
                                         },
                                         rotation = {}
                                     }
-                                    sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.convertToEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)))
+                                    sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)))
                                     scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, sceneData)
                                 end
                             end)
