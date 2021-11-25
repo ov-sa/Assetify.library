@@ -83,6 +83,6 @@ end
 quat = {
     convertToEuler = function(w, x, y, z)
         if not w or not x or not y or not z then return false end
-        return -imports.math.deg(imports.math.atan2(-2*(qy*qz-qw*qx), qw*qw-qx*qx-qy*qy+qz*qz)), -imports.math.deg(imports.math.asin(2*(qx*qz + qw*qy))), -imports.math.deg(imports.math.atan2(-2*(qx*qy-qw*qz), qw*qw+qx*qx-qy*qy-qz*qz))
+        return -imports.math.deg(imports.math.atan2(-2*(y*z-w*x), w*w-x*x-y*y+z*z)), -imports.math.deg(imports.math.asin(2*(x*z + w*y))), -imports.math.deg(imports.math.atan2(-2*(x*y-w*z), w*w+x*x-y*y-z*z))
     end
 }
