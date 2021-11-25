@@ -115,15 +115,16 @@ function manager:load(assetType, assetName)
                                 col = assetPath.."col/"..childName..".col"
                             }, function(state)
                                 if state then
-                                    scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, {
+                                    local sceneData = {
                                         position = {
                                             x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
                                             y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
                                             z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
                                         },
                                         rotation = {}
-                                        rotation.x, rotation.y, rotation.z = imports.quat.convertToEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)))
-                                    })
+                                    }
+                                    sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.convertToEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)))
+                                    scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, sceneData)
                                 end
                             end)
                             thread.pause()
