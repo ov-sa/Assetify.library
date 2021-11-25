@@ -29,6 +29,9 @@ local imports = {
     },
     string = {
         gsub = string.gsub
+    },
+    quat = {
+        convertToEuler = quat.convertToEuler
     }
 }
 
@@ -118,11 +121,8 @@ function manager:load(assetType, assetName)
                                             y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
                                             z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
                                         },
-                                        rotation = {
-                                            x = imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)),
-                                            y = imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)),
-                                            z = imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL))
-                                        }
+                                        rotation = {}
+                                        rotation.x, rotation.y, rotation.z = imports.quat.convertToEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)))
                                     })
                                 end
                             end)

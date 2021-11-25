@@ -22,7 +22,11 @@ local imports = {
     fileRead = fileRead,
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
-    fileClose = fileClose
+    fileClose = fileClose,
+    math = {
+        deg = math.deg,
+        atan2 = math.atan2
+    }
 }
 
 
@@ -69,3 +73,19 @@ function table.clone(baseTable, isRecursive)
     end
     return clonedTable
 end
+
+
+---------------------
+--[[ Class: Quat ]]--
+---------------------
+
+quat = {
+    convertToEuler = function(w, x, y, z)
+        if not w or not x or not y or not z then return false end
+        if (imports.type(w) ~= "number") or (imports.type(x) ~= "number") or (imports.type(y) ~= "number") or (imports.type(z) ~= "number") then return false end
+
+        local sinX, sinY, sinZ = 2.0 * ((w*x) + (y*z)), 2.0 * ((w*y) - (z*x)), 2.0 * ((w*z) + (x*y))
+        local cosX, cosZ = 1.0 - (2.0 * ((x*x) + (y*y))), 1.0 - (2.0 * ((y*y) + (z*z)))
+        return imports.math.deg(imports.math.atan2(sinX, cosX)), imports.math.deg(math.asin(Clamp(sinY, -1.0, 1.0))), imports.math.deg(imports.math.atan2(sinZ, cosZ))
+    end
+}
