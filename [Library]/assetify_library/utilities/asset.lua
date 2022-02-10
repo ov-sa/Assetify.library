@@ -231,27 +231,27 @@ if localPlayer then
         return true
     end
 else
-    function asset:buildFile(filePath, filePointer)
+    function asset:buildFile(filePath, filePointer, encryptKey)
         if not filePath or not filePointer then return false end
         if not filePointer[filePath] then
             local builtFileData = imports.file.read(filePath)
             if builtFileData then
                 filePointer[filePath] = true
                 filePointer.fileData[filePath] = builtFileData
-                filePointer.fileHash[filePath] = imports.md5(builtFileData)
+                filePointer.fileHash[filePath] = imports.md5(builtFileData..(encryptKey or ""))
             end
         end
         return true
     end
 
-    function asset:buildShader(assetPath, shaderPack, assetFiles)
+    function asset:buildShader(assetPath, shaderPack, assetFiles, encryptKey)
         for i, j in imports.pairs(shaderPack) do
             if j and (imports.type(j) == "table") then
-                asset:buildShader(assetPath, j, assetFiles)
+                asset:buildShader(assetPath, j, assetFiles, encryptKey)
             else
                 if i == "map" then
                     shaderPack[i] = assetPath.."map/"..j
-                    asset:buildFile(shaderPack[i], assetFiles)
+                    asset:buildFile(shaderPack[i], assetFiles, encryptKey)
                 end
             end
             thread.pause()
@@ -277,6 +277,7 @@ else
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
+                        assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
                                 manifestData = assetManifestData
@@ -303,24 +304,24 @@ else
                             local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
                             local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
-                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced)
-                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
+                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                                 local unparsedDatas = imports.split(sceneManifestData, "\n")
                                 for k = 1, #unparsedDatas, 1 do
                                     local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                                     thread.pause()
                                 end
                             end
                         else
-                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced)
-                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                             thread.pause()
                         end
                         if assetManifestData.shaderMaps then
-                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced)
+                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                         end
                     end
                 end
