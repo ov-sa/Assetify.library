@@ -24,15 +24,9 @@ local imports = {
     destroyElement = destroyElement,
     collectgarbage = collectgarbage,
     setTimer = setTimer,
-    file = {
-        read = file.read
-    },
-    string = {
-        gsub = string.gsub
-    },
-    quat = {
-        toEuler = quat.toEuler
-    }
+    file = file,
+    string = string,
+    quat = quat
 }
 
 

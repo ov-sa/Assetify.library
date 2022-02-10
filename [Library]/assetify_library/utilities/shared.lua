@@ -23,11 +23,7 @@ local imports = {
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose,
-    math = {
-        deg = math.deg,
-        asin = math.asin,
-        atan2 = math.atan2
-    }
+    math = math
 }
 
 

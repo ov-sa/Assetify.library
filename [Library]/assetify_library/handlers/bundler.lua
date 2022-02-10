@@ -17,9 +17,7 @@ local imports = {
     resourceName = getResourceName(getThisResource()),
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
-    table = {
-        insert = table.insert
-    }
+    table = table
 }
 
 
