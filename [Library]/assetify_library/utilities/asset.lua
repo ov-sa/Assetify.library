@@ -18,6 +18,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     encodeString = encodeString,
+    decodeString = decodeString,
     split = split,
     gettok = gettok,
     tonumber = tonumber,
