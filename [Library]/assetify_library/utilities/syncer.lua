@@ -17,7 +17,6 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
-    encodeString = encodeString,
     isElement = isElement,
     getElementsByType = getElementsByType,
     setElementModel = setElementModel,

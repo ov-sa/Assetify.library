@@ -39,21 +39,10 @@ local imports = {
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
     dxCreateTexture = dxCreateTexture,
-    file = {
-        read = file.read
-    },
-    table = {
-        clone = table.clone
-    },
-    string = {
-        byte = string.byte,
-        lower = string.lower,
-        gsub = string.gsub
-    },
-    math = {
-        min = math.min,
-        max = math.max
-    }
+    file = file,
+    table = table,
+    string = string,
+    math = math
 }
 
 
@@ -108,21 +97,21 @@ if localPlayer then
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.fileExists(rwPaths.dff) then
-                    rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF(rwPaths.dff)
+                    rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
                 end
                 if not rwCache.dff[(rwPaths.dff)] then
                     imports.engineFreeModel(modelID)
                     return false
                 else
                     if not rwCache.col[(rwPaths.col)] and imports.fileExists(rwPaths.col) then
-                        rwCache.col[(rwPaths.col)] = imports.engineLoadCOL(rwPaths.col)
+                        rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
                     end
                 end
             end
         end
         local loadState = false
         if not rwCache.txd[(rwPaths.txd)] and imports.fileExists(rwPaths.txd) then
-            rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD(rwPaths.txd)
+            rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
         end
         if rwCache.txd[(rwPaths.txd)] then
             imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
@@ -177,6 +166,8 @@ if localPlayer then
                             rwCache[mapType][k] = {}
                             if mapType == "bump" then
                                 if v.map and imports.fileExists(v.map) then
+                                    --TODO: SHADER DECODING WIP...
+                                    --(assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd
                                     local createdMap = imports.dxCreateTexture(v.map, "dxt5", true)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(k, "world", createdMap)
                                     rwCache[mapType][k] = {map = createdMap, shader = createdBumpMap}
@@ -239,8 +230,8 @@ else
             local builtFileData = imports.file.read(filePath)
             if builtFileData then
                 filePointer[filePath] = true
-                filePointer.fileData[filePath] = builtFileData
-                filePointer.fileHash[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
+                filePointer.fileData[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
+                filePointer.fileHash[filePath] = imports.md5(filePointer.fileData[filePath])
             end
         end
         return true
