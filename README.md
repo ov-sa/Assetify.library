@@ -25,6 +25,7 @@
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
+* Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Graphify-Maps for Asset-Packs (As easy as modifying the config!)
 * Supports Scene Asset-Pack (Supports multiple instances!)
