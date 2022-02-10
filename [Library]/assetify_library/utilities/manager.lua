@@ -129,7 +129,7 @@ function manager:load(assetType, assetName)
                             end)
                             thread.pause()
                         end
-                        asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, true)
+                        asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, assetReference.manifestData, true)
                     end
                 end):resume({
                     executions = downloadSettings.buildRate,
@@ -172,7 +172,7 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
-                    asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, false)
+                    asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, assetReference.manifestData, false)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
                 end):resume({

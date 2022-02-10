@@ -151,14 +151,14 @@ if localPlayer then
         return true
     end
 
-    function asset:refreshShaderPack(assetType, assetName, shaderPack, mapType, rwCache, state)
-        if not assetType or not assetName or not shaderPack or not rwCache then return false end
+    function asset:refreshShaderPack(assetType, assetName, shaderPack, mapType, rwCache, assetManifest, state)
+        if not assetType or not assetName or not shaderPack or not rwCache or not assetManifest then return false end
         for i, j in imports.pairs(shaderPack) do
             if not mapType then
                 if state then
                     rwCache[i] = {}
                 end
-                asset:refreshShaderPack(assetType, assetName, j, i, rwCache, state)
+                asset:refreshShaderPack(assetType, assetName, j, i, rwCache, assetManifest, state)
             else
                 for k, v in imports.pairs(shaderPack) do
                     if state then
@@ -166,9 +166,7 @@ if localPlayer then
                             rwCache[mapType][k] = {}
                             if mapType == "bump" then
                                 if v.map and imports.fileExists(v.map) then
-                                    --TODO: SHADER DECODING WIP...
-                                    --(assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd
-                                    local createdMap = imports.dxCreateTexture(v.map, "dxt5", true)
+                                    local createdMap = imports.dxCreateTexture((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(v.map), {key = assetManifest.encryptKey})) or v.map, "dxt5", true)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(k, "world", createdMap)
                                     rwCache[mapType][k] = {map = createdMap, shader = createdBumpMap}
                                 end
@@ -182,9 +180,9 @@ if localPlayer then
                                     end
                                 end
                                 if isControlValid then
-                                    local redControl = imports.dxCreateTexture(v.red.map, "dxt5", true)
-                                    local greenControl = imports.dxCreateTexture(v.green.map, "dxt5", true)
-                                    local blueControl = imports.dxCreateTexture(v.blue.map, "dxt5", true)
+                                    local redControl = imports.dxCreateTexture((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(v.red.map), {key = assetManifest.encryptKey})) or v.red.map, "dxt5", true)
+                                    local greenControl = imports.dxCreateTexture((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(v.green.map), {key = assetManifest.encryptKey})) or v.green.map, "dxt5", true)
+                                    local blueControl = imports.dxCreateTexture((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(v.blue.map), {key = assetManifest.encryptKey})) or v.blue.map, "dxt5", true)
                                     local createdControlMap = exports.graphify_library:createControlMap(k, "world", {
                                         red = {texture = redControl, scale = v.red.scale},
                                         green = {texture = greenControl, scale = v.green.scale},

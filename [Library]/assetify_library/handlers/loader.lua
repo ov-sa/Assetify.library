@@ -53,7 +53,7 @@ imports.addEventHandler("onClientResourceStop", resourceRoot, function()
         if j.autoLoad and j.rwDatas then
             for k, v in imports.pairs(j.rwDatas) do
                 if v and v.unsyncedData then
-                    asset:refreshShaderPack(i, k, v.manifestData.shaderMaps, nil, v.unsyncedData.rwCache.map, false)
+                    asset:refreshShaderPack(i, k, v.manifestData.shaderMaps, nil, v.unsyncedData.rwCache.map, v.manifestData, false)
                 end
             end
         end
