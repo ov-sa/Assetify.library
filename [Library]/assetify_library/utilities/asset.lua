@@ -17,6 +17,7 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
+    encodeString = encodeString,
     split = split,
     gettok = gettok,
     tonumber = tonumber,
@@ -238,7 +239,7 @@ else
             if builtFileData then
                 filePointer[filePath] = true
                 filePointer.fileData[filePath] = builtFileData
-                filePointer.fileHash[filePath] = imports.md5(builtFileData..(encryptKey or ""))
+                filePointer.fileHash[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
             end
         end
         return true
