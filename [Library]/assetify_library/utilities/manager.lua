@@ -16,6 +16,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    decodeString = decodeString,
     split = split,
     gettok = gettok,
     tonumber = tonumber,
@@ -98,6 +99,7 @@ function manager:load(assetType, assetName)
             if assetType == "scene" then
                 thread:create(function(cThread)
                     local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
+                    sceneManifestData = (assetReference.manifestData.encryptKey and imports.decodeString("tea", sceneManifestData, {key = assetReference.manifestData.encryptKey})) or sceneManifestData
                     if sceneManifestData then
                         local unparsedDatas = imports.split(sceneManifestData, "\n")
                         for i = 1, #unparsedDatas, 1 do
