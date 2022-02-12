@@ -26,7 +26,7 @@
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
 * Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
-* Built-In Asset-Pack Clumper (Supports only: Character, Vehicle asset-packs)
+* Built-In Asset-Pack Clumper (Supports only: `Character`, `Vehicle` asset-packs)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Graphify-Maps for Asset-Packs (As easy as modifying the config!)
 * Supports Scene Asset-Pack (Supports multiple instances!)
