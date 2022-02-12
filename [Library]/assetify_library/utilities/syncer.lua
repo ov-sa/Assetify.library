@@ -148,9 +148,9 @@ if localPlayer then
     end)
 
     imports.addEvent("Assetify:onRecieveElementModel", true)
-    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName)
+    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName, assetClump)
         if not element or not imports.isElement(element) then return false end
-        local modelID = manager:getID(assetType, assetName)
+        local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
             imports.setElementModel(element, modelID)
         end

@@ -54,16 +54,16 @@ function manager:getData(assetType, assetName)
     return false
 end
 
-function manager:getID(assetType, assetName)
+function manager:getID(assetType, assetName, assetClump)
     if not manager:isLoaded(assetType, assetName) then return false end
     local packReference = availableAssetPacks[assetType]
     local assetReference = packReference.rwDatas[assetName]
-    if assetReference.unsyncedData then
-        if assetReference.unsyncedData.cAsset then
-        end
+    if imports.type(assetReference.unsyncedData) ~= "table" then return false end
+    if assetReference.manifestData.assetClumps then
+        return (assetClump and assetReference.manifestData.assetClumps[assetClump] and assetReference.unsyncedData.assetCache[assetClump] and assetReference.unsyncedData.assetCache[assetClump].cAsset and assetReference.unsyncedData.assetCache[assetClump].cAsset.syncedData.modelID) or false
+    else
+        return (assetReference.unsyncedData.assetCache.cAsset and assetReference.unsyncedData.assetCache.cAsset.syncedData.modelID) or false
     end
-    if (imports.type(assetReference.unsyncedData) ~= "table") or not assetReference.unsyncedData.assetCache.cAsset then return false end
-    return assetReference.unsyncedData.assetCache.cAsset.syncedData.modelID or false
 end
 
 function manager:isLoaded(assetType, assetName)
@@ -132,6 +132,21 @@ function manager:load(assetType, assetName)
                     frames = 1
                 })
                 return true
+            elseif assetReference.manifestData.assetClumps then
+                thread:create(function(cThread)
+                    for i, j in imports.pairs(assetReference.manifestData.assetClumps) do
+                        assetReference.unsyncedData.assetCache[i] = {}
+                        asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
+                            txd = assetPath..(asset.references.asset)..".txd",
+                            dff = assetPath.."clump/"..j..".dff",
+                            col = assetPath..(asset.references.asset)..".col"
+                        })
+                        thread.pause()
+                    end
+                end):resume({
+                    executions = downloadSettings.buildRate,
+                    frames = 1
+                })
             else
                 return asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
                     txd = assetPath..(asset.references.asset)..".txd",
@@ -162,12 +177,6 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
-                    for i, j in imports.pairs(assetReference.unsyncedData.rwCache) do
-                        if j and imports.isElement(j) then
-                            imports.destroyElement(j)
-                        end
-                        thread.pause()
-                    end
                     asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, assetReference.manifestData, false)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
@@ -175,8 +184,26 @@ function manager:unload(assetType, assetName)
                     executions = downloadSettings.buildRate,
                     frames = 1
                 })
+            elseif assetReference.manifestData.assetClumps then
+                thread:create(function(cThread)
+                    for i, j in imports.pairs(assetReference.unsyncedData.assetCache) do
+                        if j.cAsset then
+                            j.cAsset:destroy(assetReference.unsyncedData.rwCache)
+                        end
+                        thread.pause()
+                    end
+                    assetReference.unsyncedData = nil
+                    imports.collectgarbage()
+                end):resume({
+                    executions = downloadSettings.buildRate,
+                    frames = 1
+                })
             else
-                assetReference.cAsset:destroy()
+                if assetReference.cAsset then
+                    assetReference.cAsset:destroy(assetReference.unsyncedData.rwCache)
+                    assetReference.unsyncedData = nil
+                    imports.collectgarbage()
+                end
             end
         end
     end
