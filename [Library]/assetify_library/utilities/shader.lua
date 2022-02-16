@@ -20,6 +20,8 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     dxCreateShader = dxCreateShader,
+    dxCreateTexture = dxCreateTexture,
+    dxSetShaderValue = dxSetShaderValue,
     engineApplyShaderToWorldTexture = engineApplyShaderToWorldTexture,
     engineRemoveShaderFromWorldTexture = engineRemoveShaderFromWorldTexture
 }
@@ -34,12 +36,16 @@ shader = {
         shaderPriority = 10000,
         shaderDistance = 0
     },
+    preLoadedTextures = {
+        invisibleMap = imports.dxCreateTexture(2, 2, "dxt5", "clamp")
+    },
     rwCache = shaderRW
 }
 shaderRW = nil
 shader.preLoaded = {
-    ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureClearer"], shader.defaultData.shaderPriority, shader.defaultData.shaderDistance, false, "all")
+    ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureChanger"], shader.defaultData.shaderPriority, shader.defaultData.shaderDistance, false, "all")
 }
+imports.dxSetShaderValue(shader.preLoaded["Assetify_TextureClearer"], "baseTexture", shader.preLoadedTextures.invisibleMap)
 shader.__index = shader
 
 function shader:create(...)
