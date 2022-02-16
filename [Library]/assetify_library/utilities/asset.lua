@@ -37,7 +37,6 @@ local imports = {
     engineImportTXD = engineImportTXD,
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
-    dxCreateTexture = dxCreateTexture,
     file = file,
     table = table,
     string = string,

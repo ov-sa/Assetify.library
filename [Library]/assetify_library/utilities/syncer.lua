@@ -154,8 +154,13 @@ if localPlayer then
         if modelID then
             shader:clearElementBuffer(element, "clump")
             if clumpMaps then
-                for i, j in imports.pairs(clumpMaps) do
-                    shader:create(element, "clump", "Assetify_TextureChanger", i, {baseTexture = j})
+                local assetReference = manager:getData(assetType, assetName)
+                if assetReference and assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.clump then
+                    for i, j in imports.pairs(clumpMaps) do
+                        if assetReference.manifestData.shaderMaps.clump[i] and assetReference.manifestData.shaderMaps.clump[i][j] then
+                            shader:create(element, "clump", "Assetify_TextureChanger", i, {baseTexture = assetReference.manifestData.shaderMaps.clump[i][j]}, assetReference.manifestData.encryptKey)
+                        end
+                    end
                 end
             end
             imports.setElementModel(element, modelID)
@@ -182,6 +187,7 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
+    --TODO: MODIFY TO SUPPORT ASSET CLUMP + CLUMP MAP SYNC
     function syncer:syncElementModel(element, assetType, assetName, targetPlayer, skipCaching)
         if not skipCaching then
             if not element or not imports.isElement(element) or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetPack.rwDatas[assetName] then return false end

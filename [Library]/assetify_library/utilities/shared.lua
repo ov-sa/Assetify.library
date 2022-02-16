@@ -18,6 +18,7 @@ local imports = {
     pairs = pairs,
     fileExists = fileExists,
     fileCreate = fileCreate,
+    fileDelete = fileDelete,
     fileOpen = fileOpen,
     fileRead = fileRead,
     fileWrite = fileWrite,
@@ -33,22 +34,19 @@ local imports = {
 
 file = {
     exists = imports.fileExists,
-
+    delete = imports.fileDelete,
     read = function(path)
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
         if not cFile then return false end
-
         local data = imports.fileRead(cFile, imports.fileGetSize(cFile))
         imports.fileClose(cFile)
         return data
     end,
-
     write = function(path, data)
         if not path or not data then return false end
         local cFile = imports.fileCreate(path)
         if not cFile then return false end
-    
         imports.fileWrite(cFile, data)
         imports.fileClose(cFile)    
         return true
