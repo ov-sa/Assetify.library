@@ -19,6 +19,7 @@ local imports = {
     tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
+    addEventHandler = addEventHandler,
     setmetatable = setmetatable,
     createObject = createObject,
     setElementDoubleSided = setElementDoubleSided,
@@ -56,10 +57,18 @@ function scene:load(cAsset, sceneManifest, sceneData)
     imports.setElementDimension(self.cObject, sceneManifest.sceneDimension)
     imports.setElementInterior(self.cObject, sceneManifest.sceneInterior)
     if sceneManifest.defaultLODs then
-        self.cLODObject = imports.createObject(cAsset.syncedData.modelID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
-        imports.setElementDoubleSided(self.cLODObject, true)
-        imports.setElementDimension(self.cLODObject, sceneManifest.sceneDimension)
-        imports.setElementInterior(self.cLODObject, sceneManifest.sceneInterior)
+        imports.addEventHandler("onClientElementStreamIn", self.cObject, function()
+            if not imports.isElement(self.cLODObject) then return false end
+            imports.destroyElement(self.cLODObject)
+        end)
+        imports.addEventHandler("onClientElementStreamOut", self.cObject, function()
+            if imports.isElement(self.cLODObject) then return false end
+            local sceneManifest, sceneData = sceneManifest, sceneData 
+            self.cLODObject = imports.createObject(cAsset.syncedData.modelID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
+            imports.setElementDoubleSided(self.cLODObject, true)
+            imports.setElementDimension(self.cLODObject, sceneManifest.sceneDimension)
+            imports.setElementInterior(self.cLODObject, sceneManifest.sceneInterior)
+        end)
     end
     cAsset.cScene = self
     return true
