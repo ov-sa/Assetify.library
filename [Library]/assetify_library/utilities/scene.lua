@@ -58,11 +58,11 @@ function scene:load(cAsset, sceneManifest, sceneData)
     imports.setElementInterior(self.cObject, sceneManifest.sceneInterior)
     if sceneManifest.defaultLODs then
         imports.addEventHandler("onClientElementStreamIn", self.cObject, function()
-            if not imports.isElement(self.cLODObject) then return false end
+            if not self.cLODObject or not imports.isElement(self.cLODObject) then return false end
             imports.destroyElement(self.cLODObject)
         end)
         imports.addEventHandler("onClientElementStreamOut", self.cObject, function()
-            if imports.isElement(self.cLODObject) then return false end
+            if self.cLODObject and imports.isElement(self.cLODObject) then return false end
             local sceneManifest, sceneData = sceneManifest, sceneData 
             self.cLODObject = imports.createObject(cAsset.syncedData.modelID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
             imports.setElementDoubleSided(self.cLODObject, true)
@@ -76,10 +76,10 @@ end
 
 function scene:unload()
     if not self or (self == scene) then return false end
-    if imports.isElement(self.cObject) then
+    if self.cObject and imports.isElement(self.cObject) then
         imports.destroyElement(self.cObject)
     end
-    if imports.isElement(self.cLODObject) then
+    if self.cLODObject and imports.isElement(self.cLODObject) then
         imports.destroyElement(self.cLODObject)
     end
     self = nil

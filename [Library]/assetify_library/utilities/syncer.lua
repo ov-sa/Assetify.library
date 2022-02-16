@@ -148,10 +148,15 @@ if localPlayer then
     end)
 
     imports.addEvent("Assetify:onRecieveElementModel", true)
-    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName, assetClump)
+    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName, assetClump, clumpMaps)
         if not element or not imports.isElement(element) then return false end
         local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
+            shader:clearElementBuffer(element, "clump")
+            if clumpMaps then
+                --TODO: DELETE ALL SHADERS AND RECREATE IT...
+                print("yes do it...")
+            end
             imports.setElementModel(element, modelID)
         end
     end)

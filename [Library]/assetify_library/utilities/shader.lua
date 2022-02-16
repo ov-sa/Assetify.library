@@ -39,6 +39,9 @@ shader = {
     preLoadedTex = {
         invisibleMap = imports.dxCreateTexture(2, 2, "dxt5", "clamp")
     },
+    buffer = {
+        element = {}
+    },
     rwCache = shaderRW
 }
 shaderRW = nil
@@ -60,6 +63,29 @@ end
 function shader:destroy(...)
     if not self or (self == shader) then return false end
     return self:unload(...)
+end
+
+function shader:clearElementBuffer(element, identifier)
+    if self or (self ~= shader) then return false end
+    if not element or not imports.isElement(element) or not buffer.element[element] or (identifier and not buffer.element[element][identifier]) then return false end
+    if identifier then    
+        for i, j in imports.pairs(buffer.element[element]) do
+            for k, v in imports.pairs(j) do
+                if v and imports.isElement(v) then
+                    imports.destroyElement(v)
+                end
+            end
+        end
+        buffer.element[element] = nil
+    else
+        for i, j in imports.pairs(buffer.element[element][identifier]) do
+            if j and imports.isElement(j) then
+                imports.destroyElement(j)
+            end
+        end
+        buffer.element[element][identifier] = nil
+    end
+    return true
 end
 
 function shader:load(shaderName, textureName, textureElement, shaderPriority, shaderDistance)
