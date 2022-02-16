@@ -21,7 +21,6 @@ local imports = {
     gettok = gettok,
     tonumber = tonumber,
     tostring = tostring,
-    isElement = isElement,
     destroyElement = destroyElement,
     collectgarbage = collectgarbage,
     setTimer = setTimer,
@@ -96,6 +95,7 @@ function manager:load(assetType, assetName)
                     map = {}
                 }
             }
+            shader:createTex(assetReference.manifestData.shaderMaps, assetReference.unsyncedData.rwCache.map, assetReference.manifestData.encryptKey)
             if assetType == "scene" then
                 thread:create(function(cThread)
                     local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
@@ -125,8 +125,7 @@ function manager:load(assetType, assetName)
                             end)
                             thread.pause()
                         end
-                        --TODO:..
-                        --asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, assetReference.manifestData, true)
+                        --TODO: EMBED NEW SHADER PIPELINE
                     end
                 end):resume({
                     executions = downloadSettings.buildRate,
@@ -178,8 +177,7 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
-                    --TODO:..
-                    --asset:refreshShaderPack(assetType, assetName, assetReference.manifestData.shaderMaps, nil, assetReference.unsyncedData.rwCache.map, assetReference.manifestData, false)
+                    shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
                 end):resume({
@@ -194,6 +192,7 @@ function manager:unload(assetType, assetName)
                         end
                         thread.pause()
                     end
+                    shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
                 end):resume({
@@ -203,6 +202,7 @@ function manager:unload(assetType, assetName)
             else
                 if assetReference.cAsset then
                     assetReference.cAsset:destroy(assetReference.unsyncedData.rwCache)
+                    shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
                     assetReference.unsyncedData = nil
                     imports.collectgarbage()
                 end

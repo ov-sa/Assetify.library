@@ -49,15 +49,6 @@ end)
 
 imports.addEventHandler("onClientResourceStop", resourceRoot, function()
 
-    for i, j in imports.pairs(availableAssetPacks) do
-        if j.autoLoad and j.rwDatas then
-            for k, v in imports.pairs(j.rwDatas) do
-                if v and v.unsyncedData then
-                    asset:refreshShaderPack(i, k, v.manifestData.shaderMaps, nil, v.unsyncedData.rwCache.map, v.manifestData, false)
-                end
-            end
-        end
-    end
     imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
 
 end)

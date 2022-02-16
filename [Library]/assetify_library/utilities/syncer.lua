@@ -158,7 +158,7 @@ if localPlayer then
                 if assetReference and assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.clump then
                     for i, j in imports.pairs(clumpMaps) do
                         if assetReference.manifestData.shaderMaps.clump[i] and assetReference.manifestData.shaderMaps.clump[i][j] then
-                            shader:create(element, "clump", "Assetify_TextureChanger", i, {baseTexture = assetReference.manifestData.shaderMaps.clump[i][j]}, assetReference.manifestData.encryptKey)
+                            shader:create(element, "clump", "Assetify_TextureChanger", i, {baseTexture = assetReference.manifestData.shaderMaps.clump[i][j]}, assetReference.unsyncedData.rwCache.map, assetReference.manifestData.encryptKey)
                         end
                     end
                 end

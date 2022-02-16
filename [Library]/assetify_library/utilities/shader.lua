@@ -29,21 +29,6 @@ local imports = {
     file = file
 }
 
-imports.dxCreateCustomTexture = function(texturePath, encryptKey, ...)
-    if not texturePath then return false end
-    if encryptKey then
-        local cTexturePath = texturePath..".tmp"
-        if imports.file.write(cTexturePath, imports.decodeString("tea", imports.file.read(texturePath), {key = encryptKey})) then
-            local cTexture = imports.dxCreateTexture(cTexturePath, ...)
-            imports.file.delete(cTexturePath)
-            return cTexture
-        end
-    else
-        return imports.dxCreateTexture(texturePath, ...)
-    end
-    return false
-end
-
 
 -----------------------
 --[[ Class: Shader ]]--
@@ -58,7 +43,6 @@ shader = {
         invisibleMap = imports.dxCreateTexture(2, 2, "dxt5", "clamp")
     },
     buffer = {
-        texture = {},
         element = {}
     },
     rwCache = shaderRW
@@ -79,15 +63,54 @@ function shader:create(...)
     return cShader
 end
 
+function shader:createTex(shaderMaps, rwCache, encryptKey)
+    if not shaderMaps or not rwCache then return false end
+    rwCache.shader = {}
+    rwCache.texture = {}
+    for i, j in imports.pairs(shaderMaps) do
+        if i == "clump" then
+            for k, v in imports.pairs(j) do
+                for m = 1, #v, 1 do
+                    local n = v[m]
+                    if encryptKey then
+                        local cTexturePath = n..".tmp"
+                        if imports.file.write(cTexturePath, imports.decodeString("tea", imports.file.read(n), {key = encryptKey})) then
+                            rwCache.texture[(n)] = imports.dxCreateTexture(cTexturePath, "dxt5", true)
+                            imports.file.delete(cTexturePath)
+                        end
+                    else
+                        rwCache.texture[(n)] = imports.dxCreateTexture(n, "dxt5", true)
+                    end
+                end
+            end
+        end
+    end
+    return true
+end
+
 function shader:destroy(...)
     if not self or (self == shader) then return false end
     return self:unload(...)
 end
 
+function shader:clearAssetBuffer(rwCache)
+    if not rwCache then return false end
+    for i, j in imports.pairs(rwCache.shader) do
+        if j and imports.isElement(j) then
+            imports.destroyElement(j)
+        end
+    end
+    for i, j in imports.pairs(rwCache.texture) do
+        if j and imports.isElement(j) then
+            imports.destroyElement(j)
+        end
+    end
+    return true
+end
+
 function shader:clearElementBuffer(element, shaderCategory)
-    if self or (self ~= shader) then return false end
     if not element or not imports.isElement(element) or not shader.buffer.element[element] or (shaderCategory and not shader.buffer.element[element][shaderCategory]) then return false end
-    if shaderCategory then
+    if not shaderCategory then
         for i, j in imports.pairs(shader.buffer.element[element]) do
             for k, v in imports.pairs(j) do
                 if v and imports.isElement(v) then
@@ -98,7 +121,7 @@ function shader:clearElementBuffer(element, shaderCategory)
         shader.buffer.element[element] = nil
     else
         for i, j in imports.pairs(shader.buffer.element[element][shaderCategory]) do
-            if j and imports.isElement(j) then
+            if j then
                 j:destroy()
             end
         end
@@ -106,23 +129,19 @@ function shader:clearElementBuffer(element, shaderCategory)
     end
     return true
 end
-imports.addEventHandler("onClientElementDestroy", reourceRoot, function() shader:clearElementBuffer(source) end)
+imports.addEventHandler("onClientElementDestroy", resourceRoot, function() shader:clearElementBuffer(source) end)
 
-function shader:load(element, shaderCategory, shaderName, textureName, shaderTextures, encryptKey, shaderPriority, shaderDistance)
+function shader:load(element, shaderCategory, shaderName, textureName, shaderTextures, rwCache, encryptKey, shaderPriority, shaderDistance)
     if not self or (self == shader) then return false end
-    if not element or not imports.isElement(element) or not shaderCategory or not shaderName or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or not textureName or not shaderTextures then return false end
+    if not element or not imports.isElement(element) or not shaderCategory or not shaderName or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or not textureName or not shaderTextures or not rwCache then return false end
     shaderPriority = imports.tonumber(shaderPriority) or shader.defaultData.shaderPriority
     shaderDistance = imports.tonumber(shaderDistance) or shader.defaultData.shaderDistance
     self.isPreLoaded = (shader.preLoaded[shaderName] and true) or false
     self.cShader = (self.isPreLoaded and shader.preLoaded[shaderName]) or imports.dxCreateShader(shader.rwCache[shaderName], shaderPriority, shaderDistance, false, "all")
+    if not self.isPreLoaded then rwCache.shader[shaderName] = self.cShader end
     for i, j in imports.pairs(shaderTextures) do
-        if j and imports.file.exists(j) then
-            shader.buffer.texture[i] = shader.buffer.texture[i] or {
-                textureElement = imports.dxCreateCustomTexture(j, encryptKey, "dxt5", true),
-                streamCount = 0
-            }
-            shader.buffer.texture[i].streamCount = shader.buffer.texture[i].streamCount + 1
-            imports.dxSetShaderValue(self.cShader, i, shader.buffer.texture[i].textureElement)
+        if j and imports.isElement(rwCache.texture[j]) then
+            imports.dxSetShaderValue(self.cShader, i, rwCache.texture[j])
         end
     end
     self.shaderData = {
@@ -149,15 +168,6 @@ function shader:unload()
         end
     else
         imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element)
-    end
-    for i, j in imports.pairs(self.shaderData.shaderTextures) do
-        if shader.buffer.texture[i] then
-            shader.buffer.texture[i].streamCount = shader.buffer.texture[i].streamCount - 1
-            if shader.buffer.texture[i].streamCount <= 0 then
-                imports.destroyElement(shader.buffer.texture[i].textureElement)
-                shader.buffer.texture[i] = nil
-            end
-        end
     end
     shader.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)][(self.shaderData.textureName)] = nil
     self = nil
