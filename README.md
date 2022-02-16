@@ -36,10 +36,6 @@
 * Supports Weapon Asset-Pack
 * Necessary Integration APIs
 
-## ━ Dependencies
-
-* [**Graphify Library**](https://github.com/OvileAmriam/MTA-Graphify-Library)
-
 ## ━ Roadmap
 
 * Custom Bone Attachment Handler
