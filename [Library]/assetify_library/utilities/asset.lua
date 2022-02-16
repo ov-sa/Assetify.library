@@ -238,7 +238,16 @@ else
     function asset:buildShader(assetPath, shaderPack, assetFiles, encryptKey)
         for i, j in imports.pairs(shaderPack) do
             if j and (imports.type(j) == "table") then
-                asset:buildShader(assetPath, j, assetFiles, encryptKey)
+                if i == "clump" then
+                    for k, v in imports.pairs(j) do
+                        for m = 1, #v, 1 do
+                            v[m] = assetPath.."map/"..v[m]
+                            asset:buildFile(v[m], assetFiles, encryptKey)
+                        end
+                    end
+                else
+                    asset:buildShader(assetPath, j, assetFiles, encryptKey)
+                end
             else
                 if i == "map" then
                     shaderPack[i] = assetPath.."map/"..j

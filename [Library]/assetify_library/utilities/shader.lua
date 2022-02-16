@@ -64,7 +64,7 @@ end
 
 function shader:load(shaderName, textureName, textureElement, shaderPriority, shaderDistance)
     if not self or (self == shader) then return false end
-    if not shaderName or not shader.rwCache[shaderName] or not textureName or not textureElement or not imports.isElement(textureElement) then return false end
+    if not shaderName or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or not textureName or not textureElement or not imports.isElement(textureElement) then return false end
     self.isPreLoaded = (shader.preLoaded[shaderName] and true) or false
     shaderPriority = imports.tonumber(shaderPriority) or shader.defaultData.shaderPriority
     shaderDistance = imports.tonumber(shaderDistance) or shader.defaultData.shaderDistance
