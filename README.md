@@ -20,7 +20,6 @@
 * Procedure Oriented Programming
 * Completely Performance-Friendly
 * Gamemode Perspective
-* Graphify Integration 🎨
 * UE inspired Unlimited & Configurable Asset Packs
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
