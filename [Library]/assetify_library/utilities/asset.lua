@@ -28,7 +28,6 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     setTimer = setTimer,
-    fileExists = fileExists,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
     engineFreeModel = engineFreeModel,
@@ -96,21 +95,21 @@ if localPlayer then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 imports.engineSetModelLODDistance(modelID, 300)
-                if not rwCache.dff[(rwPaths.dff)] and imports.fileExists(rwPaths.dff) then
+                if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
                     rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
                 end
                 if not rwCache.dff[(rwPaths.dff)] then
                     imports.engineFreeModel(modelID)
                     return false
                 else
-                    if not rwCache.col[(rwPaths.col)] and imports.fileExists(rwPaths.col) then
+                    if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
                         rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
                     end
                 end
             end
         end
         local loadState = false
-        if not rwCache.txd[(rwPaths.txd)] and imports.fileExists(rwPaths.txd) then
+        if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
             rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
         end
         if rwCache.txd[(rwPaths.txd)] then
@@ -151,8 +150,11 @@ if localPlayer then
         return true
     end
 
+    --TODO:..
+    --[[
     function asset:refreshShaderPack(assetType, assetName, shaderPack, mapType, rwCache, assetManifest, state)
         if not assetType or not assetName or not shaderPack or not rwCache or not assetManifest then return false end
+        print(assetType)
         for i, j in imports.pairs(shaderPack) do
             if not mapType then
                 if state then
@@ -165,7 +167,7 @@ if localPlayer then
                         if not rwCache[mapType][k] then
                             rwCache[mapType][k] = {}
                             if mapType == "bump" then
-                                if v.map and imports.fileExists(v.map) then
+                                if v.map and imports.file.exists(v.map) then
                                     local createdMap = imports.dxCreateTexture((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(v.map), {key = assetManifest.encryptKey})) or v.map, "dxt5", true)
                                     local createdBumpMap = exports.graphify_library:createBumpMap(k, "world", createdMap)
                                     rwCache[mapType][k] = {map = createdMap, shader = createdBumpMap}
@@ -174,7 +176,7 @@ if localPlayer then
                                 local isControlValid = true
                                 for m = 1, #asset.shaders.controlMap.validControls, 1 do
                                     local n = asset.shaders.controlMap.validControls[m]
-                                    if not v[n] or not v[n].map or not imports.fileExists(v[n].map) or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
+                                    if not v[n] or not v[n].map or not imports.file.exists(v[n].map) or not v[n].scale or (imports.type(v[n].scale) ~= "number") or (v[n].scale <= 0) then
                                         isControlValid = false
                                         break
                                     end
@@ -198,6 +200,8 @@ if localPlayer then
                             end
                         end
                     else
+                        print(mapType)
+                        print(k)
                         if rwCache[mapType][k] then
                             for m, n in imports.pairs(rwCache[mapType][k]) do
                                 if n and imports.isElement(n) then
@@ -221,6 +225,7 @@ if localPlayer then
         end
         return true
     end
+    ]]
 else
     function asset:buildFile(filePath, filePointer, encryptKey)
         if not filePath or not filePointer then return false end

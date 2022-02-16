@@ -32,6 +32,8 @@ local imports = {
 ---------------------
 
 file = {
+    exists = imports.fileExists,
+
     read = function(path)
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
