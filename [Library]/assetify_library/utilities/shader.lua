@@ -36,7 +36,7 @@ shader = {
         shaderPriority = 10000,
         shaderDistance = 0
     },
-    preLoadedTextures = {
+    preLoadedTex = {
         invisibleMap = imports.dxCreateTexture(2, 2, "dxt5", "clamp")
     },
     rwCache = shaderRW
@@ -45,7 +45,7 @@ shaderRW = nil
 shader.preLoaded = {
     ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureChanger"], shader.defaultData.shaderPriority, shader.defaultData.shaderDistance, false, "all")
 }
-imports.dxSetShaderValue(shader.preLoaded["Assetify_TextureClearer"], "baseTexture", shader.preLoadedTextures.invisibleMap)
+imports.dxSetShaderValue(shader.preLoaded["Assetify_TextureClearer"], "baseTexture", shader.preLoadedTex.invisibleMap)
 shader.__index = shader
 
 function shader:create(...)
