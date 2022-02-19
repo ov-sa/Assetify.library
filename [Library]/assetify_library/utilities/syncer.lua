@@ -30,8 +30,7 @@ local imports = {
     triggerLatentClientEvent = triggerLatentClientEvent,
     triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
-    file = file,
-    table = table
+    file = file
 }
 
 

@@ -89,10 +89,11 @@ if localPlayer then
     function asset:load(assetType, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
         if not assetType or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
-        local modelID = false
+        local modelID, modelID2 = false
         if rwPaths.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
+                modelID2 = imports.engineRequestModel(assetPack.assetType, 1484)
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
                     rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
@@ -116,8 +117,10 @@ if localPlayer then
         end
         imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
         if rwCache.col[(rwPaths.col)] then
+            imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID2)
             imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
         end
+        self.modelID2 = modelID2
         assetData.cAsset = self
         self.rwPaths = rwPaths
         self.syncedData = {
