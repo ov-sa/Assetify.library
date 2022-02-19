@@ -93,6 +93,7 @@ if localPlayer then
         if rwPaths.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
+                --TODO: ... DO THIS ONLY FOR SCENES...
                 modelID2 = imports.engineRequestModel(assetPack.assetType, 1484)
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
