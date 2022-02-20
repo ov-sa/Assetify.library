@@ -2,7 +2,6 @@
     "sceneName": "Terrain Field (Example)",
     "sceneDimension": 0,
     "sceneInterior": 0,
-    "defaultLODs": false,
     "sceneOffset": {"x": 0, "y": 0, "z": 2000},
     "shaderMaps": {
         "emissive": {},
