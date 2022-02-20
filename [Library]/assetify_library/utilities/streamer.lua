@@ -75,15 +75,15 @@ imports.addEventHandler("onAssetifyLoad", root, function()
         if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
             for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
                 if j then
-                    local isObjectVisible = false
+                    local isStreamed = false
                     for k = 1, #i.occlusions, 1 do
                         local v = i.occlusions[k]
                         if imports.isElementOnScreen(v) then
-                            isObjectVisible = true
+                            isStreamed = true
                             break
                         end
                     end
-                    imports.setElementDimension(i.streamer, (isObjectVisible and clientDimension) or downloadSettings.streamer.syncDimension)
+                    imports.setElementDimension(i.streamer, (isStreamed and clientDimension) or downloadSettings.streamer.syncDimension)
                 end
             end
         end
