@@ -67,8 +67,8 @@ asset.__index = asset
 
 if localPlayer then
     asset.rwAssets = {
-        txd = imports.engineLoadTXD("files/raw/dict.rw"),
-        dff = imports.engineLoadDFF("files/raw/buffer.rw")
+        txd = imports.engineLoadTXD("utilities/rw/dict.rw"),
+        dff = imports.engineLoadDFF("utilities/rw/buffer.rw")
     }
 
     function asset:create(...)
