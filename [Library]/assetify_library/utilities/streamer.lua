@@ -22,7 +22,8 @@ local imports = {
     isElementOnScreen = isElementOnScreen,
     getElementDimension = getElementDimension,
     getElementInterior = getElementInterior,
-    setElementDimension = setElementDimension
+    setElementDimension = setElementDimension,
+    setElementInterior = setElementInterior
 }
 
 
@@ -56,6 +57,8 @@ function streamer:load(streamerInstance, streamType, occlusionInstances)
     self.streamType = streamType
     self.occlusions = occlusionInstances
     local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
+    imports.setElementDimension(streamerInstance, streamDimension)
+    imports.setElementInterior(streamerInstance, streamInterior)
     streamer.buffer[streamDimension] = streamer.buffer[streamDimension] or {}
     streamer.buffer[streamDimension][streamInterior] = streamer.buffer[streamDimension][streamInterior] or {}
     streamer.buffer[streamDimension][streamInterior][self] = true

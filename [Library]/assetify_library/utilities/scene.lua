@@ -63,8 +63,6 @@ function scene:load(cAsset, sceneManifest, sceneData)
         imports.attachElements(self.cStreamerInstance, self.cCollisionInstance)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
         imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
-        imports.setElementDimension(self.cStreamerInstance, sceneManifest.sceneDimension)
-        imports.setElementInterior(self.cStreamerInstance, sceneManifest.sceneInterior)
         self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cModelInstance, self.cCollisionInstance})
     end
     cAsset.cScene = self
