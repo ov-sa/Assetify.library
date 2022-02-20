@@ -104,16 +104,21 @@ if localPlayer then
                     imports.engineFreeModel(modelID)
                     if collisionID then
                         imports.engineFreeModel(collisionID)
+                        collisionID = false
                     end
                     return false
                 else
                     if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
                         rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
+                    else
+                        if collisionID then
+                            imports.engineFreeModel(collisionID)
+                            collisionID = false
+                        end
                     end
                 end
             end
         end
-        collisionID = collisionID or false
         local loadState = false
         if modelID then
             if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
