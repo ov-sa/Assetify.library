@@ -18,7 +18,7 @@ downloadSettings = {
     syncRate = 50,
     buildRate = 500,
     streamer = {
-        syncRate = 50,
+        syncRate = 5000,
         syncDimension = 65535
     }
 }
