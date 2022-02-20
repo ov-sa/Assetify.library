@@ -22,6 +22,7 @@ local imports = {
     destroyElement = destroyElement,
     setmetatable = setmetatable,
     createObject = createObject,
+    setElementAlpha = setElementAlpha,
     setElementDoubleSided = setElementDoubleSided,
     setElementDimension = setElementDimension,
     setElementInterior = setElementInterior
@@ -59,6 +60,7 @@ function scene:load(cAsset, sceneManifest, sceneData)
     if cAsset.syncedData.collisionID then
         self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z)
         self.cStreamerInstance = imports.createObject(cAsset.syncedData.collisionID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
+        imports.setElementAlpha(self.cCollisionInstance, 0)
         imports.attachElements(self.cModelInstance, self.cCollisionInstance)
         imports.attachElements(self.cStreamerInstance, self.cCollisionInstance)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
