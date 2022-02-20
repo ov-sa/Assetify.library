@@ -49,6 +49,10 @@ local imports = {
 ----------------------
 
 asset = {
+    rwAssets = {
+        txd = imports.engineLoadTXD("files/raw/dict.rw"),
+        dff = imports.engineLoadDFF("files/raw/buffer.rw")
+    },
     references = {
         root = "@files/assets/",
         manifest = "manifest",
@@ -94,7 +98,7 @@ if localPlayer then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
                 if assetType == "scene" then
-                    collisionID = imports.engineRequestModel(assetPack.assetType, 1484) --TODO: THIS ID MUST BE CONFIGURABLE??
+                    collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
                 end
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
@@ -128,6 +132,10 @@ if localPlayer then
                 imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
             end
             imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
+            if collisionID then
+                imports.engineImportTXD(asset.rwAssets.txd, collisionID)
+                imports.engineReplaceModel(asset.rwAssets.dff, collisionID, false)
+            end
             if rwCache.col[(rwPaths.col)] then
                 imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
                 if collisionID then

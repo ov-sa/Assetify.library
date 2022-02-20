@@ -26,7 +26,8 @@
     <script src="handlers/loader.lua" type="client"/>
 
     <!-- Files: Raw -->
-    <file src="files/raw/dummy.rw"/>
+    <file src="files/rw/buffer.rw"/>
+    <file src="files/rw/dict.rw"/>
 
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
