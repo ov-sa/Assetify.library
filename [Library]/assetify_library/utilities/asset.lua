@@ -49,10 +49,6 @@ local imports = {
 ----------------------
 
 asset = {
-    rwAssets = {
-        txd = imports.engineLoadTXD("files/raw/dict.rw"),
-        dff = imports.engineLoadDFF("files/raw/buffer.rw")
-    },
     references = {
         root = "@files/assets/",
         manifest = "manifest",
@@ -70,10 +66,9 @@ asset = {
 asset.__index = asset
 
 if localPlayer then
-    asset.shaders = {
-        controlMap = {
-            validControls = {"red", "green", "blue"}
-        }
+    asset.rwAssets = {
+        txd = imports.engineLoadTXD("files/raw/dict.rw"),
+        dff = imports.engineLoadDFF("files/raw/buffer.rw")
     }
 
     function asset:create(...)
