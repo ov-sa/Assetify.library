@@ -89,18 +89,22 @@ if localPlayer then
     function asset:load(assetType, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
         if not assetType or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
-        local modelID, modelID2 = false
+        local modelID, collisionID = false, false
         if rwPaths.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
-                --TODO: ... DO THIS ONLY FOR SCENES...
-                modelID2 = imports.engineRequestModel(assetPack.assetType, 1484)
+                if assetType == "scene" then
+                    collisionID = imports.engineRequestModel(assetPack.assetType, 1484) --TODO: THIS ID MUST BE CONFIGURABLE??
+                end
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
                     rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
                 end
                 if not rwCache.dff[(rwPaths.dff)] then
                     imports.engineFreeModel(modelID)
+                    if collisionID then
+                        imports.engineFreeModel(collisionID)
+                    end
                     return false
                 else
                     if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
@@ -109,25 +113,30 @@ if localPlayer then
                 end
             end
         end
+        collisionID = collisionID or false
         local loadState = false
-        if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
-            rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
+        if modelID then
+            if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
+                rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
+            end
+            if rwCache.txd[(rwPaths.txd)] then
+                imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
+            end
+            imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
+            if rwCache.col[(rwPaths.col)] then
+                imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
+                if collisionID then
+                    imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
+                end
+            end
+            assetData.cAsset = self
+            self.rwPaths = rwPaths
+            self.syncedData = {
+                modelID = modelID,
+                collisionID = collisionID
+            }
+            loadState = true
         end
-        if rwCache.txd[(rwPaths.txd)] then
-            imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
-        end
-        imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
-        if rwCache.col[(rwPaths.col)] then
-            imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID2)
-            imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
-        end
-        self.modelID2 = modelID2
-        assetData.cAsset = self
-        self.rwPaths = rwPaths
-        self.syncedData = {
-            modelID = modelID
-        }
-        loadState = true
         if callback and (imports.type(callback) == "function") then
             callback(loadState)
         end
@@ -138,6 +147,9 @@ if localPlayer then
         if not self or (self == asset) then return false end
         if not rwCache then return false end
         imports.engineFreeModel(self.syncedData.modelID)
+        if self.syncedData.collisionID then
+            imports.engineFreeModel(self.syncedData.collisionID)
+        end
         if self.rwPaths then
             for i, j in imports.pairs(self.rwPaths) do
                 if rwCache[i] and rwCache[i][j] and imports.isElement(rwCache[i][j]) then
