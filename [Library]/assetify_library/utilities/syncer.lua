@@ -165,6 +165,9 @@ if localPlayer then
             imports.setElementModel(element, modelID)
         end
     end)
+
+    imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
+    imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
 else
     syncer.loadedClients = {}
     syncer.scheduledClients = {}

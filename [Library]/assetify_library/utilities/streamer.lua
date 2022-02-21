@@ -76,7 +76,26 @@ function streamer:unload()
     return true
 end
 
+function streamer:update(clientDimension, clientInterior)
+    if not clientDimension and not clientInterior then return false end
+    local currentDimension, currentInterior = imports.getElementDimension(localPlayer), imports.getElementInterior(localPlayer)
+    clientDimension, clientInterior = clientDimension or _clientDimension, clientInterior or clientInterior
+    if streamer.waterBuffer then
+        imports.setElementDimension(streamer.waterBuffer, currentDimension)
+        imports.setElementInterior(streamer.waterBuffer, currentInterior)
+    end
+    if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
+        for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
+            if j then
+                imports.setElementDimension(i.streamer, downloadSettings.streamer.syncDimension)
+            end
+        end
+    end
+    return true
+end
+
 imports.addEventHandler("onAssetifyLoad", root, function()
+    streamer:update(imports.getElementDimension(localPlayer))
     imports.setTimer(function()
         local clientDimension, clientInterior = imports.getElementDimension(localPlayer), imports.getElementInterior(localPlayer)
         if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
