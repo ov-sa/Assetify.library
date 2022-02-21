@@ -53,13 +53,14 @@ end
 function scene:load(cAsset, sceneManifest, sceneData)
     if not self or (self == scene) then return false end
     if not cAsset or not sceneManifest or not sceneData then return false end
-    self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
+    local instanceCoords = {sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z}
+    self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], true)
     imports.setElementDoubleSided(self.cModelInstance, true)
     imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
     imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
     if cAsset.syncedData.collisionID then
-        self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z)
-        self.cStreamerInstance = imports.createObject(cAsset.syncedData.collisionID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
+        self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6])
+        self.cStreamerInstance = imports.createObject(cAsset.syncedData.collisionID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], true)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         imports.attachElements(self.cModelInstance, self.cCollisionInstance)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
