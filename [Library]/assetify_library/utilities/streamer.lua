@@ -17,6 +17,7 @@ local imports = {
     pairs = pairs,
     isElement = isElement,
     addEventHandler = addEventHandler,
+    attachElements = attachElements,
     setmetatable = setmetatable,
     setTimer = setTimer,
     isElementOnScreen = isElementOnScreen,
@@ -57,8 +58,11 @@ function streamer:load(streamerInstance, streamType, occlusionInstances)
     self.streamType = streamType
     self.occlusions = occlusionInstances
     local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
-    imports.setElementDimension(streamerInstance, streamDimension)
-    imports.setElementInterior(streamerInstance, streamInterior)
+    if streamerInstance ~= occlusionInstances[1] then
+        imports.attachElements(streamerInstance, occlusionInstances[1])
+        imports.setElementDimension(streamerInstance, streamDimension)
+        imports.setElementInterior(streamerInstance, streamInterior)
+    end
     streamer.buffer[streamDimension] = streamer.buffer[streamDimension] or {}
     streamer.buffer[streamDimension][streamInterior] = streamer.buffer[streamDimension][streamInterior] or {}
     streamer.buffer[streamDimension][streamInterior][self] = true

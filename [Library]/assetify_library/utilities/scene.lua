@@ -62,10 +62,9 @@ function scene:load(cAsset, sceneManifest, sceneData)
         self.cStreamerInstance = imports.createObject(cAsset.syncedData.collisionID, sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z, true)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         imports.attachElements(self.cModelInstance, self.cCollisionInstance)
-        imports.attachElements(self.cStreamerInstance, self.cCollisionInstance)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
         imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
-        self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cModelInstance, self.cCollisionInstance})
+        self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance, self.cModelInstance})
     end
     cAsset.cScene = self
     return true
