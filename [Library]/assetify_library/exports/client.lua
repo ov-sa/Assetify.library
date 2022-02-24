@@ -9,36 +9,30 @@
 ----------------------------------------------------------------
 
 
----------------------------------
---[[ Functions: Asset's APIs ]]--
----------------------------------
+-------------------------
+--[[ Functions: APIs ]]--
+-------------------------
+
+function isLibraryLoaded()
+    return syncer.isLibraryLoaded
+end
 
 function getAssetData(...)
-
     return manager:getData(...)
-
 end
 
 function getAssetID(...)
-
     return manager:getID(...)
-
 end
 
 function isAssetLoaded(...)
-
     return manager:isLoaded(...)
-
 end
 
 function loadAsset(...)
-
     return manager:load(...)
-
 end
 
 function unloadAsset(...)
-
     return manager:unload(...)
-
 end

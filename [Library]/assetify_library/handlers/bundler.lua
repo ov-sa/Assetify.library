@@ -74,6 +74,10 @@ function onBundleLibrary()
                     return false
                 end
 
+                assetify.isLoaded = function()
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
+                end
+
                 assetify.getAssetID = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetID", ...)
                 end
