@@ -26,6 +26,7 @@
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
 * Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
 * Built-In Asset-Pack Clumper (Supports only: `Character`, `Vehicle` asset-packs)
+* Built-In Control & Bump Mapping
 * Built-In Asset-Pack Streamer
 * Built-In LOD Streamer (Supports only: `Scene` asset-pack)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
