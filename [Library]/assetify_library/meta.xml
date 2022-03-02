@@ -16,7 +16,7 @@
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>
-    <script src="utilities/shader.lua" type="client"/>
+    <script src="utilities/shader.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
     <script src="utilities/manager.lua" type="client"/>

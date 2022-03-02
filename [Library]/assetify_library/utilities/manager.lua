@@ -131,13 +131,19 @@ function manager:load(assetType, assetName)
                                 for m = 1, #v, 1 do
                                     local n = v[m]
                                     if n.control then
-                                        shaderTextures["controlTex_"..m] = n.control.map
+                                        shaderTextures[("controlTex_"..m)] = n.control
+                                    end
+                                    if n.bump then
+                                        shaderTextures[("controlTex_"..m.."_bump")] = n.bump
                                     end
                                     for x = 1, #shader.defaultData.shaderChannels, 1 do
                                         local y = shader.defaultData.shaderChannels[x]
                                         if n[(y.index)] then
-                                            shaderTextures["controlTex_"..m.."_"..(y.index)] = n[(y.index)].map
-                                            shaderInputs["controlScale_"..m.."_"..(y.index)] = n[(y.index)].scale
+                                            shaderTextures[("controlTex_"..m.."_"..(y.index))] = n[(y.index)].map
+                                            shaderInputs[("controlScale_"..m.."_"..(y.index))] = n[(y.index)].scale
+                                            if n[(y.index)].bump then
+                                                shaderTextures[("controlTex_"..m.."_"..(y.index).."_bump")] = n[(y.index)].bump
+                                            end
                                         end
                                     end
                                 end

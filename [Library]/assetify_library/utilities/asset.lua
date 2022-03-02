@@ -196,13 +196,31 @@ else
                             asset:buildFile(v[m], assetFiles, encryptKey)
                         end
                     end
-                else
-                    asset:buildShader(assetPath, j, assetFiles, encryptKey)
-                end
-            else
-                if i == "map" then
-                    shaderPack[i] = assetPath.."map/"..j
-                    asset:buildFile(shaderPack[i], assetFiles, encryptKey)
+                elseif i == "control" then
+                    for k, v in imports.pairs(j) do
+                        for m = 1, #v, 1 do
+                            local n = v[m]
+                            if n.control then
+                                n.control = assetPath.."map/"..n.control
+                                asset:buildFile(n.control, assetFiles, encryptKey)
+                            end
+                            if n.bump then
+                                n.bump = assetPath.."map/"..n.bump
+                                asset:buildFile(n.bump, assetFiles, encryptKey)
+                            end
+                            for x = 1, #shader.defaultData.shaderChannels, 1 do
+                                local y = shader.defaultData.shaderChannels[x].index
+                                if n[y] then
+                                    n[y].map = assetPath.."map/"..n[y].map
+                                    asset:buildFile(n[y].map, assetFiles, encryptKey)
+                                    if n[y].bump then
+                                        n[y].bump = assetPath.."map/"..n[y].bump
+                                        asset:buildFile(n[y].bump, assetFiles, encryptKey)
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
             end
             thread.pause()
