@@ -125,7 +125,25 @@ function manager:load(assetType, assetName)
                             end)
                             thread.pause()
                         end
-                        --TODO: EMBED NEW SHADER PIPELINE
+                        if  assetReference.manifestData.shaderMaps.control then
+                            for k, v in imports.pairs(assetReference.manifestData.shaderMaps.control) do
+                                local shaderTextures, shaderInputs = {}, {}
+                                for m = 1, #v, 1 do
+                                    local n = v[m]
+                                    if n.control then
+                                        shaderTextures["controlTex_"..m] = n.control.map
+                                    end
+                                    for x = 1, #shader.defaultData.shaderChannels, 1 do
+                                        local y = shader.defaultData.shaderChannels[x]
+                                        if n[(y.index)] then
+                                            shaderTextures["controlTex_"..m.."_"..(y.index)] = n[(y.index)].map
+                                            shaderInputs["controlScale_"..m.."_"..(y.index)] = n[(y.index)].scale
+                                        end
+                                    end
+                                end
+                                shader:create(nil, "control", "Assetify_TextureMapper", k, shaderTextures, shaderInputs, assetReference.unsyncedData.rwCache.map, v, assetReference.manifestData.encryptKey)
+                            end
+                        end
                     end
                 end):resume({
                     executions = downloadSettings.buildRate,

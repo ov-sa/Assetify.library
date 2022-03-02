@@ -31,7 +31,6 @@ local imports = {
 -----------------------------------------------
 
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
-
     if not GTAWorldSettings.removeWorld then
         imports.restoreAllWorldModels()
     else
@@ -44,11 +43,8 @@ imports.addEventHandler("onClientResourceStart", resourceRoot, function()
     imports.setWaterLevel(GTAWorldSettings.waterLevel, true, true, true, true)
     imports.setOcclusionsEnabled(not GTAWorldSettings.removeWorld)
     imports.setWorldSpecialPropertyEnabled("randomfoliage", not GTAWorldSettings.removeWorld)
-
 end)
 
 imports.addEventHandler("onClientResourceStop", resourceRoot, function()
-
     imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
-
 end)

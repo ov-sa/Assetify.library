@@ -25,18 +25,15 @@ local imports = {
 ----------------------------------
 
 local function onLibraryLoaded()
-
     syncer.isLibraryLoaded = true
     for i, j in imports.pairs(syncer.scheduledClients) do
         syncer:syncPack(i)
         syncer.loadedClients[i] = true
         syncer.scheduledClients[i] = nil
     end
-    
 end
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
-
     thread:create(function(cThread)
         for i, j in imports.pairs(availableAssetPacks) do
             asset:buildPack(i, j, function(state)
@@ -48,5 +45,4 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
         end
         onLibraryLoaded()
     end):resume()
-
 end)

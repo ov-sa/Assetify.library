@@ -26,7 +26,7 @@ local imports = {
 local identifier = "Assetify_TextureChanger"
 local depDatas, dependencies = "", {}
 for i, j in imports.pairs(dependencies) do
-    local depData = imports.file.read(j.filePath)
+    local depData = imports.file.read(j)
     if depData then
         depDatas = depDatas.."\n"..depData
     end
@@ -37,28 +37,29 @@ end
 --[[ Shader ]]--
 ----------------
 
-shaderRW["Assetify_TextureChanger"] = depDatas..[[
-/*-----------------
--->> Variables <<--
--------------------*/
+shaderRW[identifier] = function()
+    return depDatas..[[
+    /*-----------------
+    -->> Variables <<--
+    -------------------*/
 
-texture baseTexture;
+    texture baseTexture;
 
 
-/*------------------
--->> Techniques <<--
---------------------*/
+    /*------------------
+    -->> Techniques <<--
+    --------------------*/
 
-technique ]]..identifier..[[
-{
-    pass P0
+    technique ]]..identifier..[[
     {
-        AlphaBlendEnable = true;
-        Texture[0] = baseTexture;
+        pass P0
+        {
+            Texture[0] = baseTexture;
+        }
     }
-}
 
-technique fallback {
-    pass P0 {}
-}
-]]
+    technique fallback {
+        pass P0 {}
+    }
+    ]]
+end
