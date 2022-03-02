@@ -125,7 +125,7 @@ function manager:load(assetType, assetName)
                             end)
                             thread.pause()
                         end
-                        if  assetReference.manifestData.shaderMaps.control then
+                        if  assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.control then
                             for k, v in imports.pairs(assetReference.manifestData.shaderMaps.control) do
                                 local shaderTextures, shaderInputs = {}, {}
                                 for m = 1, #v, 1 do
