@@ -54,7 +54,7 @@ function scene:load(cAsset, sceneManifest, sceneData)
     if not self or (self == scene) then return false end
     if not cAsset or not sceneManifest or not sceneData then return false end
     local instanceCoords = {sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z}
-    self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], true)
+    self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], (cAsset.syncedData.collisionID and true) or false)
     imports.setElementDoubleSided(self.cModelInstance, true)
     imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
     imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
@@ -66,6 +66,8 @@ function scene:load(cAsset, sceneManifest, sceneData)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
         imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
         self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance, self.cModelInstance})
+    else
+        self.cStreamer = streamer:create(self.cModelInstance, "scene", {self.cModelInstance})
     end
     cAsset.cScene = self
     return true

@@ -92,8 +92,10 @@ if localPlayer then
         if rwPaths.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
-                if assetType == "scene" then
-                    collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
+                if assetManifest.enableLODs then
+                    if assetType == "scene" then
+                        collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
+                    end
                 end
                 imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
@@ -246,6 +248,7 @@ else
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
+                        assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                         assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                         assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
                         cAssetPack.rwDatas[assetReference] = {
