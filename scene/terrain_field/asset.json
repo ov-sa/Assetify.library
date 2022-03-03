@@ -3,20 +3,17 @@
     "sceneDimension": 0,
     "sceneInterior": 0,
     "sceneOffset": {"x": 0, "y": 0, "z": 2000},
+    "enableLODs": true,
     "shaderMaps": {
-        "emissive": {},
-        "bump": {
-            "sand_terrain": {"map": "bump/sand_terrain.jpg"}
-        },
-        "normal": {
-            "sand_terrain": {"map": "normal/sand_terrain.jpg"}
-        },
         "control": {
-            "sand_terrain": {
-                "red": {"map": "control/grass.jpg", "scale": 70},
-                "green": {"map": "control/hay.jpg", "scale": 100},
-                "blue": {"map": "control/semi_grass.jpg", "scale": 100}
-            }
+            "sand_terrain": [
+                {
+                    "bump": "bump/sand_terrain.jpg",
+                    "red": {"map": "control/grass/albedo.jpg", "scale": 70},
+                    "green": {"map": "control/hay/albedo.jpg", "scale": 100},
+                    "blue": {"map": "control/semi_grass/albedo.jpg", "scale": 100}
+                }
+            ]
         }
     }
 }
