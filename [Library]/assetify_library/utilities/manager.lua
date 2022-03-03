@@ -234,5 +234,4 @@ function manager:unload(assetType, assetName)
         end
     end
     return false
-
 end

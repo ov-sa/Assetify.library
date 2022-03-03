@@ -138,7 +138,7 @@ shaderRW[identifier] = function(shaderMaps)
         end
         if isControlSampled then
             handlerBody = handlerBody..[[
-                sampledTexel_]]..i..[[.rgb = sampledTexel_]]..i..[[.rgb*]]..(1/samplingIteration)..[[;
+                sampledTexel_]]..i..[[.rgb *= ]]..(1/samplingIteration)..[[;
             ]]
             if j.bump then
                 handlerBody = handlerBody..[[
