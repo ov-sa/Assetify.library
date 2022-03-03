@@ -8,10 +8,10 @@
         "control": {
             "sand_terrain": [
                 {
-                    "bump": "bump/sand_terrain.jpg",
-                    "red": {"map": "control/grass/albedo.jpg", "scale": 70},
-                    "green": {"map": "control/hay/albedo.jpg", "scale": 100},
-                    "blue": {"map": "control/semi_grass/albedo.jpg", "scale": 100}
+                    "bump": "sand_terrain/bump.jpg",
+                    "red": {"map": "control/texture/grass/albedo.jpg", "scale": 70},
+                    "green": {"map": "control/texture/hay/albedo.jpg", "scale": 100},
+                    "blue": {"map": "control/texture/semi_grass/albedo.jpg", "scale": 100}
                 }
             ]
         }
