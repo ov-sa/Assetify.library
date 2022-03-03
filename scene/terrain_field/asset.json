@@ -8,7 +8,7 @@
         "control": {
             "sand_terrain": [
                 {
-                    "bump": "sand_terrain/bump.jpg",
+                    "bump": "control/sand_terrain/bump.jpg",
                     "red": {"map": "control/texture/grass/albedo.jpg", "bump": "control/texture/grass/bump.jpg", "scale": 70},
                     "green": {"map": "control/texture/hay/albedo.jpg", "bump": "control/texture/hay/bump.jpg", "scale": 100},
                     "blue": {"map": "control/texture/semi_grass/albedo.jpg", "bump": "control/texture/semi_grass/bump.jpg", "scale": 100}
