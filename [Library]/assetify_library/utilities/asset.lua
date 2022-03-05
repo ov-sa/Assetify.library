@@ -60,7 +60,8 @@ asset = {
     },
     ranges = {
         dimension = {-1, 65535},
-        interior = {0, 255}
+        interior = {0, 255},
+        streamRange = 170
     }
 }
 asset.__index = asset
@@ -92,13 +93,11 @@ if localPlayer then
         if rwPaths.dff then
             modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
             if modelID then
-                if assetManifest.enableLODs then
-                    if assetType == "scene" then
-                        collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
-                    end
+                if assetType == "scene" then
+                    collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
                 end
-                imports.engineSetModelLODDistance(modelID, 300)
                 if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
+                    imports.engineSetModelLODDistance(modelID, asset.ranges.streamRange)
                     rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
                 end
                 if not rwCache.dff[(rwPaths.dff)] then
@@ -110,6 +109,9 @@ if localPlayer then
                     return false
                 else
                     if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
+                        if collisionID then
+                            imports.engineSetModelLODDistance(collisionID, asset.ranges.streamRange)
+                        end
                         rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
                     else
                         if collisionID then
@@ -248,6 +250,7 @@ else
                     if not assetManifestData then
                         cAssetPack.rwDatas[assetPath] = false
                     else
+                        assetManifestData.streamRange = imports.math.max(imports.tonumber(assetManifestData.streamRange) or 0, asset.ranges.streamRange)
                         assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                         assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                         assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
