@@ -45,7 +45,7 @@ syncer.isLibraryLoaded = false
 if localPlayer then
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
-    imports.addEvent("onAssetifyLoad", false)
+    imports.addEvent("onAssetifyLoad", true)
     imports.addEvent("onAssetifyUnLoad", false)
     
     function syncer:syncElementModel(...)        
@@ -215,8 +215,10 @@ else
     function syncer:syncPack(player, assetDatas)
         if not assetDatas then
             thread:create(function(cThread)
+                local isLibraryVoid = true
                 for i, j in imports.pairs(availableAssetPacks) do
                     for k, v in imports.pairs(j.assetPack) do
+                        isLibraryVoid = false
                         if k ~= "rwDatas" then
                             syncer:syncData(player, i, k, nil, v)
                         else
@@ -228,6 +230,7 @@ else
                         thread.pause()
                     end
                 end
+                if isLibraryVoid then imports.triggerClientEvent(player, "onAssetifyLoad", resourceRoot) end
             end):resume({
                 executions = downloadSettings.syncRate,
                 frames = 1
