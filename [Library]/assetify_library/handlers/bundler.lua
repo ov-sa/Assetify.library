@@ -89,6 +89,22 @@ function onBundleLibrary()
                 assetify.unloadAsset = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
                 end
+
+                assetify.setBoneAttach = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneAttachment", ...)
+                end
+
+                assetify.setBoneDetach = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneDetachment", ...)
+                end
+
+                assetify.setBoneRefresh = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneRefreshment", ...)
+                end
+
+                assetify.clearBoneAttach = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearBoneAttachment", ...)
+                end
             end
 
             assetify.setCharacter = function(...)

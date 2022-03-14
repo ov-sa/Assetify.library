@@ -22,6 +22,7 @@ local imports = {
     tonumber = tonumber,
     tostring = tostring,
     destroyElement = destroyElement,
+    addEventHandler = addEventHandler,
     collectgarbage = collectgarbage,
     setTimer = setTimer,
     file = file,
@@ -235,3 +236,8 @@ function manager:unload(assetType, assetName)
     end
     return false
 end
+
+imports.addEventHandler("onClientElementDestroy", root, function()
+    shader:clearElementBuffer(source)
+    bone:clearElementBuffer(source)
+end)

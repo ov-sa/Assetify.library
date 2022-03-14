@@ -19,7 +19,6 @@ local imports = {
     tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
-    addEventHandler = addEventHandler,
     setmetatable = setmetatable,
     dxCreateShader = dxCreateShader,
     dxCreateTexture = dxCreateTexture,
@@ -148,7 +147,6 @@ if localPlayer then
         end
         return true
     end
-    imports.addEventHandler("onClientElementDestroy", resourceRoot, function() shader:clearElementBuffer(source) end)
 
     function shader:loadTex(texturePath, encryptKey)
         if texturePath then

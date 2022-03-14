@@ -81,11 +81,11 @@ function scene:unload()
     if self.cStreamer then
         self.cStreamer:destroy()
     end
-    if self.cModelInstance and imports.isElement(self.cModelInstance) then
-        imports.destroyElement(self.cModelInstance)
-    end
     if self.cStreamerInstance and imports.isElement(self.cStreamerInstance) then
         imports.destroyElement(self.cStreamerInstance)
+    end
+    if self.cModelInstance and imports.isElement(self.cModelInstance) then
+        imports.destroyElement(self.cModelInstance)
     end
     if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
         imports.destroyElement(self.cCollisionInstance)
