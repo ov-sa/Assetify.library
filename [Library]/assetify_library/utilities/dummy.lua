@@ -15,6 +15,7 @@
 
 local imports = {
     tonumber = tonumber,
+    isElement = isElement,
     setmetatable = setmetatable,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
