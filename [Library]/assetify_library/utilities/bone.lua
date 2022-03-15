@@ -71,7 +71,8 @@ function bone:clearElementBuffer(element)
     if not element or not imports.isElement(element) then return false end
     if bone.buffer.element[element] then
         bone.buffer.element[element]:destroy()
-    elseif bone.buffer.parent[element] then
+    end
+    if bone.buffer.parent[element] then
         for i, j in imports.pairs(bone.buffer.parent[element]) do
             i:destroy()
         end

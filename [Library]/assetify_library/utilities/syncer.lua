@@ -52,6 +52,22 @@ if localPlayer then
         return imports.triggerEvent("Assetify:onRecieveElementModel", localPlayer, ...)
     end
 
+    function syncer:syncBoneAttachment(...)
+        return imports.triggerEvent("Assetify:onRecieveBoneAttachment", localPlayer, ...)
+    end
+
+    function syncer:syncBoneDetachment(...)
+        return imports.triggerEvent("Assetify:onRecieveBoneDetachment", localPlayer, ...)
+    end
+
+    function syncer:syncBoneRefreshment(...)
+        return imports.triggerEvent("Assetify:onRecieveBoneRefreshment", localPlayer, ...)
+    end
+
+    function syncer:syncClearBoneAttachment(...)
+        return imports.triggerEvent("Assetify:onRecieveClearBoneAttachment", localPlayer, ...)
+    end
+
     imports.addEventHandler("onAssetifyLoad", root, function()
         imports.triggerServerEvent("Assetify:onRequestElementModels", localPlayer)
     end)
@@ -166,12 +182,36 @@ if localPlayer then
         end
     end)
 
+    imports.addEvent("Assetify:onRecieveBoneAttachment", true)
+    imports.addEventHandler("Assetify:onRecieveBoneAttachment", root, function(...)
+        bone:create(...)
+    end)
+
+    imports.addEvent("Assetify:onRecieveBoneDetachment", true)
+    imports.addEventHandler("Assetify:onRecieveBoneDetachment", root, function(element)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        bone.buffer.element[element]:destroy()
+    end)
+
+    imports.addEvent("Assetify:onRecieveBoneRefreshment", true)
+    imports.addEventHandler("Assetify:onRecieveBoneRefreshment", root, function(element, ...)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        bone.buffer.element[element]:refresh(...)
+    end)
+
+    imports.addEvent("Assetify:onRecieveClearBoneAttachment", true)
+    imports.addEventHandler("Assetify:onRecieveClearBoneAttachment", root, function(element, ...)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        bone.buffer.element[element]:clearElementBuffer(...)
+    end)
+
     imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
     imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
 else
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
     syncer.syncedElements = {}
+    syncer.syncedBoneAttachments = {}
 
     function syncer:syncHash(player, ...)
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)
@@ -189,17 +229,15 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
-    function syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, targetPlayer, skipCaching)
-        if not skipCaching then
+    function syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, targetPlayer)
+        if not targetPlayer then
             if not element or not imports.isElement(element) or not availableAssetPacks[assetType] then return false end
             local assetReference = availableAssetPacks[assetType].assetPack.rwDatas[assetName]
             if not assetReference or (assetReference.synced.manifestData.assetClumps and (not assetClump or not assetReference.synced.manifestData.assetClumps[assetClump])) then return false end
             syncer.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
-        end
-        if not targetPlayer then
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, i, true)
+                    syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, i)
                     thread.pause()
                 end
             end):resume({
@@ -208,6 +246,89 @@ else
             })
         else
             imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveElementModel", targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
+        end
+        return true
+    end
+
+    function syncer:syncBoneAttachment(element, parent, boneData, targetPlayer)
+        if not targetPlayer then
+            if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) or not boneData then return false end
+            syncer.syncedBoneAttachments[element] = {parent = parent, boneData = boneData}
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncBoneAttachment(element, parent, boneData, j)
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneAttachment", targetPlayer, element, parent, boneData)
+        end
+        return true
+    end
+
+    function syncer:syncBoneDetachment(element, targetPlayer)
+        if not targetPlayer then
+            if not element or not imports.isElement(element) or not syncer.syncedBoneAttachments[element] then return false end
+            syncer.syncedBoneAttachments[element] = nil
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncBoneDetachment(element, j)
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneDetachment", targetPlayer, element)
+        end
+        return true
+    end
+
+    function syncer:syncBoneRefreshment(element, boneData, targetPlayer)
+        if not targetPlayer then
+            if not element or not imports.isElement(element) or not boneData or not syncer.syncedBoneAttachments[element] then return false end
+            syncer.syncedBoneAttachments[element].boneData = boneData
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncBoneRefreshment(element, boneData, j)
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneRefreshment", targetPlayer, element, boneData)
+        end
+        return true
+    end
+
+    function syncer:syncClearBoneAttachment(element, targetPlayer)
+        if not targetPlayer then
+            if not element or not imports.isElement(element) then return false end
+            if syncer.syncedBoneAttachments[element] then
+                syncer.syncedBoneAttachments[element] = nil                                
+            end
+            for i, j in imports.pairs(syncer.syncedBoneAttachments) do
+                if j and (j.parent == element) then
+                    syncer.syncedBoneAttachments[i] = nil
+                end
+            end
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncClearBoneAttachment(element, j)
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveClearBoneAttachment", targetPlayer, element)
         end
         return true
     end
@@ -273,6 +394,12 @@ else
                 end
                 thread.pause()
             end
+            for i, j in imports.pairs(syncer.syncedBoneAttachments) do
+                if j then
+                    syncer:syncBoneAttachment(i, j.parent, j.boneData, source)
+                end
+                thread.pause()
+            end
         end):resume({
             executions = downloadSettings.syncRate,
             frames = 1
@@ -298,5 +425,11 @@ else
         syncer.loadedClients[source] = nil
         syncer.scheduledClients[source] = nil
         syncer.syncedElements[source] = nil
+        syncer:syncClearBoneAttachment(source)
+        for i, j in imports.pairs(syncer.syncedBoneAttachments) do
+            if j and (j.parent == source) then
+                syncer:syncClearBoneAttachment(i)
+            end
+        end
     end)
 end
