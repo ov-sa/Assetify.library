@@ -18,7 +18,9 @@ local imports = {
     setmetatable = setmetatable,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
-    setElementDoubleSided = setElementDoubleSided
+    setElementDoubleSided = setElementDoubleSided,
+    setElementDimension = setElementDimension,
+    setElementInterior = setElementInterior
 }
 
 
@@ -63,6 +65,8 @@ function dummy:load(assetType, assetName, dummyData)
     self.assetType, self.assetName = assetType, assetName
     self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
     imports.setElementDoubleSided(self.cModelInstance, true)
+    imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
+    imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
     if cAsset.syncedData.collisionID then
         self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         imports.setElementAlpha(self.cCollisionInstance, 0)
