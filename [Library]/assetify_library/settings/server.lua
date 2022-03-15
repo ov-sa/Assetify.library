@@ -47,5 +47,12 @@ availableAssetPacks = {
         assetType = "object",
         assetBase = 1337,
         assetTransparency = false
+    },
+
+    ["loot"] = {
+        autoLoad = true,
+        assetType = "object",
+        assetBase = 1337,
+        assetTransparency = false
     }
 }
