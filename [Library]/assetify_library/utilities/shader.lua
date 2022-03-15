@@ -2,9 +2,9 @@
 --[[ Resource: Assetify Library
      Script: utilities: shader.lua
      Server: -
-     Author: OvileAmriam
+     Author: vStudio
      Developer(s): Aviril, Tron
-     DOC: 19/10/2021 (OvileAmriam)
+     DOC: 19/10/2021
      Desc: Shader Utilities ]]--
 ----------------------------------------------------------------
 

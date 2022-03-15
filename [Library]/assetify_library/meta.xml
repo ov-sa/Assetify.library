@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="OvileAmriam" name="Assetify Library" type="Library" version="2.0.3"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="2.0.3"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
     <!-- Exports, Settings & Utilities -->
@@ -18,6 +18,7 @@
     <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/shader.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
+    <script src="utilities/dummy.lua" type="client"/>
     <script src="utilities/bone.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
     <script src="utilities/manager.lua" type="client"/>
@@ -33,11 +34,11 @@
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
     <export function="setElementAsset" type="shared"/>
-    <export function="createAssetDummy" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>
     <export function="setBoneRefreshment" type="shared"/>
     <export function="clearBoneAttachment" type="shared"/>
+    <export function="createAssetDummy" type="client"/>
     <export function="isLibraryLoaded" type="client"/>
     <export function="getAssetData" type="client"/>
     <export function="getAssetID" type="client"/>

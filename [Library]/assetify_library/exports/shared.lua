@@ -2,9 +2,9 @@
 --[[ Resource: Assetify Library
      Script: exports: shared.lua
      Server: -
-     Author: OvileAmriam
+     Author: vStudio
      Developer(s): Aviril, Tron
-     DOC: 19/10/2021 (OvileAmriam)
+     DOC: 19/10/2021
      Desc: Shared Exports ]]--
 ----------------------------------------------------------------
 
@@ -30,20 +30,6 @@ function setElementAsset(element, ...)
     if not availableAssetPacks[elementType] then return false end
     local arguments = {...}
     return syncer:syncElementModel(element, elementType, arguments[1], arguments[2], arguments[3], arguments[4])
-end
-
-function createAssetDummy(assetType, assetName, dummyData)
-    if not assetType or not assetName or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].rwDatas[assetName] then return false end
-    local cAsset = availableAssetPacks[assetType].rwDatas[assetName].unsyncedData.assetCache[i].cAsset
-    if not cAsset then return false end
-    local cModelInstance = imports.createObject(cAsset.syncedData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-    imports.setElementDoubleSided(cModelInstance, true)
-    if cAsset.syncedData.collisionID then
-        local cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-        imports.setElementAlpha(cCollisionInstance, 0)
-        local cStreamer = streamer:create(cModelInstance, "object", {cCollisionInstance})
-    end
-    return cModelInstance
 end
 
 function setBoneAttachment(element, parent, ...)

@@ -2,9 +2,9 @@
 --[[ Resource: Assetify Library
      Script: handlers: bundler.lua
      Server: -
-     Author: OvileAmriam
+     Author: vStudio
      Developer(s): Aviril, Tron
-     DOC: 19/10/2021 (OvileAmriam)
+     DOC: 19/10/2021
      Desc: Bundler Handler ]]--
 ----------------------------------------------------------------
 
@@ -89,14 +89,14 @@ function onBundleLibrary()
                 assetify.unloadAsset = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
                 end
+
+                assetify.createDummy = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createAssetDummy", ...)
+                end
             end
 
             assetify.setElementAsset = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setElementAsset", ...)
-            end
-
-            assetify.createDummy = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createAssetDummy", ...)
             end
 
             assetify.setBoneAttach = function(...)

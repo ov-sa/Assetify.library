@@ -2,22 +2,11 @@
 --[[ Resource: Assetify Library
      Script: exports: client.lua
      Server: -
-     Author: OvileAmriam
+     Author: vStudio
      Developer(s): Aviril, Tron
-     DOC: 19/10/2021 (OvileAmriam)
+     DOC: 19/10/2021
      Desc: Client Sided Exports ]]--
 ----------------------------------------------------------------
-
-
------------------
---[[ Imports ]]--
------------------
-
-local imports = {
-    isElement = isElement,
-    createObject = createObject,
-    setElementDoubleSided = setElementDoubleSided
-}
 
 
 -------------------------
@@ -46,4 +35,8 @@ end
 
 function unloadAsset(...)
     return manager:unload(...)
+end
+
+function createAssetDummy(...)
+    return dummy:load(...)
 end
