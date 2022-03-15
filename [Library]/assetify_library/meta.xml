@@ -33,6 +33,7 @@
 
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
+    <export function="fetchThreader" type="shared"/>
     <export function="setElementAsset" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>
