@@ -16,6 +16,7 @@
 local imports = {
     tonumber = tonumber,
     isElement = isElement,
+    destroyElement = destroyElement,
     setmetatable = setmetatable,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
@@ -73,14 +74,21 @@ function dummy:load(assetType, assetName, dummyData)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance})
     end
-    dummy.buffer[(self.cModelInstance)] = self
-    return self.cModelInstance
+    local dummyInstance = self.cCollisionInstance or self.cModelInstance
+    dummy.buffer[dummyInstance] = self
+    return dummyInstance
 end
 
 function dummy:unload()
     if not self or (self == dummy) then return false end
     if self.cStreamer then
         self.cStreamer:destroy()
+    end
+    if self.cModelInstance and imports.isElement(self.cModelInstance) then
+        imports.destroyElement(self.cModelInstance)
+    end
+    if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
+        imports.destroyElement(self.cCollisionInstance)
     end
     dummy.buffer[self] = nil
     self = nil
