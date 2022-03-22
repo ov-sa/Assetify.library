@@ -39,11 +39,6 @@
 * Supports Weapon Asset-Pack
 * Necessary Integration APIs
 
-## ━ Roadmap
-
-* Custom Bone Attachment Handler
-* UE based Weapon Asset-Pack (Fully functional w/ customizable reload, magazine & damage)
-
 ## ━ Contents
 
 * [**Official Releases**](https://github.com/ov-sa/Assetify-Library/releases)
