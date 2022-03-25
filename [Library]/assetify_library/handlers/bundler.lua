@@ -101,6 +101,10 @@ function onBundleLibrary()
                 end
             end
 
+            assetify.getAssets = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryAssets", ...)
+            end,
+
             assetify.setElementAsset = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setElementAsset", ...)
             end

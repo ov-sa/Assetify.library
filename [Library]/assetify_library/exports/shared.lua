@@ -14,14 +14,25 @@
 -----------------
 
 local imports = {
+    pairs = pairs,
     isElement = isElement,
-    getElementType = getElementType
+    getElementType = getElementType,
+    table = table
 }
 
 
 -------------------------
 --[[ Functions: APIs ]]--
 -------------------------
+
+function getLibraryAssets(assetType)
+    if not syncer.isLibraryLoaded or not assetType or not availableAssetPacks[assetType] then return false end
+    local packAssets = {}
+    for i, j in imports.pairs(availableAssetPacks[assetType].assetPack.rwDatas) do
+        imports.table.insert(packAssets, i)
+    end
+    return packAssets
+end
 
 function setElementAsset(element, ...)
     if not element or not imports.isElement(element) then return false end
