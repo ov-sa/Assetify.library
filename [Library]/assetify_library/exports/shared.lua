@@ -28,7 +28,7 @@ local imports = {
 function getLibraryAssets(assetType)
     if not syncer.isLibraryLoaded or not assetType or not availableAssetPacks[assetType] then return false end
     local packAssets = {}
-    for i, j in imports.pairs(availableAssetPacks[assetType].assetPack.rwDatas) do
+    for i, j in imports.pairs((localPlayer and availableAssetPacks[assetType].rwDatas) or availableAssetPacks[assetType].assetPack.rwDatas) do
         imports.table.insert(packAssets, i)
     end
     return packAssets
