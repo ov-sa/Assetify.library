@@ -38,5 +38,5 @@ function unloadAsset(...)
 end
 
 function createAssetDummy(...)
-    return dummy:load(...)
+    return dummy:create(...)
 end
