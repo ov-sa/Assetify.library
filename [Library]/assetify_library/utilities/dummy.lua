@@ -37,11 +37,12 @@ dummy.__index = dummy
 
 function dummy:create(...)
     local cDummy = imports.setmetatable({}, {__index = self})
-    if not cDummy:load(...) then
+    local cInstance = cDummy:load(...)
+    if not cInstance then
         cDummy = nil
         return false
     end
-    return cDummy
+    return cDummy, cInstance
 end
 
 function dummy:destroy(...)

@@ -38,5 +38,6 @@ function unloadAsset(...)
 end
 
 function createAssetDummy(...)
-    return dummy:create(...)
+    local _, cInstance = dummy:create(...)
+    return cInstance
 end
