@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="2.0.4"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="2.0.5"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
     <!-- Exports, Settings & Utilities -->
