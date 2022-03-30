@@ -113,14 +113,18 @@ if localPlayer then
 
     function shader:clearAssetBuffer(rwCache)
         if not rwCache then return false end
-        for i, j in imports.pairs(rwCache.shader) do
-            if j and imports.isElement(j) then
-                imports.destroyElement(j)
+        if rwCache.shader then
+            for i, j in imports.pairs(rwCache.shader) do
+                if j and imports.isElement(j) then
+                    imports.destroyElement(j)
+                end
             end
         end
-        for i, j in imports.pairs(rwCache.texture) do
-            if j and imports.isElement(j) then
-                imports.destroyElement(j)
+        if rwCache.texture then
+            for i, j in imports.pairs(rwCache.texture) do
+                if j and imports.isElement(j) then
+                    imports.destroyElement(j)
+                end
             end
         end
         return true
