@@ -35,6 +35,7 @@ local imports = {
 file = {
     exists = imports.fileExists,
     delete = imports.fileDelete,
+
     read = function(path)
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
@@ -43,6 +44,7 @@ file = {
         imports.fileClose(cFile)
         return data
     end,
+
     write = function(path, data)
         if not path or not data then return false end
         local cFile = imports.fileCreate(path)

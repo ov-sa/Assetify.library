@@ -9,6 +9,15 @@
 ----------------------------------------------------------------
 
 
+-----------------
+--[[ Imports ]]--
+-----------------
+
+local imports = {
+    triggerEvent = triggerEvent
+}
+
+
 -------------------------
 --[[ Functions: APIs ]]--
 -------------------------
@@ -29,12 +38,20 @@ function isAssetLoaded(...)
     return manager:isLoaded(...)
 end
 
-function loadAsset(...)
-    return manager:load(...)
+function loadAsset(assetType, assetName, ...)
+    local state = manager:load(assetType, assetName, ...)
+    if state then
+        imports.triggerEvent("onAssetLoad", localPlayer, assetType, assetName)
+    end
+    return state
 end
 
-function unloadAsset(...)
-    return manager:unload(...)
+function unloadAsset(assetType, assetName, ...)
+    local state = manager:unload(assetType, assetName, ...)
+    if state then
+        imports.triggerEvent("onAssetUnLoad", localPlayer, assetType, assetName)
+    end
+    return state
 end
 
 function createAssetDummy(...)
