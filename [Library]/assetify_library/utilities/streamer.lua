@@ -79,7 +79,7 @@ end
 function streamer:unload()
     if not self or (self == streamer) then return false end
     local streamType = self.streamType
-    local streamDimension, streamInterior = imports.getElementDimension(self.streamer), imports.getElementInterior(self.streamer)
+    local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.buffer[streamDimension][streamInterior][streamType][self] = nil
     self = nil
     return true
@@ -141,6 +141,11 @@ imports.addEventHandler("onAssetifyLoad", root, function()
         local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
         if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
             for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
+                onEntityStream(j)
+            end
+        end
+        if streamer.buffer[-1] and streamer.buffer[-1][clientInterior] then
+            for i, j in imports.pairs(streamer.buffer[-1][clientInterior]) do
                 onEntityStream(j)
             end
         end
