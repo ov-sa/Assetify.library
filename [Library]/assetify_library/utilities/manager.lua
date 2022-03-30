@@ -174,11 +174,13 @@ function manager:load(assetType, assetName)
                 })
                 return true
             else
-                return asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
+                if asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
                     txd = assetPath..(asset.references.asset)..".txd",
                     dff = assetPath..(asset.references.asset)..".dff",
                     col = assetPath..(asset.references.asset)..".col"
-                })
+                }) then
+                    return true
+                end
             end
         end
     end
