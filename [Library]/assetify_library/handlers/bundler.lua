@@ -93,7 +93,7 @@ function onBundleLibrary()
                 end
 
                 assetify.unloadAsset = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "loadAsset", ...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "unloadAsset", ...)
                 end
 
                 assetify.createDummy = function(...)
