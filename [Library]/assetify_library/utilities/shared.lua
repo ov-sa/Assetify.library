@@ -1,7 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
      Script: utilities: shared.lua
-     Server: -
      Author: vStudio
      Developer(s): Aviril, Tron
      DOC: 19/10/2021
@@ -16,6 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    setmetatable = setmetatable,
     fileExists = fileExists,
     fileCreate = fileCreate,
     fileDelete = fileDelete,
@@ -60,7 +60,7 @@ file = {
 --[[ Class: Table ]]--
 ----------------------
 
-function table.clone(baseTable, isRecursive)
+table.clone = function(baseTable, isRecursive)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     local clonedTable = {}
     for i, j in imports.pairs(baseTable) do

@@ -1,7 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
      Script: handlers: bundler.lua
-     Server: -
      Author: vStudio
      Developer(s): Aviril, Tron
      DOC: 19/10/2021
@@ -57,7 +56,7 @@ end
 function onBundleLibrary()
     threaderData = imports.file.read("utilities/thread.lua")
     local importedModules = {
-        bundler = [[
+        bundler = imports.file.read("utilities/shared.lua")..[[
             assetify = {
                 imports = {
                     resourceName = "]]..imports.resourceName..[[",

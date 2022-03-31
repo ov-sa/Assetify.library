@@ -1,7 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
      Script: utilities: syncer.lua
-     Server: -
      Author: vStudio
      Developer(s): Aviril, Tron
      DOC: 19/10/2021

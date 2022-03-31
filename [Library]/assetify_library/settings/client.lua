@@ -1,7 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
      Script: settings: client.lua
-     Server: -
      Author: vStudio
      Developer(s): Aviril, Tron
      DOC: 19/10/2021
