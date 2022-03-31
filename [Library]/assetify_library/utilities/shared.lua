@@ -88,6 +88,7 @@ quat = {
     end,
 
     toEuler = function(w, x, y, z)
+        if not w or not x or not y or not z then return false end
         local sinX, sinY, sinZ = 2*((w*x) + (y*z)), 2*((w*y) - (z*x)), 2*((w*z) + (x*y))
         local cosX, cosY, cosZ = 1.0 - (2*((x*x) + (y*y))), imports.math.min(imports.math.max(sinY, -1), 1), 1 - (2*((y*y) + (z*z)))
         return imports.math.deg(imports.math.atan2(sinX, cosX)), imports.math.deg(imports.math.asin(cosY)), imports.math.deg(imports.math.atan2(sinZ, cosZ))
