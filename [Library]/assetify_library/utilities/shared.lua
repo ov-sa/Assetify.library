@@ -79,6 +79,43 @@ end
 ---------------------
 
 quat = {
+    new = function(w, x, y, z)
+        if not w or not x or not y or not z then return false end
+        return imports.setmetatable({w, x, y, z}, quat)
+    end,
+
+    __add = function(quat1, quat2)
+        if not quat1 or not quat2 then return false end
+        return quat.new(quat1[1] + quat2[1], quat1[2] + quat2[2], quat1[3] + quat2[3], quat1[4] + quat2[4])
+    end,
+
+    __sub = function(quat1, quat2)
+        if not quat1 or not quat2 then return false end
+        return quat.new(quat1[1] - quat2[1], quat1[2] - quat2[2], quat1[3] - quat2[3], quat1[4] - quat2[4])
+    end,
+
+    __mul = function(quat1, quat2)
+        if not quat1 or not quat2 then return false end
+        return quat.new(
+            (quat1[1]*quat2[1]) - (quat1[2]*quat2[2]) - (quat1[3]*quat2[3]) - (quat1[4]*quat2[4]),
+            (quat1[1]*quat2[2]) + (quat1[2]*quat2[1]) + (quat1[3]*quat2[4]) - (quat1[4]*quat2[3]),
+            (quat1[1]*quat2[3]) + (quat1[3]*quat2[1]) + (quat1[4]*quat2[2]) - (quat1[2]*quat2[4]),
+            (quat1[1]*quat2[4]) + (quat1[4]*quat2[1]) + (quat1[2]*quat2[3]) - (quat1[3]*quat2[2])
+        )
+    end,
+
+    __div = function(quat1, quat2)
+        if not quat1 or not quat2 then return false end
+        return quat.new(quat1[1]/quat2[1], quat1[2]/quat2[2], quat1[3]/quat2[3], quat1[4]/quat2[4])
+    end,
+
+    fromVectorAngle = function(vector, angle)
+        if not vector or not angle then return false end
+        local a = imports.math.rad(angle*0.5)
+        local s, w = imports.math.sin(a), imports.math.cos(a)
+        return quat.new(w, s*vector.x, s*vector.y, s*vector.z)
+    end,
+
     fromEuler = function(x, y, z)
         if not x or not y or not z then return false end
         x, y, z = imports.math.rad(x)*0.5, imports.math.rad(y)*0.5, imports.math.rad(z)*0.5
@@ -90,10 +127,11 @@ quat = {
     toEuler = function(w, x, y, z)
         if not w or not x or not y or not z then return false end
         local sinX, sinY, sinZ = 2*((w*x) + (y*z)), 2*((w*y) - (z*x)), 2*((w*z) + (x*y))
-        local cosX, cosY, cosZ = 1.0 - (2*((x*x) + (y*y))), imports.math.min(imports.math.max(sinY, -1), 1), 1 - (2*((y*y) + (z*z)))
+        local cosX, cosY, cosZ = 1 - (2*((x*x) + (y*y))), imports.math.min(imports.math.max(sinY, -1), 1), 1 - (2*((y*y) + (z*z)))
         return imports.math.deg(imports.math.atan2(sinX, cosX)), imports.math.deg(imports.math.asin(cosY)), imports.math.deg(imports.math.atan2(sinZ, cosZ))
     end
 }
+quat.__index = quat
 
 
 -----------------------
