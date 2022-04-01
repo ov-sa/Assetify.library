@@ -48,13 +48,11 @@ mapper.ui.notif.renderUI = function()
     for i = 1, #mapper.ui.notif.buffer, 1 do
         local j = mapper.ui.notif.buffer[i]
         if j then
-            local notif_width, notif_height = imports.beautify.native.getTextWidth(j.text, 1, mapper.ui.notif.font), mapper.ui.notif.height
             local notif_offsetX, notif_offsetY = 0, 0
-            local notif_alpha = 0
             if j.slideStatus == "forward" then
-                notif_offsetX, notif_offsetY = imports.interpolateBetween(CLIENT_MTA_RESOLUTION[1], mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) - mapper.ui.notif.height, 0, (CLIENT_MTA_RESOLUTION[1]) + mapper.ui.notif.startX - notif_width, mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) + offsetY, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideInDuration), "InOutBack")
-                notif_alpha = imports.interpolateBetween(0, 0, 0, 1, 0, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideInDuration), "OutQuad")
-                if imports.math.round(notif_alpha, 2) == 1 then
+                notif_offsetX, notif_offsetY = imports.interpolateBetween(CLIENT_MTA_RESOLUTION[1], mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) - mapper.ui.notif.height, 0, (CLIENT_MTA_RESOLUTION[1]) + mapper.ui.notif.startX - j.width, mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) + offsetY, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideInDuration), "InOutBack")
+                j.alphaPercent = imports.interpolateBetween(0, 0, 0, 1, 0, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideInDuration), "OutQuad")
+                if imports.math.round(j.alphaPercent, 2) == 1 then
                     if (CLIENT_CURRENT_TICK - j.tickCounter - mapper.ui.notif.slideInDuration) >= mapper.ui.notif.slideDelayDuration then
                         j.slideStatus = "backward"
                         j.tickCounter = CLIENT_CURRENT_TICK
@@ -63,12 +61,12 @@ mapper.ui.notif.renderUI = function()
                     end
                 end
             else
-                notif_offsetX, notif_offsetY = imports.interpolateBetween((CLIENT_MTA_RESOLUTION[1]) + mapper.ui.notif.startX - notif_width, mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)), 0, CLIENT_MTA_RESOLUTION[1], mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) + (mapper.ui.notif.height*0.5) - offsetY, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideOutDuration), "InOutBack")
-                notif_alpha = imports.interpolateBetween(1, 0, 0, 0, 0, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideOutDuration), "OutQuad")
+                notif_offsetX, notif_offsetY = imports.interpolateBetween((CLIENT_MTA_RESOLUTION[1]) + mapper.ui.notif.startX - j.width, mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)), 0, CLIENT_MTA_RESOLUTION[1], mapper.ui.notif.startY + ((i - 1)*(mapper.ui.notif.height + mapper.ui.notif.paddingY)) + (mapper.ui.notif.height*0.5) - offsetY, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideOutDuration), "InOutBack")
+                j.alphaPercent = imports.interpolateBetween(1, 0, 0, 0, 0, 0, imports.getInterpolationProgress(j.tickCounter, mapper.ui.notif.slideOutDuration), "OutQuad")
             end
-            imports.beautify.native.drawText(j.text, notif_offsetX, notif_offsetY, notif_offsetX + notif_width, notif_offsetY + notif_height, imports.tocolor(j.fontColor[1], j.fontColor[2], j.fontColor[3], j.fontColor[4]*notif_alpha), 1, mapper.ui.notif.font, "center", "center", true, false, false, false, true)
+            imports.beautify.native.drawText(j.text, notif_offsetX, notif_offsetY, notif_offsetX + j.width, notif_offsetY + mapper.ui.notif.height, imports.tocolor(j.fontColor[1], j.fontColor[2], j.fontColor[3], j.fontColor[4]*j.alphaPercent), 1, mapper.ui.notif.font, "center", "center", true, false, false, false, true)
             if j.slideStatus == "backward" then
-                if imports.math.round(notif_alpha, 2) == 0 then
+                if imports.math.round(j.alphaPercent, 2) == 0 then
                     imports.table.remove(mapper.ui.notif.buffer, i)
                 end
             end
@@ -85,6 +83,7 @@ imports.addEvent("Assetify:Mapper:onNotification", true)
 imports.addEventHandler("Assetify:Mapper:onNotification", root, function(message, color)
     imports.table.insert(mapper.ui.notif.buffer, {
         text = message,
+        width = imports.beautify.native.getTextWidth(message, 1, mapper.ui.notif.font),
         fontColor = color,
         slideStatus = "forward",
         tickCounter = CLIENT_CURRENT_TICK
