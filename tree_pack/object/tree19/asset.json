@@ -1,0 +1,15 @@
+{
+    "encryptKey": "vStudio - Aviril",
+    "streamRange": 170,
+    "shaderMaps": {
+        "shaderMaps": {
+            "control": {
+                "tree01": [
+                    {
+                        "bump": "control/tree19/bump.jpg"
+                    }
+                ]
+            }
+        }
+    }
+}
