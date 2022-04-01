@@ -12,7 +12,3 @@
 ![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/4.png)
 ![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/5.png)
 ![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/6.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/7.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/8.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/9.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/tree_pack/.github/10.png)
