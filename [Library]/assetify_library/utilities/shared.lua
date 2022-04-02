@@ -147,7 +147,7 @@ matrix = {
         local sRoll, cRoll = imports.math.sin(rotZ), imports.math.cos(rotZ)
         return {
             {(sRoll*sPitch*sYaw) + (cRoll*cYaw), sRoll*cPitch, (sRoll*sPitch*cYaw) - (cRoll*sYaw)},
-            {(cRoll *sPitch*sYaw) - (sRoll*cYaw), cRoll*cPitch, (cRoll*sPitch*cYaw) + (sRoll*sYaw)},
+            {(cRoll*sPitch*sYaw) - (sRoll*cYaw), cRoll*cPitch, (cRoll*sPitch*cYaw) + (sRoll*sYaw)},
             {cPitch*sYaw, -sPitch, cPitch*cYaw}
         }
     end,
