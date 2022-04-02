@@ -107,5 +107,4 @@ camera.controlCursor = function(_, _, state)
     if not state then camera.cursorTick = CLIENT_CURRENT_TICK end
     camera.isCursorVisible = state
     imports.showCursor(camera.isCursorVisible, false)
-    return true
 end
