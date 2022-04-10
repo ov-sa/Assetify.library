@@ -45,14 +45,17 @@ if localPlayer then
         if availableAssetPacks[assetType] then
             local assetReference = availableAssetPacks[assetType].rwDatas[assetName]
             if assetReference then
-                if assetReference.manifestData.encryptKey then
+                local isExternalResource = sourceResource and (sourceResource ~= resource)
+                local unsyncedData = assetReference.unsyncedData
+                if isExternalResource then
                     assetReference = imports.table.clone(assetReference, true)
                     assetReference.manifestData.encryptKey = nil
+                    assetReference.unsyncedData = nil
                 end
                 if assetType == "scene" then
-                    return assetReference, (assetReference.unsyncedData and true) or false
+                    return assetReference, (unsyncedData and true) or false
                 else
-                    return assetReference, (assetReference.unsyncedData and assetReference.unsyncedData.assetCache.cAsset and assetReference.unsyncedData.assetCache.cAsset.syncedData) or false
+                    return assetReference, (unsyncedData and unsyncedData.assetCache.cAsset and unsyncedData.assetCache.cAsset.syncedData) or false
                 end
             end
         end

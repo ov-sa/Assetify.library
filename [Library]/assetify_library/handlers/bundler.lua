@@ -96,12 +96,7 @@ function onBundleLibrary()
             end
 
             assetify.getAsset = function(...)
-                local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
-                if cAsset then
-                    cAsset.unsyncedData = nil
-                    return cAsset, cData
-                end
-                return false
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
             end
 
             assetify.setElementAsset = function(...)

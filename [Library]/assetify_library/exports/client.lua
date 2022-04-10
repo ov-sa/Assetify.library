@@ -25,10 +25,6 @@ function isLibraryLoaded()
     return syncer.isLibraryLoaded
 end
 
-function getAssetData(...)
-    return manager:getData(...)
-end
-
 function getAssetID(...)
     return manager:getID(...)
 end

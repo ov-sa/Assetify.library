@@ -33,6 +33,10 @@ function getLibraryAssets(assetType)
     return packAssets
 end
 
+function getAssetData(...)
+    return manager:getData(...)
+end
+
 function setElementAsset(element, ...)
     if not element or not imports.isElement(element) then return false end
     local elementType = imports.getElementType(element)
