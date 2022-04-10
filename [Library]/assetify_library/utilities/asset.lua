@@ -246,9 +246,7 @@ else
                     local assetManifestPath = assetPath..(asset.references.asset)..".json"
                     local assetManifestData = imports.file.read(assetManifestPath)
                     assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
-                    if not assetManifestData then
-                        cAssetPack.rwDatas[assetPath] = false
-                    else
+                    if assetManifestData then
                         assetManifestData.streamRange = imports.math.max(imports.tonumber(assetManifestData.streamRange) or 0, asset.ranges.streamRange)
                         assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                         assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false

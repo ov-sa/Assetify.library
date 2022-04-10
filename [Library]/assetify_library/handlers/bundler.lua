@@ -66,15 +66,6 @@ function onBundleLibrary()
                 }
             }
             if localPlayer then
-                assetify.getAsset = function(...)
-                    local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
-                    if cAsset then
-                        cAsset.unsyncedData = nil
-                        return cAsset, cData
-                    end
-                    return false
-                end
-
                 assetify.isLoaded = function()
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
                 end
@@ -102,6 +93,15 @@ function onBundleLibrary()
 
             assetify.getAssets = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryAssets", ...)
+            end
+
+            assetify.getAsset = function(...)
+                local cAsset, cData = assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
+                if cAsset then
+                    cAsset.unsyncedData = nil
+                    return cAsset, cData
+                end
+                return false
             end
 
             assetify.setElementAsset = function(...)

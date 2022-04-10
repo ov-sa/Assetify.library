@@ -17,11 +17,11 @@
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/shader.lua" type="shared"/>
+    <script src="utilities/manager.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
     <script src="utilities/dummy.lua" type="client"/>
     <script src="utilities/bone.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
-    <script src="utilities/manager.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
     <script src="settings/client.lua" type="client"/>
@@ -35,6 +35,7 @@
     <export function="fetchImports" type="shared"/>
     <export function="fetchThreader" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
+    <export function="getAssetData" type="shared"/>
     <export function="setElementAsset" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>
@@ -42,7 +43,6 @@
     <export function="clearBoneAttachment" type="shared"/>
     <export function="createAssetDummy" type="client"/>
     <export function="isLibraryLoaded" type="client"/>
-    <export function="getAssetData" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="isAssetLoaded" type="client"/>
     <export function="loadAsset" type="client"/>
