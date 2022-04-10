@@ -102,6 +102,31 @@ if localPlayer then
                     }
                 }
                 shader:createTex(assetReference.manifestData.shaderMaps, assetReference.unsyncedData.rwCache.map, assetReference.manifestData.encryptKey)
+                if assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.control then
+                    for i, j in imports.pairs(assetReference.manifestData.shaderMaps.control) do
+                        local shaderTextures, shaderInputs = {}, {}
+                        for k = 1, #j, 1 do
+                            local v = j[k]
+                            if v.control then
+                                shaderTextures[("controlTex_"..k)] = v.control
+                            end
+                            if v.bump then
+                                shaderTextures[("controlTex_"..k.."_bump")] = v.bump
+                            end
+                            for x = 1, #shader.defaultData.shaderChannels, 1 do
+                                local y = shader.defaultData.shaderChannels[x]
+                                if v[(y.index)] then
+                                    shaderTextures[("controlTex_"..k.."_"..(y.index))] = v[(y.index)].map
+                                    shaderInputs[("controlScale_"..k.."_"..(y.index))] = v[(y.index)].scale
+                                    if v[(y.index)].bump then
+                                        shaderTextures[("controlTex_"..k.."_"..(y.index).."_bump")] = v[(y.index)].bump
+                                    end
+                                end
+                            end
+                        end
+                        shader:create(nil, "control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, assetReference.unsyncedData.rwCache.map, j, assetReference.manifestData.encryptKey)
+                    end
+                end
                 if assetType == "scene" then
                     thread:create(function(cThread)
                         local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
@@ -109,52 +134,34 @@ if localPlayer then
                         if sceneManifestData then
                             local unparsedDatas = imports.split(sceneManifestData, "\n")
                             for i = 1, #unparsedDatas, 1 do
-                                local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
                                 assetReference.unsyncedData.assetCache[i] = {}
-                                asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
-                                    txd = assetPath..(asset.references.asset)..".txd",
-                                    dff = assetPath.."dff/"..childName..".dff",
-                                    col = assetPath.."col/"..childName..".col"
-                                }, function(state)
-                                    if state then
-                                        local sceneData = {
-                                            position = {
-                                                x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
-                                                y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
-                                                z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
-                                            },
-                                            rotation = {}
-                                        }
-                                        sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
-                                        scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, sceneData)
-                                    end
-                                end)
-                                thread.pause()
-                            end
-                            if  assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.control then
-                                for k, v in imports.pairs(assetReference.manifestData.shaderMaps.control) do
-                                    local shaderTextures, shaderInputs = {}, {}
-                                    for m = 1, #v, 1 do
-                                        local n = v[m]
-                                        if n.control then
-                                            shaderTextures[("controlTex_"..m)] = n.control
+                                local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
+                                local sceneData = {
+                                    position = {
+                                        x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
+                                        y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
+                                        z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                    },
+                                    rotation = {}
+                                }
+                                sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
+                                if not assetReference.manifestData.sceneMapped then
+                                    asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
+                                        txd = assetPath..(asset.references.asset)..".txd",
+                                        dff = assetPath.."dff/"..childName..".dff",
+                                        col = assetPath.."col/"..childName..".col"
+                                    }, function(state)
+                                        if state then
+                                            scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, sceneData)
                                         end
-                                        if n.bump then
-                                            shaderTextures[("controlTex_"..m.."_bump")] = n.bump
-                                        end
-                                        for x = 1, #shader.defaultData.shaderChannels, 1 do
-                                            local y = shader.defaultData.shaderChannels[x]
-                                            if n[(y.index)] then
-                                                shaderTextures[("controlTex_"..m.."_"..(y.index))] = n[(y.index)].map
-                                                shaderInputs[("controlScale_"..m.."_"..(y.index))] = n[(y.index)].scale
-                                                if n[(y.index)].bump then
-                                                    shaderTextures[("controlTex_"..m.."_"..(y.index).."_bump")] = n[(y.index)].bump
-                                                end
-                                            end
-                                        end
-                                    end
-                                    shader:create(nil, "control", "Assetify_TextureMapper", k, shaderTextures, shaderInputs, assetReference.unsyncedData.rwCache.map, v, assetReference.manifestData.encryptKey)
+                                    end)
+                                else
+                                    sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.x) or 0), sceneData.position.y + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.y) or 0), sceneData.position.z + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.z) or 0)
+                                    sceneData.dimension = assetReference.manifestData.sceneDimension
+                                    sceneData.interior = assetReference.manifestData.sceneInterior
+                                    assetReference.unsyncedData.assetCache[i].cDummy = dummy:create("object", childName, sceneData)
                                 end
+                                thread.pause()
                             end
                         end
                     end):resume({
@@ -207,6 +214,9 @@ if localPlayer then
                                     j.cAsset.cScene:destroy()
                                 end
                                 j.cAsset:destroy(assetReference.unsyncedData.rwCache)
+                            end
+                            if j.cDummy then
+                                j.cDummy:destroy()
                             end
                             thread.pause()
                         end
