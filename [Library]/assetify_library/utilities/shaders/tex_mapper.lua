@@ -49,7 +49,7 @@ shaderRW[identifier] = function(shaderMaps)
             MipFilter = Linear;
             MaxAnisotropy = gMaxAnisotropy*anisotropy;
             MinFilter = Anisotropic;
-        };    
+        };
     ]], "", ""
     handlerBody = handlerBody..[[
         float4 baseTexel = tex2D(baseSampler, PS.TexCoord);

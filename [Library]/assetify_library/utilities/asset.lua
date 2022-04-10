@@ -195,8 +195,15 @@ else
                 if i == "clump" then
                     for k, v in imports.pairs(j) do
                         for m = 1, #v, 1 do
-                            v[m] = assetPath.."map/"..v[m]
-                            asset:buildFile(v[m], assetFiles, encryptKey)
+                            local n = v[m]
+                            if n.clump then
+                                n.clump = assetPath.."map/"..n.clump
+                                asset:buildFile(n.clump, assetFiles, encryptKey)
+                            end
+                            if n.bump then
+                                n.bump = assetPath.."map/"..n.bump
+                                asset:buildFile(n.bump, assetFiles, encryptKey)
+                            end
                         end
                     end
                 elseif i == "control" then
@@ -265,6 +272,7 @@ else
                         if assetType == "scene" then
                             assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
                             assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
+                            assetManifestData.sceneMapped = (assetManifestData.sceneMapped and true) or false
                             if assetManifestData.sceneOffset then
                                 if imports.type(assetManifestData.sceneOffset) ~= "table" then
                                     assetManifestData.sceneOffset = false
@@ -278,13 +286,15 @@ else
                             local sceneManifestData = imports.file.read(sceneIPLPath)
                             if sceneManifestData then
                                 asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                local unparsedDatas = imports.split(sceneManifestData, "\n")
-                                for k = 1, #unparsedDatas, 1 do
-                                    local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                    asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                    asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                    thread.pause()
+                                if not assetManifestData.sceneMapped then
+                                    asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                    local unparsedDatas = imports.split(sceneManifestData, "\n")
+                                    for k = 1, #unparsedDatas, 1 do
+                                        local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
+                                        asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        thread.pause()
+                                    end
                                 end
                             end
                         else

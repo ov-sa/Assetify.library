@@ -52,16 +52,16 @@ end
 function scene:load(cAsset, sceneManifest, sceneData)
     if not self or (self == scene) then return false end
     if not cAsset or not sceneManifest or not sceneData then return false end
-    local instanceCoords = {sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z}
-    self.cStreamerInstance = imports.createObject(cAsset.syncedData.modelID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], (sceneManifest.enableLODs and cAsset.syncedData.collisionID and true) or false)
+    local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
+    self.cStreamerInstance = imports.createObject(cAsset.syncedData.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.enableLODs and cAsset.syncedData.collisionID and true) or false)
     imports.setElementDoubleSided(self.cStreamerInstance, true)
     if cAsset.syncedData.collisionID then
-        self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6])
+        self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, posX, posY, posZ, rotX, rotY, rotZ)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
         imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
         if sceneManifest.enableLODs then
-            self.cModelInstance = imports.createObject(cAsset.syncedData.collisionID, instanceCoords[1], instanceCoords[2], instanceCoords[3], instanceCoords[4], instanceCoords[5], instanceCoords[6], true)
+            self.cModelInstance = imports.createObject(cAsset.syncedData.collisionID, posX, posY, posZ, rotX, rotY, rotZ, true)
             imports.attachElements(self.cModelInstance, self.cCollisionInstance)
             imports.setElementAlpha(self.cModelInstance, 0)
             imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)

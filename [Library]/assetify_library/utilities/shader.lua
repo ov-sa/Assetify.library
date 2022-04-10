@@ -76,7 +76,13 @@ if localPlayer then
             if i == "clump" then
                 for k, v in imports.pairs(j) do
                     for m = 1, #v, 1 do
-                        rwCache.texture[(v[m])] = shader:loadTex(v[m], encryptKey)
+                        local n = v[m]
+                        if n.clump then
+                            rwCache.texture[(n.clump)] = shader:loadTex(n.clump, encryptKey)
+                        end
+                        if n.bump then
+                            rwCache.texture[(n.bump)] = shader:loadTex(n.bump, encryptKey)
+                        end
                     end
                 end
             elseif i == "control" then
