@@ -55,7 +55,7 @@ if localPlayer then
     shader.rwCache = shaderRW
     shaderRW = nil
     shader.preLoaded = {
-        ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureChanger"](), shader.defaultData.shaderPriority, shader.defaultData.shaderDistance, false, "all")
+        ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureClearer"](), shader.defaultData.shaderPriority + 1, shader.defaultData.shaderDistance, false, "all")
     }
     imports.dxSetShaderValue(shader.preLoaded["Assetify_TextureClearer"], "baseTexture", shader.preLoadedTex.invisibleMap)
 

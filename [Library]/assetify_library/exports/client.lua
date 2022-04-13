@@ -25,6 +25,11 @@ function isLibraryLoaded()
     return syncer.isLibraryLoaded
 end
 
+function createShader(...)
+    local cShader = shader:create(...)
+    return cShader
+end
+
 function getAssetID(...)
     return manager:getID(...)
 end
@@ -50,6 +55,6 @@ function unloadAsset(assetType, assetName, ...)
 end
 
 function createAssetDummy(...)
-    local _, cInstance = dummy:create(...)
-    return cInstance
+    local cDummy = dummy:create(...)
+    return (cDummy and cDummy.cDummy) or false
 end

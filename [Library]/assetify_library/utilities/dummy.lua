@@ -36,12 +36,11 @@ dummy.__index = dummy
 
 function dummy:create(...)
     local cDummy = imports.setmetatable({}, {__index = self})
-    local cInstance = cDummy:load(...)
-    if not cInstance then
+    if not cDummy:load(...) then
         cDummy = nil
         return false
     end
-    return cDummy, cInstance
+    return cDummy
 end
 
 function dummy:destroy(...)
@@ -74,9 +73,9 @@ function dummy:load(assetType, assetName, dummyData)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance})
     end
-    local dummyInstance = self.cCollisionInstance or self.cModelInstance
-    dummy.buffer[dummyInstance] = self
-    return dummyInstance
+    self.cDummy = self.cCollisionInstance or self.cModelInstance
+    dummy.buffer[(self.cDummy)] = self
+    return true
 end
 
 function dummy:unload()
