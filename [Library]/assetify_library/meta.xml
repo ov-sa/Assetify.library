@@ -49,6 +49,8 @@
     <export function="isAssetLoaded" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
+    <export function="loadAnim" type="client"/>
+    <export function="unloadAnim" type="client"/>
     <export function="createAssetDummy" type="client"/>
 
 </meta>

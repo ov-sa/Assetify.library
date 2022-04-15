@@ -30,6 +30,7 @@ local imports = {
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
     engineFreeModel = engineFreeModel,
+    engineLoadIFP = engineLoadIFP,
     engineLoadTXD = engineLoadTXD,
     engineLoadDFF = engineLoadDFF,
     engineLoadCOL = engineLoadCOL,
@@ -85,68 +86,80 @@ if localPlayer then
         return self:unload(...)
     end
     
-    function asset:load(assetType, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
+    function asset:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
-        if not assetType or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
-        local modelID, collisionID = false, false
-        if rwPaths.dff then
-            modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
-            if modelID then
-                if assetType == "scene" then
-                    collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
+        if not assetType or not assetName or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
+        local loadState = false
+        if assetType == "animation" then
+            if rwPaths.ifp then
+                rwCache.ifp[(rwPaths.ifp)] = imports.engineLoadIFP((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.ifp), {key = assetManifest.encryptKey})) or rwPaths.ifp, assetType.."."..assetName)
+                if rwCache.ifp[(rwPaths.ifp)] then
+                    assetData.cAsset = self
+                    self.rwPaths = rwPaths
+                    self.syncedData = {}
+                    loadState = true
                 end
-                if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
-                    imports.engineSetModelLODDistance(modelID, asset.ranges.streamRange)
-                    rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
-                end
-                if not rwCache.dff[(rwPaths.dff)] then
-                    imports.engineFreeModel(modelID)
-                    if collisionID then
-                        imports.engineFreeModel(collisionID)
-                        collisionID = false
+            end
+        else
+            local modelID, collisionID = false, false
+            if rwPaths.dff then
+                modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
+                if modelID then
+                    if assetType == "scene" then
+                        collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
                     end
-                    return false
-                else
-                    if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
-                        if collisionID then
-                            imports.engineSetModelLODDistance(collisionID, asset.ranges.streamRange)
-                        end
-                        rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
-                    else
+                    if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
+                        imports.engineSetModelLODDistance(modelID, asset.ranges.streamRange)
+                        rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.dff), {key = assetManifest.encryptKey})) or rwPaths.dff)
+                    end
+                    if not rwCache.dff[(rwPaths.dff)] then
+                        imports.engineFreeModel(modelID)
                         if collisionID then
                             imports.engineFreeModel(collisionID)
                             collisionID = false
                         end
+                        return false
+                    else
+                        if not rwCache.col[(rwPaths.col)] and imports.file.exists(rwPaths.col) then
+                            if collisionID then
+                                imports.engineSetModelLODDistance(collisionID, asset.ranges.streamRange)
+                            end
+                            rwCache.col[(rwPaths.col)] = imports.engineLoadCOL((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.col), {key = assetManifest.encryptKey})) or rwPaths.col)
+                        else
+                            if collisionID then
+                                imports.engineFreeModel(collisionID)
+                                collisionID = false
+                            end
+                        end
                     end
                 end
             end
-        end
-        local loadState = false
-        if modelID then
-            if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
-                rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
-            end
-            if rwCache.txd[(rwPaths.txd)] then
-                imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
-            end
-            imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
-            if collisionID then
-                imports.engineImportTXD(asset.rwAssets.txd, collisionID)
-                imports.engineReplaceModel(asset.rwAssets.dff, collisionID, false)
-            end
-            if rwCache.col[(rwPaths.col)] then
-                imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
-                if collisionID then
-                    imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
+            if modelID then
+                if not rwCache.txd[(rwPaths.txd)] and imports.file.exists(rwPaths.txd) then
+                    rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.txd), {key = assetManifest.encryptKey})) or rwPaths.txd)
                 end
+                if rwCache.txd[(rwPaths.txd)] then
+                    imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
+                end
+                imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
+                if collisionID then
+                    imports.engineImportTXD(asset.rwAssets.txd, collisionID)
+                    imports.engineReplaceModel(asset.rwAssets.dff, collisionID, false)
+                end
+                if rwCache.col[(rwPaths.col)] then
+                    imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
+                    if collisionID then
+                        imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
+                    end
+                end
+                assetData.cAsset = self
+                self.rwPaths = rwPaths
+                self.syncedData = {
+                    modelID = modelID,
+                    collisionID = collisionID
+                }
+                loadState = true
             end
-            assetData.cAsset = self
-            self.rwPaths = rwPaths
-            self.syncedData = {
-                modelID = modelID,
-                collisionID = collisionID
-            }
-            loadState = true
         end
         if callback and (imports.type(callback) == "function") then
             callback(loadState)
@@ -157,7 +170,9 @@ if localPlayer then
     function asset:unload(rwCache, callback)
         if not self or (self == asset) then return false end
         if not rwCache then return false end
-        imports.engineFreeModel(self.syncedData.modelID)
+        if self.syncedData.modelID then
+            imports.engineFreeModel(self.syncedData.modelID)
+        end
         if self.syncedData.collisionID then
             imports.engineFreeModel(self.syncedData.collisionID)
         end
@@ -258,6 +273,8 @@ else
                         assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                         assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                         assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
+                        assetManifestData.assetAnimations = (assetManifestData.assetAnimations and (imports.type(assetManifestData.assetAnimations) == "table") and assetManifestData.assetAnimations) or false
+                        assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
                                 manifestData = assetManifestData
@@ -268,49 +285,59 @@ else
                                 fileHash = {}
                             }
                         }
-                        assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
-                        if assetType == "scene" then
-                            assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
-                            assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
-                            assetManifestData.sceneMapped = (assetManifestData.sceneMapped and true) or false
-                            if assetManifestData.sceneOffset then
-                                if imports.type(assetManifestData.sceneOffset) ~= "table" then
-                                    assetManifestData.sceneOffset = false
-                                else
-                                    for i, j in imports.pairs(assetManifestData.sceneOffset) do
-                                        assetManifestData.sceneOffset[i] = imports.tonumber(j)
-                                    end
-                                end
-                            end
-                            local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
-                            local sceneManifestData = imports.file.read(sceneIPLPath)
-                            if sceneManifestData then
-                                asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                if not assetManifestData.sceneMapped then
-                                    asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                    local unparsedDatas = imports.split(sceneManifestData, "\n")
-                                    for k = 1, #unparsedDatas, 1 do
-                                        local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
-                                        asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                        asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                                        thread.pause()
-                                    end
-                                end
-                            end
+                        if assetType == "animation" then
+                            assetManifestData.streamRange = false
+                            assetManifestData.enableLODs = false
+                            assetManifestData.assetClumps = false
+                            assetManifestData.shaderMaps = false
+                            asset:buildFile(assetPath..(asset.references.asset)..".ifp", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            thread.pause()
                         else
-                            asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                            if assetManifestData.assetClumps then
-                                for i, j in imports.pairs(assetManifestData.assetClumps) do
-                                    asset:buildFile(assetPath.."clump/"..j..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            assetManifestData.assetAnimations = false
+                            if assetType == "scene" then
+                                assetManifestData.assetClumps = false
+                                assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
+                                assetManifestData.sceneInterior = imports.math.max(asset.ranges.interior[1], imports.math.min(asset.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
+                                assetManifestData.sceneMapped = (assetManifestData.sceneMapped and true) or false
+                                if assetManifestData.sceneOffset then
+                                    if imports.type(assetManifestData.sceneOffset) ~= "table" then
+                                        assetManifestData.sceneOffset = false
+                                    else
+                                        for i, j in imports.pairs(assetManifestData.sceneOffset) do
+                                            assetManifestData.sceneOffset[i] = imports.tonumber(j)
+                                        end
+                                    end
+                                end
+                                local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
+                                local sceneManifestData = imports.file.read(sceneIPLPath)
+                                if sceneManifestData then
+                                    asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                    if not assetManifestData.sceneMapped then
+                                        asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        local unparsedDatas = imports.split(sceneManifestData, "\n")
+                                        for k = 1, #unparsedDatas, 1 do
+                                            local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
+                                            asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                            asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                            thread.pause()
+                                        end
+                                    end
                                 end
                             else
-                                asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                if assetManifestData.assetClumps then
+                                    for i, j in imports.pairs(assetManifestData.assetClumps) do
+                                        asset:buildFile(assetPath.."clump/"..j..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                    end
+                                else
+                                    asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                end
+                                asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                thread.pause()
                             end
-                            asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
-                            thread.pause()
-                        end
-                        if assetManifestData.shaderMaps then
-                            asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            if assetManifestData.shaderMaps then
+                                asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            end
                         end
                     end
                 end

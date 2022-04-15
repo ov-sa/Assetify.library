@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    isElement = isElement,
     triggerEvent = triggerEvent
 }
 
@@ -52,6 +53,16 @@ function unloadAsset(assetType, assetName, ...)
         imports.triggerEvent("onAssetUnLoad", localPlayer, assetType, assetName)
     end
     return state
+end
+
+function loadAnim(element, ...)
+    if not element or not imports.isElement(element) then return false end
+    return manager:loadAnim(element, ...)
+end
+
+function unloadAnim(element, ...)
+    if not element or not imports.isElement(element) then return false end
+    return manager:unloadAnim(element, ...)
 end
 
 function createAssetDummy(...)

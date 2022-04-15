@@ -20,10 +20,10 @@ local imports = {
     gettok = gettok,
     tonumber = tonumber,
     tostring = tostring,
-    destroyElement = destroyElement,
     addEventHandler = addEventHandler,
+    engineReplaceAnimation = engineReplaceAnimation,
+    engineRestoreAnimation = engineRestoreAnimation,
     collectgarbage = collectgarbage,
-    setTimer = setTimer,
     file = file,
     table = table,
     string = string,
@@ -98,6 +98,7 @@ if localPlayer then
                 assetReference.unsyncedData = {
                     assetCache = {},
                     rwCache = {
+                        ifp = {},
                         txd = {},
                         dff = {},
                         col = {},
@@ -130,7 +131,13 @@ if localPlayer then
                         shader:create(nil, "control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, assetReference.unsyncedData.rwCache.map, j, assetReference.manifestData.encryptKey)
                     end
                 end
-                if assetType == "scene" then
+                if assetType == "animation" then
+                    if asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
+                        ifp = assetPath..(asset.references.asset)..".ifp",
+                    }) then
+                        return true
+                    end
+                elseif assetType == "scene" then
                     thread:create(function(cThread)
                         local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
                         sceneManifestData = (assetReference.manifestData.encryptKey and imports.decodeString("tea", sceneManifestData, {key = assetReference.manifestData.encryptKey})) or sceneManifestData
@@ -149,7 +156,7 @@ if localPlayer then
                                 }
                                 sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
                                 if not assetReference.manifestData.sceneMapped then
-                                    asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
+                                    asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
                                         txd = assetPath..(asset.references.asset)..".txd",
                                         dff = assetPath.."dff/"..childName..".dff",
                                         col = assetPath.."col/"..childName..".col"
@@ -176,7 +183,7 @@ if localPlayer then
                     thread:create(function(cThread)
                         for i, j in imports.pairs(assetReference.manifestData.assetClumps) do
                             assetReference.unsyncedData.assetCache[i] = {}
-                            asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
+                            asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
                                 txd = assetPath..(asset.references.asset)..".txd",
                                 dff = assetPath.."clump/"..j..".dff",
                                 col = assetPath..(asset.references.asset)..".col"
@@ -189,7 +196,7 @@ if localPlayer then
                     })
                     return true
                 else
-                    if asset:create(assetType, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
+                    if asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
                         txd = assetPath..(asset.references.asset)..".txd",
                         dff = assetPath..(asset.references.asset)..".dff",
                         col = assetPath..(asset.references.asset)..".col"
@@ -266,6 +273,34 @@ if localPlayer then
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
     end)
+
+    function manager:loadAnim(element, assetName)
+        if not syncer.isLibraryLoaded then return false end
+        if not element or not assetName then return false end
+        local cAsset = manager:getData("animation", assetName)
+        if not cAsset then return false end
+        if cAsset.manifestData.assetAnimations then
+            for i = 1, #cAsset.manifestData.assetAnimations, 1 do
+                local j = cAsset.manifestData.assetAnimations[i]
+                imports.engineReplaceAnimation(element, j.defaultBlock, j.defaultAnim, "animation."..assetName, j.assetAnim)
+            end
+        end
+        return true
+    end
+
+    function manager:unloadAnim(element, assetName)
+        if not syncer.isLibraryLoaded then return false end
+        if not element or not assetName then return false end
+        local cAsset = manager:getData("animation", assetName)
+        if not cAsset then return false end
+        if cAsset.manifestData.assetAnimations then
+            for i = 1, #cAsset.manifestData.assetAnimations, 1 do
+                local j = cAsset.manifestData.assetAnimations[i]
+                imports.engineRestoreAnimation(element, j.defaultBlock, j.defaultAnim)
+            end
+        end
+        return true
+    end
 else
     function manager:getData(assetType, assetName)
         if not syncer.isLibraryLoaded then return false end
