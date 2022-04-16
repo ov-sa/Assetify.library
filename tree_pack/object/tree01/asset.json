@@ -1,6 +1,7 @@
 {
     "encryptKey": "vStudio - Aviril",
     "streamRange": 170,
+    "assetTransparency": true,
     "shaderMaps": {
         "control": {
             "tree01": [
