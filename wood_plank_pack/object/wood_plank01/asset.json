@@ -1,0 +1,13 @@
+{
+    "encryptKey": "vStudio - Аниса",
+    "streamRange": 170,
+    "shaderMaps": {
+        "control": {
+            "wood_plank01_a": [
+                {
+                    "bump": "control/wood_plank01_a/bump.jpg"
+                }
+            ]
+        }
+    }
+}
