@@ -1,4 +1,4 @@
-## ━ Asset: Scene: Road Pack
+## ━ Asset: Object: Road Pack
 
 ##### ━ Author(s): Broken Vector, [Aviril](https://github.com/Aviril)
 

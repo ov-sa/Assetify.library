@@ -1,0 +1,13 @@
+{
+    "encryptKey": "vStudio - Аниса",
+    "streamRange": 170,
+    "shaderMaps": {
+        "control": {
+            "barrel01_a": [
+                {
+                    "bump": "control/barrel01_a/bump.jpg"
+                }
+            ]
+        }
+    }
+}

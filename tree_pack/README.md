@@ -1,4 +1,4 @@
-## ━ Asset: Scene: Tree Pack
+## ━ Asset: Object: Tree Pack
 
 ##### ━ Author(s): Elegant Crow, [Aviril](https://github.com/Aviril), [Buddy](https://github.com/Buddy99-40)
 
