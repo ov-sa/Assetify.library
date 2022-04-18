@@ -15,6 +15,9 @@
     <script src="utilities/shaders/tex_mapper.lua" type="client"/>
     <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
+    <script src="settings/shared.lua" type="shared"/>
+    <script src="settings/server.lua" type="server"/>
+    <script src="settings/client.lua" type="client"/>
     <script src="utilities/thread.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>
@@ -24,9 +27,6 @@
     <script src="utilities/dummy.lua" type="client"/>
     <script src="utilities/bone.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
-    <script src="settings/shared.lua" type="shared"/>
-    <script src="settings/server.lua" type="server"/>
-    <script src="settings/client.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
