@@ -65,6 +65,14 @@ function unloadAnim(element, ...)
     return manager:unloadAnim(element, ...)
 end
 
+function playSoundAsset(...)
+    return manager:playSound(...)
+end
+
+function playSoundAsset3D(...)
+    return manager:playSound3D(...)
+end
+
 function createAssetDummy(...)
     local cDummy = dummy:create(...)
     return (cDummy and cDummy.cDummy) or false

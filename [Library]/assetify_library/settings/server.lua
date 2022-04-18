@@ -18,6 +18,11 @@ availableAssetPacks = {
         autoLoad = true
     },
 
+    ["sound"] = {
+        assetType = "sound",
+        autoLoad = true
+    },
+
     ["scene"] = {
         autoLoad = true,
         assetType = "object",

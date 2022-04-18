@@ -50,7 +50,7 @@ local imports = {
 
 asset = {
     references = {
-        root = "@files/assets/",
+        root = ((downloadSettings.isAccessSafe and "@") or "").."files/assets/",
         manifest = "manifest",
         asset = "asset",
         scene = "scene"
@@ -91,14 +91,20 @@ if localPlayer then
         if not assetType or not assetName or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local loadState = false
         if assetType == "animation" then
-            if rwPaths.ifp then
+            if rwPaths.ifp and not rwCache.ifp[(rwPaths.ifp)] then
                 rwCache.ifp[(rwPaths.ifp)] = imports.engineLoadIFP((assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.ifp), {key = assetManifest.encryptKey})) or rwPaths.ifp, assetType.."."..assetName)
                 if rwCache.ifp[(rwPaths.ifp)] then
                     assetData.cAsset = self
                     self.rwPaths = rwPaths
-                    self.syncedData = {}
                     loadState = true
                 end
+            end
+        elseif assetType == "sound" then
+            if rwPaths.sound and not rwCache.sound[(rwPaths.sound)] then
+                rwCache.sound[(rwPaths.sound)] = (assetManifest.encryptKey and imports.decodeString("tea", imports.file.read(rwPaths.sound), {key = assetManifest.encryptKey})) or rwPaths.sound
+                assetData.cAsset = self
+                self.rwPaths = rwPaths
+                loadState = true
             end
         else
             local modelID, collisionID = false, false
@@ -170,11 +176,13 @@ if localPlayer then
     function asset:unload(rwCache, callback)
         if not self or (self == asset) then return false end
         if not rwCache then return false end
-        if self.syncedData.modelID then
-            imports.engineFreeModel(self.syncedData.modelID)
-        end
-        if self.syncedData.collisionID then
-            imports.engineFreeModel(self.syncedData.collisionID)
+        if self.syncedData then
+            if self.syncedData.modelID then
+                imports.engineFreeModel(self.syncedData.modelID)
+            end
+            if self.syncedData.collisionID then
+                imports.engineFreeModel(self.syncedData.collisionID)
+            end
         end
         if self.rwPaths then
             for i, j in imports.pairs(self.rwPaths) do
@@ -274,6 +282,7 @@ else
                         assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                         assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
                         assetManifestData.assetAnimations = (assetManifestData.assetAnimations and (imports.type(assetManifestData.assetAnimations) == "table") and assetManifestData.assetAnimations) or false
+                        assetManifestData.assetSounds = (assetManifestData.assetSounds and (imports.type(assetManifestData.assetSounds) == "table") and assetManifestData.assetSounds) or false
                         assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
@@ -289,11 +298,35 @@ else
                             assetManifestData.streamRange = false
                             assetManifestData.enableLODs = false
                             assetManifestData.assetClumps = false
+                            assetManifestData.assetSounds = false
                             assetManifestData.shaderMaps = false
                             asset:buildFile(assetPath..(asset.references.asset)..".ifp", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                             thread.pause()
+                        elseif assetType == "sound" then
+                            assetManifestData.streamRange = false
+                            assetManifestData.enableLODs = false
+                            assetManifestData.assetClumps = false
+                            assetManifestData.assetAnimations = false
+                            assetManifestData.shaderMaps = false
+                            if assetManifestData.assetSounds then
+                                local assetSounds = {}
+                                for i, j in imports.pairs(assetManifestData.assetSounds) do
+                                    if j and (imports.type(j) == "table") then
+                                        assetSounds[i] = {}
+                                        for k, v in imports.pairs(j) do
+                                            if v then
+                                                assetSounds[i][k] = v
+                                                asset:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                            end
+                                        end
+                                    end
+                                end
+                                assetManifestData.assetSounds = assetSounds
+                            end
+                            thread.pause()
                         else
                             assetManifestData.assetAnimations = false
+                            assetManifestData.assetSounds = false
                             if assetType == "scene" then
                                 assetManifestData.assetClumps = false
                                 assetManifestData.sceneDimension = imports.math.max(asset.ranges.dimension[1], imports.math.min(asset.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))

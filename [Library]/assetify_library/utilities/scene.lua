@@ -51,7 +51,7 @@ end
 
 function scene:load(cAsset, sceneManifest, sceneData)
     if not self or (self == scene) then return false end
-    if not cAsset or not sceneManifest or not sceneData then return false end
+    if not cAsset or not sceneManifest or not sceneData or not cAsset.syncedData then return false end
     local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
     self.cStreamerInstance = imports.createObject(cAsset.syncedData.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.enableLODs and cAsset.syncedData.collisionID and true) or false)
     imports.setElementDoubleSided(self.cStreamerInstance, true)
