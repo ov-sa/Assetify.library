@@ -20,6 +20,8 @@ local imports = {
     gettok = gettok,
     tonumber = tonumber,
     tostring = tostring,
+    isElement = isElement,
+    destroyElement = destroyElement,
     addEventHandler = addEventHandler,
     engineReplaceAnimation = engineReplaceAnimation,
     engineRestoreAnimation = engineRestoreAnimation,
@@ -41,6 +43,32 @@ manager = {}
 manager.__index = manager
 
 if localPlayer then
+    manager.buffer = {
+        instance = {},
+        scoped = {}
+    }
+
+    function manager:clearElementBuffer(element, isResource)
+        if not element then return false end
+        if isResource then
+            local resourceScope = manager.buffer.scoped[element]
+            if not resourceScope then return false end
+            manager.buffer.scoped[element] = nil
+            for i, j in imports.pairs(resourceScope) do
+                if i and imports.isElement(i) then
+                    imports.destroyElement(i)
+                end
+            end
+        else
+            if not imports.isElement(element) then return false end
+            local elementScope = manager.buffer.instance[element]
+            if not elementScope or not manager.buffer.scoped[elementScope] then return false end
+            manager.buffer.scoped[elementScope][element] = nil
+            manager.buffer.instance[element] = nil
+        end
+        return true
+    end
+
     function manager:getData(assetType, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not assetType or not assetName then return false end
@@ -308,10 +336,15 @@ if localPlayer then
         return false
     end
 
+    imports.addEventHandler("onClientResourceStop", root, function(stoppedResource)
+        manager:clearElementBuffer(stoppedResource, true)
+    end)
+
     imports.addEventHandler("onClientElementDestroy", root, function()
         shader:clearElementBuffer(source)
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
+        manager:clearElementBuffer(source)
     end)
 
     function manager:loadAnim(element, assetName)
@@ -342,20 +375,32 @@ if localPlayer then
         return true
     end
 
-    function manager:playSound(assetName, soundCategory, soundIndex, ...)
+    function manager:playSound(assetName, soundCategory, soundIndex, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         if not manager:isLoaded("sound", assetName) then return false end
         local assetReference = availableAssetPacks["sound"].rwDatas[assetName]
         if not assetReference.manifestData.assetSounds or not assetReference.unsyncedData.assetCache[soundCategory] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
-        return imports.playSound(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        local cSound = imports.playSound(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        if cSound and isScoped and sourceResource and (sourceResource ~= resource) then
+            manager.buffer.instance[cSound] = sourceResource
+            manager.buffer.scoped[sourceResource] = manager.buffer.scoped[sourceResource] or {}
+            manager.buffer.scoped[sourceResource][cSound] = true
+        end
+        return cSound
     end
 
-    function manager:playSound3D(assetName, soundCategory, soundIndex, ...)
+    function manager:playSound3D(assetName, soundCategory, soundIndex, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         if not manager:isLoaded("sound", assetName) then return false end
         local assetReference = availableAssetPacks["sound"].rwDatas[assetName]
         if not assetReference.manifestData.assetSounds or not assetReference.unsyncedData.assetCache[soundCategory] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
-        return imports.playSound3D(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        local cSound = imports.playSound3D(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        if cSound and isScoped and sourceResource and (sourceResource ~= resource) then
+            manager.buffer.instance[cSound] = sourceResource
+            manager.buffer.scoped[sourceResource] = manager.buffer.scoped[sourceResource] or {}
+            manager.buffer.scoped[sourceResource][cSound] = true
+        end
+        return cSound
     end
 else
     function manager:getData(assetType, assetName)
