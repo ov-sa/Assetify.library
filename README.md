@@ -10,7 +10,7 @@
 
 **"Tired of replacing objects?"** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones! 
 
-**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Scenes`, `Characters`, `Vehicles`, `Weapons` asset-packs & Custom Graphics!)
+**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Animations`, `Sounds`, `Scenes`, `Characters`, `Vehicles`, `Weapons`, `Objects` asset-packs & Custom Graphics!)
 
 ## ━ Features
 
@@ -25,19 +25,24 @@
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
 * Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
-* Built-In Asset-Pack Clumper (Supports only: `Character`, `Vehicle` asset-packs)
+* Built-In Asset-Pack Clumper (Supports only `character`, `vehicle`, `weapon`, `object` asset-packs)
+* Built-In Asset-Pack Dependency Broadcaster
 * Built-In Control & Bump Mapping
 * Built-In Asset-Pack Streamer
-* Built-In LOD Streamer (Supports only: `Scene` asset-pack)
+* Built-In LOD Streamer (Integrated w/ Assetify's Streamer)
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
+* Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
 * Built-In Assetify Mapper (`assetify_mapper`)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
+* Supports Sound Asset-Pack
+* Supports Animation Asset-Pack
 * Supports Scene Asset-Pack (Supports multiple instances!)
 * Supports Scene Dimension, Interior & Offsets (Useful for mass movement!)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
+* Supports Object Asset-Pack
 * Necessary Integration APIs
 
 ## ━ Contents
