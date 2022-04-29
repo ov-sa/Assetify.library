@@ -25,7 +25,7 @@
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
 * Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
-* Built-In Asset-Pack Clumper
+* Built-In Asset-Pack Clumper (Supports only `character`, `vehicle`, `weapon`, `object` asset-packs)
 * Built-In Asset-Pack Dependency Broadcaster
 * Built-In Control & Bump Mapping
 * Built-In Asset-Pack Streamer
@@ -35,11 +35,14 @@
 * Built-In Assetify Mapper (`assetify_mapper`)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
+* Supports Sound Asset-Pack
+* Supports Animation Asset-Pack
 * Supports Scene Asset-Pack (Supports multiple instances!)
 * Supports Scene Dimension, Interior & Offsets (Useful for mass movement!)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
+* Supports Object Asset-Pack
 * Necessary Integration APIs
 
 ## ━ Contents
