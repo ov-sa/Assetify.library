@@ -44,7 +44,8 @@ local imports = {
 syncer = {
     isLibraryLoaded = false,
     libraryName = imports.getResourceName(resource),
-    librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime()))
+    librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime())),
+    libraryBandwidth = 0
 }
 syncer.__index = syncer
 
@@ -80,16 +81,26 @@ if localPlayer then
         imports.triggerServerEvent("Assetify:onRequestElementModels", localPlayer)
     end)
 
+    imports.addEvent("Assetify:onRecieveBandwidth", true)
+    imports.addEventHandler("Assetify:onRecieveBandwidth", root, function(libraryBandwidth)
+        syncer.libraryBandwidth = libraryBandwidth
+    end)
+
     imports.addEvent("Assetify:onRecieveHash", true)
     imports.addEventHandler("Assetify:onRecieveHash", root, function(assetType, assetName, hashes)
         if not syncer.scheduledAssets[assetType] then syncer.scheduledAssets[assetType] = {} end
-        syncer.scheduledAssets[assetType][assetName] = true
+        syncer.scheduledAssets[assetType][assetName] = syncer.scheduledAssets[assetType][assetName] or {
+            assetSize = 0
+        }
         thread:create(function(cThread)
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local fileData = imports.file.read(i)
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
+                else
+                    syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[i]
+                    syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[i]
                 end
                 fileData = nil
                 thread.pause()
@@ -123,7 +134,11 @@ if localPlayer then
     end)
 
     imports.addEvent("Assetify:onRecieveContent", true)
-    imports.addEventHandler("Assetify:onRecieveContent", root, function(contentPath, ...)
+    imports.addEventHandler("Assetify:onRecieveContent", root, function(assetType, assetName, contentPath, ...)
+        if assetType and assetName then
+            syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+            syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+        end
         imports.file.write(contentPath, ...)
         imports.collectgarbage()
     end)
@@ -345,6 +360,7 @@ else
         if not assetDatas then
             thread:create(function(cThread)
                 local isLibraryVoid = true
+                imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
                 for i, j in imports.pairs(availableAssetPacks) do
                     for k, v in imports.pairs(j.assetPack) do
                         isLibraryVoid = false
@@ -352,6 +368,7 @@ else
                             syncer:syncData(player, i, k, nil, v)
                         else
                             for m, n in imports.pairs(v) do
+                                syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
                                 syncer:syncHash(player, i, m, n.unSynced.fileHash)
                                 thread.pause()
                             end
@@ -367,12 +384,14 @@ else
         else
             thread:create(function(cThread)
                 local assetReference = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
-                for i, j in imports.pairs(assetDatas.hashes) do
-                    syncer:syncContent(player, i, assetReference.unSynced.fileData[i])
+                for i, j in imports.pairs(assetReference.synced) do
+                    if i ~= "assetSize" then
+                        syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                    end
                     thread.pause()
                 end
-                for i, j in imports.pairs(assetReference.synced) do
-                    syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                for i, j in imports.pairs(assetDatas.hashes) do
+                    syncer:syncContent(player, assetDatas.type, assetDatas.name, i, assetReference.unSynced.fileData[i])
                     thread.pause()
                 end
                 syncer:syncState(player, assetDatas.type, assetDatas.name)

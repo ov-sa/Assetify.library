@@ -69,8 +69,8 @@ function onBundleLibrary()
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
                 end
 
-                assetify.createShader = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createShader", ...)
+                assetify.getProgress = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryProgress", ...)
                 end
 
                 assetify.getAssetID = function(...)
@@ -99,6 +99,10 @@ function onBundleLibrary()
 
                 assetify.unloadAnim = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "unloadAnim", ...)
+                end
+
+                assetify.createShader = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createShader", ...)
                 end
 
                 assetify.playSound = function(...)

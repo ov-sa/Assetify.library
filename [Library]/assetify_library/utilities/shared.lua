@@ -40,9 +40,10 @@ file = {
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
         if not cFile then return false end
-        local data = imports.fileRead(cFile, imports.fileGetSize(cFile))
+        local size = imports.fileGetSize(cFile)
+        local data = imports.fileRead(cFile, size)
         imports.fileClose(cFile)
-        return data
+        return data, size
     end,
 
     write = function(path, data)

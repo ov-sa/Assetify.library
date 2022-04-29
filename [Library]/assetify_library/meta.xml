@@ -44,7 +44,7 @@
     <export function="setBoneRefreshment" type="shared"/>
     <export function="clearBoneAttachment" type="shared"/>
     <export function="isLibraryLoaded" type="client"/>
-    <export function="createShader" type="client"/>
+    <export function="getLibraryProgress" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="isAssetLoaded" type="client"/>
     <export function="getAssetDep" type="client"/>
@@ -52,6 +52,7 @@
     <export function="unloadAsset" type="client"/>
     <export function="loadAnim" type="client"/>
     <export function="unloadAnim" type="client"/>
+    <export function="createShader" type="client"/>
     <export function="playSoundAsset" type="client"/>
     <export function="playSoundAsset3D" type="client"/>
     <export function="createAssetDummy" type="client"/>
