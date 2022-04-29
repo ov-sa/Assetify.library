@@ -29,7 +29,7 @@
 * Built-In Asset-Pack Dependency Broadcaster
 * Built-In Control & Bump Mapping
 * Built-In Asset-Pack Streamer
-* Built-In LOD Streamer (Supports only: `Scene` asset-pack)
+* Built-In LOD Streamer (Integrated w/ Assetify's Streamer)
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
 * Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
 * Built-In Assetify Mapper (`assetify_mapper`)
