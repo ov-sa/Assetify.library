@@ -10,7 +10,7 @@
 
 **"Tired of replacing objects?"** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones! 
 
-**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Scenes`, `Characters`, `Vehicles`, `Objects`, `Weapons`, `Animations`, `Sounds` asset-packs & Custom Graphics!)
+**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Animations`, `Sounds`, `Scenes`, `Characters`, `Vehicles`, `Weapons`, `Objects` asset-packs & Custom Graphics!)
 
 ## ━ Features
 
