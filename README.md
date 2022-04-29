@@ -30,6 +30,7 @@
 * Built-In Asset-Pack Streamer
 * Built-In LOD Streamer (Supports only: `Scene` asset-pack)
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
+* Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
 * Built-In Assetify Mapper (`assetify_mapper`)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
