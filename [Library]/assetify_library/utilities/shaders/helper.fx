@@ -98,33 +98,28 @@ int CUSTOMFLAGS
     string skipUnusedParameters = "yes";
 >;
 
-float MTAUnlerp(float from, float to, float pos)
-{
+float MTAUnlerp(float from, float to, float pos) {
     if (from == to)
         return 1.0;
     else
         return (pos - from) / (to - from);
 }
 
-float4 MTACalcScreenPosition(float3 InPosition)
-{
+float4 MTACalcScreenPosition(float3 InPosition) {
     float4 posWorld = mul(float4(InPosition,1), gWorld);
     float4 posWorldView = mul(posWorld, gView);
     return mul(posWorldView, gProjection);
 }
 
-float3 MTACalcWorldPosition(float3 InPosition)
-{
+float3 MTACalcWorldPosition(float3 InPosition) {
     return mul(float4(InPosition,1), gWorld).xyz;
 }
 
-float3 MTACalcWorldNormal(float3 InNormal)
-{
+float3 MTACalcWorldNormal(float3 InNormal) {
     return mul(InNormal, (float3x3)gWorld);
 }
 
-float4 MTACalcGTABuildingDiffuse(float4 InDiffuse)
-{
+float4 MTACalcGTABuildingDiffuse(float4 InDiffuse) {
     float4 OutDiffuse;
     if (!gLighting)
         OutDiffuse = InDiffuse;
@@ -139,8 +134,7 @@ float4 MTACalcGTABuildingDiffuse(float4 InDiffuse)
     return OutDiffuse;
 }
 
-float4 MTACalcGTAVehicleDiffuse(float3 WorldNormal, float4 InDiffuse)
-{
+float4 MTACalcGTAVehicleDiffuse(float3 WorldNormal, float4 InDiffuse) {
     float4 ambient  = gAmbientMaterialSource  == 0 ? gMaterialAmbient  : InDiffuse;
     float4 diffuse  = gDiffuseMaterialSource  == 0 ? gMaterialDiffuse  : InDiffuse;
     float4 emissive = gEmissiveMaterialSource == 0 ? gMaterialEmissive : InDiffuse;
@@ -152,8 +146,7 @@ float4 MTACalcGTAVehicleDiffuse(float3 WorldNormal, float4 InDiffuse)
     return OutDiffuse;
 }
 
-float4 MTACalcGTACompleteDiffuse(float3 WorldNormal, float4 InDiffuse)
-{
+float4 MTACalcGTACompleteDiffuse(float3 WorldNormal, float4 InDiffuse) {
     float4 ambient  = gAmbientMaterialSource  == 0 ? gMaterialAmbient  : InDiffuse;
     float4 diffuse  = gDiffuseMaterialSource  == 0 ? gMaterialDiffuse  : InDiffuse;
     float4 emissive = gEmissiveMaterialSource == 0 ? gMaterialEmissive : InDiffuse;
@@ -182,8 +175,7 @@ float4 MTACalcGTACompleteDiffuse(float3 WorldNormal, float4 InDiffuse)
     return OutDiffuse;
 }
 
-float4 MTACalcGTADynamicDiffuse(float3 WorldNormal)
-{
+float4 MTACalcGTADynamicDiffuse(float3 WorldNormal) {
     float DirectionFactor=0;
     float4 TotalDiffuse=0;
     if (gLight1Enable) {
@@ -206,18 +198,15 @@ float4 MTACalcGTADynamicDiffuse(float3 WorldNormal)
     return OutDiffuse;
 }
 
-float3 MTACalculateCameraDirection(float3 CamPos, float3 InWorldPos)
-{
+float3 MTACalculateCameraDirection(float3 CamPos, float3 InWorldPos) {
     return normalize(InWorldPos - CamPos);
 }
 
-float MTACalcCameraDistance(float3 CamPos, float3 InWorldPos)
-{
+float MTACalcCameraDistance(float3 CamPos, float3 InWorldPos) {
     return distance(InWorldPos, CamPos);
 }
 
-float MTACalculateSpecular(float3 CamDir, float3 LightDir, float3 SurfNormal, float SpecPower)
-{
+float MTACalculateSpecular(float3 CamDir, float3 LightDir, float3 SurfNormal, float SpecPower) {
     LightDir = normalize(LightDir);
     SurfNormal = normalize(SurfNormal);
     float3 halfAngle = normalize(-CamDir - LightDir);
@@ -225,8 +214,7 @@ float MTACalculateSpecular(float3 CamDir, float3 LightDir, float3 SurfNormal, fl
     return pow(saturate(r), SpecPower);
 }
 
-float3 MTAApplyFog(float3 texel, float linDistance)
-{
+float3 MTAApplyFog(float3 texel, float linDistance) {
     if (!gFogEnable)
         return texel;
  
@@ -235,8 +223,7 @@ float3 MTAApplyFog(float3 texel, float linDistance)
     return texel;
 }
 
-void MTAFixUpNormal(in out float3 OutNormal)
-{
+void MTAFixUpNormal(in out float3 OutNormal) {
     if (OutNormal.x == 0 && OutNormal.y == 0 && OutNormal.z == 0)
         OutNormal = float3(0,0,1);
 }

@@ -81,11 +81,36 @@ if localPlayer then
         return cAsset
     end
     
+    function asset:createDep(assetDeps, rwCache, encryptKey)
+        if not assetDeps or not rwCache then return false end
+        for i, j in imports.pairs(assetDeps) do
+            rwCache[i] = {}
+            for k, v in imports.pairs(j) do
+                if i == "texture" then
+                    rwCache[i][k] = shader:loadTex(v, encryptKey)
+                else
+                    rwCache[i][k] = (encryptKey and imports.decodeString("tea", imports.file.read(v), {key = encryptKey})) or imports.file.read(v)
+                end
+            end
+        end
+        return true
+    end
+
     function asset:destroy(...)
         if not self or (self == asset) then return false end
         return self:unload(...)
     end
-    
+
+    function asset:clearAssetBuffer(rwCache)
+        if not rwCache then return false end
+        for i, j in imports.pairs(rwCache) do
+            if j and imports.isElement(j) then
+                imports.destroyElement(j)
+            end
+        end
+        return true
+    end
+
     function asset:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
         if not assetType or not assetName or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
@@ -111,7 +136,7 @@ if localPlayer then
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
                 if modelID then
-                    if assetType == "scene" then
+                    if assetManifest.assetClumps or (assetType == "scene") then
                         collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
                     end
                     if not rwCache.dff[(rwPaths.dff)] and imports.file.exists(rwPaths.dff) then
@@ -284,6 +309,7 @@ else
                         assetManifestData.assetAnimations = (assetManifestData.assetAnimations and (imports.type(assetManifestData.assetAnimations) == "table") and assetManifestData.assetAnimations) or false
                         assetManifestData.assetSounds = (assetManifestData.assetSounds and (imports.type(assetManifestData.assetSounds) == "table") and assetManifestData.assetSounds) or false
                         assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
+                        assetManifestData.assetDeps = (assetManifestData.assetDeps and (imports.type(assetManifestData.assetDeps) == "table") and assetManifestData.assetDeps) or false
                         cAssetPack.rwDatas[assetReference] = {
                             synced = {
                                 manifestData = assetManifestData
@@ -317,6 +343,7 @@ else
                                             if v then
                                                 assetSounds[i][k] = v
                                                 asset:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                                thread.pause()
                                             end
                                         end
                                     end
@@ -360,7 +387,10 @@ else
                                 asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
                                 if assetManifestData.assetClumps then
                                     for i, j in imports.pairs(assetManifestData.assetClumps) do
-                                        asset:buildFile(assetPath.."clump/"..j..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".col", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                        thread.pause()
                                     end
                                 else
                                     asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
@@ -370,6 +400,22 @@ else
                             end
                             if assetManifestData.shaderMaps then
                                 asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                            end
+                            if assetManifestData.assetDeps then
+                                local assetDeps = {}
+                                for i, j in imports.pairs(assetManifestData.assetDeps) do
+                                    if j and (imports.type(j) == "table") then
+                                        assetDeps[i] = {}
+                                        for k, v in imports.pairs(j) do
+                                            j[k] = assetPath.."dep/"..j[k]
+                                            assetDeps[i][k] = j[k]
+                                            asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetReference].unSynced, assetManifestData.encryptKey)
+                                            thread.pause()
+                                        end
+                                    end
+                                    thread.pause()
+                                end
+                                assetManifestData.assetDeps = assetDeps
                             end
                         end
                     end

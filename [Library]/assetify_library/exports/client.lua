@@ -39,6 +39,10 @@ function isAssetLoaded(...)
     return manager:isLoaded(...)
 end
 
+function getAssetDep(...)
+    return manager:getDep(...)
+end
+
 function loadAsset(assetType, assetName, ...)
     local state = manager:load(assetType, assetName, ...)
     if state then

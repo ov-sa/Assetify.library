@@ -13,7 +13,6 @@
 -----------------
 
 local imports = {
-    resourceName = getResourceName(getThisResource()),
     table = table,
     file = file
 }
@@ -36,7 +35,7 @@ function fetchImports(recieveData)
         return bundlerData
     else
         return [[
-        local importList = call(getResourceFromName("]]..imports.resourceName..[["), "fetchImports", true)
+        local importList = call(getResourceFromName("]]..syncer.libraryName..[["), "fetchImports", true)
         for i = 1, #importList, 1 do
             loadstring(importList[i])()
         end
@@ -59,7 +58,7 @@ function onBundleLibrary()
         bundler = imports.file.read("utilities/shared.lua")..[[
             assetify = {
                 imports = {
-                    resourceName = "]]..imports.resourceName..[[",
+                    resourceName = "]]..syncer.libraryName..[[",
                     type = type,
                     call = call,
                     getResourceFromName = getResourceFromName
@@ -80,6 +79,10 @@ function onBundleLibrary()
 
                 assetify.isAssetLoaded = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isAssetLoaded", ...)
+                end
+
+                assetify.getAssetDep = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetDep", ...)
                 end
 
                 assetify.loadAsset = function(...)

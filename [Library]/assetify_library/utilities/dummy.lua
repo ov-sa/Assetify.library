@@ -21,7 +21,8 @@ local imports = {
     setElementAlpha = setElementAlpha,
     setElementDoubleSided = setElementDoubleSided,
     setElementDimension = setElementDimension,
-    setElementInterior = setElementInterior
+    setElementInterior = setElementInterior,
+    triggerEvent = triggerEvent
 }
 
 
@@ -56,22 +57,26 @@ function dummy:clearElementBuffer(element)
     return true
 end
 
-function dummy:load(assetType, assetName, dummyData)
+function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData)
     if not self or (self == dummy) then return false end
-    if not assetType or not assetName or not dummyData or not dummyData.position or not dummyData.rotation or not availableAssetPacks[assetType] or not availableAssetPacks[assetType].rwDatas[assetName] then return false end
-    local cAsset = availableAssetPacks[assetType].rwDatas[assetName].unsyncedData.assetCache.cAsset
-    if not cAsset or not cAsset.syncedData then return false end
+    if not dummyData then return false end
+    local cAsset, cData = manager:getData(assetType, assetName)
+    cData = (cAsset and cData and ((cAsset.manifestData.assetClumps and cAsset.unsyncedData.assetCache[assetClump].cAsset.syncedData) or cData)) or false
+    if not cAsset or not cData then return false end
+    dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
     dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
     dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
     self.assetType, self.assetName = assetType, assetName
-    self.cModelInstance = imports.createObject(cAsset.syncedData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+    self.cModelInstance = imports.createObject(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+    self.syncRate = imports.tonumber(dummyData.syncRate)
     imports.setElementDoubleSided(self.cModelInstance, true)
     imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
     imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
-    if cAsset.syncedData.collisionID then
-        self.cCollisionInstance = imports.createObject(cAsset.syncedData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+    imports.triggerEvent("Assetify:onRecieveElementModel", localPlayer, self.cModelInstance, assetType, assetName, assetClump, clumpMaps)
+    if cData.collisionID then
+        self.cCollisionInstance = imports.createObject(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         imports.setElementAlpha(self.cCollisionInstance, 0)
-        self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance})
+        self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
     end
     self.cDummy = self.cCollisionInstance or self.cModelInstance
     dummy.buffer[(self.cDummy)] = self

@@ -47,6 +47,7 @@
     <export function="createShader" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="isAssetLoaded" type="client"/>
+    <export function="getAssetDep" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
     <export function="loadAnim" type="client"/>

@@ -15,10 +15,13 @@
 local imports = {
     pairs = pairs,
     isElement = isElement,
+    destroyElement = destroyElement,
     addEventHandler = addEventHandler,
+    removeEventHandler = removeEventHandler,
     attachElements = attachElements,
     setmetatable = setmetatable,
     getTickCount = getTickCount,
+    isTimer = isTimer,
     setTimer = setTimer,
     isElementOnScreen = isElementOnScreen,
     getElementDimension = getElementDimension,
@@ -34,9 +37,21 @@ local imports = {
 
 streamer = {
     buffer = {},
-    cache = {}
+    cache = {},
+    allocator = {
+        validStreams = {"bone"}
+    }
 }
 streamer.__index = streamer
+
+local onEntityStream, onBoneStream, onBoneUpdate = nil, nil, nil
+streamer.allocator.__validStreams = {}
+for i = 1, #streamer.allocator.validStreams, 1 do
+    local j = streamer.allocator.validStreams[i]
+    streamer.allocator.__validStreams[j] = true
+end
+streamer.allocator.validStreams = streamer.allocator.__validStreams
+streamer.allocator.__validStreams = nil
 
 function streamer:create(...)
     local cStreamer = imports.setmetatable({}, {__index = self})
@@ -52,13 +67,16 @@ function streamer:destroy(...)
     return self:unload(...)
 end
 
-function streamer:load(streamerInstance, streamType, occlusionInstances)
+function streamer:load(streamerInstance, streamType, occlusionInstances, syncRate)
     if not self or (self == streamer) then return false end
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
+    local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
     self.streamer = streamerInstance
     self.streamType = streamType
     self.occlusions = occlusionInstances
-    local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
+    self.dimension = streamDimension
+    self.interior = streamInterior
+    self.syncRate = syncRate or streamerSettings.syncRate
     if streamerInstance ~= occlusionInstances[1] then
         if streamType ~= "bone" then
             imports.attachElements(streamerInstance, occlusionInstances[1])
@@ -72,6 +90,7 @@ function streamer:load(streamerInstance, streamType, occlusionInstances)
     streamer.buffer[streamDimension][streamInterior][streamType][self] = {
         isStreamed = false
     }
+    self:allocate()
     return true
 end
 
@@ -80,6 +99,7 @@ function streamer:unload()
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.buffer[streamDimension][streamInterior][streamType][self] = nil
+    self:deallocate()
     self = nil
     return true
 end
@@ -105,7 +125,59 @@ function streamer:update(clientDimension, clientInterior)
     return true
 end
 
-local onEntityStream = function(streamBuffer)
+function streamer:allocate()
+    if not self or (self == streamer) then return false end
+    if not streamer.allocator.validStreams[(self.streamType)] then return false end
+    streamer.allocator[(self.syncRate)] = streamer.allocator[(self.syncRate)] or {}
+    streamer.allocator[(self.syncRate)][(self.streamType)] = streamer.allocator[(self.syncRate)][(self.streamType)] or {}
+    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or {}
+    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] or {}
+    local streamBuffer = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]
+    if self.streamType == "bone" then
+        if self.syncRate <= 0 then
+            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = true
+                imports.addEventHandler("onClientPedsProcessed", root, onBoneUpdate)
+            end
+        else
+            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer or not imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
+                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = imports.setTimer(onBoneUpdate, self.syncRate, 0, streamer.allocator[(self.syncRate)][(self.streamType)])
+            end
+        end
+        streamBuffer[self] = streamer.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
+    end
+    return true
+end
+
+function streamer:deallocate()
+    if not self or (self == streamer) then return false end
+    if not streamer.allocator.validStreams[(self.streamType)] then return false end
+    if not streamer.allocator[(self.syncRate)] or not streamer.allocator[(self.syncRate)][(self.streamType)] or not streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or not streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] then return false end
+    local isAllocatorVoid = true
+    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)][self] = nil
+    for i, j in imports.pairs(streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]) do
+        isAllocatorVoid = false
+        break
+    end
+    if isAllocatorVoid then
+        if self.streamType == "bone" then
+            if self.syncRate <= 0 then
+                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                    imports.removeEventHandler("onClientPedsProcessed", root, onBoneUpdate)
+                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
+                end
+            else
+                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer and imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
+                    imports.destroyElement(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer)
+                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
+                end
+            end
+        end
+    end
+    return true
+end
+
+onEntityStream = function(streamBuffer)
     if not streamBuffer then return false end
     for i, j in imports.pairs(streamBuffer) do
         if j then
@@ -123,7 +195,7 @@ local onEntityStream = function(streamBuffer)
     return true
 end
 
-local onBoneStream = function(streamBuffer)
+onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
     for i, j in imports.pairs(streamBuffer) do
         if j and j.isStreamed then
@@ -132,6 +204,14 @@ local onBoneStream = function(streamBuffer)
     end
     bone.cache.streamTick = imports.getTickCount()
     return true
+end
+
+onBoneUpdate = function(streamBuffer)
+    streamBuffer = streamBuffer or (streamer.allocator[0] and streamer.allocator[0]["bone"]) or false
+    local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
+    if streamBuffer and streamBuffer[clientDimension] and streamBuffer[clientDimension][clientInterior] then
+        onBoneStream(streamBuffer[clientDimension][clientInterior])
+    end
 end
 
 imports.addEventHandler("onAssetifyLoad", root, function()
@@ -149,15 +229,4 @@ imports.addEventHandler("onAssetifyLoad", root, function()
             end
         end
     end, streamerSettings.syncRate, 0)
-    local onBoneUpdate = function()
-        local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
-        if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
-            onBoneStream(streamer.buffer[clientDimension][clientInterior]["bone"])
-        end
-    end
-    if streamerSettings.boneSyncRate <= 0 then
-        imports.addEventHandler("onClientPedsProcessed", root, onBoneUpdate)
-    else
-        imports.setTimer(onBoneUpdate, streamerSettings.boneSyncRate, 0)
-    end
 end)

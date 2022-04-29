@@ -69,7 +69,7 @@ if localPlayer then
         return true
     end
 
-    function manager:getData(assetType, assetName)
+    function manager:getData(assetType, assetName, isInternal)
         if not syncer.isLibraryLoaded then return false end
         if not assetType or not assetName then return false end
         if availableAssetPacks[assetType] then
@@ -77,12 +77,12 @@ if localPlayer then
             if assetReference then
                 local isExternalResource = sourceResource and (sourceResource ~= resource)
                 local unsyncedData = assetReference.unsyncedData
-                if isExternalResource then
+                if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
                     assetReference = imports.table.clone(assetReference, true)
                     assetReference.manifestData.encryptKey = nil
                     assetReference.unsyncedData = nil
                 end
-                if (assetType == "animation") or (assetType == "sound") or (assetType == "scene") then
+                if assetReference.manifestData.assetClumps or (assetType == "animation") or (assetType == "sound") or (assetType == "scene") then
                     return assetReference, (unsyncedData and true) or false
                 else
                     return assetReference, (unsyncedData and unsyncedData.assetCache.cAsset and unsyncedData.assetCache.cAsset.syncedData) or false
@@ -94,243 +94,238 @@ if localPlayer then
 
     function manager:getID(assetType, assetName, assetClump)
         if (assetType == "animation") or (assetType == "sound") then return false end
-        if not manager:isLoaded(assetType, assetName) then return false end
-        local packReference = availableAssetPacks[assetType]
-        local assetReference = packReference.rwDatas[assetName]
-        if imports.type(assetReference.unsyncedData) ~= "table" then return false end
-        if assetReference.manifestData.assetClumps then
-            return (assetClump and assetReference.manifestData.assetClumps[assetClump] and assetReference.unsyncedData.assetCache[assetClump] and assetReference.unsyncedData.assetCache[assetClump].cAsset and assetReference.unsyncedData.assetCache[assetClump].cAsset.syncedData and assetReference.unsyncedData.assetCache[assetClump].cAsset.syncedData.modelID) or false
+        local cAsset, isLoaded = manager:getData(assetType, assetName)
+        if not cAsset or not isLoaded or imports.type(cAsset.unsyncedData) ~= "table" then return false end
+        if cAsset.manifestData.assetClumps then
+            return (assetClump and cAsset.manifestData.assetClumps[assetClump] and cAsset.unsyncedData.assetCache[assetClump] and cAsset.unsyncedData.assetCache[assetClump].cAsset and cAsset.unsyncedData.assetCache[assetClump].cAsset.syncedData and cAsset.unsyncedData.assetCache[assetClump].cAsset.syncedData.modelID) or false
         else
-            return (assetReference.unsyncedData.assetCache.cAsset and assetReference.unsyncedData.assetCache.cAsset.syncedData and assetReference.unsyncedData.assetCache.cAsset.syncedData.modelID) or false
+            return (cAsset.unsyncedData.assetCache.cAsset and cAsset.unsyncedData.assetCache.cAsset.syncedData and cAsset.unsyncedData.assetCache.cAsset.syncedData.modelID) or false
         end
     end
 
     function manager:isLoaded(assetType, assetName)
-        if not syncer.isLibraryLoaded then return false end
-        if not assetType or not assetName then return false end
-        local packReference = availableAssetPacks[assetType]
-        if packReference and packReference.rwDatas then
-            local assetReference = packReference.rwDatas[assetName]
-            if assetReference and assetReference.unsyncedData then
+        local cAsset, isLoaded = manager:getData(assetType, assetName)
+        return (cAsset and isLoaded and true) or false
+    end
+
+    function manager:getDep(assetType, assetName, depType, depIndex)
+        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
+        if not cAsset or not isLoaded then return false end
+        return (cAsset.manifestData.assetDeps and cAsset.unsyncedData.rwCache.dep[depType] and cAsset.unsyncedData.rwCache.dep[depType][depIndex]) or false
+    end
+
+    function manager:load(assetType, assetName)
+        local cAsset, isLoaded = manager:getData(assetType, assetName)
+        if not cAsset or isLoaded then return false end
+        local cAssetPack = availableAssetPacks[assetType]
+        local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
+        cAsset.unsyncedData = {
+            assetCache = {},
+            rwCache = {
+                ifp = {},
+                sound = {},
+                txd = {},
+                dff = {},
+                col = {},
+                map = {},
+                dep = {}
+            }
+        }
+        shader:createTex(cAsset.manifestData.shaderMaps, cAsset.unsyncedData.rwCache.map, cAsset.manifestData.encryptKey)
+        asset:createDep(cAsset.manifestData.assetDeps, cAsset.unsyncedData.rwCache.dep, cAsset.manifestData.encryptKey, true)
+        if cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.control then
+            for i, j in imports.pairs(cAsset.manifestData.shaderMaps.control) do
+                local shaderTextures, shaderInputs = {}, {}
+                for k = 1, #j, 1 do
+                    local v = j[k]
+                    if v.control then
+                        shaderTextures[("controlTex_"..k)] = v.control
+                    end
+                    if v.bump then
+                        shaderTextures[("controlTex_"..k.."_bump")] = v.bump
+                    end
+                    for x = 1, #shader.defaultData.shaderChannels, 1 do
+                        local y = shader.defaultData.shaderChannels[x]
+                        if v[(y.index)] then
+                            shaderTextures[("controlTex_"..k.."_"..(y.index))] = v[(y.index)].map
+                            shaderInputs[("controlScale_"..k.."_"..(y.index))] = v[(y.index)].scale
+                            if v[(y.index)].bump then
+                                shaderTextures[("controlTex_"..k.."_"..(y.index).."_bump")] = v[(y.index)].bump
+                            end
+                        end
+                    end
+                end
+                shader:create(nil, "control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unsyncedData.rwCache.map, j, cAsset.manifestData.encryptKey)
+            end
+        end
+        if assetType == "animation" then
+            if asset:create(assetType, assetName, cAssetPack, cAsset.unsyncedData.rwCache, cAsset.manifestData, cAsset.unsyncedData.assetCache, {
+                ifp = assetPath..(asset.references.asset)..".ifp",
+            }) then
+                return true
+            end
+        elseif assetType == "sound" then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(cAsset.manifestData.assetSounds) do
+                    cAsset.unsyncedData.assetCache[i] = {}
+                    for k, v in imports.pairs(j) do
+                        cAsset.unsyncedData.assetCache[i][k] = {}
+                        asset:create(assetType, assetName, cAssetPack, cAsset.unsyncedData.rwCache, cAsset.manifestData, cAsset.unsyncedData.assetCache[i][k], {
+                            sound = assetPath.."sound/"..v,
+                        })
+                        thread.pause()
+                    end
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        elseif assetType == "scene" then
+            thread:create(function(cThread)
+                local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
+                sceneManifestData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneManifestData, {key = cAsset.manifestData.encryptKey})) or sceneManifestData
+                if sceneManifestData then
+                    local unparsedDatas = imports.split(sceneManifestData, "\n")
+                    for i = 1, #unparsedDatas, 1 do
+                        cAsset.unsyncedData.assetCache[i] = {}
+                        local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
+                        local sceneData = {
+                            position = {
+                                x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
+                                y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
+                                z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                            },
+                            rotation = {}
+                        }
+                        sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
+                        if not cAsset.manifestData.sceneMapped then
+                            asset:create(assetType, assetName, cAssetPack, cAsset.unsyncedData.rwCache, cAsset.manifestData, cAsset.unsyncedData.assetCache[i], {
+                                txd = assetPath..(asset.references.asset)..".txd",
+                                dff = assetPath.."dff/"..childName..".dff",
+                                col = assetPath.."col/"..childName..".col"
+                            }, function(state)
+                                if state then
+                                    scene:create(cAsset.unsyncedData.assetCache[i].cAsset, cAsset.manifestData, sceneData)
+                                end
+                            end)
+                        else
+                            sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.x) or 0), sceneData.position.y + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.y) or 0), sceneData.position.z + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.z) or 0)
+                            sceneData.dimension = cAsset.manifestData.sceneDimension
+                            sceneData.interior = cAsset.manifestData.sceneInterior
+                            cAsset.unsyncedData.assetCache[i].cDummy = dummy:create("object", childName, sceneData)
+                        end
+                        thread.pause()
+                    end
+                end
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        elseif cAsset.manifestData.assetClumps then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(cAsset.manifestData.assetClumps) do
+                    cAsset.unsyncedData.assetCache[i] = {}
+                    local clumpTXD, clumpDFF, clumpCOL = assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", assetPath.."clump/"..j.."/"..(asset.references.asset)..".col"
+                    clumpTXD = (imports.file.exists(clumpTXD) and clumpTXD) or assetPath..(asset.references.asset)..".txd"
+                    clumpCOL = (imports.file.exists(clumpCOL) and clumpCOL) or assetPath..(asset.references.asset)..".col"
+                    asset:create(assetType, assetName, cAssetPack, cAsset.unsyncedData.rwCache, cAsset.manifestData, cAsset.unsyncedData.assetCache[i], {
+                        txd = clumpTXD,
+                        dff = clumpDFF,
+                        col = clumpCOL
+                    })
+                    thread.pause()
+                end
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        else
+            if asset:create(assetType, assetName, cAssetPack, cAsset.unsyncedData.rwCache, cAsset.manifestData, cAsset.unsyncedData.assetCache, {
+                txd = assetPath..(asset.references.asset)..".txd",
+                dff = assetPath..(asset.references.asset)..".dff",
+                col = assetPath..(asset.references.asset)..".col"
+            }) then
                 return true
             end
         end
         return false
     end
 
-    function manager:load(assetType, assetName)
-        if not syncer.isLibraryLoaded then return false end
-        if not assetType or not assetName then return false end
-        local packReference = availableAssetPacks[assetType]
-        if packReference and packReference.rwDatas then
-            local assetReference = packReference.rwDatas[assetName]
-            if assetReference and not assetReference.unsyncedData then
-                local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
-                assetReference.unsyncedData = {
-                    assetCache = {},
-                    rwCache = {
-                        ifp = {},
-                        sound = {},
-                        txd = {},
-                        dff = {},
-                        col = {},
-                        map = {}
-                    }
-                }
-                shader:createTex(assetReference.manifestData.shaderMaps, assetReference.unsyncedData.rwCache.map, assetReference.manifestData.encryptKey)
-                if assetReference.manifestData.shaderMaps and assetReference.manifestData.shaderMaps.control then
-                    for i, j in imports.pairs(assetReference.manifestData.shaderMaps.control) do
-                        local shaderTextures, shaderInputs = {}, {}
-                        for k = 1, #j, 1 do
-                            local v = j[k]
-                            if v.control then
-                                shaderTextures[("controlTex_"..k)] = v.control
-                            end
-                            if v.bump then
-                                shaderTextures[("controlTex_"..k.."_bump")] = v.bump
-                            end
-                            for x = 1, #shader.defaultData.shaderChannels, 1 do
-                                local y = shader.defaultData.shaderChannels[x]
-                                if v[(y.index)] then
-                                    shaderTextures[("controlTex_"..k.."_"..(y.index))] = v[(y.index)].map
-                                    shaderInputs[("controlScale_"..k.."_"..(y.index))] = v[(y.index)].scale
-                                    if v[(y.index)].bump then
-                                        shaderTextures[("controlTex_"..k.."_"..(y.index).."_bump")] = v[(y.index)].bump
-                                    end
-                                end
-                            end
-                        end
-                        shader:create(nil, "control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, assetReference.unsyncedData.rwCache.map, j, assetReference.manifestData.encryptKey)
-                    end
-                end
-                if assetType == "animation" then
-                    if asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
-                        ifp = assetPath..(asset.references.asset)..".ifp",
-                    }) then
-                        return true
-                    end
-                elseif assetType == "sound" then
-                    thread:create(function(cThread)
-                        for i, j in imports.pairs(assetReference.manifestData.assetSounds) do
-                            assetReference.unsyncedData.assetCache[i] = {}
-                            for k, v in imports.pairs(j) do
-                                assetReference.unsyncedData.assetCache[i][k] = {}
-                                asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i][k], {
-                                    sound = assetPath.."sound/"..v,
-                                })
-                                thread.pause()
-                            end
-                            thread.pause()
-                        end
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                    return true
-                elseif assetType == "scene" then
-                    thread:create(function(cThread)
-                        local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
-                        sceneManifestData = (assetReference.manifestData.encryptKey and imports.decodeString("tea", sceneManifestData, {key = assetReference.manifestData.encryptKey})) or sceneManifestData
-                        if sceneManifestData then
-                            local unparsedDatas = imports.split(sceneManifestData, "\n")
-                            for i = 1, #unparsedDatas, 1 do
-                                assetReference.unsyncedData.assetCache[i] = {}
-                                local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
-                                local sceneData = {
-                                    position = {
-                                        x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
-                                        y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
-                                        z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
-                                    },
-                                    rotation = {}
-                                }
-                                sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
-                                if not assetReference.manifestData.sceneMapped then
-                                    asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
-                                        txd = assetPath..(asset.references.asset)..".txd",
-                                        dff = assetPath.."dff/"..childName..".dff",
-                                        col = assetPath.."col/"..childName..".col"
-                                    }, function(state)
-                                        if state then
-                                            scene:create(assetReference.unsyncedData.assetCache[i].cAsset, assetReference.manifestData, sceneData)
-                                        end
-                                    end)
-                                else
-                                    sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.x) or 0), sceneData.position.y + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.y) or 0), sceneData.position.z + ((assetReference.manifestData.sceneOffset and assetReference.manifestData.sceneOffset.z) or 0)
-                                    sceneData.dimension = assetReference.manifestData.sceneDimension
-                                    sceneData.interior = assetReference.manifestData.sceneInterior
-                                    assetReference.unsyncedData.assetCache[i].cDummy = dummy:create("object", childName, sceneData)
-                                end
-                                thread.pause()
-                            end
-                        end
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                    return true
-                elseif assetReference.manifestData.assetClumps then
-                    thread:create(function(cThread)
-                        for i, j in imports.pairs(assetReference.manifestData.assetClumps) do
-                            assetReference.unsyncedData.assetCache[i] = {}
-                            asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache[i], {
-                                txd = assetPath..(asset.references.asset)..".txd",
-                                dff = assetPath.."clump/"..j..".dff",
-                                col = assetPath..(asset.references.asset)..".col"
-                            })
-                            thread.pause()
-                        end
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                    return true
-                else
-                    if asset:create(assetType, assetName, packReference, assetReference.unsyncedData.rwCache, assetReference.manifestData, assetReference.unsyncedData.assetCache, {
-                        txd = assetPath..(asset.references.asset)..".txd",
-                        dff = assetPath..(asset.references.asset)..".dff",
-                        col = assetPath..(asset.references.asset)..".col"
-                    }) then
-                        return true
-                    end
-                end
-            end
-        end
-        return false
-    end
-
     function manager:unload(assetType, assetName)
-        if not syncer.isLibraryLoaded then return false end
-        if not assetType or not assetName then return false end
-        local packReference = availableAssetPacks[assetType]
-        if packReference and packReference.rwDatas then
-            local assetReference = packReference.rwDatas[assetName]
-            if assetReference and assetReference.unsyncedData then
-                if assetType == "sound" then
-                    thread:create(function(cThread)
-                        for i, j in imports.pairs(assetReference.unsyncedData.assetCache) do
-                            for k, v in imports.pairs(j) do
-                                if v.cAsset then
-                                    v.cAsset:destroy(assetReference.unsyncedData.rwCache)
-                                end
-                                thread.pause()
-                            end
-                            thread.pause()
+        local cAsset, isLoaded = manager:getData(assetType, assetName)
+        if not cAsset or not isLoaded then return false end
+        if assetType == "sound" then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(cAsset.unsyncedData.assetCache) do
+                    for k, v in imports.pairs(j) do
+                        if v.cAsset then
+                            v.cAsset:destroy(cAsset.unsyncedData.rwCache)
                         end
-                        shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
-                        assetReference.unsyncedData = nil
-                        imports.collectgarbage()
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                elseif assetType == "scene" then
-                    thread:create(function(cThread)
-                        for i, j in imports.pairs(assetReference.unsyncedData.assetCache) do
-                            if j.cAsset then
-                                if j.cAsset.cScene then
-                                    j.cAsset.cScene:destroy()
-                                end
-                                j.cAsset:destroy(assetReference.unsyncedData.rwCache)
-                            end
-                            if j.cDummy then
-                                j.cDummy:destroy()
-                            end
-                            thread.pause()
-                        end
-                        shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
-                        assetReference.unsyncedData = nil
-                        imports.collectgarbage()
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                    return true
-                elseif assetReference.manifestData.assetClumps then
-                    thread:create(function(cThread)
-                        for i, j in imports.pairs(assetReference.unsyncedData.assetCache) do
-                            if j.cAsset then
-                                j.cAsset:destroy(assetReference.unsyncedData.rwCache)
-                            end
-                            thread.pause()
-                        end
-                        shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
-                        assetReference.unsyncedData = nil
-                        imports.collectgarbage()
-                    end):resume({
-                        executions = downloadSettings.buildRate,
-                        frames = 1
-                    })
-                    return true
-                else
-                    if assetReference.cAsset then
-                        assetReference.cAsset:destroy(assetReference.unsyncedData.rwCache)
-                        shader:clearAssetBuffer(assetReference.unsyncedData.rwCache.map)
-                        assetReference.unsyncedData = nil
-                        imports.collectgarbage()
-                        return true
+                        thread.pause()
                     end
+                    thread.pause()
                 end
+                shader:clearAssetBuffer(cAsset.unsyncedData.rwCache.map)
+                asset:clearAssetBuffer(cAsset.unsyncedData.rwCache.dep)
+                cAsset.unsyncedData = nil
+                imports.collectgarbage()
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        elseif assetType == "scene" then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(cAsset.unsyncedData.assetCache) do
+                    if j.cAsset then
+                        if j.cAsset.cScene then
+                            j.cAsset.cScene:destroy()
+                        end
+                        j.cAsset:destroy(cAsset.unsyncedData.rwCache)
+                    end
+                    if j.cDummy then
+                        j.cDummy:destroy()
+                    end
+                    thread.pause()
+                end
+                shader:clearAssetBuffer(cAsset.unsyncedData.rwCache.map)
+                asset:clearAssetBuffer(cAsset.unsyncedData.rwCache.dep)
+                cAsset.unsyncedData = nil
+                imports.collectgarbage()
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        elseif cAsset.manifestData.assetClumps then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(cAsset.unsyncedData.assetCache) do
+                    if j.cAsset then
+                        j.cAsset:destroy(cAsset.unsyncedData.rwCache)
+                    end
+                    thread.pause()
+                end
+                shader:clearAssetBuffer(cAsset.unsyncedData.rwCache.map)
+                asset:clearAssetBuffer(cAsset.unsyncedData.rwCache.dep)
+                cAsset.unsyncedData = nil
+                imports.collectgarbage()
+            end):resume({
+                executions = downloadSettings.buildRate,
+                frames = 1
+            })
+            return true
+        else
+            if cAsset.cAsset then
+                cAsset.cAsset:destroy(cAsset.unsyncedData.rwCache)
+                
+                shader:clearAssetBuffer(cAsset.unsyncedData.rwCache.map)
+                cAsset.unsyncedData = nil
+                imports.collectgarbage()
+                return true
             end
         end
         return false
@@ -376,11 +371,10 @@ if localPlayer then
     end
 
     function manager:playSound(assetName, soundCategory, soundIndex, isScoped, ...)
-        if not syncer.isLibraryLoaded then return false end
-        if not manager:isLoaded("sound", assetName) then return false end
-        local assetReference = availableAssetPacks["sound"].rwDatas[assetName]
-        if not assetReference.manifestData.assetSounds or not assetReference.unsyncedData.assetCache[soundCategory] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
-        local cSound = imports.playSound(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        local cAsset, isLoaded = manager:getData("sound", assetName)
+        if not cAsset or not isLoaded then return false end
+        if not cAsset.manifestData.assetSounds or not cAsset.unsyncedData.assetCache[soundCategory] or not cAsset.unsyncedData.assetCache[soundCategory][soundIndex] or not cAsset.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
+        local cSound = imports.playSound(cAsset.unsyncedData.rwCache.sound[(cAsset.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
         if cSound and isScoped and sourceResource and (sourceResource ~= resource) then
             manager.buffer.instance[cSound] = sourceResource
             manager.buffer.scoped[sourceResource] = manager.buffer.scoped[sourceResource] or {}
@@ -390,11 +384,10 @@ if localPlayer then
     end
 
     function manager:playSound3D(assetName, soundCategory, soundIndex, isScoped, ...)
-        if not syncer.isLibraryLoaded then return false end
-        if not manager:isLoaded("sound", assetName) then return false end
-        local assetReference = availableAssetPacks["sound"].rwDatas[assetName]
-        if not assetReference.manifestData.assetSounds or not assetReference.unsyncedData.assetCache[soundCategory] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex] or not assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
-        local cSound = imports.playSound3D(assetReference.unsyncedData.rwCache.sound[(assetReference.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
+        local cAsset, isLoaded = manager:getData("sound", assetName)
+        if not cAsset or not isLoaded then return false end
+        if not cAsset.manifestData.assetSounds or not cAsset.unsyncedData.assetCache[soundCategory] or not cAsset.unsyncedData.assetCache[soundCategory][soundIndex] or not cAsset.unsyncedData.assetCache[soundCategory][soundIndex].cAsset then return false end
+        local cSound = imports.playSound3D(cAsset.unsyncedData.rwCache.sound[(cAsset.unsyncedData.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
         if cSound and isScoped and sourceResource and (sourceResource ~= resource) then
             manager.buffer.instance[cSound] = sourceResource
             manager.buffer.scoped[sourceResource] = manager.buffer.scoped[sourceResource] or {}
