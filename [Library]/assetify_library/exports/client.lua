@@ -40,7 +40,7 @@ function getLibraryProgress(assetType, assetName)
     end
     if cDownloaded and cBandwidth then
         cDownloaded = imports.math.min(cDownloaded, cBandwidth)
-        return cDownloaded, cBandwidth, (cDownloaded/cBandwidth)*100
+        return cDownloaded, cBandwidth, (cDownloaded/imports.math.max(1, cBandwidth))*100
     end
     return false
 end
