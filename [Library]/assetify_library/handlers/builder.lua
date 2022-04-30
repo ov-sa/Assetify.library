@@ -34,6 +34,7 @@ end
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
     thread:create(function(cThread)
+        syncer.libraryModules = {}
         for i, j in imports.pairs(availableAssetPacks) do
             asset:buildPack(i, j, function(state)
                 imports.setTimer(function()

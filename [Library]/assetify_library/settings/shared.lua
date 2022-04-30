@@ -21,6 +21,7 @@ downloadSettings = {
 
 streamerSettings = {
     syncRate = 250,
+    cameraSyncRate = 75,
     boneSyncRate = 25,
     unsyncDimension = 65535
 }

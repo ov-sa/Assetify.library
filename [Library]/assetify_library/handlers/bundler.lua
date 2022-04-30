@@ -69,6 +69,10 @@ function onBundleLibrary()
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
                 end
 
+                assetify.isModuleLoaded = function()
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryModuleLoaded")
+                end
+
                 assetify.getProgress = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryProgress", ...)
                 end
@@ -79,10 +83,6 @@ function onBundleLibrary()
 
                 assetify.isAssetLoaded = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isAssetLoaded", ...)
-                end
-
-                assetify.getAssetDep = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetDep", ...)
                 end
 
                 assetify.loadAsset = function(...)
@@ -124,6 +124,10 @@ function onBundleLibrary()
 
             assetify.getAsset = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetData", ...)
+            end
+
+            assetify.getAssetDep = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetDep", ...)
             end
 
             assetify.setElementAsset = function(...)

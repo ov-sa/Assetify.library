@@ -27,6 +27,10 @@ function isLibraryLoaded()
     return syncer.isLibraryLoaded
 end
 
+function isLibraryModuleLoaded()
+    return syncer.isLibraryModuleLoaded
+end
+
 function getLibraryProgress(assetType, assetName)
     local cDownloaded, cBandwidth = nil, nil
     if assetType and assetName then
@@ -51,10 +55,6 @@ end
 
 function isAssetLoaded(...)
     return manager:isLoaded(...)
-end
-
-function getAssetDep(...)
-    return manager:getDep(...)
 end
 
 function loadAsset(assetType, assetName, ...)

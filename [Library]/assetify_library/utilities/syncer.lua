@@ -50,10 +50,12 @@ syncer = {
 syncer.__index = syncer
 
 if localPlayer then
+    syncer.isLibraryModuleLoaded = false
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
     imports.addEvent("onAssetifyLoad", true)
     imports.addEvent("onAssetifyUnLoad", false)
+    imports.addEvent("onAssetifyModuleLoad", true)
     imports.addEvent("onAssetLoad", false)
     imports.addEvent("onAssetUnLoad", false)
 
@@ -163,24 +165,42 @@ if localPlayer then
                 end
             end
             if isSyncDone then
-                syncer.scheduledAssets = nil
-                syncer.isLibraryLoaded = true
-                imports.triggerEvent("onAssetifyLoad", resourceRoot)
-                thread:create(function(cThread)
-                    for i, j in imports.pairs(availableAssetPacks) do
-                        if j.autoLoad and j.rwDatas then
-                            for k, v in imports.pairs(j.rwDatas) do
-                                if v then
-                                    imports.loadAsset(i, k)
+                if assetType == "module" then
+                    imports.triggerServerEvent("Assetify:onRequestAssets", localPlayer)
+                    thread:create(function(cThread)
+                        if availableAssetPacks["module"].autoLoad and availableAssetPacks["module"].rwDatas then
+                            for i, j in imports.pairs(availableAssetPacks["module"].rwDatas) do
+                                if j then
+                                    imports.loadAsset("module", i)
                                 end
                                 thread.pause()
                             end
                         end
-                    end
-                end):resume({
-                    executions = downloadSettings.buildRate,
-                    frames = 1
-                })
+                        imports.triggerEvent("onAssetifyModuleLoad", localPlayer)
+                    end):resume({
+                        executions = downloadSettings.buildRate,
+                        frames = 1
+                    })
+                else
+                    syncer.scheduledAssets = nil
+                    syncer.isLibraryLoaded = true
+                    imports.triggerEvent("onAssetifyLoad", resourceRoot)
+                    thread:create(function(cThread)
+                        for i, j in imports.pairs(availableAssetPacks) do
+                            if j.autoLoad and j.rwDatas then
+                                for k, v in imports.pairs(j.rwDatas) do
+                                    if v then
+                                        imports.loadAsset(i, k)
+                                    end
+                                    thread.pause()
+                                end
+                            end
+                        end
+                    end):resume({
+                        executions = downloadSettings.buildRate,
+                        frames = 1
+                    })
+                end
             end
         end
     end)
@@ -356,42 +376,68 @@ else
         return true
     end
 
-    function syncer:syncPack(player, assetDatas)
+    function syncer:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
             thread:create(function(cThread)
-                local isLibraryVoid = true
                 imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
-                for i, j in imports.pairs(availableAssetPacks) do
-                    for k, v in imports.pairs(j.assetPack) do
-                        isLibraryVoid = false
-                        if k ~= "rwDatas" then
-                            syncer:syncData(player, i, k, nil, v)
-                        else
-                            for m, n in imports.pairs(v) do
-                                syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
-                                syncer:syncHash(player, i, m, n.unSynced.fileHash)
+                if syncModules then
+                    local isModuleVoid = true
+                    if availableAssetPacks["module"] then
+                        for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
+                            isModuleVoid = false
+                            if i ~= "rwDatas" then
+                                syncer:syncData(player, "module", i, nil, j)
+                            else
+                                for k, v in imports.pairs(j) do
+                                    syncer:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
+                                    syncer:syncHash(player, "module", k, v.unSynced.fileHash)
+                                    thread.pause()
+                                end
+                            end
+                            thread.pause()
+                        end
+                    end
+                    if isModuleVoid then
+                        syncer.isModuleLoaded = true
+                        imports.triggerClientEvent(player, "onAssetifyModuleLoad", player)
+                        imports.triggerEvent("Assetify:onRequestAssets", player)
+                    end
+                else
+                    local isLibraryVoid = true
+                    for i, j in imports.pairs(availableAssetPacks) do
+                        if i ~= "module" then
+                            for k, v in imports.pairs(j.assetPack) do
+                                isLibraryVoid = false
+                                if k ~= "rwDatas" then
+                                    syncer:syncData(player, i, k, nil, v)
+                                else
+                                    for m, n in imports.pairs(v) do
+                                        syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
+                                        syncer:syncHash(player, i, m, n.unSynced.fileHash)
+                                        thread.pause()
+                                    end
+                                end
                                 thread.pause()
                             end
                         end
-                        thread.pause()
                     end
+                    if isLibraryVoid then imports.triggerClientEvent(player, "onAssetifyLoad", resourceRoot) end
                 end
-                if isLibraryVoid then imports.triggerClientEvent(player, "onAssetifyLoad", resourceRoot) end
             end):resume({
                 executions = downloadSettings.syncRate,
                 frames = 1
             })
         else
             thread:create(function(cThread)
-                local assetReference = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
-                for i, j in imports.pairs(assetReference.synced) do
+                local cAsset = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
+                for i, j in imports.pairs(cAsset.synced) do
                     if i ~= "assetSize" then
                         syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
                     end
                     thread.pause()
                 end
                 for i, j in imports.pairs(assetDatas.hashes) do
-                    syncer:syncContent(player, assetDatas.type, assetDatas.name, i, assetReference.unSynced.fileData[i])
+                    syncer:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
                     thread.pause()
                 end
                 syncer:syncState(player, assetDatas.type, assetDatas.name)
@@ -410,6 +456,11 @@ else
             name = assetName,
             hashes = hashes
         })
+    end)
+
+    imports.addEvent("Assetify:onRequestAssets", true)
+    imports.addEventHandler("Assetify:onRequestAssets", root, function()
+        syncer:syncPack(source, _)
     end)
 
     imports.addEvent("Assetify:onRequestElementModels", true)
@@ -437,7 +488,7 @@ else
         if imports.getResourceRootElement(resourceElement) == resourceRoot then
             if syncer.isLibraryLoaded then
                 syncer.loadedClients[source] = true
-                syncer:syncPack(source)
+                syncer:syncPack(source, _, true)
             else
                 syncer.scheduledClients[source] = true
             end
