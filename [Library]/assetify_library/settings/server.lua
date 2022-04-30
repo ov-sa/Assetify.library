@@ -14,13 +14,13 @@
 
 availableAssetPacks = {
     ["animation"] = {
-        assetType = "animation",
-        autoLoad = true
+        autoLoad = true,
+        assetType = "animation"
     },
 
     ["sound"] = {
-        assetType = "sound",
-        autoLoad = true
+        autoLoad = true,
+        assetType = "sound"
     },
 
     ["scene"] = {
