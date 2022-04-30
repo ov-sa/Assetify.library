@@ -24,6 +24,7 @@ local imports = {
     fadeCamera = fadeCamera,
     setPlayerHudComponentVisible = setPlayerHudComponentVisible,
     showChat = showChat,
+    table = table,
     quat = quat,
     assetify = assetify,
     beautify = beautify
@@ -76,7 +77,19 @@ imports.addEventHandler("onClientResourceStart", resource, function()
         imports.beautify.setUITemplate(i, j)
     end
     local booter = function()
-        Assetify_Props = imports.assetify.getAssets(mapper.assetPack) or {}
+        local loadedAssets = imports.assetify.getAssets(mapper.assetPack)
+        Assetify_Props = {}
+        for i = 1, #loadedAssets, 1 do
+            local assetName = loadedAssets[i]
+            local cAsset = imports.assetify.getAsset(assetName)
+            if not cAsset.manifestData.assetClumps then
+                imports.table.insert(Assetify_Props, assetName)
+            else
+                for k, v in imports.pairs(cAsset.manifestData.assetClumps) do
+                    imports.table.insert(Assetify_Props, k)
+                end
+            end
+        end
         mapper:enable(true)
         mapper:toggle(true)
     end

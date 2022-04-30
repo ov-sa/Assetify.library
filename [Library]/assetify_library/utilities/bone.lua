@@ -20,9 +20,12 @@ local imports = {
     getElementType = getElementType,
     setElementMatrix = setElementMatrix,
     setElementPosition = setElementPosition,
+    getElementRotation = getElementRotation,
     getElementBoneMatrix = getElementBoneMatrix,
     setElementCollisionsEnabled = setElementCollisionsEnabled,
+    Vector3 = Vector3,
     math = math,
+    quat = quat,
     matrix = matrix
 }
 
@@ -115,6 +118,12 @@ function bone:refresh(boneData)
     boneData.position, boneData.rotation = boneData.position or {}, boneData.rotation or {}
     boneData.position.x, boneData.position.y, boneData.position.z = imports.tonumber(boneData.position.x) or 0, imports.tonumber(boneData.position.y) or 0, imports.tonumber(boneData.position.z) or 0
     boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.tonumber(boneData.rotation.x) or 0, imports.tonumber(boneData.rotation.y) or 0, imports.tonumber(boneData.rotation.z) or 0
+    if boneData.rotation.isRelative then
+        local rotQuat = imports.quat.new(imports.quat.fromEuler(imports.getElementRotation(self.element, "ZYX")))
+        local __rotQuat = imports.quat.fromVectorAngle(imports.Vector3(1, 0, 0), boneData.rotation.x)*imports.quat.fromVectorAngle(imports.Vector3(0, 1, 0), boneData.rotation.y)*imports.quat.fromVectorAngle(imports.Vector3(0, 0, 1), boneData.rotation.z) 
+        rotQuat = __rotQuat*rotQuat
+        boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.quat.toEuler(rotQuat[1], rotQuat[2], rotQuat[3], rotQuat[4])
+    end
     boneData.rotationMatrix = imports.matrix.fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
     boneData.syncRate = imports.tonumber(boneData.syncRate) or streamerSettings.boneSyncRate
     local isSyncRateModified = self.boneData and (self.boneData.syncRate ~= boneData.syncRate)
