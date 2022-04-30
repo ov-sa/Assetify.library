@@ -24,6 +24,14 @@ local imports = {
 --[[ Functions: APIs ]]--
 -------------------------
 
+function isLibraryLoaded()
+    return syncer.isLibraryLoaded
+end
+
+function isModuleLoaded()
+    return syncer.isModuleLoaded
+end
+
 function getLibraryAssets(assetType)
     if not syncer.isLibraryLoaded or not assetType or not availableAssetPacks[assetType] then return false end
     local packAssets = {}

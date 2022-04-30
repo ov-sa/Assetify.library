@@ -49,13 +49,13 @@ syncer = {
 }
 syncer.__index = syncer
 
+imports.addEvent("onAssetifyLoad", true)
+imports.addEvent("onAssetifyUnLoad", false)
+imports.addEvent("onAssetifyModuleLoad", true)
 if localPlayer then
-    syncer.isLibraryModuleLoaded = false
+    syncer.isModuleLoaded = false
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
-    imports.addEvent("onAssetifyLoad", true)
-    imports.addEvent("onAssetifyUnLoad", false)
-    imports.addEvent("onAssetifyModuleLoad", true)
     imports.addEvent("onAssetLoad", false)
     imports.addEvent("onAssetUnLoad", false)
 

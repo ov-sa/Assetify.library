@@ -61,18 +61,45 @@ function onBundleLibrary()
                     resourceName = "]]..syncer.libraryName..[[",
                     type = type,
                     call = call,
-                    getResourceFromName = getResourceFromName
+                    getResourceFromName = getResourceFromName,
+                    addEventHandler = addEventHandler,
+                    removeEventHandler = removeEventHandler
                 }
             }
+            assetify.execOnLoad = function(execFunc)
+                if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                local isLoaded = true
+                if localPlayer then isLoaded = assetify.isLoaded() end
+                if isLoaded then
+                    execFunc()
+                else
+                    local execWrapper = nil
+                    execWrapper = function()
+                        execFunc()
+                        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                    end
+                    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                end
+                return true
+            end
+            assetify.execOnModuleLoad = function(execFunc)
+                if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                local isModuleLoaded = true
+                if localPlayer then isModuleLoaded = assetify.isModuleLoaded() end
+                if isModuleLoaded then
+                    execFunc()
+                else
+                    local execWrapper = nil
+                    execWrapper = function()
+                        execFunc()
+                        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                    end
+                    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                end
+                return true
+            end
+
             if localPlayer then
-                assetify.isLoaded = function()
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
-                end
-
-                assetify.isModuleLoaded = function()
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryModuleLoaded")
-                end
-
                 assetify.getProgress = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryProgress", ...)
                 end
@@ -116,6 +143,14 @@ function onBundleLibrary()
                 assetify.createDummy = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createAssetDummy", ...)
                 end
+            end
+
+            assetify.isLoaded = function()
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
+            end
+
+            assetify.isModuleLoaded = function()
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isModuleLoaded")
             end
 
             assetify.getAssets = function(...)

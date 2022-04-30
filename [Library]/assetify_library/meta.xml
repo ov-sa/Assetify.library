@@ -36,6 +36,8 @@
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
     <export function="fetchThreader" type="shared"/>
+    <export function="isLibraryLoaded" type="shared"/>
+    <export function="isModuleLoaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
     <export function="getAssetData" type="shared"/>
     <export function="getAssetDep" type="shared"/>
@@ -44,8 +46,6 @@
     <export function="setBoneDetachment" type="shared"/>
     <export function="setBoneRefreshment" type="shared"/>
     <export function="clearBoneAttachment" type="shared"/>
-    <export function="isLibraryLoaded" type="client"/>
-    <export function="isLibraryModuleLoaded" type="client"/>
     <export function="getLibraryProgress" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="isAssetLoaded" type="client"/>

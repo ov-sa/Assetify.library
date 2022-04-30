@@ -23,14 +23,6 @@ local imports = {
 --[[ Functions: APIs ]]--
 -------------------------
 
-function isLibraryLoaded()
-    return syncer.isLibraryLoaded
-end
-
-function isLibraryModuleLoaded()
-    return syncer.isLibraryModuleLoaded
-end
-
 function getLibraryProgress(assetType, assetName)
     local cDownloaded, cBandwidth = nil, nil
     if assetType and assetName then

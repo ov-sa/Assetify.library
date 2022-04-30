@@ -439,7 +439,7 @@ else
                 end
                 assetPack.assetPack = cAssetPack
                 if callbackReference and (imports.type(callbackReference) == "function") then
-                    callbackReference(true)
+                    callbackReference(true, assetType)
                 end
             end):resume({
                 executions = downloadSettings.buildRate,
@@ -448,7 +448,7 @@ else
             return true
         end
         if callbackReference and (imports.type(callbackReference) == "function") then
-            callbackReference(false)
+            callbackReference(false, assetType)
         end
         return false
     end
