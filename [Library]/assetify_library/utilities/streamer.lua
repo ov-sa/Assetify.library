@@ -14,6 +14,7 @@
 
 local imports = {
     pairs = pairs,
+    getCamera = getCamera,
     isElement = isElement,
     destroyElement = destroyElement,
     addEventHandler = addEventHandler,
@@ -27,7 +28,8 @@ local imports = {
     getElementDimension = getElementDimension,
     getElementInterior = getElementInterior,
     setElementDimension = setElementDimension,
-    setElementInterior = setElementInterior
+    setElementInterior = setElementInterior,
+    getElementVelocity = getElementVelocity
 }
 
 
@@ -37,7 +39,9 @@ local imports = {
 
 streamer = {
     buffer = {},
-    cache = {},
+    cache = {
+        clientCamera = imports.getCamera()
+    },
     allocator = {
         validStreams = {"bone"}
     }
@@ -119,6 +123,7 @@ function streamer:update(clientDimension, clientInterior)
             end
         end
     end
+    streamer.cache.isCameraTranslated = true
     streamer.cache.clientWorld = streamer.cache.clientWorld or {}
     streamer.cache.clientWorld.dimension = currentDimension
     streamer.cache.clientWorld.interior = currentInterior
@@ -217,6 +222,12 @@ end
 imports.addEventHandler("onAssetifyLoad", root, function()
     streamer:update(imports.getElementDimension(localPlayer))
     imports.setTimer(function()
+        if streamer.cache.isCameraTranslated then return false end
+        local velX, velY, velZ = imports.getElementVelocity(streamer.cache.clientCamera)
+        streamer.cache.isCameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
+    end, streamerSettings.cameraSyncRate, 0)
+    imports.setTimer(function()
+        if not streamer.cache.isCameraTranslated then return false end
         local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
         if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
             for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
@@ -228,5 +239,6 @@ imports.addEventHandler("onAssetifyLoad", root, function()
                 onEntityStream(j)
             end
         end
+        streamer.cache.isCameraTranslated = false
     end, streamerSettings.syncRate, 0)
 end)
