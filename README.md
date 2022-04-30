@@ -10,7 +10,7 @@
 
 **"Tired of replacing objects?"** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones! 
 
-**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Animations`, `Sounds`, `Scenes`, `Characters`, `Vehicles`, `Weapons`, `Objects` asset-packs & Custom Graphics!)
+**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Modules`, `Animations`, `Sounds`, `Scenes`, `Characters`, `Vehicles`, `Weapons`, `Objects` asset-packs & Custom Graphics!)
 
 ## ━ Features
 
@@ -35,8 +35,9 @@
 * Built-In Assetify Mapper (`assetify_mapper`)
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
-* Supports Sound Asset-Pack
+* Supports Module Asset-Pack
 * Supports Animation Asset-Pack
+* Supports Sound Asset-Pack
 * Supports Scene Asset-Pack (Supports multiple instances!)
 * Supports Scene Dimension, Interior & Offsets (Useful for mass movement!)
 * Supports Character Asset-Pack
