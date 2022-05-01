@@ -228,7 +228,7 @@ if localPlayer then
         return true
     end
 else
-    function asset:buildFile(filePath, filePointer, encryptKey)
+    function asset:buildFile(filePath, filePointer, encryptKey, rawPointer)
         if not filePath or not filePointer then return false end
         if not filePointer.unSynced.fileHash[filePath] then
             local builtFileData, builtFileSize = imports.file.read(filePath)
@@ -238,6 +238,7 @@ else
                 syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.assetSize.file[filePath]
                 filePointer.unSynced.fileData[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
                 filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
+                if rawPointer then rawPointer[filePath] = builtFileData end
             end
         end
         return true
@@ -325,6 +326,7 @@ else
                                 }
                             },
                             unSynced = {
+                                rawData = {},
                                 fileData = {},
                                 fileHash = {}
                             }
@@ -427,7 +429,7 @@ else
                                     for k, v in imports.pairs(j) do
                                         j[k] = assetPath.."dep/"..j[k]
                                         assetDeps[i][k] = j[k]
-                                        asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData)
                                         thread.pause()
                                     end
                                 end

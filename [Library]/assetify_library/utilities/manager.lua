@@ -429,6 +429,6 @@ else
     function manager:getDep(assetType, assetName, depType, depIndex)
         local cAsset = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset then return false end
-        return (cAsset.synced.manifestData.assetDeps and cAsset.synced.manifestData.assetDeps[depType] and cAsset.synced.manifestData.assetDeps[depType][depIndex] and cAsset.unSynced.fileData[(cAsset.synced.manifestData.assetDeps[depType][depIndex])]) or false
+        return (cAsset.synced.manifestData.assetDeps and cAsset.synced.manifestData.assetDeps[depType] and cAsset.synced.manifestData.assetDeps[depType][depIndex] and cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex])]) or false
     end
 end
