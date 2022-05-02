@@ -25,7 +25,6 @@ local imports = {
 ----------------------------------
 
 local function onLibraryLoaded()
-    syncer.isLibraryLoaded = true
     imports.triggerEvent("onAssetifyLoad", resourceRoot)
     for i, j in imports.pairs(syncer.scheduledClients) do
         syncer:syncPack(i)

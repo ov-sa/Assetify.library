@@ -15,6 +15,8 @@
 local imports = {
     type = type,
     pairs = pairs,
+    utf8 = utf8,
+    decodeString = decodeString,
     setmetatable = setmetatable,
     fileExists = fileExists,
     fileCreate = fileCreate,
@@ -26,6 +28,20 @@ local imports = {
     fileClose = fileClose,
     math = math
 }
+
+
+-----------------
+--[[ Decoder ]]--
+-----------------
+
+decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
+    local rawString = imports.decodeString(decodeType, decodeData, decodeOptions)
+    if not rawString then return false end
+    if removeNull then
+        rawString = imports.utf8.gsub(rawString, imports.utf8.char(0), "")
+    end
+    return rawString
+end
 
 
 ---------------------

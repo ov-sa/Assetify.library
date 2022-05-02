@@ -25,6 +25,7 @@ local imports = {
     collectgarbage = collectgarbage,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
+    removeEventHandler = removeEventHandler,
     getResourceRootElement = getResourceRootElement,
     triggerEvent = triggerEvent,
     triggerClientEvent = triggerClientEvent,
@@ -43,6 +44,7 @@ local imports = {
 
 syncer = {
     isLibraryLoaded = false,
+    isModuleLoaded = false,
     libraryName = imports.getResourceName(resource),
     librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime())),
     libraryBandwidth = 0
@@ -52,8 +54,28 @@ syncer.__index = syncer
 imports.addEvent("onAssetifyLoad", true)
 imports.addEvent("onAssetifyUnLoad", false)
 imports.addEvent("onAssetifyModuleLoad", true)
+syncer.execOnLoad = function(execFunc)
+    local execWrapper = nil
+    execWrapper = function()
+        execFunc()
+        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    end
+    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    return true
+end
+syncer.execOnModuleLoad = function(execFunc)
+    local execWrapper = nil
+    execWrapper = function()
+        execFunc()
+        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    end
+    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    return true
+end
+syncer.execOnLoad(function() syncer.isLibraryLoaded = true end)
+syncer.execOnModuleLoad(function() syncer.isModuleLoaded = true end)
+
 if localPlayer then
-    syncer.isModuleLoaded = false
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
     imports.addEvent("onAssetLoad", false)
@@ -183,16 +205,17 @@ if localPlayer then
                     })
                 else
                     syncer.scheduledAssets = nil
-                    syncer.isLibraryLoaded = true
                     imports.triggerEvent("onAssetifyLoad", resourceRoot)
                     thread:create(function(cThread)
                         for i, j in imports.pairs(availableAssetPacks) do
-                            if j.autoLoad and j.rwDatas then
-                                for k, v in imports.pairs(j.rwDatas) do
-                                    if v then
-                                        imports.loadAsset(i, k)
+                            if i ~= "module" then
+                                if j.autoLoad and j.rwDatas then
+                                    for k, v in imports.pairs(j.rwDatas) do
+                                        if v then
+                                            imports.loadAsset(i, k)
+                                        end
+                                        thread.pause()
                                     end
-                                    thread.pause()
                                 end
                             end
                         end
@@ -216,7 +239,7 @@ if localPlayer then
                 if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.clump then
                     for i, j in imports.pairs(clumpMaps) do
                         if cAsset.manifestData.shaderMaps.clump[i] and cAsset.manifestData.shaderMaps.clump[i][j] then
-                            shader:create(element, "clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps.clump[i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps.clump[i][j].bump}, {}, cAsset.unsyncedData.rwCache.map, cAsset.manifestData.shaderMaps.clump[i][j], cAsset.manifestData.encryptKey)
+                            shader:create(element, "clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps.clump[i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps.clump[i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps.clump[i][j], cAsset.manifestData.encryptKey)
                         end
                     end
                 end
@@ -398,7 +421,6 @@ else
                         end
                     end
                     if isModuleVoid then
-                        syncer.isModuleLoaded = true
                         imports.triggerClientEvent(player, "onAssetifyModuleLoad", player)
                         imports.triggerEvent("Assetify:onRequestAssets", player)
                     end

@@ -61,43 +61,73 @@ function onBundleLibrary()
                     resourceName = "]]..syncer.libraryName..[[",
                     type = type,
                     call = call,
+                    loadstring = loadstring,
                     getResourceFromName = getResourceFromName,
                     addEventHandler = addEventHandler,
-                    removeEventHandler = removeEventHandler
+                    removeEventHandler = removeEventHandler,
+                    table = table
                 }
             }
             assetify.execOnLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
-                local isLoaded = true
-                if localPlayer then isLoaded = assetify.isLoaded() end
+                local isLoaded = assetify.isLoaded()
                 if isLoaded then
                     execFunc()
                 else
                     local execWrapper = nil
                     execWrapper = function()
                         execFunc()
-                        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                        assetify.imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
                     end
-                    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                    assetify.imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
                 end
                 return true
             end
             assetify.execOnModuleLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
-                local isModuleLoaded = true
-                if localPlayer then isModuleLoaded = assetify.isModuleLoaded() end
+                local isModuleLoaded = assetify.isModuleLoaded()
                 if isModuleLoaded then
                     execFunc()
                 else
                     local execWrapper = nil
                     execWrapper = function()
                         execFunc()
-                        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                        assetify.imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
                     end
-                    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                    assetify.imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
                 end
                 return true
             end
+            assetify.scheduleExec = {
+                buffer = {
+                    onLoad = {}, onModuleLoad = {}
+                },
+                boot = function()
+                    assetify.execOnLoad(function()
+                        for i = 1, #assetify.scheduleExec.buffer.onLoad, 1 do
+                            assetify.execOnLoad(assetify.scheduleExec.buffer.onLoad[i])
+                        end
+                        assetify.scheduleExec.buffer.onLoad = {}
+                    end)
+                    assetify.execOnModuleLoad(function()
+                        for i = 1, #assetify.scheduleExec.buffer.onModuleLoad, 1 do
+                            assetify.execOnModuleLoad(assetify.scheduleExec.buffer.onModuleLoad[i])
+                        end
+                        assetify.scheduleExec.buffer.onModuleLoad = {}
+                    end)
+                    return true
+                end,
+                execOnLoad = function(execFunc)
+                    if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                    assetify.imports.table.insert(assetify.scheduleExec.buffer.onLoad, execFunc)
+                    return true
+                end,
+                execOnModuleLoad = function(execFunc)
+                    if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                    assetify.imports.table.insert(assetify.scheduleExec.buffer.onModuleLoad, execFunc)
+                    return true
+                end
+            }
 
             if localPlayer then
                 assetify.getProgress = function(...)
@@ -163,6 +193,22 @@ function onBundleLibrary()
 
             assetify.getAssetDep = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getAssetDep", ...)
+            end
+
+            assetify.loadModule = function(assetName, moduleTypes)
+                local cAsset = assetify.getAsset("module", assetName)
+                if not cAsset or not moduleTypes or (#moduleTypes <= 0) then return false end
+                cAsset = (localPlayer and cAsset) or cAsset.synced
+                if not cAsset.manifestData.assetDeps or not cAsset.manifestData.assetDeps.script then return false end
+                for i = 1, #moduleTypes, 1 do
+                    local j = moduleTypes[i]
+                    if cAsset.manifestData.assetDeps.script[j] then
+                        for k = 1, #cAsset.manifestData.assetDeps.script[j], 1 do
+                            assetify.imports.loadstring(assetify.getAssetDep("module", assetName, "script", j, k))()
+                        end
+                    end
+                end
+                return true
             end
 
             assetify.setElementAsset = function(...)

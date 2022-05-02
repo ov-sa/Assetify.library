@@ -88,8 +88,13 @@ if localPlayer then
             for k, v in imports.pairs(j) do
                 if i == "texture" then
                     rwCache[i][k] = shader:loadTex(v, encryptKey)
-                else
-                    rwCache[i][k] = (encryptKey and imports.decodeString("tea", imports.file.read(v), {key = encryptKey})) or imports.file.read(v)
+                elseif i == "script" then
+                    rwCache[i][k] = {}
+                    if k ~= "server" then
+                        for m, n in imports.pairs(v) do
+                            rwCache[i][k][m] = (encryptKey and imports.decodeString("tea", imports.file.read(n), {key = encryptKey}, true)) or imports.file.read(n)
+                        end
+                    end
                 end
             end
         end
@@ -113,7 +118,7 @@ if localPlayer then
 
     function asset:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
         if not self or (self == asset) then return false end
-        if not assetType or not assetName or not assetPack or not assetPack.assetType or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
+        if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local loadState = false
         if assetType == "module" then
             assetData.cAsset = self
@@ -136,6 +141,7 @@ if localPlayer then
                 loadState = true
             end
         else
+            if not assetPack.assetType then return false end
             local modelID, collisionID = false, false
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
@@ -189,7 +195,7 @@ if localPlayer then
                 end
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
-                self.syncedData = {
+                self.synced = {
                     modelID = modelID,
                     collisionID = collisionID
                 }
@@ -205,12 +211,12 @@ if localPlayer then
     function asset:unload(rwCache, callback)
         if not self or (self == asset) then return false end
         if not rwCache then return false end
-        if self.syncedData then
-            if self.syncedData.modelID then
-                imports.engineFreeModel(self.syncedData.modelID)
+        if self.synced then
+            if self.synced.modelID then
+                imports.engineFreeModel(self.synced.modelID)
             end
-            if self.syncedData.collisionID then
-                imports.engineFreeModel(self.syncedData.collisionID)
+            if self.synced.collisionID then
+                imports.engineFreeModel(self.synced.collisionID)
             end
         end
         if self.rwPaths then
@@ -228,16 +234,18 @@ if localPlayer then
         return true
     end
 else
-    function asset:buildFile(filePath, filePointer, encryptKey, rawPointer)
+    function asset:buildFile(filePath, filePointer, encryptKey, rawPointer, skipSync)
         if not filePath or not filePointer then return false end
-        if not filePointer.unSynced.fileHash[filePath] then
+        if (not skipSync and not filePointer.unSynced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFileData, builtFileSize = imports.file.read(filePath)
             if builtFileData then
-                filePointer.synced.assetSize.file[filePath] = builtFileSize
-                filePointer.synced.assetSize.total = filePointer.synced.assetSize.total + filePointer.synced.assetSize.file[filePath]
-                syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.assetSize.file[filePath]
-                filePointer.unSynced.fileData[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
-                filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
+                if not skipSync then
+                    filePointer.synced.assetSize.file[filePath] = builtFileSize
+                    filePointer.synced.assetSize.total = filePointer.synced.assetSize.total + filePointer.synced.assetSize.file[filePath]
+                    syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.assetSize.file[filePath]
+                    filePointer.unSynced.fileData[filePath] = (encryptKey and imports.encodeString("tea", builtFileData, {key = encryptKey})) or builtFileData
+                    filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
+                end
                 if rawPointer then rawPointer[filePath] = builtFileData end
             end
         end
@@ -427,9 +435,19 @@ else
                                 if j and (imports.type(j) == "table") then
                                     assetDeps[i] = {}
                                     for k, v in imports.pairs(j) do
-                                        j[k] = assetPath.."dep/"..j[k]
-                                        assetDeps[i][k] = j[k]
-                                        asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData)
+                                        assetDeps[i][k] = {}
+                                        if i == "script" then
+                                            for m, n in imports.pairs(v) do
+                                                v[m] = assetPath.."dep/"..v[m]
+                                                assetDeps[i][k][m] = v[m]
+                                                asset:buildFile(assetDeps[i][k][m], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData, k == "server")
+                                                thread.pause()
+                                            end
+                                        else
+                                            j[k] = assetPath.."dep/"..j[k]
+                                            assetDeps[i][k] = j[k]
+                                            asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData)
+                                        end
                                         thread.pause()
                                     end
                                 end
