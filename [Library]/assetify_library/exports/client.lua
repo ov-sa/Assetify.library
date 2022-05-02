@@ -13,7 +13,11 @@
 -----------------
 
 local imports = {
+    tonumber = tonumber,
     isElement = isElement,
+    engineImportTXD = engineImportTXD,
+    engineReplaceModel = engineReplaceModel,
+    engineRestoreModel = engineRestoreModel,
     triggerEvent = triggerEvent,
     math = math
 }
@@ -78,6 +82,21 @@ end
 function createShader(...)
     local cShader = shader:create(...)
     return cShader
+end
+
+function clearModel(modelID)
+    modelID = imports.tonumber(modelID)
+    if modelID and imports.engineImportTXD(asset.rwAssets.txd, modelID) then
+        imports.engineReplaceModel(asset.rwAssets.dff, modelID, false)
+        return true
+    end
+    return false
+end
+
+function restoreModel(modelID)
+    modelID = imports.tonumber(modelID)
+    if not modelID then return false end
+    return imports.engineRestoreModel(modelID)
 end
 
 function playSoundAsset(...)

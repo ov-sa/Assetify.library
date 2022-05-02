@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="2.1.5"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="2.1.6"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
     <!-- Exports, Settings & Utilities -->
@@ -54,6 +54,8 @@
     <export function="loadAnim" type="client"/>
     <export function="unloadAnim" type="client"/>
     <export function="createShader" type="client"/>
+    <export function="clearModel" type="client"/>
+    <export function="restoreModel" type="client"/>
     <export function="playSoundAsset" type="client"/>
     <export function="playSoundAsset3D" type="client"/>
     <export function="createAssetDummy" type="client"/>
