@@ -407,11 +407,11 @@ else
                     local isModuleVoid = true
                     if availableAssetPacks["module"] then
                         for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
-                            isModuleVoid = false
                             if i ~= "rwDatas" then
                                 syncer:syncData(player, "module", i, nil, j)
                             else
                                 for k, v in imports.pairs(j) do
+                                    isModuleVoid = false
                                     syncer:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
                                     syncer:syncHash(player, "module", k, v.unSynced.fileHash)
                                     thread.pause()
@@ -429,11 +429,11 @@ else
                     for i, j in imports.pairs(availableAssetPacks) do
                         if i ~= "module" then
                             for k, v in imports.pairs(j.assetPack) do
-                                isLibraryVoid = false
                                 if k ~= "rwDatas" then
                                     syncer:syncData(player, i, k, nil, v)
                                 else
                                     for m, n in imports.pairs(v) do
+                                        isLibraryVoid = false
                                         syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
                                         syncer:syncHash(player, i, m, n.unSynced.fileHash)
                                         thread.pause()
