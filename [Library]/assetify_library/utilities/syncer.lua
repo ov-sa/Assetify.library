@@ -405,7 +405,7 @@ else
                 imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
                 if syncModules then
                     local isModuleVoid = true
-                    if availableAssetPacks["module"] then
+                    if availableAssetPacks["module"] and availableAssetPacks["module"].assetPack then
                         for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
                                 syncer:syncData(player, "module", i, nil, j)
@@ -428,18 +428,20 @@ else
                     local isLibraryVoid = true
                     for i, j in imports.pairs(availableAssetPacks) do
                         if i ~= "module" then
-                            for k, v in imports.pairs(j.assetPack) do
-                                if k ~= "rwDatas" then
-                                    syncer:syncData(player, i, k, nil, v)
-                                else
-                                    for m, n in imports.pairs(v) do
-                                        isLibraryVoid = false
-                                        syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
-                                        syncer:syncHash(player, i, m, n.unSynced.fileHash)
-                                        thread.pause()
+                            if j.assetPack then
+                                for k, v in imports.pairs(j.assetPack) do
+                                    if k ~= "rwDatas" then
+                                        syncer:syncData(player, i, k, nil, v)
+                                    else
+                                        for m, n in imports.pairs(v) do
+                                            isLibraryVoid = false
+                                            syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
+                                            syncer:syncHash(player, i, m, n.unSynced.fileHash)
+                                            thread.pause()
+                                        end
                                     end
+                                    thread.pause()
                                 end
-                                thread.pause()
                             end
                         end
                     end
