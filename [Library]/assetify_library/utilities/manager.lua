@@ -71,7 +71,7 @@ if localPlayer then
     end
 
     function manager:getData(assetType, assetName, isInternal, isModule)
-        if (not isModule or (isInternal and (isInternal ~= syncer.librarySerial))) and (not syncer.isLibraryLoaded) then return false end
+        if (not isModule or not isInternal or (isInternal ~= syncer.librarySerial)) and (not syncer.isLibraryLoaded) then return false end
         if not assetType or not assetName then return false end
         if availableAssetPacks[assetType] then
             local cAsset = availableAssetPacks[assetType].rwDatas[assetName]

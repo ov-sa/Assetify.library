@@ -299,7 +299,7 @@ else
         if not targetPlayer then
             if not element or not imports.isElement(element) then return false end
             local cAsset = manager:getData(assetType, assetName)
-            if not cAsset or (cAsset.synced.manifestData.assetClumps and (not assetClump or not cAsset.synced.manifestData.assetClumps[assetClump])) then return false end
+            if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
             syncer.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
@@ -402,9 +402,9 @@ else
     function syncer:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
             thread:create(function(cThread)
-                imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
                 if syncModules then
                     local isModuleVoid = true
+                    imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
                     if availableAssetPacks["module"] and availableAssetPacks["module"].assetPack then
                         for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
