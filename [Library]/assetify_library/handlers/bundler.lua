@@ -77,9 +77,9 @@ function onBundleLibrary()
                     local execWrapper = nil
                     execWrapper = function()
                         execFunc()
-                        assetify.imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                        assetify.imports.removeEventHandler("onAssetifyLoad", root, execWrapper)
                     end
-                    assetify.imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                    assetify.imports.addEventHandler("onAssetifyLoad", root, execWrapper)
                 end
                 return true
             end

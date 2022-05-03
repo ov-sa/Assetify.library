@@ -58,9 +58,9 @@ syncer.execOnLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
-        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+        imports.removeEventHandler("onAssetifyLoad", root, execWrapper)
     end
-    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    imports.addEventHandler("onAssetifyLoad", root, execWrapper)
     return true
 end
 syncer.execOnModuleLoad = function(execFunc)
