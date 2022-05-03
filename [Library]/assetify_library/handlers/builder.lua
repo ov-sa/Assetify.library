@@ -27,7 +27,7 @@ local imports = {
 local function onLibraryLoaded()
     imports.triggerEvent("onAssetifyLoad", resourceRoot)
     for i, j in imports.pairs(syncer.scheduledClients) do
-        syncer:syncPack(i)
+        syncer:syncPack(i, _, true)
         syncer.loadedClients[i] = true
         syncer.scheduledClients[i] = nil
     end

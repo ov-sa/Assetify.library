@@ -484,7 +484,7 @@ else
 
     imports.addEvent("Assetify:onRequestAssets", true)
     imports.addEventHandler("Assetify:onRequestAssets", root, function()
-        syncer:syncPack(source, _)
+        syncer:syncPack(source)
     end)
 
     imports.addEvent("Assetify:onRequestElementModels", true)
