@@ -206,7 +206,6 @@ function onBundleLibrary()
             assetify.loadModule = function(assetName, moduleTypes)
                 local cAsset = assetify.getAsset("module", assetName)
                 if not cAsset or not moduleTypes or (#moduleTypes <= 0) then return false end
-                cAsset = (localPlayer and cAsset) or cAsset.synced
                 if not cAsset.manifestData.assetDeps or not cAsset.manifestData.assetDeps.script then return false end
                 for i = 1, #moduleTypes, 1 do
                     local j = moduleTypes[i]
