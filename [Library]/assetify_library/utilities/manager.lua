@@ -266,7 +266,7 @@ if localPlayer then
     end
 
     function manager:unload(assetType, assetName)
-        local cAsset, isLoaded = manager:getData(assetType, assetName)
+        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if assetType == "sound" then
             thread:create(function(cThread)
@@ -331,7 +331,6 @@ if localPlayer then
         else
             if cAsset.cAsset then
                 cAsset.cAsset:destroy(cAsset.unSynced.rwCache)
-                
                 shader:clearAssetBuffer(cAsset.unSynced.rwCache.map)
                 cAsset.unSynced = nil
                 imports.collectgarbage()
