@@ -70,8 +70,7 @@ if localPlayer then
         return true
     end
 
-    function manager:getData(assetType, assetName, isInternal, isModule)
-        if (not isModule or not isInternal or (isInternal ~= syncer.librarySerial)) and (not syncer.isLibraryLoaded) then return false end
+    function manager:getData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
         if availableAssetPacks[assetType] then
             local cAsset = availableAssetPacks[assetType].rwDatas[assetName]
@@ -121,7 +120,7 @@ if localPlayer then
     end
 
     function manager:load(assetType, assetName)
-        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial, assetType == "module")
+        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or isLoaded then return false end
         local cAssetPack = availableAssetPacks[assetType]
         local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
@@ -353,7 +352,7 @@ if localPlayer then
 
     function manager:loadAnim(element, assetName)
         if not syncer.isLibraryLoaded then return false end
-        if not element then return false end
+        if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getData("animation", assetName)
         if not cAsset or not isLoaded then return false end
         if cAsset.manifestData.assetAnimations then
@@ -367,7 +366,7 @@ if localPlayer then
 
     function manager:unloadAnim(element, assetName)
         if not syncer.isLibraryLoaded then return false end
-        if not element then return false end
+        if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getData("animation", assetName)
         if not cAsset or not isLoaded then return false end
         if cAsset.manifestData.assetAnimations then
@@ -380,6 +379,7 @@ if localPlayer then
     end
 
     function manager:playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+        if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
@@ -396,6 +396,7 @@ if localPlayer then
     end
 
     function manager:playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+        if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
@@ -412,7 +413,6 @@ if localPlayer then
     end
 else
     function manager:getData(assetType, assetName, isInternal)
-        if not syncer.isLibraryLoaded then return false end
         if not assetType or not assetName then return false end
         if availableAssetPacks[assetType] then
             local cAsset = availableAssetPacks[assetType].assetPack.rwDatas[assetName]
