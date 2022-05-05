@@ -16,9 +16,11 @@ local imports = {
     type = type,
     pairs = pairs,
     tonumber = tonumber,
-    utf8 = utf8,
     decodeString = decodeString,
     setmetatable = setmetatable,
+    isElement = isElement,
+    getElementMatrix = getElementMatrix,
+    getElementPosition = getElementPosition,
     fileExists = fileExists,
     fileCreate = fileCreate,
     fileDelete = fileDelete,
@@ -27,14 +29,15 @@ local imports = {
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose,
+    utf8 = utf8,
     string = string,
     math = math
 }
 
 
------------------
---[[ Decoder ]]--
------------------
+---------------
+--[[ Utils ]]--
+---------------
 
 decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
     local rawString = imports.decodeString(decodeType, decodeData, decodeOptions)
@@ -43,6 +46,17 @@ decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
         rawString = imports.utf8.gsub(rawString, imports.utf8.char(0), "")
     end
     return rawString
+end
+
+getElementPosition = function(element, offX, offY, offZ)
+    if not offX or not offY or not offZ then
+        return imports.getElementPosition(element)
+    else
+        if not element or not imports.isElement(element) then return false end
+        offX, offY, offZ = imports.tonumber(offX) or 0, imports.tonumber(offY) or 0, imports.tonumber(offZ) or 0
+        local cMatrix = imports.getElementMatrix(element)
+        return (offX*cMatrix[1][1]) + (offY*cMatrix[2][1]) + (offZ*cMatrix[3][1]) + cMatrix[4][1], (offX*cMatrix[1][2]) + (offY*cMatrix[2][2]) + (offZ*cMatrix[3][2]) + cMatrix[4][2], (offX*cMatrix[1][3]) + (offY*cMatrix[2][3]) + (offZ*cMatrix[3][3]) + cMatrix[4][3]
+    end
 end
 
 
@@ -108,6 +122,21 @@ math.round = function(number, decimals)
     if not number then return false end
     decimals = imports.tonumber(decimals) or 0
     return imports.tonumber(imports.string.format("%."..decimals.."f", number))
+end
+
+math.findRotation2D = function(x1, y1, x2, y2) 
+    x1, y1, x2, y2 = imports.tonumber(x1), imports.tonumber(y1), imports.tonumber(x2), imports.tonumber(y2)
+    if not x1 or not y1 or not x2 or not y2 then return false end
+    local rotAngle = -imports.math.deg(imports.math.atan2(x2 - x1, y2 - y1))
+    return ((rotAngle < 0) and (rotAngle + 360)) or rotAngle
+end
+
+math.findDistRotationPoint2D = function(x, y, distance, angle)
+    x, y, distance, angle = imports.tonumber(x), imports.tonumber(y), imports.tonumber(distance), imports.tonumber(angle)
+    if not x or not y or not distance then return false end
+    angle = angle or 0
+    angle = imports.math.rad(90 - angle)
+    return x + (imports.math.cos(angle)*distance), y + (imports.math.sin(angle)*distance)
 end
 
 
