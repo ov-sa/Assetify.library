@@ -20,13 +20,16 @@ local imports = {
     isElement = isElement,
     getRealTime = getRealTime,
     getResourceName = getResourceName,
+    getResourceInfo = getResourceInfo,
     getElementsByType = getElementsByType,
     setElementModel = setElementModel,
     collectgarbage = collectgarbage,
+    outputDebugString = outputDebugString,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     getResourceRootElement = getResourceRootElement,
+    fetchRemote = fetchRemote,
     triggerEvent = triggerEvent,
     triggerClientEvent = triggerClientEvent,
     triggerServerEvent = triggerServerEvent,
@@ -34,6 +37,7 @@ local imports = {
     triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
     toJSON = toJSON,
+    fromJSON = fromJSON,
     file = file
 }
 
@@ -46,6 +50,7 @@ syncer = {
     isLibraryLoaded = false,
     isModuleLoaded = false,
     libraryName = imports.getResourceName(resource),
+    librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest",
     librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime())),
     libraryBandwidth = 0,
     syncedElements = {}
@@ -276,6 +281,8 @@ if localPlayer then
     imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
     imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
 else
+    syncer.libraryVersion = imports.getResourceInfo(resource, "version")
+    syncer.libraryVersion = (syncer.libraryVersion and "v."..syncer.libraryVersion) or syncer.libraryVersion
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
     syncer.syncedBoneAttachments = {}
@@ -520,6 +527,13 @@ else
         end
     end)
 
+    imports.fetchRemote(syncer.librarySource, function(response, status)
+        if not response or not status or (status ~= 0) then return false end
+        response = imports.fromJSON(response)
+        if response and response.tag_name and (syncer.libraryVersion ~= response.tag_name) then
+            imports.outputDebugString("[Assetify]: Latest version available - "..response.tag_name, 3)
+        end
+    end)
     imports.addEventHandler("onElementModelChange", root, function()
         syncer.syncedElements[source] = nil
     end)
