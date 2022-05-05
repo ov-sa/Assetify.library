@@ -57,13 +57,19 @@ function getAssetDep(...)
     return manager:getDep(...)
 end
 
-function setElementAsset(element, ...)
+function setElementAsset(element, assetType, ...)
     if not element or not imports.isElement(element) then return false end
     local elementType = imports.getElementType(element)
-    elementType = (((elementType == "ped") or (elementType == "player")) and "character") or elementType
-    if not availableAssetPacks[elementType] then return false end
+    elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
+    if not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetType or (availableAssetPacks[assetType].assetType ~= elementType) then return false end
     local arguments = {...}
     return syncer:syncElementModel(element, elementType, arguments[1], arguments[2], arguments[3], arguments[4])
+end
+
+function getElementAssetInfo(element)
+    if not element or not imports.isElement(element) then return false end
+    if not syncer.syncedElements[element] then return false end
+    return syncer.syncedElements[element].type, syncer.syncedElements[element].name, syncer.syncedElements[element].clump, syncer.syncedElements[element].clumpMaps
 end
 
 function setBoneAttachment(element, parent, ...)

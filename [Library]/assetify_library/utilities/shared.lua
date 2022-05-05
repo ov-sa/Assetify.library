@@ -15,6 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    tonumber = tonumber,
     utf8 = utf8,
     decodeString = decodeString,
     setmetatable = setmetatable,
@@ -26,6 +27,7 @@ local imports = {
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose,
+    string = string,
     math = math
 }
 
@@ -88,6 +90,24 @@ table.clone = function(baseTable, isRecursive)
         end
     end
     return clonedTable
+end
+
+
+---------------------
+--[[ Class: Math ]]--
+---------------------
+
+math.percent = function(amount, percent)
+    amount, percent = imports.tonumber(amount), imports.tonumber(percent)
+    if not percent or not amount then return false end
+    return amount*percent*0.01
+end
+
+math.round = function(number, decimals)
+    number = imports.tonumber(number)
+    if not number then return false end
+    decimals = imports.tonumber(decimals) or 0
+    return imports.tonumber(imports.string.format("%."..decimals.."f", number))
 end
 
 

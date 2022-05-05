@@ -47,7 +47,8 @@ syncer = {
     isModuleLoaded = false,
     libraryName = imports.getResourceName(resource),
     librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime())),
-    libraryBandwidth = 0
+    libraryBandwidth = 0,
+    syncedElements = {}
 }
 syncer.__index = syncer
 
@@ -233,6 +234,7 @@ if localPlayer then
         if not element or not imports.isElement(element) then return false end
         local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
+            syncer.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
             shader:clearElementBuffer(element, "clump")
             if clumpMaps then
                 local cAsset = manager:getData(assetType, assetName)
@@ -276,7 +278,6 @@ if localPlayer then
 else
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
-    syncer.syncedElements = {}
     syncer.syncedBoneAttachments = {}
 
     function syncer:syncHash(player, ...)
@@ -519,10 +520,12 @@ else
         end
     end)
 
+    imports.addEventHandler("onElementModelChange", root, function()
+        syncer.syncedElements[source] = nil
+    end)
     imports.addEventHandler("onElementDestroy", root, function()
         syncer.syncedElements[source] = nil
     end)
-    
     imports.addEventHandler("onPlayerQuit", root, function()
         syncer.loadedClients[source] = nil
         syncer.scheduledClients[source] = nil

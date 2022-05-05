@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="2.1.6"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="2.1.7"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
     <!-- Exports, Settings & Utilities -->
@@ -42,6 +42,7 @@
     <export function="getAssetData" type="shared"/>
     <export function="getAssetDep" type="shared"/>
     <export function="setElementAsset" type="shared"/>
+    <export function="getElementAssetInfo" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>
     <export function="setBoneRefreshment" type="shared"/>
