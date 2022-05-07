@@ -60,7 +60,7 @@ end
 function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData)
     if not self or (self == dummy) then return false end
     if not dummyData then return false end
-    local cAsset, cData = manager:getData(assetType, assetName)
+    local cAsset, cData = manager:getData(assetType, assetName, syncer.librarySerial)
     cData = (cAsset and cData and ((cAsset.manifestData.assetClumps and cAsset.unSynced.assetCache[assetClump].cAsset.synced) or cData)) or false
     if not cAsset or not cData then return false end
     dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
