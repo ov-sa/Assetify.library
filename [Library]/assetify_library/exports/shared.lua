@@ -63,7 +63,7 @@ function setElementAsset(element, assetType, ...)
     elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
     if not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetType or (availableAssetPacks[assetType].assetType ~= elementType) then return false end
     local arguments = {...}
-    return syncer:syncElementModel(element, elementType, arguments[1], arguments[2], arguments[3], arguments[4])
+    return syncer:syncElementModel(element, assetType, arguments[1], arguments[2], arguments[3], arguments[4])
 end
 
 function getElementAssetInfo(element)
