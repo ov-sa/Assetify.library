@@ -98,7 +98,8 @@ function bone:load(element, parent, boneData)
 end
 
 function bone:unload()
-    if not self or (self == bone) then return false end
+    if not self or (self == bone) or self.isUnloading then return false end
+    self.isUnloading = true
     if self.cStreamer then
         self.cStreamer:destroy()
     end
@@ -119,7 +120,10 @@ function bone:refresh(boneData)
     boneData.position.x, boneData.position.y, boneData.position.z = imports.tonumber(boneData.position.x) or 0, imports.tonumber(boneData.position.y) or 0, imports.tonumber(boneData.position.z) or 0
     boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.tonumber(boneData.rotation.x) or 0, imports.tonumber(boneData.rotation.y) or 0, imports.tonumber(boneData.rotation.z) or 0
     if boneData.rotation.isRelative then
-        local rotQuat = imports.quat.new(imports.quat.fromEuler(imports.getElementRotation(self.element, "ZYX")))
+        local prev_rotX, prev_rotY, prev_rotZ = nil, nil, nil
+        if self.boneData then prev_rotX, prev_rotY, prev_rotZ = self.boneData.rotation.x, self.boneData.rotation.y, self.boneData.rotation.z
+        else prev_rotX, prev_rotY, prev_rotZ = imports.getElementRotation(self.element, "ZYX") end
+        local rotQuat = imports.quat.new(imports.quat.fromEuler(prev_rotX, prev_rotY, prev_rotZ))
         local __rotQuat = imports.quat.fromVectorAngle(imports.Vector3(1, 0, 0), boneData.rotation.x)*imports.quat.fromVectorAngle(imports.Vector3(0, 1, 0), boneData.rotation.y)*imports.quat.fromVectorAngle(imports.Vector3(0, 0, 1), boneData.rotation.z) 
         rotQuat = __rotQuat*rotQuat
         boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.quat.toEuler(rotQuat[1], rotQuat[2], rotQuat[3], rotQuat[4])

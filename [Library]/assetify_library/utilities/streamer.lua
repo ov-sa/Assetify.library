@@ -99,7 +99,8 @@ function streamer:load(streamerInstance, streamType, occlusionInstances, syncRat
 end
 
 function streamer:unload()
-    if not self or (self == streamer) then return false end
+    if not self or (self == streamer) or self.isUnloading then return false end
+    self.isUnloading = true
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.buffer[streamDimension][streamInterior][streamType][self] = nil

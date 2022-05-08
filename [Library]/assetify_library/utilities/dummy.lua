@@ -84,7 +84,8 @@ function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData)
 end
 
 function dummy:unload()
-    if not self or (self == dummy) then return false end
+    if not self or (self == dummy) or self.isUnloading then return false end
+    self.isUnloading = true
     if self.cStreamer then
         self.cStreamer:destroy()
     end

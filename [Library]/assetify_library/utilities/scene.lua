@@ -77,7 +77,8 @@ function scene:load(cAsset, sceneManifest, sceneData)
 end
 
 function scene:unload()
-    if not self or (self == scene) then return false end
+    if not self or (self == scene) or self.isUnloading then return false end
+    self.isUnloading = true
     if self.cStreamer then
         self.cStreamer:destroy()
     end

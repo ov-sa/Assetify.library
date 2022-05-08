@@ -209,7 +209,8 @@ if localPlayer then
     end
 
     function shader:unload()
-        if not self or (self == shader) then return false end
+        if not self or (self == shader) or self.isUnloading then return false end
+        self.isUnloading = true
         if not self.preLoaded then
             if self.cShader and imports.isElement(self.cShader) then
                 imports.destroyElement(self.cShader)
