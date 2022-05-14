@@ -81,7 +81,7 @@ imports.addEventHandler("onClientResourceStart", resource, function()
         Assetify_Props = {}
         for i = 1, #loadedAssets, 1 do
             local assetName = loadedAssets[i]
-            local cAsset = imports.assetify.getAsset(assetName)
+            local cAsset = imports.assetify.getAsset(mapper.assetPack, assetName)
             if not cAsset.manifestData.assetClumps then
                 imports.table.insert(Assetify_Props, assetName)
             else

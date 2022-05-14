@@ -56,6 +56,7 @@ asset = {
         scene = "scene"
     },
     separators = {
+        IDE = imports.string.byte(", "),
         IPL = imports.string.byte(", ")
     },
     ranges = {
@@ -397,16 +398,32 @@ else
                                     end
                                 end
                                 local sceneIPLPath = assetPath..(asset.references.scene)..".ipl"
-                                local sceneManifestData = imports.file.read(sceneIPLPath)
-                                if sceneManifestData then
+                                local sceneIPLData = imports.file.read(sceneIPLPath)
+                                if sceneIPLData then
                                     asset:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                     if not assetManifestData.sceneMapped then
+                                        local sceneIDEPath = assetPath..(asset.references.scene)..".ide"
+                                        local sceneIDEData = imports.file.read(sceneIDEPath)
+                                        asset:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset:buildFile(assetPath..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        local unparsedDatas = imports.split(sceneManifestData, "\n")
-                                        for k = 1, #unparsedDatas, 1 do
-                                            local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[k], 2, asset.separators.IPL)), " ", "")
+                                        local unparsedIDEDatas, unparsedIPLDatas = (sceneIDEData and imports.split(sceneIDEData, "\n")) or false, imports.split(sceneIPLData, "\n")
+                                        local parsedIDEDatas = (unparsedIDEDatas and {}) or false
+                                        cAssetPack.rwDatas[assetName].synced.sceneIDE = (parsedIDEDatas and true) or false
+                                        if unparsedIDEDatas then
+                                            for k = 1, #unparsedIDEDatas, 1 do
+                                                local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedIDEDatas[k], 2, asset.separators.IDE)), " ", "")
+                                                parsedIDEDatas[childName] = {
+                                                    imports.string.gsub(imports.tostring(imports.gettok(unparsedIDEDatas[k], 3, asset.separators.IDE)), " ", "")
+                                                }
+                                            end
+                                        end
+                                        for k = 1, #unparsedIPLDatas, 1 do
+                                            local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedIPLDatas[k], 2, asset.separators.IPL)), " ", "")
                                             asset:buildFile(assetPath.."dff/"..childName..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             asset:buildFile(assetPath.."col/"..childName..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            if parsedIDEDatas and parsedIDEDatas[childName] then
+                                                asset:buildFile(assetPath.."txd/"..(parsedIDEDatas[childName][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            end
                                             thread.pause()
                                         end
                                     end

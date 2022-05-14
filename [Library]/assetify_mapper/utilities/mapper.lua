@@ -63,7 +63,7 @@ local imports = {
 -----------------------
 
 mapper = {
-    assetPack = "object",
+    assetPack = "weapon",
     cacheDirectoryPath = ":assetify_library/files/cache/",
     sceneDirectoryPath = ":assetify_library/files/assets/scene/",
     cacheManifestPath = ":assetify_library/files/cache/manifest.json",
@@ -173,7 +173,7 @@ if localPlayer then
 
     function mapper:load(assetName, dummyData, retargetFocus)
         if not self or (self == mapper) then return false end
-        local cDummy = assetify.createDummy(mapper.assetPack, assetName, dummyData)
+        local cDummy = assetify.createDummy(mapper.assetPack, assetName, false, false, dummyData)
         if not cDummy then return false end
         self.id = #mapper.buffer.index + 1
         self.element = cDummy

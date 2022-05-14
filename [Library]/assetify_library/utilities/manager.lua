@@ -193,25 +193,38 @@ if localPlayer then
             return true
         elseif assetType == "scene" then
             thread:create(function(cThread)
-                local sceneManifestData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
-                sceneManifestData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneManifestData, {key = cAsset.manifestData.encryptKey})) or sceneManifestData
-                if sceneManifestData then
-                    local unparsedDatas = imports.split(sceneManifestData, "\n")
-                    for i = 1, #unparsedDatas, 1 do
+                local sceneIPLData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
+                sceneIPLData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIPLData, {key = cAsset.manifestData.encryptKey})) or sceneIPLData
+                if sceneIPLData then
+                    local sceneIDEData = (cAsset.synced.sceneIDE and imports.file.read(assetPath..(asset.references.scene)..".ide")) or false
+                    if sceneIDEData then
+                        sceneIDEData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIDEData, {key = cAsset.manifestData.encryptKey})) or sceneIDEData
+                    end
+                    local unparsedIDEDatas, unparsedIPLDatas = (sceneIDEData and imports.split(sceneIDEData, "\n")) or false, imports.split(sceneIPLData, "\n")
+                    local parsedIDEDatas = (unparsedIDEDatas and {}) or false
+                    if unparsedIDEDatas then
+                        for i = 1, #unparsedIDEDatas, 1 do
+                            local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedIDEDatas[i], 2, asset.separators.IDE)), " ", "")
+                            parsedIDEDatas[childName] = {
+                                imports.string.gsub(imports.tostring(imports.gettok(unparsedIDEDatas[i], 3, asset.separators.IDE)), " ", "")
+                            }
+                        end
+                    end
+                    for i = 1, #unparsedIPLDatas, 1 do
                         cAsset.unSynced.assetCache[i] = {}
-                        local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedDatas[i], 2, asset.separators.IPL)), " ", "")
+                        local childName = imports.string.gsub(imports.tostring(imports.gettok(unparsedIPLDatas[i], 2, asset.separators.IPL)), " ", "")
                         local sceneData = {
                             position = {
-                                x = imports.tonumber(imports.gettok(unparsedDatas[i], 4, asset.separators.IPL)),
-                                y = imports.tonumber(imports.gettok(unparsedDatas[i], 5, asset.separators.IPL)),
-                                z = imports.tonumber(imports.gettok(unparsedDatas[i], 6, asset.separators.IPL))
+                                x = imports.tonumber(imports.gettok(unparsedIPLDatas[i], 4, asset.separators.IPL)),
+                                y = imports.tonumber(imports.gettok(unparsedIPLDatas[i], 5, asset.separators.IPL)),
+                                z = imports.tonumber(imports.gettok(unparsedIPLDatas[i], 6, asset.separators.IPL))
                             },
                             rotation = {}
                         }
-                        sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedDatas[i], 9, asset.separators.IPL)))
+                        sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = imports.quat.toEuler(imports.tonumber(imports.gettok(unparsedIPLDatas[i], 10, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 9, asset.separators.IPL)))
                         if not cAsset.manifestData.sceneMapped then
                             asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
-                                txd = assetPath..(asset.references.asset)..".txd",
+                                txd = (parsedIDEDatas and parsedIDEDatas[childName] and assetPath.."txd/"..(parsedIDEDatas[childName][1])..".txd") or assetPath..(asset.references.asset)..".txd",
                                 dff = assetPath.."dff/"..childName..".dff",
                                 col = assetPath.."col/"..childName..".col"
                             }, function(state)
@@ -223,6 +236,7 @@ if localPlayer then
                             sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.x) or 0), sceneData.position.y + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.y) or 0), sceneData.position.z + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.z) or 0)
                             sceneData.dimension = cAsset.manifestData.sceneDimension
                             sceneData.interior = cAsset.manifestData.sceneInterior
+                            --TODO: DETECT IF ITS CLUMPED OR NOT...
                             cAsset.unSynced.assetCache[i].cDummy = dummy:create("object", childName, sceneData)
                         end
                         thread.pause()
