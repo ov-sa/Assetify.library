@@ -196,7 +196,7 @@ if localPlayer then
                 local sceneIPLData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
                 sceneIPLData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIPLData, {key = cAsset.manifestData.encryptKey})) or sceneIPLData
                 if sceneIPLData then
-                    local sceneIDEData = (cAsset.synced.sceneIDE and imports.file.read(assetPath..(asset.references.scene)..".ide")) or false
+                    local sceneIDEData = (cAsset.sceneIDE and imports.file.read(assetPath..(asset.references.scene)..".ide")) or false
                     if sceneIDEData then
                         sceneIDEData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIDEData, {key = cAsset.manifestData.encryptKey})) or sceneIDEData
                     end
