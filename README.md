@@ -40,7 +40,7 @@
 * Supports Animation Asset-Pack
 * Supports Sound Asset-Pack
 * Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene Dimension, Interior & Offsets (Useful for mass movement!)
+* Supports Scene IDE, Dimension, Interior & Offsets (Useful for mass movement!)
 * Supports Character Asset-Pack
 * Supports Vehicle Asset-Pack
 * Supports Weapon Asset-Pack
