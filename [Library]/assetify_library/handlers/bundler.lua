@@ -104,16 +104,22 @@ function onBundleLibrary()
                 },
                 boot = function()
                     assetify.execOnLoad(function()
-                        for i = 1, #assetify.scheduleExec.buffer.onLoad, 1 do
-                            assetify.execOnLoad(assetify.scheduleExec.buffer.onLoad[i])
+                        if #assetify.scheduleExec.buffer.onLoad > 0 then
+                            for i = 1, #assetify.scheduleExec.buffer.onLoad, 1 do
+                                assetify.execOnLoad(assetify.scheduleExec.buffer.onLoad[i])
+                            end
+                            assetify.scheduleExec.buffer.onLoad = {}
                         end
-                        assetify.scheduleExec.buffer.onLoad = {}
+                        return true
                     end)
                     assetify.execOnModuleLoad(function()
-                        for i = 1, #assetify.scheduleExec.buffer.onModuleLoad, 1 do
-                            assetify.execOnModuleLoad(assetify.scheduleExec.buffer.onModuleLoad[i])
+                        if #assetify.scheduleExec.buffer.onModuleLoad > 0 then
+                            for i = 1, #assetify.scheduleExec.buffer.onModuleLoad, 1 do
+                                assetify.execOnModuleLoad(assetify.scheduleExec.buffer.onModuleLoad[i])
+                            end
+                            assetify.scheduleExec.buffer.onModuleLoad = {}
                         end
-                        assetify.scheduleExec.buffer.onModuleLoad = {}
+                        return true
                     end)
                     return true
                 end,
