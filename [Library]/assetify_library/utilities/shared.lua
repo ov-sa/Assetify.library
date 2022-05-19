@@ -29,6 +29,8 @@ local imports = {
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose,
+    toJSON = toJSON,
+    fromJSON = fromJSON,
     utf8 = utf8,
     string = string,
     math = math
@@ -86,6 +88,16 @@ file = {
         imports.fileClose(cFile)    
         return true
     end
+}
+
+
+---------------------
+--[[ Class: JSON ]]--
+---------------------
+
+json = {
+    encode = imports.toJSON,
+    decode = imports.fromJSON
 }
 
 

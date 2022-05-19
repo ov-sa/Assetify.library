@@ -36,9 +36,8 @@ local imports = {
     triggerLatentClientEvent = triggerLatentClientEvent,
     triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
-    toJSON = toJSON,
-    fromJSON = fromJSON,
-    file = file
+    file = file,
+    json = json
 }
 
 
@@ -51,7 +50,7 @@ syncer = {
     isModuleLoaded = false,
     libraryName = imports.getResourceName(resource),
     librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest",
-    librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.toJSON(imports.getRealTime())),
+    librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.json.encode(imports.getRealTime())),
     libraryBandwidth = 0,
     syncedElements = {}
 }
@@ -211,7 +210,6 @@ if localPlayer then
                     })
                 else
                     syncer.scheduledAssets = nil
-                    imports.triggerEvent("onAssetifyLoad", resourceRoot)
                     thread:create(function(cThread)
                         for i, j in imports.pairs(availableAssetPacks) do
                             if i ~= "module" then
@@ -225,6 +223,7 @@ if localPlayer then
                                 end
                             end
                         end
+                        imports.triggerEvent("onAssetifyLoad", resourceRoot)
                     end):resume({
                         executions = downloadSettings.buildRate,
                         frames = 1
@@ -529,7 +528,7 @@ else
 
     imports.fetchRemote(syncer.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return false end
-        response = imports.fromJSON(response)
+        response = imports.json.decode(response)
         if response and response.tag_name and (syncer.libraryVersion ~= response.tag_name) then
             imports.outputDebugString("[Assetify]: Latest version available - "..response.tag_name, 3)
         end

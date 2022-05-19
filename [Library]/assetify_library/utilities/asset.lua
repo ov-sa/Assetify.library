@@ -22,7 +22,6 @@ local imports = {
     gettok = gettok,
     tonumber = tonumber,
     tostring = tostring,
-    fromJSON = fromJSON,
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
@@ -38,6 +37,7 @@ local imports = {
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
     file = file,
+    json = json,
     table = table,
     string = string,
     math = math
@@ -307,7 +307,7 @@ else
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
         local cAssetPack = imports.table.clone(assetPack, true)
         cAssetPack.manifestData = imports.file.read((asset.references.root)..imports.string.lower(assetType).."/"..(asset.references.manifest)..".json")
-        cAssetPack.manifestData = (cAssetPack.manifestData and imports.fromJSON(cAssetPack.manifestData)) or false
+        cAssetPack.manifestData = (cAssetPack.manifestData and imports.json.decode(cAssetPack.manifestData)) or false
         if cAssetPack.manifestData then
             cAssetPack.rwDatas = {}
             thread:create(function(cThread)
@@ -317,7 +317,7 @@ else
                     local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetName.."/"
                     local assetManifestPath = assetPath..(asset.references.asset)..".json"
                     local assetManifestData = imports.file.read(assetManifestPath)
-                    assetManifestData = (assetManifestData and imports.fromJSON(assetManifestData)) or false
+                    assetManifestData = (assetManifestData and imports.json.decode(assetManifestData)) or false
                     if assetManifestData then
                         assetManifestData.streamRange = imports.math.max(imports.tonumber(assetManifestData.streamRange) or 0, asset.ranges.streamRange)
                         assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
