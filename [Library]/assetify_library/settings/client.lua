@@ -16,3 +16,7 @@ GTAWorldSettings = {
     removeWorld = true,
     waterLevel = 0.01
 }
+
+rendererSettings = {
+    resolution = 1
+}
