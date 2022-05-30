@@ -149,8 +149,8 @@ if localPlayer then
                     if v.bump then
                         shaderTextures[("controlTex_"..k.."_bump")] = v.bump
                     end
-                    for x = 1, #shader.defaultData.shaderChannels, 1 do
-                        local y = shader.defaultData.shaderChannels[x]
+                    for x = 1, #shader.cache.validChannels, 1 do
+                        local y = shader.cache.validChannels[x]
                         if v[(y.index)] then
                             shaderTextures[("controlTex_"..k.."_"..(y.index))] = v[(y.index)].map
                             shaderInputs[("controlScale_"..k.."_"..(y.index))] = v[(y.index)].scale
@@ -237,7 +237,7 @@ if localPlayer then
                             sceneData.dimension = cAsset.manifestData.sceneDimension
                             sceneData.interior = cAsset.manifestData.sceneInterior
                             --TODO: DETECT IF ITS CLUMPED OR NOT...
-                            cAsset.unSynced.assetCache[i].cDummy = dummy:create("object", childName, sceneData)
+                            cAsset.unSynced.assetCache[i].cDummy = dummy:create("object", childName, _, _, SsceneData)
                         end
                         thread.pause()
                     end
@@ -362,6 +362,11 @@ if localPlayer then
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
         manager:clearElementBuffer(source)
+        for i, j in imports.pairs(light) do
+            if j and (imports.type(j) == "table") and j.clearElementBuffer then
+                j:clearElementBuffer(source)
+            end
+        end
     end)
 
     function manager:loadAnim(element, assetName)

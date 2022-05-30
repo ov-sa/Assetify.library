@@ -1,5 +1,4 @@
 static const float PI = 3.141592653589793f;
-
 float4x4 gWorld : WORLD;
 float4x4 gView : VIEW;
 float4x4 gProjection : PROJECTION;
@@ -12,14 +11,16 @@ float4x4 gViewInverse : VIEWINVERSE;
 float4x4 gWorldInverseTranspose : WORLDINVERSETRANSPOSE;
 float4x4 gViewInverseTranspose : VIEWINVERSETRANSPOSE;
 
-float3 gCameraPosition : CAMERAPOSITION;
-float3 gCameraDirection : CAMERADIRECTION;
-
 float gTime : TIME;
+bool gTimeSync = false;
+float gServerTick = 3600;
+float gMinuteDuration = 60;
 float4 gLightAmbient : LIGHTAMBIENT;
 float4 gLightDiffuse : LIGHTDIFFUSE;
 float4 gLightSpecular : LIGHTSPECULAR;
 float3 gLightDirection : LIGHTDIRECTION;
+float3 gCameraPosition : CAMERAPOSITION;
+float3 gCameraDirection : CAMERADIRECTION;
 
 int gLighting                      <string renderState="LIGHTING";>;
 float4 gGlobalAmbient              <string renderState="AMBIENT";>;
@@ -40,10 +41,12 @@ float4 gMaterialSpecular    <string materialState="Specular";>;
 float4 gMaterialEmissive    <string materialState="Emissive";>;
 float gMaterialSpecPower    <string materialState="Power";>;
 
+texture vSource0;
 texture gTexture0           <string textureState="0,Texture";>;
 texture gTexture1           <string textureState="1,Texture";>;
 texture gTexture2           <string textureState="2,Texture";>;
 texture gTexture3           <string textureState="3,Texture";>;
+bool vRenderingEnabled = false;
 
 int gDeclNormal             <string vertexDeclState="Normal";>;
 
@@ -217,7 +220,7 @@ float MTACalculateSpecular(float3 CamDir, float3 LightDir, float3 SurfNormal, fl
 float3 MTAApplyFog(float3 texel, float linDistance) {
     if (!gFogEnable)
         return texel;
- 
+
     float FogAmount = (linDistance - gFogStart)/(gFogEnd - gFogStart);
     texel.rgb = lerp(texel.rgb, gFogColor.rgb, saturate(FogAmount));
     return texel;
@@ -226,4 +229,16 @@ float3 MTAApplyFog(float3 texel, float linDistance) {
 void MTAFixUpNormal(in out float3 OutNormal) {
     if (OutNormal.x == 0 && OutNormal.y == 0 && OutNormal.z == 0)
         OutNormal = float3(0,0,1);
+}
+
+float4x4 MTACreateTranslationMatrix(float3 InPosition) {
+    return float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, InPosition.x, InPosition.y, InPosition.z, 1);
+}
+
+float MTAGetWeatherValue() {
+    float cDuration = gTimeSync ? gServerTick + gTime : gServerTick;
+    float cTick = cDuration/(60*gMinuteDuration);
+    float weatherValue = (cTick%24)/24;
+    bool isReverse = (floor(cTick/24)%2) != 0;
+    return isReverse ? 1 - weatherValue : weatherValue;
 }

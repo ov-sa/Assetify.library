@@ -86,7 +86,8 @@ end
 
 function clearModel(modelID)
     modelID = imports.tonumber(modelID)
-    if modelID and imports.engineImportTXD(asset.rwAssets.txd, modelID) then
+    if modelID then
+        imports.engineImportTXD(asset.rwAssets.txd, modelID)
         imports.engineReplaceModel(asset.rwAssets.dff, modelID, false)
         return true
     end
@@ -110,4 +111,43 @@ end
 function createAssetDummy(...)
     local cDummy = dummy:create(...)
     return (cDummy and cDummy.cDummy) or false
+end
+
+function isRendererVirtualRendering()
+    return renderer.cache.isVirtualRendering
+end
+
+function setRendererVirtualRendering(...)
+    return renderer:setVirtualRendering(...)
+end
+
+function getRendererVirtualSource()
+    return (renderer.cache.isVirtualRendering and renderer.cache.virtualSource) or false
+end
+
+function setRendererTimeSync(...)
+    return renderer:setTimeSync(...)
+end
+
+function setRendererServerTick(...)
+    return renderer:setServerTick(...)
+end
+
+function setRendererMinuteDuration(...)
+    return renderer:setMinuteDuration(...)
+end
+
+function createPlanarLight(...)
+    local cLight = light.planar:create(...)
+    return (cLight and cLight.cLight) or false
+end
+
+function setPlanarLightTexture(cLight, ...)
+    if not light.planar.buffer[cLight] then return false end
+    return light.planar.buffer[cLight]:setTexture(...)
+end
+
+function setPlanarLightColor(cLight, ...)
+    if not light.planar.buffer[cLight] then return false end
+    return light.planar.buffer[cLight]:setColor(...)
 end

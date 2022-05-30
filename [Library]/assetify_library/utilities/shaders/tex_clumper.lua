@@ -91,6 +91,7 @@ shaderRW[identifier] = function(shaderMaps)
 
     float4 PSHandler(PSInput PS) : COLOR0 {
         ]]..handlerBody..handlerFooter..[[
+        sampledTexel.rgb *= MTAGetWeatherValue();
         return saturate(sampledTexel);
     }
 

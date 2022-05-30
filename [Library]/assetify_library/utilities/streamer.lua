@@ -43,7 +43,7 @@ streamer = {
         clientCamera = imports.getCamera()
     },
     allocator = {
-        validStreams = {"bone"}
+        validStreams = {"dummy", "bone", "light"}
     }
 }
 streamer.__index = streamer
@@ -218,6 +218,7 @@ onBoneUpdate = function(streamBuffer)
     if streamBuffer and streamBuffer[clientDimension] and streamBuffer[clientDimension][clientInterior] then
         onBoneStream(streamBuffer[clientDimension][clientInterior])
     end
+    return true
 end
 
 imports.addEventHandler("onAssetifyLoad", root, function()

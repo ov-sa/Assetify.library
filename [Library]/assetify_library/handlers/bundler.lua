@@ -68,6 +68,7 @@ function onBundleLibrary()
                     table = table
                 }
             }
+
             assetify.execOnLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                 local isLoaded = assetify.isLoaded()
@@ -83,6 +84,7 @@ function onBundleLibrary()
                 end
                 return true
             end
+
             assetify.execOnModuleLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                 local isModuleLoaded = assetify.isModuleLoaded()
@@ -98,10 +100,12 @@ function onBundleLibrary()
                 end
                 return true
             end
+
             assetify.scheduleExec = {
                 buffer = {
                     onLoad = {}, onModuleLoad = {}
                 },
+
                 boot = function()
                     assetify.execOnLoad(function()
                         if #assetify.scheduleExec.buffer.onLoad > 0 then
@@ -123,11 +127,13 @@ function onBundleLibrary()
                     end)
                     return true
                 end,
+
                 execOnLoad = function(execFunc)
                     if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                     assetify.imports.table.insert(assetify.scheduleExec.buffer.onLoad, execFunc)
                     return true
                 end,
+
                 execOnModuleLoad = function(execFunc)
                     if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                     assetify.imports.table.insert(assetify.scheduleExec.buffer.onModuleLoad, execFunc)
@@ -136,6 +142,48 @@ function onBundleLibrary()
             }
 
             if localPlayer then
+                assetify.renderer = {
+                    isVirtualRendering = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isRendererVirtualRendering", ...)
+                    end,
+    
+                    setVirtualRendering = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererVirtualRendering", ...)
+                    end,
+
+                    getVirtualSource = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualSource", ...)
+                    end,
+
+                    setTimeSync = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererTimeSync", ...)
+                    end,
+
+                    setServerTick = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererServerTick", ...)
+                    end,
+
+                    setMinuteDuration = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererMinuteDuration", ...)
+                    end
+                }
+
+                assetify.light = {
+                    planar = {
+                        create = function(...)
+                            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createPlanarLight", ...)
+                        end,
+
+                        setTexture = function(...)
+                            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightTexture", ...)
+                        end,
+
+                        setColor = function(...)
+                            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightColor", ...)
+                        end
+                    }
+                }
+
                 assetify.getProgress = function(...)
                     return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getLibraryProgress", ...)
                 end

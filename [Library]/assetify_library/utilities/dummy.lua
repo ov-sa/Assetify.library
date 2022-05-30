@@ -50,10 +50,8 @@ function dummy:destroy(...)
 end
 
 function dummy:clearElementBuffer(element)
-    if not element or not imports.isElement(element) then return false end
-    if dummy.buffer[element] then
-        dummy.buffer[element]:destroy()
-    end
+    if not element or not imports.isElement(element) or not dummy.buffer[element] then return false end
+    dummy.buffer[element]:destroy()
     return true
 end
 
@@ -97,12 +95,5 @@ function dummy:unload()
     end
     dummy.buffer[self] = nil
     self = nil
-    return true
-end
-
-function dummy:stream()
-    if not self or (self == dummy) then return false end
-    if self.cStreamer or not self.cModelInstance or not self.cCollisionInstance then return false end
-    self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance})
     return true
 end

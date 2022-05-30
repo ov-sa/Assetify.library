@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="2.1.9"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="2.2.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -9,6 +9,9 @@
     <!-- Exports, Settings & Utilities -->
     <file src="utilities/rw/dict.rw"/>
     <file src="utilities/rw/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/dict.rw"/>
+    <file src="utilities/rw/planar_1x1/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/collision.rw"/>
     <script src="utilities/shared.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <file src="utilities/shaders/helper.fx"/>
@@ -16,6 +19,8 @@
     <script src="utilities/shaders/tex_changer.lua" type="client"/>
     <script src="utilities/shaders/tex_clumper.lua" type="client"/>
     <script src="utilities/shaders/tex_mapper.lua" type="client"/>
+    <script src="utilities/shaders/tex_exporter.lua" type="client"/>
+    <script src="utilities/shaders/light_planar.lua" type="client"/>
     <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
@@ -30,6 +35,9 @@
     <script src="utilities/dummy.lua" type="client"/>
     <script src="utilities/bone.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
+    <script src="utilities/renderer.lua" type="client"/>
+    <script src="utilities/light.lua" type="client"/>
+    <script src="utilities/lights/planar.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/builder.lua" type="server"/>
@@ -63,5 +71,14 @@
     <export function="playSoundAsset" type="client"/>
     <export function="playSoundAsset3D" type="client"/>
     <export function="createAssetDummy" type="client"/>
+    <export function="isRendererVirtualRendering" type="client"/>
+    <export function="setRendererVirtualRendering" type="client"/>
+    <export function="getRendererVirtualSource" type="client"/>
+    <export function="setRendererTimeSync" type="client"/>
+    <export function="setRendererServerTick" type="client"/>
+    <export function="setRendererMinuteDuration" type="client"/>
+    <export function="createPlanarLight" type="client"/>
+    <export function="setPlanarLightTexture" type="client"/>
+    <export function="setPlanarLightColor" type="client"/>
 
 </meta>

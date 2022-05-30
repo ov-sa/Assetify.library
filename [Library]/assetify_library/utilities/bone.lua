@@ -146,4 +146,5 @@ function bone:update()
     bone.cache.element[(self.parent)][(self.boneData.id)] = ((bone.cache.element[(self.parent)].streamTick == bone.cache.streamTick) and bone.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
     bone.cache.element[(self.parent)].streamTick = bone.cache.streamTick
     imports.setElementMatrix(self.element, imports.matrix.transform(bone.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z))
+    return true
 end
