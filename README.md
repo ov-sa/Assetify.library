@@ -32,6 +32,7 @@
 * Built-In LOD Streamer (Integrated w/ Assetify's Streamer)
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
 * Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
+* Built-In Custom Lights (Integrated w/ Assetify's Streamer)
 * Built-In Assetify Mapper (`assetify_mapper`)
 * Built-In Model Clearer & Restorer
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
