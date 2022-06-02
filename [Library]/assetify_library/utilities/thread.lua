@@ -14,17 +14,15 @@
 
 local imports = {
     type = type,
+    unpack = unpack,
     tonumber = tonumber,
     setmetatable = setmetatable,
     collectgarbage = collectgarbage,
     setTimer = setTimer,
     isTimer = isTimer,
     killTimer = killTimer,
-    coroutine = {
-        create = coroutine.create,
-        resume = coroutine.resume,
-        status = coroutine.status
-    }
+    coroutine = coroutine,
+    math = math
 }
 
 
@@ -33,16 +31,23 @@ local imports = {
 -----------------------
 
 thread = {
-    pause = coroutine.yield
+    buffer = {}
 }
 thread.__index = thread
 
-function thread:create(threadFunction)
-    if not threadFunction or imports.type(threadFunction) ~= "function" then return false end
-    local createdThread = imports.setmetatable({}, {__index = self})
-    createdThread.syncRate = {}
-    createdThread.thread = imports.coroutine.create(threadFunction)
-    return createdThread
+function thread:isInstance(cThread)
+    if not self then return false end
+    if self == thread then return (cThread and thread.buffer[cThread] and true) or false end
+    return (thread.buffer[self] and true) or false
+end
+
+function thread:create(exec)
+    if not exec or imports.type(exec) ~= "function" then return false end
+    local cThread = imports.setmetatable({}, {__index = self})
+    cThread.syncRate = {}
+    cThread.thread = imports.coroutine.create(exec)
+    thread.buffer[cThread] = true
+    return cThread
 end
 
 function thread:destroy()
@@ -50,6 +55,7 @@ function thread:destroy()
     if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end
+    thread.buffer[self] = nil
     self = nil
     imports.collectgarbage()
     return true
@@ -62,6 +68,10 @@ function thread:status()
     else
         return imports.coroutine.status(self.thread)
     end
+end
+
+function thread:pause()
+    return imports.coroutine.yield()
 end
 
 function thread:resume(syncRate)
@@ -101,3 +111,37 @@ function thread:resume(syncRate)
     end
     return true
 end
+
+function thread:sleep(duration)
+    duration = imports.math.max(0, imports.tonumber(duration) or 0)
+    if not self or (self == thread) then return false end
+    if self.timer and imports.isTimer(self.timer) then return false end
+    self.timer = imports.setTimer(function()
+        self:resume()
+    end, duration, 1)
+    self:pause()
+    return true
+end
+
+function thread:await(exec)
+    if not self or (self == thread) then return false end
+    if not exec or imports.type(exec) ~= "function" then return self:resolve(exec) end
+    exec(self)
+    self.isScheduled = true
+    thread:pause()
+    local resolvedValues = self.scheduledValues
+    self.scheduledValues = nil
+    return imports.unpack(resolvedValues)
+end
+
+function thread:resolve(...)
+    if not self or (self == thread) then return false end
+    if not self.isScheduled then return false end
+    self.scheduledValues = {...}
+    self:resume()
+    return true
+end
+
+function async(...) return thread:create(...) end
+function await(...) return thread:await(...) end
+function sleep(...) return thread:sleep(...) end

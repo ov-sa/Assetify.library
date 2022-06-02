@@ -298,7 +298,7 @@ else
                     end
                 end
             end
-            thread.pause()
+            thread:pause()
         end
         return true
     end
@@ -311,7 +311,7 @@ else
         if cAssetPack.manifestData then
             cAssetPack.rwDatas = {}
             thread:create(function(cThread)
-                local callbackReference = callback
+                local cbRef = callback
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetName = cAssetPack.manifestData[i]
                     local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetName.."/"
@@ -356,7 +356,7 @@ else
                             assetManifestData.assetSounds = false
                             assetManifestData.shaderMaps = false
                             asset:buildFile(assetPath..(asset.references.asset)..".ifp", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                            thread.pause()
+                            thread:pause()
                         elseif assetType == "sound" then
                             assetManifestData.streamRange = false
                             assetManifestData.enableLODs = false
@@ -372,14 +372,14 @@ else
                                             if v then
                                                 assetSounds[i][k] = v
                                                 asset:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                                thread.pause()
+                                                thread:pause()
                                             end
                                         end
                                     end
                                 end
                                 assetManifestData.assetSounds = assetSounds
                             end
-                            thread.pause()
+                            thread:pause()
                         else
                             assetManifestData.assetAnimations = false
                             assetManifestData.assetSounds = false
@@ -424,7 +424,7 @@ else
                                             if parsedIDEDatas and parsedIDEDatas[childName] then
                                                 asset:buildFile(assetPath.."txd/"..(parsedIDEDatas[childName][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             end
-                                            thread.pause()
+                                            thread:pause()
                                         end
                                     end
                                 end
@@ -435,13 +435,13 @@ else
                                         asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset:buildFile(assetPath.."clump/"..j.."/"..(asset.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        thread.pause()
+                                        thread:pause()
                                     end
                                 else
                                     asset:buildFile(assetPath..(asset.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                 end
                                 asset:buildFile(assetPath..(asset.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                thread.pause()
+                                thread:pause()
                             end
                             if assetManifestData.shaderMaps then
                                 asset:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
@@ -459,25 +459,25 @@ else
                                                 v[m] = assetPath.."dep/"..v[m]
                                                 assetDeps[i][k][m] = v[m]
                                                 asset:buildFile(assetDeps[i][k][m], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData, k == "server")
-                                                thread.pause()
+                                                thread:pause()
                                             end
                                         else
                                             j[k] = assetPath.."dep/"..j[k]
                                             assetDeps[i][k] = j[k]
                                             asset:buildFile(assetDeps[i][k], cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, cAssetPack.rwDatas[assetName].unSynced.rawData)
                                         end
-                                        thread.pause()
+                                        thread:pause()
                                     end
                                 end
-                                thread.pause()
+                                thread:pause()
                             end
                             assetManifestData.assetDeps = assetDeps
                         end
                     end
                 end
                 assetPack.assetPack = cAssetPack
-                if callbackReference and (imports.type(callbackReference) == "function") then
-                    callbackReference(true, assetType)
+                if cbRef and (imports.type(cbRef) == "function") then
+                    cbRef(true, assetType)
                 end
             end):resume({
                 executions = downloadSettings.buildRate,
@@ -485,8 +485,8 @@ else
             })
             return true
         end
-        if callbackReference and (imports.type(callbackReference) == "function") then
-            callbackReference(false, assetType)
+        if cbRef and (imports.type(cbRef) == "function") then
+            cbRef(false, assetType)
         end
         return false
     end

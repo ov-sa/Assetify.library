@@ -48,12 +48,6 @@ shaderRW[identifier] = function()
     float2 lightResolution = float2(1, 1);
     float4 lightColor = float4(1, 1, 1, 1);
     texture baseTexture;
-    sampler baseSampler = sampler_state {
-        Texture = baseTexture;
-    };
-    sampler vSourceSampler = sampler_state {
-        Texture = (vSource0);
-    };
     struct VSInput {
         float4 Position : POSITION0;
         float4 Diffuse : COLOR0;
@@ -62,6 +56,20 @@ shaderRW[identifier] = function()
     struct PSInput {
         float4 Position : POSITION0;
         float2 TexCoord : TEXCOORD0;
+    };
+    struct Export {
+        float4 World : COLOR0;
+        float4 Diffuse : COLOR1;
+        float4 Emissive : COLOR2;
+    };
+    sampler baseSampler = sampler_state {
+        Texture = baseTexture;
+    };
+    sampler vSource0Sampler = sampler_state {
+        Texture = (vSource0);
+    };
+    sampler vSource1Sampler = sampler_state {
+        Texture = (vSource1);
     };
 
     
@@ -78,20 +86,26 @@ shaderRW[identifier] = function()
         float4 worldViewPosition = float4(worldViewMatrix[3].xyz + position.xzy - lightOffset.xzy, 1);
         worldViewPosition.xyz += 1.5*mul(normalize(gCameraPosition - lightOffset), gView).xyz;
         PS.Position = mul(worldViewPosition, gProjection);
-        PS.TexCoord = float2(VS.TexCoord.x, 1 - VS.TexCoord.y);
+        PS.TexCoord = float2(VS.TexCoord.x, VS.TexCoord.y);
         return PS;
     }
     
-    float4 PSHandler(PSInput PS) : COLOR0 {
+    Export PSHandler(PSInput PS) : COLOR0 {
+        Export output;
         float4 sampledTexel = tex2D(baseSampler, PS.TexCoord.xy);
         sampledTexel.rgb = pow(sampledTexel.rgb*1.5, 1.5);
+        output.Diffuse = 0;
         if (vRenderingEnabled) {
-            float4 sourceTex = tex2D(vSourceSampler, PS.TexCoord.xy);
+            float4 sourceTex = vSource1Enabled ? tex2D(vSource1Sampler, PS.TexCoord.xy) : tex2D(vSource0Sampler, PS.TexCoord.xy);
             sampledTexel.rgb *= lerp(sampledTexel.rgb, sourceTex.rgb*2.5, 0.95);
+        } else {
+            output.Emissive = 0;
         }
         sampledTexel *= lightColor;
         sampledTexel.rgb *= 1 + (1 - MTAGetWeatherValue());
-        return saturate(sampledTexel);
+        if (vRenderingEnabled) output.Emissive = sampledTexel;
+        output.World = saturate(sampledTexel);
+        return output;
     }
     
 

@@ -83,16 +83,35 @@ shaderRW[identifier] = function(shaderMaps)
         float4 Diffuse : COLOR0;
         float2 TexCoord : TEXCOORD0;
     };
+    struct Export {
+        float4 World : COLOR0;
+        float4 Diffuse : COLOR1;
+        float4 Emissive : COLOR2;
+    };
 
 
     /*----------------
     -->> Handlers <<--
     ------------------*/
 
-    float4 PSHandler(PSInput PS) : COLOR0 {
+    Export PSHandler(PSInput PS) : COLOR0 {
+        Export output;
         ]]..handlerBody..handlerFooter..[[
+        if (vRenderingEnabled) {
+            if (vEmissiveSource) {
+                output.Diffuse = 0;
+                output.Emissive = sampledTexel;
+            } else {
+                output.Diffuse = sampledTexel;
+                output.Emissive = 0;
+            }
+        } else {
+            output.Diffuse = 0;
+            output.Emissive = 0;
+        }
         sampledTexel.rgb *= MTAGetWeatherValue();
-        return saturate(sampledTexel);
+        output.World = saturate(sampledTexel);
+        return output;
     }
 
 

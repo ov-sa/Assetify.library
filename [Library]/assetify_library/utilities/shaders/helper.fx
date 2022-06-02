@@ -41,12 +41,18 @@ float4 gMaterialSpecular    <string materialState="Specular";>;
 float4 gMaterialEmissive    <string materialState="Emissive";>;
 float gMaterialSpecPower    <string materialState="Power";>;
 
+float2 vResolution = false;
+bool vEmissiveSource = false;
+bool vRenderingEnabled = false;
+bool vSource1Enabled = false;
+bool vSource2Enabled = false;
 texture vSource0;
+texture vSource1 <string renderTarget = "yes";>;
+texture vSource2 <string renderTarget = "yes";>;
 texture gTexture0           <string textureState="0,Texture";>;
 texture gTexture1           <string textureState="1,Texture";>;
 texture gTexture2           <string textureState="2,Texture";>;
 texture gTexture3           <string textureState="3,Texture";>;
-bool vRenderingEnabled = false;
 
 int gDeclNormal             <string vertexDeclState="Normal";>;
 

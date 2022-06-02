@@ -132,7 +132,7 @@ if localPlayer then
                     syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[i]
                 end
                 fileData = nil
-                thread.pause()
+                thread:pause()
             end
             imports.triggerLatentServerEvent("Assetify:onRecieveHash", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
             imports.collectgarbage()
@@ -200,7 +200,7 @@ if localPlayer then
                                 if j then
                                     imports.loadAsset("module", i)
                                 end
-                                thread.pause()
+                                thread:pause()
                             end
                         end
                         imports.triggerEvent("onAssetifyModuleLoad", localPlayer)
@@ -218,7 +218,7 @@ if localPlayer then
                                         if v then
                                             imports.loadAsset(i, k)
                                         end
-                                        thread.pause()
+                                        thread:pause()
                                     end
                                 end
                             end
@@ -311,7 +311,7 @@ else
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, i)
-                    thread.pause()
+                    thread:pause()
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -330,7 +330,7 @@ else
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncBoneAttachment(element, parent, boneData, j)
-                    thread.pause()
+                    thread:pause()
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -349,7 +349,7 @@ else
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncBoneDetachment(element, j)
-                    thread.pause()
+                    thread:pause()
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -368,7 +368,7 @@ else
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncBoneRefreshment(element, boneData, j)
-                    thread.pause()
+                    thread:pause()
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -394,7 +394,7 @@ else
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncClearBoneAttachment(element, j)
-                    thread.pause()
+                    thread:pause()
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -421,10 +421,10 @@ else
                                     isModuleVoid = false
                                     syncer:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
                                     syncer:syncHash(player, "module", k, v.unSynced.fileHash)
-                                    thread.pause()
+                                    thread:pause()
                                 end
                             end
-                            thread.pause()
+                            thread:pause()
                         end
                     end
                     if isModuleVoid then
@@ -444,10 +444,10 @@ else
                                             isLibraryVoid = false
                                             syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
                                             syncer:syncHash(player, i, m, n.unSynced.fileHash)
-                                            thread.pause()
+                                            thread:pause()
                                         end
                                     end
-                                    thread.pause()
+                                    thread:pause()
                                 end
                             end
                         end
@@ -465,11 +465,11 @@ else
                     if i ~= "assetSize" then
                         syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
                     end
-                    thread.pause()
+                    thread:pause()
                 end
                 for i, j in imports.pairs(assetDatas.hashes) do
                     syncer:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
-                    thread.pause()
+                    thread:pause()
                 end
                 syncer:syncState(player, assetDatas.type, assetDatas.name)
             end):resume({
@@ -501,13 +501,13 @@ else
                 if j then
                     syncer:syncElementModel(i, j.type, j.name, j.clump, j.clumpMaps, source)
                 end
-                thread.pause()
+                thread:pause()
             end
             for i, j in imports.pairs(syncer.syncedBoneAttachments) do
                 if j then
                     syncer:syncBoneAttachment(i, j.parent, j.boneData, source)
                 end
-                thread.pause()
+                thread:pause()
             end
         end):resume({
             executions = downloadSettings.syncRate,

@@ -23,6 +23,7 @@ local imports = {
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     dxCreateScreenSource = dxCreateScreenSource,
+    dxCreateRenderTarget = dxCreateRenderTarget,
     dxUpdateScreenSource = dxUpdateScreenSource,
     dxSetShaderValue = dxSetShaderValue
 }
@@ -51,20 +52,28 @@ end
 
 function renderer:syncShader(syncShader)
     if not syncShader then return false end
-    renderer:setVirtualRendering(_, syncShader, syncer.librarySerial)
+    renderer:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
     renderer:setTimeSync(_, syncShader, syncer.librarySerial)
     renderer:setServerTick(_, syncShader, syncer.librarySerial)
     renderer:setMinuteDuration(_, syncShader, syncer.librarySerial)
     return true
 end
 
-function renderer:setVirtualRendering(state, syncShader, isInternal)
+function renderer:setVirtualRendering(state, rtModes, syncShader, isInternal)
     if not syncShader then
         state = (state and true) or false
+        rtModes = (rtModes and (imports.type(rtModes) == "table") and rtModes) or false
         if renderer.cache.isVirtualRendering == state then return false end
         renderer.cache.isVirtualRendering = state
         if renderer.cache.isVirtualRendering then
             renderer.cache.virtualSource = imports.dxCreateScreenSource(renderer.resolution[1], renderer.resolution[2])
+            renderer.cache.virtualRTs = renderer.cache.virtualRTs or {}
+            if rtModes.diffuse then
+                renderer.cache.virtualRTs.diffuse = imports.dxCreateRenderTarget(renderer.resolution[1], renderer.resolution[2], true)
+                if rtModes.emissive then
+                    renderer.cache.virtualRTs.emissive = imports.dxCreateRenderTarget(renderer.resolution[1], renderer.resolution[2], false)
+                end
+            end
             imports.addEventHandler("onClientHUDRender", root, renderer.render)
         else
             imports.removeEventHandler("onClientHUDRender", root, renderer.render)
@@ -72,17 +81,29 @@ function renderer:setVirtualRendering(state, syncShader, isInternal)
                 imports.destroyElement(renderer.cache.virtualSource)
             end
             renderer.cache.virtualSource = nil
+            for i, j in imports.pairs(renderer.cache.virtualRTs) do
+                if j and imports.isElement(j) then
+                    imports.destroyElement(j)
+                end
+                renderer.cache.virtualRTs[i] = nil
+            end
         end
         for i, j in imports.pairs(shader.buffer.shader) do
-            renderer:setVirtualRendering(_, i, syncer.librarySerial)
+            renderer:setVirtualRendering(_, _, i, syncer.librarySerial)
         end
     else
         local isExternalResource = sourceResource and (sourceResource ~= resource)
         if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
             return false
         end
+        local vSource0, vSource1, vSource2 = (renderer.cache.isVirtualRendering and renderer.cache.virtualSource) or false, (renderer.cache.isVirtualRendering and renderer.cache.virtualRTs.diffuse) or false, (renderer.cache.isVirtualRendering and renderer.cache.virtualRTs.emissive) or false
+        imports.dxSetShaderValue(syncShader, "vResolution", (renderer.cache.isVirtualRendering and renderer.resolution) or false)
         imports.dxSetShaderValue(syncShader, "vRenderingEnabled", (renderer.cache.isVirtualRendering and true) or false)
-        imports.dxSetShaderValue(syncShader, "vSource0", (renderer.cache.isVirtualRendering and renderer.cache.virtualSource) or false)
+        imports.dxSetShaderValue(syncShader, "vSource0", vSource0)
+        imports.dxSetShaderValue(syncShader, "vSource1", vSource1)
+        imports.dxSetShaderValue(syncShader, "vSource1Enabled", (vSource1 and true) or false)
+        imports.dxSetShaderValue(syncShader, "vSource2", vSource2)
+        imports.dxSetShaderValue(syncShader, "vSource2Enabled", (vSource2 and true) or false)
     end
     return true
 end

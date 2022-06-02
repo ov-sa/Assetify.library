@@ -48,7 +48,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
                     cThread:resume()
                 end, 1, 1)
             end)
-            thread.pause()
+            thread:pause()
         end
         onLibraryLoaded()
     end):resume()

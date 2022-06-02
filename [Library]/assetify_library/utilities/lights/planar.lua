@@ -85,7 +85,7 @@ function light.planar:clearElementBuffer(element)
     return true
 end
 
-function light.planar:load(lightType, lightData, shaderInputs)
+function light.planar:load(lightType, lightData, shaderInputs, isScoped)
     if not self or (self == light.planar) then return false end
     if not lightType or not lightData or not shaderInputs then return false end
     local lightCache = light.planar.cache.validTypes[lightType]
@@ -117,6 +117,7 @@ function light.planar:load(lightType, lightData, shaderInputs)
     self.lightData.shaderInputs = shaderInputs
     self:setColor(self.lightData.color and self.lightData.color.r, self.lightData.color and self.lightData.color.g, self.lightData.color and self.lightData.color.b, self.lightData.color and self.lightData.color.a)
     imports.engineApplyShaderToWorldTexture(self.cShader, lightCache.textureName, self.cLight)
+    if isScoped then manager:setElementScoped(self.cLight) end
     return true
 end
 

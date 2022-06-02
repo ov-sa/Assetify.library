@@ -125,6 +125,10 @@ function getRendererVirtualSource()
     return (renderer.cache.isVirtualRendering and renderer.cache.virtualSource) or false
 end
 
+function getRendererVirtualRTs()
+    return (renderer.cache.isVirtualRendering and renderer.cache.virtualRTs) or false
+end
+
 function setRendererTimeSync(...)
     return renderer:setTimeSync(...)
 end

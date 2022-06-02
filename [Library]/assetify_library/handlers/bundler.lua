@@ -155,6 +155,10 @@ function onBundleLibrary()
                         return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualSource", ...)
                     end,
 
+                    getVirtualRTs = function(...)
+                        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualRTs", ...)
+                    end,
+
                     setTimeSync = function(...)
                         return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererTimeSync", ...)
                     end,

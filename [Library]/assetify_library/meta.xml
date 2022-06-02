@@ -74,6 +74,7 @@
     <export function="isRendererVirtualRendering" type="client"/>
     <export function="setRendererVirtualRendering" type="client"/>
     <export function="getRendererVirtualSource" type="client"/>
+    <export function="getRendererVirtualRTs" type="client"/>
     <export function="setRendererTimeSync" type="client"/>
     <export function="setRendererServerTick" type="client"/>
     <export function="setRendererMinuteDuration" type="client"/>
