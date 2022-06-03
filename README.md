@@ -14,7 +14,7 @@
 
 ## ━ Features
 
-💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovileamriam) **US TO SUPPORT THE DEVELOPMENT.**
+💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovStudio) **US TO SUPPORT THE DEVELOPMENT.**
 
 * Completely Open-Source
 * Modular Programming
