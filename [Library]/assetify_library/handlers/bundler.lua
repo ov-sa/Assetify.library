@@ -22,7 +22,7 @@ local imports = {
 --[[ Variables ]]--
 -------------------
 
-local bundlerData, threaderData = false, false
+local bundler = {}
 
 
 -----------------------------------
@@ -30,9 +30,9 @@ local bundlerData, threaderData = false, false
 -----------------------------------
 
 function fetchImports(recieveData)
-    if not bundlerData then return false end
+    if not bundler.library then return false end
     if recieveData == true then
-        return bundlerData
+        return bundler.library
     else
         return [[
         local importList = call(getResourceFromName("]]..syncer.libraryName..[["), "fetchImports", true)
@@ -44,7 +44,11 @@ function fetchImports(recieveData)
 end
 
 function fetchThreader()
-    return threaderData or false
+    return bundler.thread or false
+end
+
+function fetchNetworker()
+    return bundler.network or false
 end
 
 
@@ -53,14 +57,18 @@ end
 -----------------------------------
 
 function onBundleLibrary()
-    threaderData = imports.file.read("utilities/thread.lua")
-    local importedModules = {
-        bundler = imports.file.read("utilities/shared.lua")..[[
+    bundler.thread = imports.file.read("utilities/threader.lua")
+    bundler.network = imports.file.read("utilities/networker.lua")
+    local libraryModules = {
+        library = imports.file.read("utilities/shared.lua")..[[
             assetify = {
                 imports = {
                     resourceName = "]]..syncer.libraryName..[[",
                     type = type,
                     call = call,
+                    pcall = pcall,
+                    assert = assert,
+                    print = print,
                     loadstring = loadstring,
                     getResourceFromName = getResourceFromName,
                     addEventHandler = addEventHandler,
@@ -269,7 +277,11 @@ function onBundleLibrary()
                     local j = moduleTypes[i]
                     if cAsset.manifestData.assetDeps.script[j] then
                         for k = 1, #cAsset.manifestData.assetDeps.script[j], 1 do
-                            assetify.imports.loadstring(assetify.getAssetDep("module", assetName, "script", j, k))()
+                            local rwData = assetify.getAssetDep("module", assetName, "script", j, k)
+                            if not assetify.imports.pcall(assetify.imports.loadstring(rwData)) then
+                                assetify.imports.print("[Module: "..assetName.."] "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
+                                assetify.imports.assert(assetify.imports.loadstring(rwData))
+                            end
                         end
                     end
                 end
@@ -301,7 +313,7 @@ function onBundleLibrary()
             end
         ]]
     }
-    bundlerData = {}
-    imports.table.insert(bundlerData, importedModules.bundler)
+    bundler.library = {}
+    imports.table.insert(bundler.library, libraryModules.library)
 end
 onBundleLibrary()
