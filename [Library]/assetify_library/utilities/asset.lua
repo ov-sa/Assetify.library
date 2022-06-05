@@ -319,13 +319,13 @@ else
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath.."dep/"..v[m]
                             __assetDeps[i][k][m] = v[m]
-                            asset:buildFile(__assetDeps[i][k][m], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, k == "server", true)
+                            asset:buildFile(__assetDeps[i][k][m], filePointer, encryptKey, filePointer.unSynced.rawData, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath.."dep/"..j[k]
                         __assetDeps[i][k] = j[k]
-                        asset:buildFile(__assetDeps[i][k], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, _, true)
+                        asset:buildFile(__assetDeps[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
                     end
                     thread:pause()
                 end
