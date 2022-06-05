@@ -312,20 +312,20 @@ else
         local __assetDeps = {}
         for i, j in imports.pairs(assetDeps) do
             if j and (imports.type(j) == "table") then
-                assetDeps[i] = {}
+                __assetDeps[i] = {}
                 for k, v in imports.pairs(j) do
-                    assetDeps[i][k] = {}
+                    __assetDeps[i][k] = {}
                     if i == "script" then
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath.."dep/"..v[m]
-                            assetDeps[i][k][m] = v[m]
-                            asset:buildFile(assetDeps[i][k][m], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, k == "server", true)
+                            __assetDeps[i][k][m] = v[m]
+                            asset:buildFile(__assetDeps[i][k][m], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath.."dep/"..j[k]
-                        assetDeps[i][k] = j[k]
-                        asset:buildFile(assetDeps[i][k], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, _, true)
+                        __assetDeps[i][k] = j[k]
+                        asset:buildFile(__assetDeps[i][k], filePointer, assetManifestData.encryptKey, filePointer.unSynced.rawData, _, true)
                     end
                     thread:pause()
                 end
