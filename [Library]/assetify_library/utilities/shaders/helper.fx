@@ -13,7 +13,7 @@ float4x4 gViewInverseTranspose : VIEWINVERSETRANSPOSE;
 
 float gTime : TIME;
 bool gTimeSync = false;
-float gServerTick = 3600;
+float gServerTick = 60*60*12;
 float gMinuteDuration = 60;
 float4 gLightAmbient : LIGHTAMBIENT;
 float4 gLightDiffuse : LIGHTDIFFUSE;
@@ -243,8 +243,8 @@ float4x4 MTACreateTranslationMatrix(float3 InPosition) {
 
 float MTAGetWeatherValue() {
     float cDuration = gTimeSync ? gServerTick + gTime : gServerTick;
-    float cTick = cDuration/(60*gMinuteDuration);
-    float weatherValue = (cTick%24)/24;
-    bool isReverse = (floor(cTick/24)%2) != 0;
-    return isReverse ? 1 - weatherValue : weatherValue;
+    cDuration = (cDuration/(60*gMinuteDuration))%24;
+    float weatherClamp = 0.002;
+    float weatherValue = cDuration/12;
+    return (cDuration >= 12) ? max(weatherClamp, 2 - weatherValue) : max(weatherClamp, weatherValue);
 }

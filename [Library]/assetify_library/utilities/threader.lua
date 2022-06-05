@@ -36,7 +36,7 @@ thread = {
 thread.__index = thread
 
 function thread:isInstance(cThread)
-    if not self then return false end
+    if not self or (imports.type(cThread) ~= "table") then return false end
     if self == thread then return (cThread.isThread and true) or false end
     return (self.isThread and true) or false
 end

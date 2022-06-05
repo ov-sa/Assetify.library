@@ -38,8 +38,8 @@ renderer = {
     cache = {
         isVirtualRendering = false,
         isTimeSynced = false,
-        serverTick = 3600000,
-        minuteDuration = 60000
+        serverTick = 60*60*12,
+        minuteDuration = 60
     }
 }
 renderer.resolution[1], renderer.resolution[2] = renderer.resolution[1]*rendererSettings.resolution, renderer.resolution[2]*rendererSettings.resolution
@@ -114,7 +114,7 @@ function renderer:setTimeSync(state, syncShader, isInternal)
         if renderer.cache.isTimeSynced == state then return false end
         renderer.cache.isTimeSynced = state
         if not renderer.cache.isTimeSynced then
-            renderer.cache.serverTick = ((renderer.cache.serverTick or 0)*1000) + (imports.getTickCount() - (renderer.cache.__serverTick or 0))
+            renderer:setServerTick(((renderer.cache.serverTick or 0)*1000) + (imports.getTickCount() - (renderer.cache.__serverTick or 0)))
         end
         for i, j in imports.pairs(shader.buffer.shader) do
             renderer:setTimeSync(_, i, syncer.librarySerial)
@@ -125,9 +125,6 @@ function renderer:setTimeSync(state, syncShader, isInternal)
             return false
         end
         imports.dxSetShaderValue(syncShader, "gTimeSync", renderer.cache.isTimeSynced)
-        if renderer.cache.isTimeSynced then
-            renderer:setServerTick(_, syncShader, isInternal)
-        end
     end
     return true
 end

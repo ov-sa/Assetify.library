@@ -42,6 +42,7 @@ local imports = {
 ---------------
 
 decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
+    if not decodeData or (imports.type(decodeData) ~= "string") then return false end
     local rawString = imports.decodeString(decodeType, decodeData, decodeOptions)
     if not rawString then return false end
     if removeNull then
