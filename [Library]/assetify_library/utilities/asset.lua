@@ -309,7 +309,7 @@ else
     end
 
     function asset:buildDep(assetPath, assetDeps, filePointer, encryptKey)
-        local assetDeps = {}
+        local __assetDeps = {}
         for i, j in imports.pairs(assetDeps) do
             if j and (imports.type(j) == "table") then
                 assetDeps[i] = {}
@@ -332,7 +332,7 @@ else
             end
             thread:pause()
         end
-        return assetDeps
+        return __assetDeps
     end
 
     function asset:buildPack(assetType, assetPack, callback)
