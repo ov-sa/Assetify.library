@@ -73,28 +73,6 @@ function getElementAssetInfo(element)
     return syncer.syncedElements[element].type, syncer.syncedElements[element].name, syncer.syncedElements[element].clump, syncer.syncedElements[element].clumpMaps
 end
 
-function setBoneAttachment(element, parent, ...)
-    if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) then return false end
-    local arguments = {...}
-    return syncer:syncBoneAttachment(element, parent, arguments[1])
-end
-
-function setBoneDetachment(element)
-    if not element or not imports.isElement(element) then return false end
-    return syncer:syncBoneDetachment(element)
-end
-
-function setBoneRefreshment(element, ...)
-    if not element or not imports.isElement(element) then return false end
-    local arguments = {...}
-    return syncer:syncBoneRefreshment(element, arguments[1])
-end
-
-function clearBoneAttachment(element, ...)
-    if not element or not imports.isElement(element) then return false end
-    return syncer:syncClearBoneAttachment(element)
-end
-
 function setGlobalData(data, value)
     if imports.type(data) ~= "string" then return false end
     syncer.syncedGlobalDatas[data] = value
@@ -119,4 +97,26 @@ function getElementData(element, data)
         return syncer.syncedElementDatas[element][data]
     end
     return nil
+end
+
+function setBoneAttachment(element, parent, ...)
+    if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) then return false end
+    local arguments = {...}
+    return syncer:syncBoneAttachment(element, parent, arguments[1])
+end
+
+function setBoneDetachment(element)
+    if not element or not imports.isElement(element) then return false end
+    return syncer:syncBoneDetachment(element)
+end
+
+function setBoneRefreshment(element, ...)
+    if not element or not imports.isElement(element) then return false end
+    local arguments = {...}
+    return syncer:syncBoneRefreshment(element, arguments[1])
+end
+
+function clearBoneAttachment(element, ...)
+    if not element or not imports.isElement(element) then return false end
+    return syncer:syncClearBoneAttachment(element)
 end
