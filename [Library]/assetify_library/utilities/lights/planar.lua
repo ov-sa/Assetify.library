@@ -30,7 +30,6 @@ local imports = {
     engineApplyShaderToWorldTexture = engineApplyShaderToWorldTexture,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
-    setElementDoubleSided = setElementDoubleSided,
     setElementDimension = setElementDimension,
     setElementInterior = setElementInterior,
     clearModel = clearModel,
@@ -45,7 +44,7 @@ local imports = {
 light.planar = {
     cache = {
         validTypes = {
-            {index = "planar_1x1", textureName = "assetify_light_planar", resolution = {1, 1}}
+            {index = "planar_1x1", textureName = "assetify_light_planar"}
         }
     },
     buffer = {}
@@ -85,7 +84,7 @@ function light.planar:clearElementBuffer(element)
     return true
 end
 
-function light.planar:load(lightType, lightData, shaderInputs, isScoped)
+function light.planar:load(lightType, lightData, shaderInputs, isScoped, isDefaultStreamer)
     if not self or (self == light.planar) then return false end
     if not lightType or not lightData or not shaderInputs then return false end
     local lightCache = light.planar.cache.validTypes[lightType]
@@ -95,10 +94,9 @@ function light.planar:load(lightType, lightData, shaderInputs, isScoped)
     lightData.rotation.x, lightData.rotation.y, lightData.rotation.z = imports.tonumber(lightData.rotation.x) or 0, imports.tonumber(lightData.rotation.y) or 0, imports.tonumber(lightData.rotation.z) or 0
     self.cModelInstance = imports.createObject(lightCache.modelID, lightData.position.x, lightData.position.y, lightData.position.z, lightData.rotation.x, lightData.rotation.y, lightData.rotation.z)
     self.syncRate = imports.tonumber(lightData.syncRate)
-    imports.setElementDoubleSided(self.cModelInstance, true)
     imports.setElementDimension(self.cModelInstance, imports.tonumber(lightData.dimension) or 0)
     imports.setElementInterior(self.cModelInstance, imports.tonumber(lightData.interior) or 0)
-    if lightCache.collisionID then
+    if not isDefaultStreamer and lightCache.collisionID then
         self.cCollisionInstance = imports.createObject(lightCache.collisionID, lightData.position.x, lightData.position.y, lightData.position.z, lightData.rotation.x, lightData.rotation.y, lightData.rotation.z)
         imports.setElementAlpha(self.cCollisionInstance, 0)
         self.cStreamer = streamer:create(self.cModelInstance, "light", {self.cCollisionInstance}, self.syncRate)
@@ -112,9 +110,9 @@ function light.planar:load(lightType, lightData, shaderInputs, isScoped)
     for i, j in imports.pairs(shaderInputs) do
         imports.dxSetShaderValue(self.cLight, i, j)
     end
-    imports.dxSetShaderValue(self.cShader, "lightResolution", lightCache.resolution[1], lightCache.resolution[2])
     self.lightData = lightData
     self.lightData.shaderInputs = shaderInputs
+    self:setResolution(self.lightData.resolution)
     self:setColor(self.lightData.color and self.lightData.color.r, self.lightData.color and self.lightData.color.g, self.lightData.color and self.lightData.color.b, self.lightData.color and self.lightData.color.a)
     imports.engineApplyShaderToWorldTexture(self.cShader, lightCache.textureName, self.cLight)
     if isScoped then manager:setElementScoped(self.cLight) end
@@ -139,6 +137,13 @@ function light.planar:unload()
         imports.destroyElement(self.cShader)
     end
     self = nil
+    return true
+end
+
+function light.planar:setResolution(resolution)
+    if not self or (self == light.planar) then return false end
+    self.lightData.resolution = imports.math.max(0, imports.tonumber(resolution) or 1)
+    imports.dxSetShaderValue(self.cShader, "lightResolution", self.lightData.resolution)
     return true
 end
 

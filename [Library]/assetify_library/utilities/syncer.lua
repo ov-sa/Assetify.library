@@ -52,7 +52,10 @@ syncer = {
     librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest",
     librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.json.encode(imports.getRealTime())),
     libraryBandwidth = 0,
-    syncedElements = {}
+    syncedGlobalDatas = {},
+    syncedElementDatas = {},
+    syncedElements = {},
+    syncedLights = {}
 }
 syncer.__index = syncer
 
@@ -87,7 +90,7 @@ if localPlayer then
     imports.addEvent("onAssetUnLoad", false)
 
     function syncer:syncElementModel(...)        
-        return imports.triggerEvent("Assetify:onRecieveElementModel", localPlayer, ...)
+        return imports.triggerEvent("Assetify:onRecieveSyncedElement", localPlayer, ...)
     end
 
     function syncer:syncBoneAttachment(...)
@@ -107,7 +110,7 @@ if localPlayer then
     end
 
     imports.addEventHandler("onAssetifyLoad", root, function()
-        imports.triggerServerEvent("Assetify:onRequestElementModels", localPlayer)
+        imports.triggerServerEvent("Assetify:onRequestSyncedPool", localPlayer)
     end)
 
     imports.addEvent("Assetify:onRecieveBandwidth", true)
@@ -233,8 +236,20 @@ if localPlayer then
         end
     end)
 
-    imports.addEvent("Assetify:onRecieveElementModel", true)
-    imports.addEventHandler("Assetify:onRecieveElementModel", root, function(element, assetType, assetName, assetClump, clumpMaps)
+    imports.addEvent("Assetify:onRecieveSyncedGlobalData", true)
+    imports.addEventHandler("Assetify:onRecieveSyncedGlobalData", root, function(data, value)
+        syncer.syncedGlobalDatas[data] = value
+    end)
+
+    imports.addEvent("Assetify:onRecieveSyncedElementData", true)
+    imports.addEventHandler("Assetify:onRecieveSyncedElementData", root, function(element, data, value)
+        if not element or not imports.isElement(element) then return false end
+        syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
+        syncer.syncedElementDatas[element][data] = value
+    end)
+
+    imports.addEvent("Assetify:onRecieveSyncedElement", true)
+    imports.addEventHandler("Assetify:onRecieveSyncedElement", root, function(element, assetType, assetName, assetClump, clumpMaps)
         if not element or not imports.isElement(element) then return false end
         local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
@@ -302,6 +317,42 @@ else
         return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
     end
 
+    function syncer:syncGlobalData(data, value, targetPlayer)
+        if not element or not imports.isElement(element) then return false end
+        if not targetPlayer then
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncGlobalData(data, value, i)
+                    thread:pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedGlobalData", targetPlayer, data, value)
+        end
+        return true
+    end
+
+    function syncer:syncElementData(element, data, value, targetPlayer)
+        if not targetPlayer then
+            if not element or not imports.isElement(element) then return false end
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncElementData(element, data, value, i)
+                    thread:pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+        else
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedElementData", targetPlayer, element, data, value)
+        end
+        return true
+    end
+
     function syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, targetPlayer)
         if not targetPlayer then
             if not element or not imports.isElement(element) then return false end
@@ -318,7 +369,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveElementModel", targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
+            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedElement", targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
         end
         return true
     end
@@ -494,9 +545,22 @@ else
         syncer:syncPack(source)
     end)
 
-    imports.addEvent("Assetify:onRequestElementModels", true)
-    imports.addEventHandler("Assetify:onRequestElementModels", root, function()
+    imports.addEvent("Assetify:onRequestSyncedPool", true)
+    imports.addEventHandler("Assetify:onRequestSyncedPool", root, function()
+        local __source = source
         thread:create(function(cThread)
+            local source = __source
+            for i, j in imports.pairs(syncer.syncedGlobalDatas) do
+                syncer:syncGlobalData(i, j, source)
+                thread:pause()
+            end
+            for i, j in imports.pairs(syncer.syncedElementDatas) do
+                for k, v in pairs(j) do
+                    syncer:syncElementData(i, k, v, source)
+                    thread:pause()
+                end
+                thread:pause()
+            end
             for i, j in imports.pairs(syncer.syncedElements) do
                 if j then
                     syncer:syncElementModel(i, j.type, j.name, j.clump, j.clumpMaps, source)
@@ -538,6 +602,7 @@ else
     end)
     imports.addEventHandler("onElementDestroy", root, function()
         syncer.syncedElements[source] = nil
+        syncer.syncedElementDatas[source] = nil
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
         syncer.loadedClients[source] = nil

@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     isElement = isElement,
     getElementType = getElementType,
@@ -92,4 +93,30 @@ end
 function clearBoneAttachment(element, ...)
     if not element or not imports.isElement(element) then return false end
     return syncer:syncClearBoneAttachment(element)
+end
+
+function setGlobalData(data, value)
+    if imports.type(data) ~= "string" then return false end
+    syncer.syncedGlobalDatas[data] = value
+    return true
+end
+
+function getGlobalData(data)
+    if imports.type(data) ~= "string" then return false end
+    return syncer.syncedGlobalDatas[data]
+end
+
+function setElementData(element, data, value)
+    if not element or not imports.isElement(isElement) or not data or (imports.type(data) ~= "string") then return false end
+    syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
+    syncer.syncedElementDatas[element][data] = value
+    return true
+end
+
+function getElementData(element, data)
+    if not element or not imports.isElement(isElement) or not data or (imports.type(data) ~= "string") then return false end
+    if syncer.syncedElementDatas[element] and (syncer.syncedElementDatas[element][data] ~= nil) then
+        return syncer.syncedElementDatas[element][data]
+    end
+    return nil
 end

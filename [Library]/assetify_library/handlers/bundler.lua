@@ -68,7 +68,7 @@ function onBundleLibrary()
                     call = call,
                     pcall = pcall,
                     assert = assert,
-                    print = print,
+                    outputDebugString = outputDebugString,
                     loadstring = loadstring,
                     getResourceFromName = getResourceFromName,
                     addEventHandler = addEventHandler,
@@ -186,6 +186,10 @@ function onBundleLibrary()
                             return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createPlanarLight", ...)
                         end,
 
+                        setResolution = function(...)
+                            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightResolution", ...)
+                        end,
+
                         setTexture = function(...)
                             return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightTexture", ...)
                         end,
@@ -279,7 +283,7 @@ function onBundleLibrary()
                         for k = 1, #cAsset.manifestData.assetDeps.script[j], 1 do
                             local rwData = assetify.getAssetDep("module", assetName, "script", j, k)
                             if not assetify.imports.pcall(assetify.imports.loadstring(rwData)) then
-                                assetify.imports.print("[Module: "..assetName.."] | "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
+                                assetify.imports.outputDebugString("[Module: "..assetName.."] | "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
                                 assetify.imports.assert(assetify.imports.loadstring(rwData))
                             end
                         end
@@ -294,6 +298,22 @@ function onBundleLibrary()
 
             assetify.getElementAssetInfo = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getElementAssetInfo", ...)
+            end
+
+            assetify.setGlobalData = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setGlobalData", ...)
+            end
+
+            assetify.getGlobalData = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getGlobalData", ...)
+            end
+
+            assetify.setElementData = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setElementData", ...)
+            end
+
+            assetify.getElementData = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getElementData", ...)
             end
 
             assetify.setBoneAttach = function(...)

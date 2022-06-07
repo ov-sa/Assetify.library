@@ -16,7 +16,7 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
-    print = print,
+    outputDebugString = outputDebugString,
     encodeString = encodeString,
     decodeString = decodeString,
     split = split,
@@ -252,7 +252,7 @@ else
                 if rawPointer then rawPointer[filePath] = builtFileData end
             else
                 if debugExistence then
-                    imports.print("[Assetify] | Invalid File: "..filePath)
+                    imports.outputDebugString("[Assetify] | Invalid File: "..filePath)
                 end
             end
         end

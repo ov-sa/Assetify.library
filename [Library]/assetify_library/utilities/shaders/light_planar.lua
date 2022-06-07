@@ -44,8 +44,8 @@ shaderRW[identifier] = function()
     -->> Variables <<--
     -------------------*/
 
+    float lightResolution = 1;
     float3 lightOffset = float3(0, 0, 0);
-    float2 lightResolution = float2(1, 1);
     float4 lightColor = float4(1, 1, 1, 1);
     texture baseTexture;
     struct VSInput {
@@ -79,7 +79,7 @@ shaderRW[identifier] = function()
 
     PSInput VSHandler(VSInput VS) {
         PSInput PS = (PSInput)0;
-        float4 position = VS.Position;
+        float4 position = VS.Position*lightResolution;
         float4x4 positionMatrix = MTACreateTranslationMatrix(lightOffset);
         float4x4 gWorldFix = mul(gWorld, positionMatrix);
         float4x4 worldViewMatrix = mul(gWorldFix, gView);

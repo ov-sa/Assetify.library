@@ -49,7 +49,6 @@ if localPlayer then
         scoped = {}
     }
 
-
     function manager:setElementScoped(element)
         if not sourceResource or (sourceResource == resource) then return false end
         manager.buffer.instance[element] = sourceResource
@@ -371,6 +370,7 @@ if localPlayer then
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
         manager:clearElementBuffer(source)
+        syncer.syncedElementDatas[source] = nil
         for i, j in imports.pairs(light) do
             if j and (imports.type(j) == "table") and j.clearElementBuffer then
                 j:clearElementBuffer(source)
