@@ -23,6 +23,7 @@ local imports = {
     collectgarbage = collectgarbage,
     isElement = isElement,
     getElementType = getElementType,
+    getThisResource = getThisResource,
     getResourceName = getResourceName,
     addEvent = addEvent,
     addEventHandler = addEventHandler,
@@ -38,7 +39,7 @@ local imports = {
 ------------------------
 
 network = {
-    identifier = imports.md5(imports.getResourceName(resource)),
+    identifier = imports.md5(imports.getResourceName(imports.getThisResource())),
     isServerInstance = (not localPlayer and true) or false,
     buffer = {},
     cache = {

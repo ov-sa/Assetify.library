@@ -83,7 +83,7 @@ if localPlayer then
         if availableAssetPacks[assetType] then
             local cAsset = availableAssetPacks[assetType].rwDatas[assetName]
             if cAsset then
-                local isExternalResource = sourceResource and (sourceResource ~= resource)
+                local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
                 local unSynced = cAsset.unSynced
                 if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
                     cAsset = imports.table.clone(cAsset, true)
@@ -437,7 +437,7 @@ else
         if availableAssetPacks[assetType] then
             local cAsset = availableAssetPacks[assetType].assetPack.rwDatas[assetName]
             if cAsset then
-                local isExternalResource = sourceResource and (sourceResource ~= resource)
+                local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
                 if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
                     cAsset = cAsset.synced
                     if cAsset.manifestData.encryptKey then

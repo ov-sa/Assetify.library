@@ -92,7 +92,7 @@ function renderer:setVirtualRendering(state, rtModes, syncShader, isInternal)
             renderer:setVirtualRendering(_, _, i, syncer.librarySerial)
         end
     else
-        local isExternalResource = sourceResource and (sourceResource ~= resource)
+        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
             return false
         end
@@ -120,7 +120,7 @@ function renderer:setTimeSync(state, syncShader, isInternal)
             renderer:setTimeSync(_, i, syncer.librarySerial)
         end
     else
-        local isExternalResource = sourceResource and (sourceResource ~= resource)
+        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
             return false
         end
@@ -137,7 +137,7 @@ function renderer:setServerTick(serverTick, syncShader, isInternal)
             renderer:setServerTick(_, i, syncer.librarySerial)
         end
     else
-        local isExternalResource = sourceResource and (sourceResource ~= resource)
+        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
             return false
         end
@@ -153,7 +153,7 @@ function renderer:setMinuteDuration(minuteDuration, syncShader, isInternal)
             renderer:setMinuteDuration(_, i, syncer.librarySerial)
         end
     else
-        local isExternalResource = sourceResource and (sourceResource ~= resource)
+        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
             return false
         end

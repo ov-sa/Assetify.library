@@ -19,6 +19,7 @@ local imports = {
     tostring = tostring,
     isElement = isElement,
     getRealTime = getRealTime,
+    getThisResource = getThisResource,
     getResourceName = getResourceName,
     getResourceInfo = getResourceInfo,
     getElementsByType = getElementsByType,
@@ -46,17 +47,18 @@ local imports = {
 -----------------------
 
 syncer = {
+    libraryResource = imports.getThisResource(),
     isLibraryLoaded = false,
     isModuleLoaded = false,
-    libraryName = imports.getResourceName(resource),
-    librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest",
-    librarySerial = imports.md5(imports.getResourceName(resource)..":"..imports.tostring(resource)..":"..imports.json.encode(imports.getRealTime())),
     libraryBandwidth = 0,
     syncedGlobalDatas = {},
     syncedElementDatas = {},
     syncedElements = {},
     syncedLights = {}
 }
+syncer.libraryName = imports.getResourceName(syncer.libraryResource)
+syncer.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
+syncer.librarySerial = imports.md5(imports.getResourceName(syncer.libraryResource)..":"..imports.tostring(syncer.libraryResource)..":"..imports.json.encode(imports.getRealTime()))
 syncer.__index = syncer
 
 imports.addEvent("onAssetifyLoad", true)

@@ -189,7 +189,7 @@ if localPlayer then
 
     function shader:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance)
         if not self or (self == shader) then return false end
-        local isExternalResource = sourceResource and (sourceResource ~= resource)
+        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if not shaderCategory or not shaderName or (isExternalResource and shader.cache.remoteBlacklist[shaderName]) or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or not textureName or not shaderTextures or not shaderInputs or not rwCache or not shaderMaps then return false end
         element = ((element and imports.isElement(element)) and element) or false
         shaderPriority = imports.tonumber(shaderPriority) or shader.cache.shaderPriority
