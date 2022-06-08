@@ -238,13 +238,11 @@ if localPlayer then
         end
     end)
 
-    imports.addEvent("Assetify:onRecieveSyncedGlobalData", true)
-    imports.addEventHandler("Assetify:onRecieveSyncedGlobalData", root, function(data, value)
+    network:create("Assetify:onRecieveSyncedGlobalData"):on(function(data, value)
         syncer.syncedGlobalDatas[data] = value
     end)
 
-    imports.addEvent("Assetify:onRecieveSyncedElementData", true)
-    imports.addEventHandler("Assetify:onRecieveSyncedElementData", root, function(element, data, value)
+    network:create("Assetify:onRecieveSyncedElementData"):on(function(element, data, value)
         if not element or not imports.isElement(element) then return false end
         syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
         syncer.syncedElementDatas[element][data] = value
@@ -332,7 +330,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedGlobalData", targetPlayer, data, value)
+            network:emit("Assetify:onRecieveSyncedGlobalData", true, targetPlayer, data, value)
         end
         return true
     end
@@ -350,7 +348,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedElementData", targetPlayer, element, data, value)
+            network:emit("Assetify:onRecieveSyncedElementData", true, targetPlayer, element, data, value)
         end
         return true
     end
