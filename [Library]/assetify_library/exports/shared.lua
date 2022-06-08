@@ -76,6 +76,7 @@ end
 function setGlobalData(data, value)
     if imports.type(data) ~= "string" then return false end
     syncer.syncedGlobalDatas[data] = value
+    --TODO: IF ITS SERVER SIDE THEN SYNC
     return true
 end
 
@@ -88,6 +89,7 @@ function setElementData(element, data, value)
     if not element or not imports.isElement(isElement) or not data or (imports.type(data) ~= "string") then return false end
     syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
     syncer.syncedElementDatas[element][data] = value
+    --TODO: IF ITS SERVER SIDE THEN SYNC
     return true
 end
 
