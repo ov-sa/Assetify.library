@@ -87,6 +87,7 @@ function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData)
             self.cCollisionInstance = imports.createVehicle(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         end
     end
+    if not self.cModelInstance then return false end
     imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
     imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
     if self.cCollisionInstance then
