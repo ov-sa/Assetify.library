@@ -28,10 +28,10 @@ local bundler = {}
 
 
 -----------------------------------
---[[ Function: Fetches Imports ]]--
+--[[ Function: Imports Modules ]]--
 -----------------------------------
 
-function fetchImports(...)
+function import(...)
     local args = {...}
     if args[1] == true then
         local genImports = {}
@@ -58,7 +58,7 @@ function fetchImports(...)
         local args = {...}
         args = ((#args > 0) and ", "..imports.table.concat(args, ", ")) or ""
         return [[
-        local genImports = call(getResourceFromName("]]..syncer.libraryName..[["), "fetchImports", true]]..args..[[)
+        local genImports = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..args..[[)
         for i = 1, #genImports, 1 do
             loadstring(genImports[i])()
         end

@@ -46,7 +46,7 @@
     <script src="handlers/loader.lua" type="client"/>
 
     <!-- Exports -->
-    <export function="fetchImports" type="shared"/>
+    <export function="import" type="shared"/>
     <export function="isLibraryLoaded" type="shared"/>
     <export function="isModuleLoaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
