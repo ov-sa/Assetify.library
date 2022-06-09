@@ -222,6 +222,7 @@ bundler["threader"] = {module = "thread", rw = imports.file.read("utilities/thre
 bundler["networker"] = {module = "network", rw = imports.file.read("utilities/networker.lua")}
 
 bundler["scheduler"] = [[
+    if not network then ]]..bundler["networker"].rw..[[ end
     assetify.scheduler = {
         buffer = {onLoad = {}, onModuleLoad = {}},
         execOnLoad = function(execFunc)
