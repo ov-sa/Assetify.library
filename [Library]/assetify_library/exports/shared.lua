@@ -85,16 +85,16 @@ function getGlobalData(data)
     return syncer.syncedGlobalDatas[data]
 end
 
-function setElementData(element, data, value)
-    if not element or not imports.isElement(isElement) or not data or (imports.type(data) ~= "string") then return false end
+function setEntityData(element, data, value)
+    if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
     syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
     syncer.syncedElementDatas[element][data] = value
     --TODO: IF ITS SERVER SIDE THEN SYNC
     return true
 end
 
-function getElementData(element, data)
-    if not element or not imports.isElement(isElement) or not data or (imports.type(data) ~= "string") then return false end
+function getEntityData(element, data)
+    if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
     if syncer.syncedElementDatas[element] and (syncer.syncedElementDatas[element][data] ~= nil) then
         return syncer.syncedElementDatas[element][data]
     end

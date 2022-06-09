@@ -48,7 +48,7 @@ function import(...)
                 local j = args[i]
                 if (j ~= "core") and bundler[j] and not __genImports[j] then
                     __genImports[j] = true
-                    imports.table.insert(genImports, j)
+                    imports.table.insert(genImports, bundler[j])
                 end
             end
             __genImports = nil
@@ -56,7 +56,7 @@ function import(...)
         return genImports
     else
         local args = {...}
-        args = ((#args > 0) and ", "..imports.table.concat(args, ", ")) or ""
+        args = ((#args > 0) and ", \""..imports.table.concat(args, "\", \"").."\"") or ""
         return [[
         local genImports = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..args..[[)
         for i = 1, #genImports, 1 do
@@ -194,63 +194,6 @@ bundler["core"] = imports.file.read("utilities/shared.lua")..[[
 
 bundler["thread"] = imports.file.read("utilities/threader.lua")
 bundler["network"] = imports.file.read("utilities/networker.lua")
-bundler["renderer"] = [[
-    if localPlayer then
-        assetify.renderer = {
-            isVirtualRendering = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isRendererVirtualRendering", ...)
-            end,
-
-            setVirtualRendering = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererVirtualRendering", ...)
-            end,
-
-            getVirtualSource = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualSource", ...)
-            end,
-
-            getVirtualRTs = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualRTs", ...)
-            end,
-
-            setTimeSync = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererTimeSync", ...)
-            end,
-
-            setServerTick = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererServerTick", ...)
-            end,
-
-            setMinuteDuration = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererMinuteDuration", ...)
-            end
-        }
-    end
-]]
-
-bundler["light"] = [[
-    if localPlayer then
-        assetify.light = {
-            planar = {
-                create = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createPlanarLight", ...)
-                end,
-
-                setResolution = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightResolution", ...)
-                end,
-
-                setTexture = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightTexture", ...)
-                end,
-
-                setColor = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightColor", ...)
-                end
-            }
-        }
-    end
-]]
 
 bundler["scheduler"] = [[
     assetify.execOnLoad = function(execFunc)
@@ -326,6 +269,40 @@ bundler["scheduler"] = [[
     }
 ]]
 
+bundler["renderer"] = [[
+    if localPlayer then
+        assetify.renderer = {
+            isVirtualRendering = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isRendererVirtualRendering", ...)
+            end,
+
+            setVirtualRendering = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererVirtualRendering", ...)
+            end,
+
+            getVirtualSource = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualSource", ...)
+            end,
+
+            getVirtualRTs = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getRendererVirtualRTs", ...)
+            end,
+
+            setTimeSync = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererTimeSync", ...)
+            end,
+
+            setServerTick = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererServerTick", ...)
+            end,
+
+            setMinuteDuration = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setRendererMinuteDuration", ...)
+            end
+        }
+    end
+]]
+
 bundler["synced-data"] = [[
     assetify.setGlobalData = function(...)
         return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setGlobalData", ...)
@@ -335,12 +312,12 @@ bundler["synced-data"] = [[
         return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getGlobalData", ...)
     end
 
-    assetify.setElementData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setElementData", ...)
+    assetify.setEntityData = function(...)
+        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setEntityData", ...)
     end
 
-    assetify.getElementData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getElementData", ...)
+    assetify.getEntityData = function(...)
+        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getEntityData", ...)
     end
 ]]
 
@@ -359,5 +336,29 @@ bundler["bone-attachment"] = [[
 
     assetify.clearBoneAttach = function(...)
         return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearBoneAttachment", ...)
+    end
+]]
+
+bundler["light"] = [[
+    if localPlayer then
+        assetify.light = {
+            planar = {
+                create = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createPlanarLight", ...)
+                end,
+
+                setResolution = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightResolution", ...)
+                end,
+
+                setTexture = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightTexture", ...)
+                end,
+
+                setColor = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setPlanarLightColor", ...)
+                end
+            }
+        }
     end
 ]]

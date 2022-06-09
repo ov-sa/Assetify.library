@@ -56,8 +56,8 @@
     <export function="getElementAssetInfo" type="shared"/>
     <export function="setGlobalData" type="shared"/>
     <export function="getGlobalData" type="shared"/>
-    <export function="setElementData" type="shared"/>
-    <export function="getElementData" type="shared"/>
+    <export function="setEntityData" type="shared"/>
+    <export function="getEntityData" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>
     <export function="setBoneRefreshment" type="shared"/>
