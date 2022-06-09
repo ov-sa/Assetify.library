@@ -73,7 +73,7 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
                 if not payload.isRemote then
                     imports.triggerEvent("Assetify:Network:API", resourceRoot, serial, payload)
                 else
-                    if not payload.isReciever or not network.isServerInstance then
+                    if not payload.isReceiver or not network.isServerInstance then
                         if not payload.isLatent then
                             imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, serial, payload)
                         else
@@ -81,9 +81,9 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
                         end
                     else
                         if not payload.isLatent then
-                            imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, serial, payload)
+                            imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Network:API", resourceRoot, serial, payload)
                         else
-                            imports.triggerRemoteLatentEvent(payload.isReciever, "Assetify:Network:API", network.bandwidth, false, resourceRoot, serial, payload)
+                            imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Network:API", network.bandwidth, false, resourceRoot, serial, payload)
                         end
                     end
                 end
@@ -205,8 +205,8 @@ function network:emit(...)
         if payload.isRemote then
             payload.isLatent = network.fetchArg(_, cArgs)
             if network.isServerInstance then
-                payload.isReciever = network.fetchArg(_, cArgs)
-                payload.isReciever = (payload.isReciever and imports.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
+                payload.isReceiver = network.fetchArg(_, cArgs)
+                payload.isReceiver = (payload.isReceiver and imports.isElement(payload.isReceiver) and (imports.getElementType(payload.isReceiver) == "player") and payload.isReceiver) or false
             end
         end
     else
@@ -217,11 +217,11 @@ function network:emit(...)
     if not payload.isRemote then
         imports.triggerEvent("Assetify:Network:API", resourceRoot, network.identifier, payload)
     else
-        if payload.isReciever then
+        if payload.isReceiver then
             if not payload.isLatent then
-                imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, network.identifier, payload)
+                imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Network:API", resourceRoot, network.identifier, payload)
             else
-                imports.triggerRemoteLatentEvent(payload.isReciever, "Assetify:Network:API", network.bandwidth, false, resourceRoot, network.identifier, payload)
+                imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Network:API", network.bandwidth, false, resourceRoot, network.identifier, payload)
             end
         else
             if not payload.isLatent then
@@ -250,10 +250,10 @@ function network:emitCallback(cThread, ...)
         if payload.isRemote then
             payload.isLatent = network.fetchArg(_, cArgs)
             if not network.isServerInstance then
-                payload.isReciever = localPlayer
+                payload.isReceiver = localPlayer
             else
-                payload.isReciever = network.fetchArg(_, cArgs)
-                payload.isReciever = (payload.isReciever and imports.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
+                payload.isReceiver = network.fetchArg(_, cArgs)
+                payload.isReceiver = (payload.isReceiver and imports.isElement(payload.isReceiver) and (imports.getElementType(payload.isReceiver) == "player") and payload.isReceiver) or false
             end
         end
     else
