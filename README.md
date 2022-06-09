@@ -23,7 +23,7 @@
 * UE inspired Unlimited & Configurable Asset Packs
 * Built-In Threader
 * Built-In Networker
-* Built-In Global & Element Data Syncer
+* Built-In Global & Entity Data Syncer
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
