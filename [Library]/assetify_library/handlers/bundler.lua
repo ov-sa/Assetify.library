@@ -33,10 +33,10 @@ local bundler = {}
 
 function fetchImports(...)
     local args = {...}
-    if args[1] and (imports.type(args[1]) == "string") then
+    if args[1] == true then
         local genImports = {}
         imports.table.insert(genImports, bundler.core)
-        if args[1] == "*" then
+        if args[2] == "*" then
             for i, j in imports.pairs(bundler) do
                 if i ~= "core" then
                     imports.table.insert(genImports, j)
@@ -44,7 +44,8 @@ function fetchImports(...)
             end
         else
             local __genImports = {}
-            for i, j in imports.pairs(args) do
+            for i = 2, #args, 1 do
+                local j = args[i]
                 if (j ~= "core") and bundler[j] and not __genImports[j] then
                     __genImports[j] = true
                     imports.table.insert(genImports, j)
@@ -54,10 +55,12 @@ function fetchImports(...)
         end
         return genImports
     else
+        local args = {...}
+        args = ((#args > 0) and ", "..imports.table.concat(args, ", ")) or ""
         return [[
-        local importList = call(getResourceFromName("]]..syncer.libraryName..[["), "fetchImports", true)
-        for i = 1, #importList, 1 do
-            loadstring(importList[i])()
+        local genImports = call(getResourceFromName("]]..syncer.libraryName..[["), "fetchImports", true]]..args..[[)
+        for i = 1, #genImports, 1 do
+            loadstring(genImports[i])()
         end
         ]]
     end
