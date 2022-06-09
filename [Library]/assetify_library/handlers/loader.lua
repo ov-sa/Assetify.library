@@ -16,12 +16,7 @@ local imports = {
     pairs = pairs,
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
-    removeWorldModel = removeWorldModel,
-    restoreAllWorldModels = restoreAllWorldModels,
-    createWater = createWater,
-    setWaterLevel = setWaterLevel,
-    setOcclusionsEnabled = setOcclusionsEnabled,
-    setWorldSpecialPropertyEnabled = setWorldSpecialPropertyEnabled
+    setWaterLevel = setWaterLevel
 }
 
 
@@ -30,24 +25,19 @@ local imports = {
 -----------------------------------------------
 
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
-    if not GTAWorldSettings.removeWorld then
-        imports.restoreAllWorldModels()
+    if GTAWorldSettings.clearWorld then
+        clearWorld()
     else
-        for i = 550, 19999, 1 do
-            imports.removeWorldModel(i, 100000, 0, 0, 0)
-        end
-        if GTAWorldSettings.waterLevel then
-            streamer.waterBuffer = imports.createWater(-3000, -3000, 0, 3000, -3000, 0, -3000, 3000, 0, 3000, 3000, 0, false)
-            imports.setWaterLevel(streamer.waterBuffer, GTAWorldSettings.waterLevel)
-        end
+        restoreWorld()
     end
     if GTAWorldSettings.waterLevel then
+        if streamer.waterBuffer then
+            imports.setWaterLevel(streamer.waterBuffer, GTAWorldSettings.waterLevel)
+        end
         imports.setWaterLevel(GTAWorldSettings.waterLevel, true, true, true, true)
     end
-    imports.setOcclusionsEnabled(not GTAWorldSettings.removeWorld)
-    imports.setWorldSpecialPropertyEnabled("randomfoliage", not GTAWorldSettings.removeWorld)
 end)
 
 imports.addEventHandler("onClientResourceStop", resourceRoot, function()
-    imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
+    network:emit("Assetify:onUnload", false)
 end)

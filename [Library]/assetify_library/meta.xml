@@ -70,6 +70,8 @@
     <export function="loadAnim" type="client"/>
     <export function="unloadAnim" type="client"/>
     <export function="createShader" type="client"/>
+    <export function="clearWorld" type="client"/>
+    <export function="restoreWorld" type="client"/>
     <export function="clearModel" type="client"/>
     <export function="restoreModel" type="client"/>
     <export function="playSoundAsset" type="client"/>
