@@ -47,8 +47,6 @@
 
     <!-- Exports -->
     <export function="fetchImports" type="shared"/>
-    <export function="fetchThreader" type="shared"/>
-    <export function="fetchNetworker" type="shared"/>
     <export function="isLibraryLoaded" type="shared"/>
     <export function="isModuleLoaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
