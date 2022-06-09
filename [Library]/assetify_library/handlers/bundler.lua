@@ -36,7 +36,7 @@ function fetchImports(...)
     if args[1] == true then
         local genImports = {}
         imports.table.insert(genImports, bundler.core)
-        if args[2] == "*" then
+        if (#args <= 1) or (args[2] == "*") then
             for i, j in imports.pairs(bundler) do
                 if i ~= "core" then
                     imports.table.insert(genImports, j)
