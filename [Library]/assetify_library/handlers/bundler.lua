@@ -111,8 +111,6 @@ bundler["core"] = [[
                 outputDebugString = outputDebugString,
                 loadstring = loadstring,
                 getResourceFromName = getResourceFromName,
-                addEventHandler = addEventHandler,
-                removeEventHandler = removeEventHandler,
                 table = table
             }
         }
@@ -235,9 +233,8 @@ bundler["scheduler"] = [[
                 local execWrapper = nil
                 execWrapper = function()
                     execFunc()
-                    assetify.imports.removeEventHandler("onAssetifyLoad", root, execWrapper)
                 end
-                assetify.imports.addEventHandler("onAssetifyLoad", root, execWrapper)
+                network:fetch("Assetify:onLoad"):on(execWrapper)
             end
             return true
         end,
@@ -251,9 +248,8 @@ bundler["scheduler"] = [[
                 local execWrapper = nil
                 execWrapper = function()
                     execFunc()
-                    assetify.imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
                 end
-                assetify.imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+                network:fetch("Assetify:onModuleLoad"):on(execWrapper)
             end
             return true
         end,
