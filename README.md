@@ -23,7 +23,7 @@
 * UE inspired Unlimited & Configurable Asset Packs
 * Built-In Threader
 * Built-In Networker
-* Built-In Global & Entity Data Syncer
+* Built-In Scheduler
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
@@ -31,6 +31,7 @@
 * Built-In Asset-Pack Clumper (Supports only `character`, `vehicle`, `weapon`, `object` asset-packs)
 * Built-In Asset-Pack Dependency Broadcaster
 * Built-In Control & Bump Mapping
+* Built-In Global & Entity Data Syncer
 * Built-In Asset-Pack Streamer
 * Built-In LOD Streamer (Integrated w/ Assetify's Streamer)
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
