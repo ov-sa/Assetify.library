@@ -192,8 +192,8 @@ bundler["core"] = imports.file.read("utilities/shared.lua")..[[
     end
 ]]
 
-bundler["thread"] = imports.file.read("utilities/threader.lua")
-bundler["network"] = imports.file.read("utilities/networker.lua")
+bundler["threader"] = imports.file.read("utilities/threader.lua")
+bundler["networker"] = imports.file.read("utilities/networker.lua")
 
 bundler["scheduler"] = [[
     assetify.execOnLoad = function(execFunc)
@@ -303,43 +303,47 @@ bundler["renderer"] = [[
     end
 ]]
 
-bundler["synced-data"] = [[
-    assetify.setGlobalData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setGlobalData", ...)
-    end
-
-    assetify.getGlobalData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getGlobalData", ...)
-    end
-
-    assetify.setEntityData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setEntityData", ...)
-    end
-
-    assetify.getEntityData = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getEntityData", ...)
-    end
+bundler["syncer"] = [[
+    assetify.syncer = {
+        setGlobalData = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setGlobalData", ...)
+        end,
+    
+        getGlobalData = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getGlobalData", ...)
+        end,
+    
+        setEntityData = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setEntityData", ...)
+        end,
+    
+        getEntityData = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getEntityData", ...)
+        end
+    }
 ]]
 
-bundler["bone-attachment"] = [[
-    assetify.setBoneAttach = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneAttachment", ...)
-    end
-
-    assetify.setBoneDetach = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneDetachment", ...)
-    end
-
-    assetify.setBoneRefresh = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneRefreshment", ...)
-    end
-
-    assetify.clearBoneAttach = function(...)
-        return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearBoneAttachment", ...)
-    end
+bundler["attacher"] = [[
+    assetify.attacher = {
+        setBoneAttach = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneAttachment", ...)
+        end,
+    
+        setBoneDetach = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneDetachment", ...)
+        end,
+    
+        setBoneRefresh = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneRefreshment", ...)
+        end,
+    
+        clearBoneAttach = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearBoneAttachment", ...)
+        end
+    }
 ]]
 
-bundler["light"] = [[
+bundler["lights"] = [[
     if localPlayer then
         assetify.light = {
             planar = {
