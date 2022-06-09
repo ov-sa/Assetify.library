@@ -14,7 +14,6 @@
 
 downloadSettings = {
     isAccessSafe = true,
-    speed = 1250000,
     syncRate = 50,
     buildRate = 500
 }

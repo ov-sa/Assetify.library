@@ -15,8 +15,7 @@
 local imports = {
     pairs = pairs,
     setTimer = setTimer,
-    addEventHandler = addEventHandler,
-    triggerEvent = triggerEvent
+    addEventHandler = addEventHandler
 }
 
 
@@ -25,7 +24,7 @@ local imports = {
 ----------------------------------
 
 local function onLibraryLoaded()
-    imports.triggerEvent("onAssetifyLoad", resourceRoot)
+    network:emit("Assetify:onLoad", false)
     for i, j in imports.pairs(syncer.scheduledClients) do
         syncer:syncPack(i, _, true)
         syncer.loadedClients[i] = true
@@ -37,12 +36,12 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
     thread:create(function(cThread)
         syncer.libraryModules = {}
         if not availableAssetPacks["module"] then
-            imports.triggerEvent("onAssetifyModuleLoad", resourceRoot)
+            network:emit("Assetify:onModuleLoad", false)
         end
         for i, j in imports.pairs(availableAssetPacks) do
             asset:buildPack(i, j, function(state, assetType)
                 if assetType == "module" then
-                    imports.triggerEvent("onAssetifyModuleLoad", resourceRoot)
+                    network:emit("Assetify:onModuleLoad", false)
                 end
                 imports.setTimer(function()
                     cThread:resume()
@@ -55,5 +54,5 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
 end)
 
 imports.addEventHandler("onResourceStop", resourceRoot, function()
-    imports.triggerEvent("onAssetifyUnLoad", resourceRoot)
+    network:emit("Assetify:onUnload", false)
 end)

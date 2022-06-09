@@ -76,7 +76,7 @@ end
 function setGlobalData(data, value)
     if imports.type(data) ~= "string" then return false end
     syncer.syncedGlobalDatas[data] = value
-    --TODO: IF ITS SERVER SIDE THEN SYNC
+    if not localPlayer then syncer:syncGlobalData(data, value) end
     return true
 end
 
@@ -89,7 +89,7 @@ function setEntityData(element, data, value)
     if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
     syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
     syncer.syncedElementDatas[element][data] = value
-    --TODO: IF ITS SERVER SIDE THEN SYNC
+    if not localPlayer then syncer:syncElementData(element, data, value) end
     return true
 end
 

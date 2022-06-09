@@ -26,16 +26,9 @@ local imports = {
     setElementModel = setElementModel,
     collectgarbage = collectgarbage,
     outputDebugString = outputDebugString,
-    addEvent = addEvent,
     addEventHandler = addEventHandler,
-    removeEventHandler = removeEventHandler,
     getResourceRootElement = getResourceRootElement,
     fetchRemote = fetchRemote,
-    triggerEvent = triggerEvent,
-    triggerClientEvent = triggerClientEvent,
-    triggerServerEvent = triggerServerEvent,
-    triggerLatentClientEvent = triggerLatentClientEvent,
-    triggerLatentServerEvent = triggerLatentServerEvent,
     loadAsset = loadAsset,
     file = file,
     json = json
@@ -61,25 +54,25 @@ syncer.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/rele
 syncer.librarySerial = imports.md5(imports.getResourceName(syncer.libraryResource)..":"..imports.tostring(syncer.libraryResource)..":"..imports.json.encode(imports.getRealTime()))
 syncer.__index = syncer
 
-imports.addEvent("onAssetifyLoad", true)
-imports.addEvent("onAssetifyUnLoad", false)
-imports.addEvent("onAssetifyModuleLoad", true)
+network:create("Assetify:onLoad")
+network:create("Assetify:onUnload")
+network:create("Assetify:onModuleLoad")
 syncer.execOnLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
-        imports.removeEventHandler("onAssetifyLoad", root, execWrapper)
+        network:destroy("Assetify:onLoad")
     end
-    imports.addEventHandler("onAssetifyLoad", root, execWrapper)
+    network:fetch("Assetify:onLoad"):on(execWrapper)
     return true
 end
 syncer.execOnModuleLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
-        imports.removeEventHandler("onAssetifyModuleLoad", root, execWrapper)
+        network:destroy("Assetify:onModuleLoad")
     end
-    imports.addEventHandler("onAssetifyModuleLoad", root, execWrapper)
+    network:fetch("Assetify:onModuleLoad"):on(execWrapper)
     return true
 end
 syncer.execOnLoad(function() syncer.isLibraryLoaded = true end)
@@ -88,40 +81,38 @@ syncer.execOnModuleLoad(function() syncer.isModuleLoaded = true end)
 if localPlayer then
     syncer.scheduledAssets = {}
     availableAssetPacks = {}
-    imports.addEvent("onAssetLoad", false)
-    imports.addEvent("onAssetUnLoad", false)
+    network:create("Assetify:onAssetLoad")
+    network:create("Assetify:onAssetUnload")
 
-    function syncer:syncElementModel(...)        
-        return imports.triggerEvent("Assetify:onRecieveSyncedElement", localPlayer, ...)
+    function syncer:syncElementModel(...)
+        return network:emit("Assetify:onRecieveSyncedElement", false, ...)
     end
 
     function syncer:syncBoneAttachment(...)
-        return imports.triggerEvent("Assetify:onRecieveBoneAttachment", localPlayer, ...)
+        return network:emit("Assetify:onRecieveBoneAttachment", false, ...)
     end
 
     function syncer:syncBoneDetachment(...)
-        return imports.triggerEvent("Assetify:onRecieveBoneDetachment", localPlayer, ...)
+        return network:emit("Assetify:onRecieveBoneDetachment", false, ...)
     end
 
     function syncer:syncBoneRefreshment(...)
-        return imports.triggerEvent("Assetify:onRecieveBoneRefreshment", localPlayer, ...)
+        return network:emit("Assetify:onRecieveBoneRefreshment", false, ...)
     end
 
     function syncer:syncClearBoneAttachment(...)
-        return imports.triggerEvent("Assetify:onRecieveClearBoneAttachment", localPlayer, ...)
+        return network:emit("Assetify:onRecieveClearBoneAttachment", false, ...)
     end
 
-    imports.addEventHandler("onAssetifyLoad", root, function()
-        imports.triggerServerEvent("Assetify:onRequestSyncedPool", localPlayer)
+    network:fetch("Assetify:onLoad"):on(function()
+        network:emit("Assetify:onRequestSyncedPool", true, false, localPlayer)
     end)
 
-    imports.addEvent("Assetify:onRecieveBandwidth", true)
-    imports.addEventHandler("Assetify:onRecieveBandwidth", root, function(libraryBandwidth)
+    network:create("Assetify:onRecieveBandwidth"):on(function(libraryBandwidth)
         syncer.libraryBandwidth = libraryBandwidth
     end)
 
-    imports.addEvent("Assetify:onRecieveHash", true)
-    imports.addEventHandler("Assetify:onRecieveHash", root, function(assetType, assetName, hashes)
+    network:create("Assetify:onRecieveHash"):on(function(assetType, assetName, hashes)
         if not syncer.scheduledAssets[assetType] then syncer.scheduledAssets[assetType] = {} end
         syncer.scheduledAssets[assetType][assetName] = syncer.scheduledAssets[assetType][assetName] or {
             assetSize = 0
@@ -139,7 +130,7 @@ if localPlayer then
                 fileData = nil
                 thread:pause()
             end
-            imports.triggerLatentServerEvent("Assetify:onRecieveHash", downloadSettings.speed, false, localPlayer, assetType, assetName, fetchFiles)
+            network:emit("Assetify:onRecieveHash", true, true, localPlayer, assetType, assetName, fetchFiles)
             imports.collectgarbage()
         end):resume({
             executions = downloadSettings.buildRate,
@@ -147,8 +138,7 @@ if localPlayer then
         })
     end)
 
-    imports.addEvent("Assetify:onRecieveData", true)
-    imports.addEventHandler("Assetify:onRecieveData", root, function(assetType, baseIndex, subIndexes, indexData)
+    network:create("Assetify:onRecieveData"):on(function(assetType, baseIndex, subIndexes, indexData)
         if not availableAssetPacks[assetType] then availableAssetPacks[assetType] = {} end
         if not subIndexes then
             availableAssetPacks[assetType][baseIndex] = indexData
@@ -167,8 +157,7 @@ if localPlayer then
         end
     end)
 
-    imports.addEvent("Assetify:onRecieveContent", true)
-    imports.addEventHandler("Assetify:onRecieveContent", root, function(assetType, assetName, contentPath, ...)
+    network:create("Assetify:onRecieveContent"):on(function(assetType, assetName, contentPath, ...)
         if assetType and assetName then
             syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
             syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
@@ -177,8 +166,7 @@ if localPlayer then
         imports.collectgarbage()
     end)
 
-    imports.addEvent("Assetify:onRecieveState", true)
-    imports.addEventHandler("Assetify:onRecieveState", root, function(assetType, assetName)
+    network:create("Assetify:onRecieveState"):on(function(assetType, assetName)
         local isTypeVoid = true
         syncer.scheduledAssets[assetType][assetName] = nil
         for i, j in imports.pairs(syncer.scheduledAssets[assetType]) do
@@ -198,7 +186,7 @@ if localPlayer then
             end
             if isSyncDone then
                 if assetType == "module" then
-                    imports.triggerServerEvent("Assetify:onRequestAssets", localPlayer)
+                    network:emit("Assetify:onRequestAssets", true, false, localPlayer)
                     thread:create(function(cThread)
                         if availableAssetPacks["module"].autoLoad and availableAssetPacks["module"].rwDatas then
                             for i, j in imports.pairs(availableAssetPacks["module"].rwDatas) do
@@ -208,7 +196,7 @@ if localPlayer then
                                 thread:pause()
                             end
                         end
-                        imports.triggerEvent("onAssetifyModuleLoad", localPlayer)
+                        network:emit("Assetify:onModuleLoad", false)
                     end):resume({
                         executions = downloadSettings.buildRate,
                         frames = 1
@@ -228,7 +216,7 @@ if localPlayer then
                                 end
                             end
                         end
-                        imports.triggerEvent("onAssetifyLoad", resourceRoot)
+                        network:emit("Assetify:onLoad", false)
                     end):resume({
                         executions = downloadSettings.buildRate,
                         frames = 1
@@ -248,8 +236,7 @@ if localPlayer then
         syncer.syncedElementDatas[element][data] = value
     end)
 
-    imports.addEvent("Assetify:onRecieveSyncedElement", true)
-    imports.addEventHandler("Assetify:onRecieveSyncedElement", root, function(element, assetType, assetName, assetClump, clumpMaps)
+    network:create("Assetify:onRecieveSyncedElement"):on(function(element, assetType, assetName, assetClump, clumpMaps)
         if not element or not imports.isElement(element) then return false end
         local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
@@ -269,25 +256,21 @@ if localPlayer then
         end
     end)
 
-    imports.addEvent("Assetify:onRecieveBoneAttachment", true)
-    imports.addEventHandler("Assetify:onRecieveBoneAttachment", root, function(...)
+    network:create("Assetify:onRecieveBoneAttachment"):on(function(...)
         bone:create(...)
     end)
 
-    imports.addEvent("Assetify:onRecieveBoneDetachment", true)
-    imports.addEventHandler("Assetify:onRecieveBoneDetachment", root, function(element)
+    network:create("Assetify:onRecieveBoneDetachment"):on(function(element)
         if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
         bone.buffer.element[element]:destroy()
     end)
 
-    imports.addEvent("Assetify:onRecieveBoneRefreshment", true)
-    imports.addEventHandler("Assetify:onRecieveBoneRefreshment", root, function(element, ...)
+    network:create("Assetify:onRecieveBoneRefreshment"):on(function(element, ...)
         if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
         bone.buffer.element[element]:refresh(...)
     end)
 
-    imports.addEvent("Assetify:onRecieveClearBoneAttachment", true)
-    imports.addEventHandler("Assetify:onRecieveClearBoneAttachment", root, function(element, ...)
+    network:create("Assetify:onRecieveClearBoneAttachment"):on(function(element, ...)
         if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
         bone.buffer.element[element]:clearElementBuffer(...)
     end)
@@ -302,19 +285,19 @@ else
     syncer.syncedBoneAttachments = {}
 
     function syncer:syncHash(player, ...)
-        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveHash", downloadSettings.speed, false, player, ...)
+        return network:emit("Assetify:onRecieveHash", true, false, player, ...)
     end
 
     function syncer:syncData(player, ...)
-        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveData", downloadSettings.speed, false, player, ...)
+        return network:emit("Assetify:onRecieveData", true, false, player, ...)
     end
 
     function syncer:syncContent(player, ...)
-        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveContent", downloadSettings.speed, false, player, ...)
+        return network:emit("Assetify:onRecieveContent", true, false, player, ...)
     end
 
     function syncer:syncState(player, ...)
-        return imports.triggerLatentClientEvent(player, "Assetify:onRecieveState", downloadSettings.speed, false, player, ...)
+        return network:emit("Assetify:onRecieveState", true, false, player, ...)
     end
 
     function syncer:syncGlobalData(data, value, targetPlayer)
@@ -330,7 +313,7 @@ else
                 frames = 1
             })
         else
-            network:emit("Assetify:onRecieveSyncedGlobalData", true, targetPlayer, data, value)
+            network:emit("Assetify:onRecieveSyncedGlobalData", true, false, targetPlayer, data, value)
         end
         return true
     end
@@ -348,7 +331,7 @@ else
                 frames = 1
             })
         else
-            network:emit("Assetify:onRecieveSyncedElementData", true, targetPlayer, element, data, value)
+            network:emit("Assetify:onRecieveSyncedElementData", true, false, targetPlayer, element, data, value)
         end
         return true
     end
@@ -369,7 +352,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveSyncedElement", targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
+            network:emit("Assetify:onRecieveSyncedElement", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
         end
         return true
     end
@@ -388,7 +371,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneAttachment", targetPlayer, element, parent, boneData)
+            network:emit("Assetify:onRecieveBoneAttachment", true, false, targetPlayer, element, parent, boneData)
         end
         return true
     end
@@ -407,7 +390,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneDetachment", targetPlayer, element)
+            network:emit("Assetify:onRecieveBoneDetachment", true, false, targetPlayer, element)
         end
         return true
     end
@@ -426,7 +409,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveBoneRefreshment", targetPlayer, element, boneData)
+            network:emit("Assetify:onRecieveBoneRefreshment", true, false, targetPlayer, element, boneData)
         end
         return true
     end
@@ -452,7 +435,7 @@ else
                 frames = 1
             })
         else
-            imports.triggerClientEvent(targetPlayer, "Assetify:onRecieveClearBoneAttachment", targetPlayer, element)
+            network:emit("Assetify:onRecieveClearBoneAttachment", true, false, targetPlayer, element)
         end
         return true
     end
@@ -462,7 +445,7 @@ else
             thread:create(function(cThread)
                 if syncModules then
                     local isModuleVoid = true
-                    imports.triggerClientEvent(player, "Assetify:onRecieveBandwidth", player, syncer.libraryBandwidth)
+                    network:emit("Assetify:onRecieveBandwidth", true, false, player, syncer.libraryBandwidth)
                     if availableAssetPacks["module"] and availableAssetPacks["module"].assetPack then
                         for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
@@ -479,8 +462,8 @@ else
                         end
                     end
                     if isModuleVoid then
-                        imports.triggerClientEvent(player, "onAssetifyModuleLoad", player)
-                        imports.triggerEvent("Assetify:onRequestAssets", player)
+                        network:emit("Assetify:onModuleLoad", true, false, player)
+                        network:emit("Assetify:onRequestAssets", false, player)
                     end
                 else
                     local isLibraryVoid = true
@@ -503,7 +486,7 @@ else
                             end
                         end
                     end
-                    if isLibraryVoid then imports.triggerClientEvent(player, "onAssetifyLoad", resourceRoot) end
+                    if isLibraryVoid then network:emit("Assetify:onLoad", true, false, player) end
                 end
             end):resume({
                 executions = downloadSettings.syncRate,
@@ -531,8 +514,7 @@ else
         return true
     end
 
-    imports.addEvent("Assetify:onRecieveHash", true)
-    imports.addEventHandler("Assetify:onRecieveHash", root, function(assetType, assetName, hashes)
+    network:create("Assetify:onRecieveHash"):on(function(source, assetType, assetName, hashes)
         syncer:syncPack(source, {
             type = assetType,
             name = assetName,
@@ -540,13 +522,11 @@ else
         })
     end)
 
-    imports.addEvent("Assetify:onRequestAssets", true)
-    imports.addEventHandler("Assetify:onRequestAssets", root, function()
+    network:create("Assetify:onRequestAssets"):on(function(source)
         syncer:syncPack(source)
     end)
 
-    imports.addEvent("Assetify:onRequestSyncedPool", true)
-    imports.addEventHandler("Assetify:onRequestSyncedPool", root, function()
+    network:create("Assetify:onRequestSyncedPool"):on(function(source)
         local __source = source
         thread:create(function(cThread)
             local source = __source

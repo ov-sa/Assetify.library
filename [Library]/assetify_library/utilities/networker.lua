@@ -29,6 +29,7 @@ local imports = {
     addEventHandler = addEventHandler,
     triggerEvent = triggerEvent,
     triggerRemoteEvent = (localPlayer and triggerServerEvent) or triggerClientEvent,
+    triggerRemoteLatentEvent = (localPlayer and triggerLatentServerEvent) or triggerLatentClientEvent,
     json = json,
     table = table
 }
@@ -41,6 +42,7 @@ local imports = {
 network = {
     identifier = imports.md5(imports.getResourceName(imports.getThisResource())),
     isServerInstance = (not localPlayer and true) or false,
+    bandwidth = 1250000,
     buffer = {},
     cache = {
         execSerials = {}
@@ -48,7 +50,7 @@ network = {
 }
 network.__index = network
 
-imports.addEvent("Assetify:Network:API")
+imports.addEvent("Assetify:Network:API", true)
 imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
     if not serial or not payload or not payload.processType or (payload.isRestricted and (serial ~= network.identifier)) then return false end
     if payload.processType == "emit" then
@@ -72,9 +74,17 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
                     imports.triggerEvent("Assetify:Network:API", resourceRoot, serial, payload)
                 else
                     if not payload.isReciever or not network.isServerInstance then
-                        imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, serial, payload)
+                        if not payload.isLatent then
+                            imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, serial, payload)
+                        else
+                            imports.triggerRemoteLatentEvent("Assetify:Network:API", network.bandwidth, false, resourceRoot, serial, payload)
+                        end
                     else
-                        imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, serial, payload)
+                        if not payload.isLatent then
+                            imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, serial, payload)
+                        else
+                            imports.triggerRemoteLatentEvent(payload.isReciever, "Assetify:Network:API", network.bandwidth, false, resourceRoot, serial, payload)
+                        end
                     end
                 end
             end
@@ -192,9 +202,12 @@ function network:emit(...)
     }
     if self == network then
         payload.networkName, payload.isRemote = network.fetchArg(_, cArgs), network.fetchArg(_, cArgs)
-        if payload.isRemote and network.isServerInstance then
-            payload.isReciever = network.fetchArg(_, cArgs)
-            payload.isReciever = (payload.isReciever and import.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
+        if payload.isRemote then
+            payload.isLatent = network.fetchArg(_, cArgs)
+            if network.isServerInstance then
+                payload.isReciever = network.fetchArg(_, cArgs)
+                payload.isReciever = (payload.isReciever and imports.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
+            end
         end
     else
         payload.isRestricted = true
@@ -205,9 +218,17 @@ function network:emit(...)
         imports.triggerEvent("Assetify:Network:API", resourceRoot, network.identifier, payload)
     else
         if payload.isReciever then
-            imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, network.identifier, payload)
+            if not payload.isLatent then
+                imports.triggerRemoteEvent(payload.isReciever, "Assetify:Network:API", resourceRoot, network.identifier, payload)
+            else
+                imports.triggerRemoteLatentEvent(payload.isReciever, "Assetify:Network:API", network.bandwidth, false, resourceRoot, network.identifier, payload)
+            end
         else
-            imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, network.identifier, payload)
+            if not payload.isLatent then
+                imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, network.identifier, payload)
+            else
+                imports.triggerRemoteLatentEvent("Assetify:Network:API", network.bandwidth, false, resourceRoot, network.identifier, payload)
+            end
         end
     end
     return true
@@ -227,11 +248,12 @@ function network:emitCallback(cThread, ...)
     if self == network then
         payload.networkName, payload.isRemote = network.fetchArg(_, cArgs), network.fetchArg(_, cArgs)
         if payload.isRemote then
+            payload.isLatent = network.fetchArg(_, cArgs)
             if not network.isServerInstance then
                 payload.isReciever = localPlayer
             else
                 payload.isReciever = network.fetchArg(_, cArgs)
-                payload.isReciever = (payload.isReciever and import.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
+                payload.isReciever = (payload.isReciever and imports.isElement(payload.isReciever) and (imports.getElementType(payload.isReciever) == "player") and payload.isReciever) or false
             end
         end
     else
@@ -242,6 +264,10 @@ function network:emitCallback(cThread, ...)
     if not payload.isRemote then
         return function() imports.triggerEvent("Assetify:Network:API", resourceRoot, network.identifier, payload) end
     else
-        return function() imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, network.identifier, payload) end
+        if not payload.isLatent then
+            return function() imports.triggerRemoteEvent("Assetify:Network:API", resourceRoot, network.identifier, payload) end
+        else
+            return function() imports.triggerRemoteLatentEvent("Assetify:Network:API", network.bandwidth, false, resourceRoot, network.identifier, payload) end
+        end
     end
 end
