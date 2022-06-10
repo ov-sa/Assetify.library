@@ -480,7 +480,7 @@ else
                     if availableAssetPacks["module"] and availableAssetPacks["module"].assetPack then
                         for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
-                                syncer:syncData(player, "module", i, nil, j)
+                                syncer:syncData(player, "module", i, false, j)
                             else
                                 for k, v in imports.pairs(j) do
                                     isModuleVoid = false
@@ -503,7 +503,7 @@ else
                             if j.assetPack then
                                 for k, v in imports.pairs(j.assetPack) do
                                     if k ~= "rwDatas" then
-                                        syncer:syncData(player, i, k, nil, v)
+                                        syncer:syncData(player, i, k, false, v)
                                     else
                                         for m, n in imports.pairs(v) do
                                             isLibraryVoid = false

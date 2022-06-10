@@ -20,6 +20,7 @@ local imports = {
     createObject = createObject,
     createPed = createPed,
     createVehicle = createVehicle,
+    setElementModel = setElementModel,
     setElementAlpha = setElementAlpha,
     setElementDoubleSided = setElementDoubleSided,
     setElementDimension = setElementDimension,
@@ -94,6 +95,7 @@ if localPlayer then
         end
         if not self.cModelInstance then return false end
         if targetDummy then
+            imports.setElementModel(self.cModelInstance, cData.modelID)
             imports.setElementAlpha(self.cModelInstance, 255)
         else
             imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
