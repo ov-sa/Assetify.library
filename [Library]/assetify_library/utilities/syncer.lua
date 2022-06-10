@@ -29,12 +29,6 @@ local imports = {
     outputDebugString = outputDebugString,
     addEventHandler = addEventHandler,
     getResourceRootElement = getResourceRootElement,
-    createObject = createObject,
-    createPed = createPed,
-    createVehicle = createVehicle,
-    setElementAlpha = setElementAlpha,
-    setElementDimension = setElementDimension,
-    setElementInterior = setElementInterior,
     fetchRemote = fetchRemote,
     loadAsset = loadAsset,
     file = file,
@@ -375,26 +369,8 @@ else
 
     function syncer:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, targetPlayer)    
         if not targetPlayer then
-            if not dummyData then return false end
-            local cAsset = manager:getData(assetType, assetName)
-            if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
-            local dummyType = availableAssetPacks[assetType].assetType
-            if not dummyType then return false end
-            local cDummy = false
-            dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
-            dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
-            dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
-            if dummyType == "object" then
-                cDummy = imports.createObject(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-            elseif dummyType == "ped" then
-                cDummy = imports.createPed(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)
-            elseif dummyType == "vehicle" then
-                cDummy = imports.createVehicle(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-            end
+            cDummy = dummy:create(assetType, assetName, assetClump, clumpMaps, dummyData)
             if not cDummy then return false end
-            imports.setElementAlpha(cDummy, 0)
-            imports.setElementDimension(cDummy, imports.tonumber(dummyData.dimension) or 0)
-            imports.setElementInterior(cDummy, imports.tonumber(dummyData.interior) or 0)
             syncer.syncedAssetDummies[cDummy] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps, dummyData = dummyData}
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do

@@ -29,11 +29,11 @@
     <script src="utilities/threader.lua" type="shared"/>
     <script src="utilities/networker.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
+    <script src="utilities/dummy.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/shader.lua" type="shared"/>
     <script src="utilities/manager.lua" type="shared"/>
     <script src="utilities/scene.lua" type="client"/>
-    <script src="utilities/dummy.lua" type="client"/>
     <script src="utilities/bone.lua" type="client"/>
     <script src="utilities/streamer.lua" type="client"/>
     <script src="utilities/renderer.lua" type="client"/>
