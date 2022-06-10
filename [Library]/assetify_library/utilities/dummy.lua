@@ -92,9 +92,12 @@ function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData, targ
         end
     end
     if not self.cModelInstance then return false end
-    imports.setElementAlpha(self.cModelInstance, 255)
-    imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
-    imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
+    if targetDummy then
+        imports.setElementAlpha(self.cModelInstance, 255)
+    else
+        imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
+        imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
+    end
     if self.cCollisionInstance then
         imports.setElementAlpha(self.cCollisionInstance, 0)
         self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)

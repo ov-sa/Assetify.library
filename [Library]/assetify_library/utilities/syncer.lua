@@ -33,6 +33,8 @@ local imports = {
     createPed = createPed,
     createVehicle = createVehicle,
     setElementAlpha = setElementAlpha,
+    setElementDimension = setElementDimension,
+    setElementInterior = setElementInterior,
     fetchRemote = fetchRemote,
     loadAsset = loadAsset,
     file = file,
@@ -391,6 +393,8 @@ else
             end
             if not cDummy then return false end
             imports.setElementAlpha(cDummy, 0)
+            imports.setElementDimension(cDummy, imports.tonumber(dummyData.dimension) or 0)
+            imports.setElementInterior(cDummy, imports.tonumber(dummyData.interior) or 0)
             syncer.syncedAssetDummies[cDummy] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps, dummyData = dummyData}
             thread:create(function(cThread)
                 for i, j in imports.pairs(syncer.loadedClients) do
