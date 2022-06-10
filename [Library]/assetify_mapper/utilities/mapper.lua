@@ -63,7 +63,7 @@ local imports = {
 -----------------------
 
 mapper = {
-    assetPack = "inventory",
+    assetPack = "object",
     cacheDirectoryPath = ":assetify_library/files/cache/",
     sceneDirectoryPath = ":assetify_library/files/assets/scene/",
     cacheManifestPath = ":assetify_library/files/cache/manifest.json",
