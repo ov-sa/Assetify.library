@@ -66,9 +66,11 @@ function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData, targ
     if not cAsset or not cData then return false end
     local dummyType = availableAssetPacks[assetType].assetType
     if not dummyType then return false end
-    dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
-    dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
-    dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
+    if not targetDummy then
+        dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
+        dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
+        dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
+    end
     self.assetType, self.assetName = assetType, assetName
     self.syncRate = imports.tonumber(dummyData.syncRate)
     if dummyType == "object" then
