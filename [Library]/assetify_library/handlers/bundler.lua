@@ -171,10 +171,6 @@ bundler["core"] = [[
             assetify.playSound3D = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "playSoundAsset3D", ...)
             end
-
-            assetify.createDummy = function(...)
-                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createAssetDummy", ...)
-            end
         end
 
         assetify.isLoaded = function()
@@ -222,6 +218,10 @@ bundler["core"] = [[
 
         assetify.getElementAssetInfo = function(...)
             return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "getElementAssetInfo", ...)
+        end
+
+        assetify.createDummy = function(...)
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "createAssetDummy", ...)
         end
     end
 ]]

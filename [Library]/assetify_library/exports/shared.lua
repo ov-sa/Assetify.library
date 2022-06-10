@@ -101,6 +101,11 @@ function getEntityData(element, data)
     return nil
 end
 
+function createAssetDummy(...)
+    local arguments = {...}
+    return syncer:syncAssetDummy(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5])
+end
+
 function setBoneAttachment(element, parent, ...)
     if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) then return false end
     local arguments = {...}

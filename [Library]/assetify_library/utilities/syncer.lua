@@ -28,6 +28,10 @@ local imports = {
     outputDebugString = outputDebugString,
     addEventHandler = addEventHandler,
     getResourceRootElement = getResourceRootElement,
+    createObject = createObject,
+    createPed = createPed,
+    createVehicle = createVehicle,
+    setElementAlpha = setElementAlpha,
     fetchRemote = fetchRemote,
     loadAsset = loadAsset,
     file = file,
@@ -47,6 +51,8 @@ syncer = {
     syncedGlobalDatas = {},
     syncedElementDatas = {},
     syncedElements = {},
+    syncedAssetDummies = {},
+    syncedBoneAttachments = {},
     syncedLights = {}
 }
 syncer.libraryName = imports.getResourceName(syncer.libraryResource)
@@ -88,6 +94,10 @@ if localPlayer then
         return network:emit("Assetify:onRecieveSyncedElement", false, ...)
     end
 
+    function syncer:syncAssetDummy(...)
+        return network:emit("Assetify:onRecieveAssetDummy", false, ...)
+    end
+
     function syncer:syncBoneAttachment(...)
         return network:emit("Assetify:onRecieveBoneAttachment", false, ...)
     end
@@ -108,8 +118,8 @@ if localPlayer then
         network:emit("Assetify:onRequestSyncedPool", true, false, localPlayer)
     end)
 
-    network:create("Assetify:onRecieveBandwidth"):on(function(libraryBandwidth)
-        syncer.libraryBandwidth = libraryBandwidth
+    network:create("Assetify:onRecieveBandwidth"):on(function(bandwidth)
+        syncer.libraryBandwidth = bandwidth
     end)
 
     network:create("Assetify:onRecieveHash"):on(function(assetType, assetName, hashes)
@@ -256,6 +266,10 @@ if localPlayer then
         end
     end)
 
+    network:create("Assetify:onRecieveAssetDummy"):on(function(...)
+        dummy:create(...)
+    end)
+
     network:create("Assetify:onRecieveBoneAttachment"):on(function(...)
         bone:create(...)
     end)
@@ -282,7 +296,6 @@ else
     syncer.libraryVersion = (syncer.libraryVersion and "v."..syncer.libraryVersion) or syncer.libraryVersion
     syncer.loadedClients = {}
     syncer.scheduledClients = {}
-    syncer.syncedBoneAttachments = {}
 
     function syncer:syncHash(player, ...)
         return network:emit("Assetify:onRecieveHash", true, false, player, ...)
@@ -353,6 +366,40 @@ else
             })
         else
             network:emit("Assetify:onRecieveSyncedElement", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps)
+        end
+        return true
+    end
+
+    function syncer:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, targetPlayer)    
+        if not targetPlayer then
+            if not dummyData then return false end
+            local cAsset = manager:getData(assetType, assetName)
+            if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
+            local dummyType = availableAssetPacks[assetType].assetType
+            if not dummyType then return false end
+            local cDummy = false
+            if dummyType == "object" then
+                cDummy = imports.createObject(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+            elseif dummyType == "ped" then
+                cDummy = imports.createPed(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)
+            elseif dummyType == "vehicle" then
+                cDummy = imports.createVehicle(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+            end
+            if not cDummy then return false end
+            imports.setElementAlpha(cDummy, 0)
+            syncer.syncedAssetDummies[cDummy] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps, dummyData = dummyData}
+            thread:create(function(cThread)
+                for i, j in imports.pairs(syncer.loadedClients) do
+                    syncer:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, cDummy, j)
+                    thread:pause()
+                end
+            end):resume({
+                executions = downloadSettings.syncRate,
+                frames = 1
+            })
+            return cDummy
+        else
+            network:emit("Assetify:onRecieveAssetDummy", true, false, targetPlayer, assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy)
         end
         return true
     end
@@ -547,6 +594,12 @@ else
                 end
                 thread:pause()
             end
+            for i, j in imports.pairs(syncer.syncedAssetDummies) do
+                if j then
+                    syncer:syncAssetDummy(j.type, j.name, j.clump, j.clumpMaps, j.dummyData, i, source)
+                end
+                thread:pause()
+            end
             for i, j in imports.pairs(syncer.syncedBoneAttachments) do
                 if j then
                     syncer:syncBoneAttachment(i, j.parent, j.boneData, source)
@@ -581,18 +634,15 @@ else
         syncer.syncedElements[source] = nil
     end)
     imports.addEventHandler("onElementDestroy", root, function()
-        syncer.syncedElements[source] = nil
+        syncer.syncedGlobalDatas[source] = nil
         syncer.syncedElementDatas[source] = nil
+        syncer.syncedElements[source] = nil
+        syncer.syncedAssetDummies[source] = nil
+        syncer.syncedLights[source] = nil
+        syncer:syncClearBoneAttachment(source)
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
         syncer.loadedClients[source] = nil
         syncer.scheduledClients[source] = nil
-        syncer.syncedElements[source] = nil
-        syncer:syncClearBoneAttachment(source)
-        for i, j in imports.pairs(syncer.syncedBoneAttachments) do
-            if j and (j.parent == source) then
-                syncer:syncClearBoneAttachment(i)
-            end
-        end
     end)
 end

@@ -136,11 +136,6 @@ function playSoundAsset3D(...)
     return manager:playSound3D(...)
 end
 
-function createAssetDummy(...)
-    local cDummy = dummy:create(...)
-    return (cDummy and cDummy.cDummy) or false
-end
-
 function isRendererVirtualRendering()
     return renderer.cache.isVirtualRendering
 end
