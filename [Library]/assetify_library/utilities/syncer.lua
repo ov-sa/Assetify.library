@@ -64,7 +64,7 @@ syncer.execOnLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
-        network:destroy("Assetify:onLoad")
+        network:fetch("Assetify:onLoad"):off(execWrapper)
     end
     network:fetch("Assetify:onLoad"):on(execWrapper)
     return true
@@ -73,7 +73,7 @@ syncer.execOnModuleLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
-        network:destroy("Assetify:onModuleLoad")
+        network:fetch("Assetify:onModuleLoad"):off(execWrapper)
     end
     network:fetch("Assetify:onModuleLoad"):on(execWrapper)
     return true
