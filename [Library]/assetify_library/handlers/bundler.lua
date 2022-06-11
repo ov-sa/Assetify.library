@@ -249,8 +249,7 @@ bundler["scheduler"] = [[
                     execFunc()
                     network:fetch("Assetify:onLoad"):off(execWrapper)
                 end
-                local cNetwork = network:fetch("Assetify:onLoad") or network:create("Assetify:onLoad")
-                cNetwork:on(execWrapper)
+                network:fetch("Assetify:onLoad", true):on(execWrapper)
             end
             return true
         end,
@@ -266,8 +265,7 @@ bundler["scheduler"] = [[
                     execFunc()
                     network:fetch("Assetify:onModuleLoad"):off(execWrapper)
                 end
-                local cNetwork = network:fetch("Assetify:onModuleLoad") or network:create("Assetify:onModuleLoad")
-                cNetwork:on(execWrapper)
+                network:fetch("Assetify:onModuleLoad", true):on(execWrapper)
             end
             return true
         end,

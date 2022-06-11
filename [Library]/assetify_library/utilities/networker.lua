@@ -150,9 +150,13 @@ function network:unload()
     return true
 end
 
-function network:fetch(name)
+function network:fetch(name, isRemote)
     if not self or (self ~= network) then return false end
-    return network.buffer[name] or false
+    local cNetwork = network.buffer[name] or false
+    if not cNetwork and isRemote then
+        cNetwork = network:create(name)
+    end
+    return cNetwork
 end
 
 function network:serializeExec(exec)
