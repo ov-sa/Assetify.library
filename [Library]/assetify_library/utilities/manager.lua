@@ -370,7 +370,7 @@ if localPlayer then
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
         manager:clearElementBuffer(source)
-        syncer.syncedElementDatas[source] = nil
+        syncer.syncedEntityDatas[source] = nil
         for i, j in imports.pairs(light) do
             if j and (imports.type(j) == "table") and j.clearElementBuffer then
                 j:clearElementBuffer(source)

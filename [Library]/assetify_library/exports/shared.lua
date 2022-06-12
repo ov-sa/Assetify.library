@@ -73,10 +73,10 @@ function getElementAssetInfo(element)
     return syncer.syncedElements[element].type, syncer.syncedElements[element].name, syncer.syncedElements[element].clump, syncer.syncedElements[element].clumpMaps
 end
 
-function setGlobalData(data, value)
+function setGlobalData(data, value, isSync)
     if imports.type(data) ~= "string" then return false end
     syncer.syncedGlobalDatas[data] = value
-    if not localPlayer then syncer:syncGlobalData(data, value) end
+    if not localPlayer then syncer:syncGlobalData(data, value, isSync) end
     return true
 end
 
@@ -85,18 +85,18 @@ function getGlobalData(data)
     return syncer.syncedGlobalDatas[data]
 end
 
-function setEntityData(element, data, value)
+function setEntityData(element, data, value, isSync)
     if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-    syncer.syncedElementDatas[element] = syncer.syncedElementDatas[element] or {}
-    syncer.syncedElementDatas[element][data] = value
-    if not localPlayer then syncer:syncElementData(element, data, value) end
+    syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
+    syncer.syncedEntityDatas[element][data] = value
+    if not localPlayer then syncer:syncEntityData(element, data, value, isSync) end
     return true
 end
 
 function getEntityData(element, data)
     if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-    if syncer.syncedElementDatas[element] and (syncer.syncedElementDatas[element][data] ~= nil) then
-        return syncer.syncedElementDatas[element][data]
+    if syncer.syncedEntityDatas[element] and (syncer.syncedEntityDatas[element][data] ~= nil) then
+        return syncer.syncedEntityDatas[element][data]
     end
     return nil
 end
