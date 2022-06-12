@@ -81,9 +81,11 @@ function thread:resume(syncRate)
     self.syncRate.frames = (self.syncRate.executions and syncRate and imports.tonumber(syncRate.frames)) or false
     if self.syncRate.executions and self.syncRate.frames then
         self.timer = imports.setTimer(function()
+            if self.isScheduled then return false end
             local status = self:status()
             if status == "suspended" then
                 for i = 1, self.syncRate.executions, 1 do
+                    if self.isScheduled then return false end
                     status = self:status()
                     if status == "dead" then
                         self:destroy()
@@ -98,6 +100,7 @@ function thread:resume(syncRate)
             end
         end, self.syncRate.frames, 0)
     else
+        if self.isScheduled then return false end
         if self.timer and imports.isTimer(self.timer) then
             imports.killTimer(self.timer)
         end
@@ -138,6 +141,7 @@ end
 function thread:resolve(...)
     if not self or (self == thread) then return false end
     if not self.isScheduled then return false end
+    self.isScheduled = nil
     self.scheduledValues = {...}
     local self = self
     imports.setTimer(function()

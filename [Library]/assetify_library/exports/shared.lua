@@ -73,32 +73,22 @@ function getElementAssetInfo(element)
     return syncer.syncedElements[element].type, syncer.syncedElements[element].name, syncer.syncedElements[element].clump, syncer.syncedElements[element].clumpMaps
 end
 
-function setGlobalData(data, value, isSync)
-    if imports.type(data) ~= "string" then return false end
-    syncer.syncedGlobalDatas[data] = value
-    if not localPlayer then syncer:syncGlobalData(data, value, isSync) end
-    return true
+function setGlobalData(...)
+    return syncer:syncGlobalData(...)
 end
 
 function getGlobalData(data)
-    if imports.type(data) ~= "string" then return false end
+    if not data or (imports.type(data) ~= "string") then return false end
     return syncer.syncedGlobalDatas[data]
 end
 
-function setEntityData(element, data, value, isSync)
-    if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-    syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
-    syncer.syncedEntityDatas[element][data] = value
-    if not localPlayer then syncer:syncEntityData(element, data, value, isSync) end
-    return true
+function setEntityData(...)
+    return syncer:syncEntityData(...)
 end
 
 function getEntityData(element, data)
     if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-    if syncer.syncedEntityDatas[element] and (syncer.syncedEntityDatas[element][data] ~= nil) then
-        return syncer.syncedEntityDatas[element][data]
-    end
-    return nil
+    return syncer.syncedEntityDatas[element] and syncer.syncedEntityDatas[element][data]
 end
 
 function createAssetDummy(...)

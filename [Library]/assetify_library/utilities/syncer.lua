@@ -95,6 +95,14 @@ if localPlayer then
         return network:emit("Assetify:onRecieveAssetDummy", false, ...)
     end
 
+    function syncer:syncGlobalData(...)
+        return network:emit("Assetify:onRecieveSyncedGlobalData", false, ...)
+    end
+
+    function syncer:syncEntityData(...)
+        return network:emit("Assetify:onRecieveSyncedEntityData", false, ...)
+    end
+
     function syncer:syncBoneAttachment(...)
         return network:emit("Assetify:onRecieveBoneAttachment", false, ...)
     end
@@ -234,11 +242,12 @@ if localPlayer then
     end)
 
     network:create("Assetify:onRecieveSyncedGlobalData"):on(function(data, value)
+        if not data or (imports.type(data) ~= "string") then return false end
         syncer.syncedGlobalDatas[data] = value
     end)
 
     network:create("Assetify:onRecieveSyncedEntityData"):on(function(element, data, value)
-        if not element or not imports.isElement(element) then return false end
+        if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
         syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
         syncer.syncedEntityDatas[element][data] = value
     end)
@@ -311,17 +320,25 @@ else
     end
 
     function syncer:syncGlobalData(data, value, isSync, targetPlayer)
-        if not element or not imports.isElement(element) then return false end
+        if not data or (imports.type(data) ~= "string") then return false end
         if not targetPlayer then
-            thread:create(function(cThread)
+            syncer.syncedGlobalDatas[data] = value
+            local execWrapper = nil
+            execWrapper = function()
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncGlobalData(data, value, isSync, i)
                     if not isSync then thread:pause() end
                 end
-            end):resume({
-                executions = (not isSync and downloadSettings.syncRate) or 1,
-                frames = (not isSync and 1) or 0
-            })
+                execWrapper = nil
+            end
+            if isSync then
+                execWrapper()
+            else
+                thread:create(execWrapper):resume({
+                    executions = downloadSettings.syncRate,
+                    frames = 1
+                })
+            end
         else
             network:emit("Assetify:onRecieveSyncedGlobalData", true, false, targetPlayer, data, value)
         end
@@ -330,16 +347,25 @@ else
 
     function syncer:syncEntityData(element, data, value, isSync, targetPlayer)
         if not targetPlayer then
-            if not element or not imports.isElement(element) then return false end
-            thread:create(function(cThread)
+            if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
+            syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
+            syncer.syncedEntityDatas[element][data] = value
+            local execWrapper = nil
+            execWrapper = function()
                 for i, j in imports.pairs(syncer.loadedClients) do
                     syncer:syncEntityData(element, data, value, isSync, i)
                     if not isSync then thread:pause() end
                 end
-            end):resume({
-                executions = (not isSync and downloadSettings.syncRate) or 1,
-                frames = (not isSync and 1) or 0
-            })
+                execWrapper = nil
+            end
+            if isSync then
+                execWrapper()
+            else
+                thread:create(execWrapper):resume({
+                    executions = downloadSettings.syncRate,
+                    frames = 1
+                })
+            end
         else
             network:emit("Assetify:onRecieveSyncedEntityData", true, false, targetPlayer, element, data, value)
         end
