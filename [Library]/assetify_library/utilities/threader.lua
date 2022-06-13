@@ -82,36 +82,24 @@ function thread:resume(syncRate)
     if self.syncRate.executions and self.syncRate.frames then
         self.timer = imports.setTimer(function()
             if self.isScheduled then return false end
-            local status = self:status()
-            if status == "suspended" then
+            if self:status() == "suspended" then
                 for i = 1, self.syncRate.executions, 1 do
                     if self.isScheduled then return false end
-                    status = self:status()
-                    if status == "dead" then
-                        self:destroy()
-                        return
-                    end
+                    if self:status() == "dead" then return self:destroy() end
                     imports.coroutine.resume(self.thread, self)
                 end
             end
-            status = self:status()
-            if status == "dead" then
-                self:destroy()
-            end
+            if self:status() == "dead" then self:destroy() end
         end, self.syncRate.frames, 0)
     else
         if self.isScheduled then return false end
         if self.timer and imports.isTimer(self.timer) then
             imports.killTimer(self.timer)
         end
-        local status = self:status()
-        if status == "suspended" then
+        if self:status() == "suspended" then
             imports.coroutine.resume(self.thread, self)
         end
-        status = self:status()
-        if status == "dead" then
-            self:destroy()
-        end
+        if self:status() == "dead" then self:destroy() end
     end
     return true
 end
