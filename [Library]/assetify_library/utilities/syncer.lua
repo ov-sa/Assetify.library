@@ -92,7 +92,7 @@ if localPlayer then
     end
 
     function syncer:syncAssetDummy(...)
-        return network:emit("Assetify:onRecieveAssetDummy", false, ...)
+        return dummy:create(...)
     end
 
     function syncer:syncGlobalData(...)
@@ -104,19 +104,22 @@ if localPlayer then
     end
 
     function syncer:syncBoneAttachment(...)
-        return network:emit("Assetify:onRecieveBoneAttachment", false, ...)
+        return bone:create(...)
     end
 
-    function syncer:syncBoneDetachment(...)
-        return network:emit("Assetify:onRecieveBoneDetachment", false, ...)
+    function syncer:syncBoneDetachment(element, ...)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        return bone.buffer.element[element]:destroy()
     end
 
-    function syncer:syncBoneRefreshment(...)
-        return network:emit("Assetify:onRecieveBoneRefreshment", false, ...)
+    function syncer:syncBoneRefreshment(element, ...)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        return bone.buffer.element[element]:refresh(...)
     end
 
-    function syncer:syncClearBoneAttachment(...)
-        return network:emit("Assetify:onRecieveClearBoneAttachment", false, ...)
+    function syncer:syncClearBoneAttachment(element, ...)
+        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
+        return bone.buffer.element[element]:clearElementBuffer(...)
     end
 
     network:fetch("Assetify:onLoad"):on(function()
@@ -272,29 +275,11 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:onRecieveAssetDummy"):on(function(...)
-        dummy:create(...)
-    end)
-
-    network:create("Assetify:onRecieveBoneAttachment"):on(function(...)
-        bone:create(...)
-    end)
-
-    network:create("Assetify:onRecieveBoneDetachment"):on(function(element)
-        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
-        bone.buffer.element[element]:destroy()
-    end)
-
-    network:create("Assetify:onRecieveBoneRefreshment"):on(function(element, ...)
-        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
-        bone.buffer.element[element]:refresh(...)
-    end)
-
-    network:create("Assetify:onRecieveClearBoneAttachment"):on(function(element, ...)
-        if not element or not imports.isElement(element) or not bone.buffer.element[element] then return false end
-        bone.buffer.element[element]:clearElementBuffer(...)
-    end)
-
+    network:create("Assetify:onRecieveAssetDummy"):on(function(...) syncer:syncAssetDummy(...) end)
+    network:create("Assetify:onRecieveBoneAttachment"):on(function(...) syncer:syncBoneAttachment(...) end)
+    network:create("Assetify:onRecieveBoneDetachment"):on(function(...) syncer:syncBoneDetachment(...) end)
+    network:create("Assetify:onRecieveBoneRefreshment"):on(function(...) syncer:syncBoneRefreshment(...) end)
+    network:create("Assetify:onRecieveClearBoneAttachment"):on(function(...) syncer:syncClearBoneAttachment(...) end)
     imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
     imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
 else
