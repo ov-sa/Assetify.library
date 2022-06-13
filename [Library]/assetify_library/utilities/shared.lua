@@ -17,6 +17,7 @@ local imports = {
     pairs = pairs,
     tonumber = tonumber,
     decodeString = decodeString,
+    isElement = isElement,
     setmetatable = setmetatable,
     getElementMatrix = getElementMatrix,
     getElementPosition = getElementPosition,
@@ -40,10 +41,6 @@ local imports = {
 --[[ Utils ]]--
 ---------------
 
-isElement = function(element)
-    return imports.type(element) == "userdata"
-end
-
 decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
     if not decodeData or (imports.type(decodeData) ~= "string") then return false end
     local rawString = imports.decodeString(decodeType, decodeData, decodeOptions)
@@ -58,7 +55,7 @@ getElementPosition = function(element, offX, offY, offZ)
     if not offX or not offY or not offZ then
         return imports.getElementPosition(element)
     else
-        if not element or not isElement(element) then return false end
+        if not element or not imports.isElement(element) then return false end
         offX, offY, offZ = imports.tonumber(offX) or 0, imports.tonumber(offY) or 0, imports.tonumber(offZ) or 0
         local cMatrix = imports.getElementMatrix(element)
         return (offX*cMatrix[1][1]) + (offY*cMatrix[2][1]) + (offZ*cMatrix[3][1]) + cMatrix[4][1], (offX*cMatrix[1][2]) + (offY*cMatrix[2][2]) + (offZ*cMatrix[3][2]) + cMatrix[4][2], (offX*cMatrix[1][3]) + (offY*cMatrix[2][3]) + (offZ*cMatrix[3][3]) + cMatrix[4][3]
