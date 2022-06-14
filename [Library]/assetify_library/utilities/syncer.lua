@@ -245,14 +245,18 @@ if localPlayer then
         end
     end)
 
+    network:create("Assetify:onGlobalDataChange")
     network:create("Assetify:onRecieveSyncedGlobalData"):on(function(data, value)
         if not data or (imports.type(data) ~= "string") then return false end
+        network:emit("Assetify:onGlobalDataChange", data, syncer.syncedGlobalDatas[data], value)
         syncer.syncedGlobalDatas[data] = value
     end)
 
+    network:create("Assetify:onEntityDataChange")
     network:create("Assetify:onRecieveSyncedEntityData"):on(function(element, data, value, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) or not data or (imports.type(data) ~= "string") then return false end
         syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
+        network:emit("Assetify:onEntityDataChange", element, data, syncer.syncedEntityDatas[element][data], value)
         syncer.syncedEntityDatas[element][data] = value
     end)
 
