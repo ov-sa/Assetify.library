@@ -33,7 +33,7 @@ local function onLibraryLoaded()
 end
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
-    thread:create(function(cThread)
+    thread:create(function(self)
         syncer.libraryModules = {}
         if not availableAssetPacks["module"] then
             network:emit("Assetify:onModuleLoad", false)
@@ -44,7 +44,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
                     network:emit("Assetify:onModuleLoad", false)
                 end
                 imports.setTimer(function()
-                    cThread:resume()
+                    self:resume()
                 end, 1, 1)
             end)
             thread:pause()

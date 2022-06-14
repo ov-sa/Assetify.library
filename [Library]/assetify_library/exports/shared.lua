@@ -87,7 +87,7 @@ function setEntityData(...)
 end
 
 function getEntityData(element, data)
-    if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
+    if not element or not data or (imports.type(data) ~= "string") then return false end
     return syncer.syncedEntityDatas[element] and syncer.syncedEntityDatas[element][data]
 end
 
@@ -96,24 +96,20 @@ function createAssetDummy(...)
     return syncer:syncAssetDummy(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5])
 end
 
-function setBoneAttachment(element, parent, ...)
-    if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) then return false end
+function setBoneAttachment(...)
     local arguments = {...}
-    return syncer:syncBoneAttachment(element, parent, arguments[1])
+    return syncer:syncBoneAttachment(arguments[1], arguments[2], arguments[3])
 end
 
 function setBoneDetachment(element)
-    if not element or not imports.isElement(element) then return false end
     return syncer:syncBoneDetachment(element)
 end
 
-function setBoneRefreshment(element, ...)
-    if not element or not imports.isElement(element) then return false end
+function setBoneRefreshment(...)
     local arguments = {...}
-    return syncer:syncBoneRefreshment(element, arguments[1])
+    return syncer:syncBoneRefreshment(arguments[1], arguments[2])
 end
 
-function clearBoneAttachment(element, ...)
-    if not element or not imports.isElement(element) then return false end
+function clearBoneAttachment(element)
     return syncer:syncClearBoneAttachment(element)
 end

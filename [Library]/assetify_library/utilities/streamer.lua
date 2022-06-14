@@ -24,6 +24,7 @@ local imports = {
     getTickCount = getTickCount,
     isTimer = isTimer,
     setTimer = setTimer,
+    killTimer = killTimer,
     isElementOnScreen = isElementOnScreen,
     getElementDimension = getElementDimension,
     getElementInterior = getElementInterior,
@@ -174,7 +175,7 @@ function streamer:deallocate()
                 end
             else
                 if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer and imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
-                    imports.destroyElement(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer)
+                    imports.killTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer)
                     streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             end

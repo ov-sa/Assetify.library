@@ -79,7 +79,7 @@ function light.planar:destroy(...)
 end
 
 function light.planar:clearElementBuffer(element)
-    if not element or not imports.isElement(element) or not light.planar.buffer[element] then return false end
+    if not element or not light.planar.buffer[element] then return false end
     light.planar.buffer[element]:destroy()
     return true
 end

@@ -51,6 +51,21 @@ function thread:create(exec)
     return cThread
 end
 
+function thread:createHeartbeat(conditionExec, exec, rate)
+    if not conditionExec or not exec or (imports.type(conditionExec) ~= "function") or (imports.type(exec) ~= "function") then return false end
+    rate = imports.math.max(imports.tonumber(rate) or 0, 1)
+    return thread:create(function(self)
+      while(conditionExec()) do
+        self:pause()
+      end
+      exec()
+      conditionExec, exec = nil, nil
+    end):resume({
+      executions = 1,
+      frame = rate
+    })
+end
+
 function thread:destroy()
     if not self or (self == thread) then return false end
     if self.timer and imports.isTimer(self.timer) then

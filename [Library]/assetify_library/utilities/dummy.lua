@@ -53,15 +53,15 @@ if localPlayer then
     end
 
     function dummy:clearElementBuffer(element)
-        if not element or not imports.isElement(element) or not dummy.buffer[element] then return false end
+        if not element or not dummy.buffer[element] then return false end
         dummy.buffer[element]:destroy()
         return true
     end
 
-    function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy)
+    function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, remoteSignature)
         if not self or (self == dummy) then return false end
         if not dummyData then return false end
-        targetDummy = (targetDummy and imports.isElement(targetDummy) and targetDummy) or false
+        targetDummy = (remoteSignature and targetDummy) or false
         local cAsset, cData = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         if assetClump then cData = cAsset.unSynced.assetCache[assetClump].cAsset.synced end
@@ -77,8 +77,6 @@ if localPlayer then
         self.syncRate = imports.tonumber(dummyData.syncRate)
         if dummyType == "object" then
             self.cModelInstance = targetDummy or imports.createObject(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-            imports.setElementDoubleSided(self.cModelInstance, true)
-            network:emit("Assetify:onRecieveElementModel", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps)
             if cData.collisionID then
                 self.cCollisionInstance = imports.createObject(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
             end
@@ -94,17 +92,27 @@ if localPlayer then
             end
         end
         if not self.cModelInstance then return false end
-        if targetDummy then
-            imports.setElementModel(self.cModelInstance, cData.modelID)
-            imports.setElementAlpha(self.cModelInstance, 255)
-        else
-            imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
-            imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
-        end
-        if self.cCollisionInstance then
-            imports.setElementAlpha(self.cCollisionInstance, 0)
-            self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
-        end
+        if self.cCollisionInstance then imports.setElementAlpha(self.cCollisionInstance, 0) end
+        self.hearbeat = thread:createHeartbeat(function()
+            if not targetDummy then
+                return false
+            else
+                return not imports.isElement(targetDummy)
+            end
+        end, function()
+            if dummyType == "object" then imports.setElementDoubleSided(self.cModelInstance, true) end
+            network:emit("Assetify:onRecieveSyncedElement", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remoteSignature)
+            if targetDummy then
+                imports.setElementAlpha(self.cModelInstance, 255)
+            else
+                imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
+                imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
+            end
+            if self.cCollisionInstance then
+                self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
+            end
+            self.hearbeat = nil
+        end, downloadSettings.buildRate)
         self.cDummy = self.cCollisionInstance or self.cModelInstance
         dummy.buffer[(self.cDummy)] = self
         return true
@@ -113,6 +121,9 @@ if localPlayer then
     function dummy:unload()
         if not self or (self == dummy) or self.isUnloading then return false end
         self.isUnloading = true
+        if self.hearbeat then
+            self.hearbeat:destroy()
+        end
         if self.cStreamer then
             self.cStreamer:destroy()
         end

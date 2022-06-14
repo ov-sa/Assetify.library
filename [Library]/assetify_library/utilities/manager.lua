@@ -182,7 +182,7 @@ if localPlayer then
                 return true
             end
         elseif assetType == "sound" then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 for i, j in imports.pairs(cAsset.manifestData.assetSounds) do
                     cAsset.unSynced.assetCache[i] = {}
                     for k, v in imports.pairs(j) do
@@ -200,7 +200,7 @@ if localPlayer then
             })
             return true
         elseif assetType == "scene" then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 local sceneIPLData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
                 sceneIPLData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIPLData, {key = cAsset.manifestData.encryptKey})) or sceneIPLData
                 if sceneIPLData then
@@ -256,7 +256,7 @@ if localPlayer then
             })
             return true
         elseif cAsset.manifestData.assetClumps then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 for i, j in imports.pairs(cAsset.manifestData.assetClumps) do
                     cAsset.unSynced.assetCache[i] = {}
                     local clumpTXD, clumpDFF, clumpCOL = assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", assetPath.."clump/"..j.."/"..(asset.references.asset)..".col"
@@ -290,7 +290,7 @@ if localPlayer then
         local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if assetType == "sound" then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 for i, j in imports.pairs(cAsset.unSynced.assetCache) do
                     for k, v in imports.pairs(j) do
                         if v.cAsset then
@@ -310,7 +310,7 @@ if localPlayer then
             })
             return true
         elseif assetType == "scene" then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 for i, j in imports.pairs(cAsset.unSynced.assetCache) do
                     if j.cAsset then
                         if j.cAsset.cScene then
@@ -333,7 +333,7 @@ if localPlayer then
             })
             return true
         elseif cAsset.manifestData.assetClumps then
-            thread:create(function(cThread)
+            thread:create(function(self)
                 for i, j in imports.pairs(cAsset.unSynced.assetCache) do
                     if j.cAsset then
                         j.cAsset:destroy(cAsset.unSynced.rwCache)
@@ -363,19 +363,6 @@ if localPlayer then
 
     imports.addEventHandler("onClientResourceStop", root, function(stoppedResource)
         manager:clearElementBuffer(stoppedResource, true)
-    end)
-
-    imports.addEventHandler("onClientElementDestroy", root, function()
-        shader:clearElementBuffer(source)
-        dummy:clearElementBuffer(source)
-        bone:clearElementBuffer(source)
-        manager:clearElementBuffer(source)
-        syncer.syncedEntityDatas[source] = nil
-        for i, j in imports.pairs(light) do
-            if j and (imports.type(j) == "table") and j.clearElementBuffer then
-                j:clearElementBuffer(source)
-            end
-        end
     end)
 
     function manager:loadAnim(element, assetName)
