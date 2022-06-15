@@ -237,6 +237,7 @@ bundler["networker"] = {
     module = "network",
     rw = [[
         if not assetify.network then
+            ]]..bundler["threader"].rw..[[
             ]]..imports.utf8.gsub(imports.utf8.gsub(imports.file.read("utilities/networker.lua"), "thread", "assetify.thread", true, "(", ".:)"), "network", "assetify.network", true, "(", ".:)")..[[
         end
     ]]
@@ -258,9 +259,9 @@ bundler["scheduler"] = {
                         local execWrapper = nil
                         execWrapper = function()
                             execFunc()
-                            network:fetch("Assetify:onLoad"):off(execWrapper)
+                            assetify.network:fetch("Assetify:onLoad"):off(execWrapper)
                         end
-                        network:fetch("Assetify:onLoad", true):on(execWrapper)
+                        assetify.network:fetch("Assetify:onLoad", true):on(execWrapper)
                     end
                     return true
                 end,
@@ -274,9 +275,9 @@ bundler["scheduler"] = {
                         local execWrapper = nil
                         execWrapper = function()
                             execFunc()
-                            network:fetch("Assetify:onModuleLoad"):off(execWrapper)
+                            assetify.network:fetch("Assetify:onModuleLoad"):off(execWrapper)
                         end
-                        network:fetch("Assetify:onModuleLoad", true):on(execWrapper)
+                        assetify.network:fetch("Assetify:onModuleLoad", true):on(execWrapper)
                     end
                     return true
                 end,
