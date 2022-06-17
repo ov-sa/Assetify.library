@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: settings: server.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Server Sided Settings ]]--
 ----------------------------------------------------------------
@@ -12,7 +12,7 @@
 --[[ Settings ]]--
 ------------------
 
-availableAssetPacks = {
+settings.assetPacks = {
     ["module"] = {
         autoLoad = true
     },
@@ -54,6 +54,13 @@ availableAssetPacks = {
     },
 
     ["object"] = {
+        autoLoad = true,
+        assetType = "object",
+        assetBase = 1337,
+        assetTransparency = false
+    },
+
+    ["inventory"] = {
         autoLoad = true,
         assetType = "object",
         assetBase = 1337,
