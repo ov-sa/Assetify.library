@@ -364,7 +364,7 @@ else
             local execWrapper = nil
             execWrapper = function()
                 for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncEntityData(element, data, value, isSync, i)
+                    syncer:syncEntityData(element, data, value, isSync, i, remoteSignature)
                     if not isSync then thread:pause() end
                 end
                 execWrapper = nil
