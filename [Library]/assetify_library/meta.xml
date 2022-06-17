@@ -25,7 +25,6 @@
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
-    <script src="settings/client.lua" type="client"/>
     <script src="utilities/threader.lua" type="shared"/>
     <script src="utilities/networker.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>

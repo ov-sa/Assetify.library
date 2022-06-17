@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: handlers. loader.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Laoder Handler ]]--
 ----------------------------------------------------------------
@@ -25,16 +25,16 @@ local imports = {
 -----------------------------------------------
 
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
-    if GTAWorldSettings.clearWorld then
+    if settings.GTA.clearWorld then
         clearWorld()
     else
         restoreWorld()
     end
-    if GTAWorldSettings.waterLevel then
+    if settings.GTA.waterLevel then
         if streamer.waterBuffer then
-            imports.setWaterLevel(streamer.waterBuffer, GTAWorldSettings.waterLevel)
+            imports.setWaterLevel(streamer.waterBuffer, settings.GTA.waterLevel)
         end
-        imports.setWaterLevel(GTAWorldSettings.waterLevel, true, true, true, true)
+        imports.setWaterLevel(settings.GTA.waterLevel, true, true, true, true)
     end
 end)
 

@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: streamer.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Streamer Utilities ]]--
 ----------------------------------------------------------------
@@ -81,7 +81,7 @@ function streamer:load(streamerInstance, streamType, occlusionInstances, syncRat
     self.occlusions = occlusionInstances
     self.dimension = streamDimension
     self.interior = streamInterior
-    self.syncRate = syncRate or streamerSettings.syncRate
+    self.syncRate = syncRate or settings.streamer.syncRate
     if streamerInstance ~= occlusionInstances[1] then
         if streamType ~= "bone" then
             imports.attachElements(streamerInstance, occlusionInstances[1])
@@ -121,7 +121,7 @@ function streamer:update(clientDimension, clientInterior)
     if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
         for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
             if j then
-                imports.setElementDimension(i.streamer, streamerSettings.unsyncDimension)
+                imports.setElementDimension(i.streamer, settings.streamer.unsyncDimension)
             end
         end
     end
@@ -196,7 +196,7 @@ onEntityStream = function(streamBuffer)
                     break
                 end
             end
-            imports.setElementDimension(i.streamer, (j.isStreamed and streamer.cache.clientWorld.dimension) or streamerSettings.unsyncDimension)
+            imports.setElementDimension(i.streamer, (j.isStreamed and streamer.cache.clientWorld.dimension) or settings.streamer.unsyncDimension)
         end
     end
     return true
@@ -228,7 +228,7 @@ network:fetch("Assetify:onLoad"):on(function()
         if streamer.cache.isCameraTranslated then return false end
         local velX, velY, velZ = imports.getElementVelocity(streamer.cache.clientCamera)
         streamer.cache.isCameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
-    end, streamerSettings.cameraSyncRate, 0)
+    end, settings.streamer.cameraSyncRate, 0)
     imports.setTimer(function()
         if not streamer.cache.isCameraTranslated then return false end
         local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
@@ -243,5 +243,5 @@ network:fetch("Assetify:onLoad"):on(function()
             end
         end
         streamer.cache.isCameraTranslated = false
-    end, streamerSettings.syncRate, 0)
+    end, settings.streamer.syncRate, 0)
 end)

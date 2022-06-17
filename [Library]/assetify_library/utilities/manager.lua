@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: manager.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Manager Utilities ]]--
 ----------------------------------------------------------------
@@ -80,8 +80,8 @@ if localPlayer then
 
     function manager:getData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
-        if availableAssetPacks[assetType] then
-            local cAsset = availableAssetPacks[assetType].rwDatas[assetName]
+        if settings.assetPacks[assetType] then
+            local cAsset = settings.assetPacks[assetType].rwDatas[assetName]
             if cAsset then
                 local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
                 local unSynced = cAsset.unSynced
@@ -130,7 +130,7 @@ if localPlayer then
     function manager:load(assetType, assetName)
         local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or isLoaded then return false end
-        local cAssetPack = availableAssetPacks[assetType]
+        local cAssetPack = settings.assetPacks[assetType]
         local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
         cAsset.unSynced = {
             assetCache = {},
@@ -195,7 +195,7 @@ if localPlayer then
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -251,7 +251,7 @@ if localPlayer then
                     end
                 end
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -270,7 +270,7 @@ if localPlayer then
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -305,7 +305,7 @@ if localPlayer then
                 cAsset.unSynced = nil
                 imports.collectgarbage()
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -328,7 +328,7 @@ if localPlayer then
                 cAsset.unSynced = nil
                 imports.collectgarbage()
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -345,7 +345,7 @@ if localPlayer then
                 cAsset.unSynced = nil
                 imports.collectgarbage()
             end):resume({
-                executions = downloadSettings.buildRate,
+                executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
@@ -421,8 +421,8 @@ if localPlayer then
 else
     function manager:getData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
-        if availableAssetPacks[assetType] then
-            local cAsset = availableAssetPacks[assetType].assetPack.rwDatas[assetName]
+        if settings.assetPacks[assetType] then
+            local cAsset = settings.assetPacks[assetType].assetPack.rwDatas[assetName]
             if cAsset then
                 local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
                 if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then

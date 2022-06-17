@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: syncer.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Syncer Utilities ]]--
 ----------------------------------------------------------------
@@ -85,7 +85,7 @@ syncer.execOnModuleLoad(function() syncer.isModuleLoaded = true end)
 
 if localPlayer then
     syncer.scheduledAssets = {}
-    availableAssetPacks = {}
+    settings.assetPacks = {}
     network:create("Assetify:onAssetLoad")
     network:create("Assetify:onAssetUnload")
 
@@ -143,8 +143,8 @@ if localPlayer then
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[i]
-                    syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[i]
+                    syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
+                    syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
                 end
                 fileData = nil
                 thread:pause()
@@ -152,19 +152,19 @@ if localPlayer then
             network:emit("Assetify:onRecieveHash", true, true, localPlayer, assetType, assetName, fetchFiles)
             imports.collectgarbage()
         end):resume({
-            executions = downloadSettings.buildRate,
+            executions = settings.downloader.buildRate,
             frames = 1
         })
     end)
 
     network:create("Assetify:onRecieveData"):on(function(assetType, baseIndex, subIndexes, indexData)
-        if not availableAssetPacks[assetType] then availableAssetPacks[assetType] = {} end
+        if not settings.assetPacks[assetType] then settings.assetPacks[assetType] = {} end
         if not subIndexes then
-            availableAssetPacks[assetType][baseIndex] = indexData
+            settings.assetPacks[assetType][baseIndex] = indexData
         else
-            if not availableAssetPacks[assetType][baseIndex] then availableAssetPacks[assetType][baseIndex] = {} end
+            if not settings.assetPacks[assetType][baseIndex] then settings.assetPacks[assetType][baseIndex] = {} end
             local totalIndexes = #subIndexes
-            local indexPointer = availableAssetPacks[assetType][baseIndex]
+            local indexPointer = settings.assetPacks[assetType][baseIndex]
             if totalIndexes > 1 then
                 for i = 1, totalIndexes - 1, 1 do
                     local indexReference = subIndexes[i]
@@ -178,8 +178,8 @@ if localPlayer then
 
     network:create("Assetify:onRecieveContent"):on(function(assetType, assetName, contentPath, ...)
         if assetType and assetName then
-            syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
-            syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + availableAssetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+            syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+            syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
         end
         imports.file.write(contentPath, ...)
         imports.collectgarbage()
@@ -207,8 +207,8 @@ if localPlayer then
                 if assetType == "module" then
                     network:emit("Assetify:onRequestSyncPack", true, false, localPlayer)
                     thread:create(function(self)
-                        if availableAssetPacks["module"].autoLoad and availableAssetPacks["module"].rwDatas then
-                            for i, j in imports.pairs(availableAssetPacks["module"].rwDatas) do
+                        if settings.assetPacks["module"].autoLoad and settings.assetPacks["module"].rwDatas then
+                            for i, j in imports.pairs(settings.assetPacks["module"].rwDatas) do
                                 if j then
                                     imports.loadAsset("module", i)
                                 end
@@ -217,13 +217,13 @@ if localPlayer then
                         end
                         network:emit("Assetify:onModuleLoad", false)
                     end):resume({
-                        executions = downloadSettings.buildRate,
+                        executions = settings.downloader.buildRate,
                         frames = 1
                     })
                 else
                     syncer.scheduledAssets = nil
                     thread:create(function(self)
-                        for i, j in imports.pairs(availableAssetPacks) do
+                        for i, j in imports.pairs(settings.assetPacks) do
                             if i ~= "module" then
                                 if j.autoLoad and j.rwDatas then
                                     for k, v in imports.pairs(j.rwDatas) do
@@ -237,7 +237,7 @@ if localPlayer then
                         end
                         network:emit("Assetify:onLoad", false)
                     end):resume({
-                        executions = downloadSettings.buildRate,
+                        executions = settings.downloader.buildRate,
                         frames = 1
                     })
                 end
@@ -280,7 +280,7 @@ if localPlayer then
                     end
                 end
                 imports.setElementModel(element, modelID)
-            end, downloadSettings.buildRate)
+            end, settings.downloader.buildRate)
         end
     end)
 
@@ -345,7 +345,7 @@ else
                 execWrapper()
             else
                 thread:create(execWrapper):resume({
-                    executions = downloadSettings.syncRate,
+                    executions = settings.downloader.syncRate,
                     frames = 1
                 })
             end
@@ -373,7 +373,7 @@ else
                 execWrapper()
             else
                 thread:create(execWrapper):resume({
-                    executions = downloadSettings.syncRate,
+                    executions = settings.downloader.syncRate,
                     frames = 1
                 })
             end
@@ -396,7 +396,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
@@ -417,7 +417,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
             return targetDummy
@@ -442,7 +442,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
@@ -461,7 +461,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
@@ -484,7 +484,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
@@ -510,7 +510,7 @@ else
                     thread:pause()
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
@@ -526,8 +526,8 @@ else
                     local isModuleVoid = true
                     network:emit("Assetify:onRecieveBandwidth", true, false, player, syncer.libraryBandwidth)
                     self:await(network:emitCallback(self, "Assetify:onRequestPreSyncPool", false, player))
-                    if availableAssetPacks["module"] and availableAssetPacks["module"].assetPack then
-                        for i, j in imports.pairs(availableAssetPacks["module"].assetPack) do
+                    if settings.assetPacks["module"] and settings.assetPacks["module"].assetPack then
+                        for i, j in imports.pairs(settings.assetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
                                 syncer:syncData(player, "module", i, false, j)
                             else
@@ -547,7 +547,7 @@ else
                     end
                 else
                     local isLibraryVoid = true
-                    for i, j in imports.pairs(availableAssetPacks) do
+                    for i, j in imports.pairs(settings.assetPacks) do
                         if i ~= "module" then
                             if j.assetPack then
                                 for k, v in imports.pairs(j.assetPack) do
@@ -569,12 +569,12 @@ else
                     if isLibraryVoid then network:emit("Assetify:onLoad", true, false, player) end
                 end
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         else
             thread:create(function(self)
-                local cAsset = availableAssetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
+                local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(cAsset.synced) do
                     if i ~= "assetSize" then
                         syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
@@ -587,7 +587,7 @@ else
                 end
                 syncer:syncState(player, assetDatas.type, assetDatas.name)
             end):resume({
-                executions = downloadSettings.syncRate,
+                executions = settings.downloader.syncRate,
                 frames = 1
             })
         end
@@ -623,7 +623,7 @@ else
             end
             __self:resume()
         end):resume({
-            executions = downloadSettings.syncRate,
+            executions = settings.downloader.syncRate,
             frames = 1
         })
         __self:pause()
@@ -653,7 +653,7 @@ else
                 thread:pause()
             end
         end):resume({
-            executions = downloadSettings.syncRate,
+            executions = settings.downloader.syncRate,
             frames = 1
         })
     end)
@@ -693,7 +693,7 @@ else
                 thread:pause()
             end
         end):resume({
-            executions = downloadSettings.syncRate,
+            executions = settings.downloader.syncRate,
             frames = 1
         })
     end)

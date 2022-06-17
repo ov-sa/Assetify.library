@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: renderer.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Renderer Utilities ]]--
 ----------------------------------------------------------------
@@ -42,7 +42,7 @@ renderer = {
         minuteDuration = 60
     }
 }
-renderer.resolution[1], renderer.resolution[2] = renderer.resolution[1]*rendererSettings.resolution, renderer.resolution[2]*rendererSettings.resolution
+renderer.resolution[1], renderer.resolution[2] = renderer.resolution[1]*settings.renderer.resolution, renderer.resolution[2]*settings.renderer.resolution
 renderer.__index = renderer
 
 renderer.render = function()

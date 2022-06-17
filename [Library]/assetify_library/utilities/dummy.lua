@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: dummy.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Dummy Utilities ]]--
 ----------------------------------------------------------------
@@ -66,7 +66,7 @@ if localPlayer then
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         if assetClump then cData = cAsset.unSynced.assetCache[assetClump].cAsset.synced end
         if not cAsset or not cData then return false end
-        local dummyType = availableAssetPacks[assetType].assetType
+        local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end
         if not targetDummy then
             dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
@@ -112,7 +112,7 @@ if localPlayer then
                 self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
             end
             self.hearbeat = nil
-        end, downloadSettings.buildRate)
+        end, settings.downloader.buildRate)
         self.cDummy = self.cCollisionInstance or self.cModelInstance
         dummy.buffer[(self.cDummy)] = self
         return true
@@ -141,18 +141,18 @@ else
     function dummy:create(assetType, assetName, assetClump, clumpMaps, dummyData)
         local cAsset = manager:getData(assetType, assetName)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
-        local dummyType = availableAssetPacks[assetType].assetType
+        local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end
         local cDummy = false
         dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
         dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
         dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
         if dummyType == "object" then
-            cDummy = imports.createObject(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+            cDummy = imports.createObject(settings.assetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         elseif dummyType == "ped" then
-            cDummy = imports.createPed(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)
+            cDummy = imports.createPed(settings.assetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)
         elseif dummyType == "vehicle" then
-            cDummy = imports.createVehicle(availableAssetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
+            cDummy = imports.createVehicle(settings.assetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         end
         if not cDummy then return false end
         imports.setElementAlpha(cDummy, 0)

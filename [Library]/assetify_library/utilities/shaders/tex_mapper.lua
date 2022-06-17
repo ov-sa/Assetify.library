@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: utilities: shaders: tex_mapper.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Texture Changer ]]--
 ----------------------------------------------------------------

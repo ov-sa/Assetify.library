@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: exports: shared.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Shared Exports ]]--
 ----------------------------------------------------------------
@@ -34,15 +34,15 @@ function isModuleLoaded()
 end
 
 function getLibraryAssets(assetType)
-    if not syncer.isLibraryLoaded or not assetType or not availableAssetPacks[assetType] then return false end
+    if not syncer.isLibraryLoaded or not assetType or not settings.assetPacks[assetType] then return false end
     local packAssets = {}
     if localPlayer then
-        for i, j in imports.pairs(localPlayer and availableAssetPacks[assetType].rwDatas) do
+        for i, j in imports.pairs(localPlayer and settings.assetPacks[assetType].rwDatas) do
             imports.table.insert(packAssets, i)
         end
     else
-        for i, j in imports.pairs(availableAssetPacks[assetType].assetPack.manifestData) do
-            if availableAssetPacks[assetType].assetPack.rwDatas[j] then
+        for i, j in imports.pairs(settings.assetPacks[assetType].assetPack.manifestData) do
+            if settings.assetPacks[assetType].assetPack.rwDatas[j] then
                 imports.table.insert(packAssets, j)
             end
         end
@@ -62,7 +62,7 @@ function setElementAsset(element, assetType, ...)
     if not element or not imports.isElement(element) then return false end
     local elementType = imports.getElementType(element)
     elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
-    if not availableAssetPacks[assetType] or not availableAssetPacks[assetType].assetType or (availableAssetPacks[assetType].assetType ~= elementType) then return false end
+    if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
     local arguments = {...}
     return syncer:syncElementModel(element, assetType, arguments[1], arguments[2], arguments[3], arguments[4])
 end

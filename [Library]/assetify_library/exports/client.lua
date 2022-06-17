@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: exports: client.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Client Sided Exports ]]--
 ----------------------------------------------------------------
@@ -35,8 +35,8 @@ local imports = {
 function getLibraryProgress(assetType, assetName)
     local cDownloaded, cBandwidth = nil, nil
     if assetType and assetName then
-        if availableAssetPacks[assetType] and availableAssetPacks[assetType].rwDatas[assetName] then
-            cBandwidth = availableAssetPacks[assetType].rwDatas[assetName].assetSize.total
+        if settings.assetPacks[assetType] and settings.assetPacks[assetType].rwDatas[assetName] then
+            cBandwidth = settings.assetPacks[assetType].rwDatas[assetName].assetSize.total
             cDownloaded = (syncer.scheduledAssets and syncer.scheduledAssets[assetType] and syncer.scheduledAssets[assetType][assetName] and syncer.scheduledAssets[assetType][assetName].assetSize) or cBandwidth
         end
     else
@@ -93,7 +93,7 @@ function clearWorld()
     for i = 550, 19999, 1 do
         imports.removeWorldModel(i, 100000, 0, 0, 0)
     end
-    if GTAWorldSettings.waterLevel then
+    if settings.GTA.waterLevel then
         streamer.waterBuffer = imports.createWater(-3000, -3000, 0, 3000, -3000, 0, -3000, 3000, 0, 3000, 3000, 0, false)
     end
     imports.setOcclusionsEnabled(false)

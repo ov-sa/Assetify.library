@@ -2,7 +2,7 @@
 --[[ Resource: Assetify Library
      Script: handlers: bundler.lua
      Author: vStudio
-     Developer(s): Aviril, Tron
+     Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
      Desc: Bundler Handler ]]--
 ----------------------------------------------------------------
