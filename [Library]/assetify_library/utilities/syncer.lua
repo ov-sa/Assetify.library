@@ -292,6 +292,7 @@ if localPlayer then
     imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
     imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
     network:create("Assetify:onElementDestroy"):on(function(source)
+        if not source then return false end
         shader:clearElementBuffer(source)
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
