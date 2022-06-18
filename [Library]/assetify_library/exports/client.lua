@@ -86,7 +86,7 @@ end
 
 function createShader(...)
     local cShader = shader:create(...)
-    return cShader
+    return cShader.cShader
 end
 
 function clearWorld()

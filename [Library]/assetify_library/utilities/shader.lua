@@ -206,8 +206,10 @@ if localPlayer then
         shader.buffer.shader[(self.cShader)] = true
         if not self.isPreLoaded and not isStandalone then rwCache.shader[textureName] = self.cShader end
         for i, j in imports.pairs(shaderTextures) do
-            if j and imports.isElement(rwCache.texture[j]) then
-                imports.dxSetShaderValue(self.cShader, i, rwCache.texture[j])
+            if rwCache.texture then
+                if j and imports.isElement(rwCache.texture[j]) then
+                    imports.dxSetShaderValue(self.cShader, i, rwCache.texture[j])
+                end
             end
         end
         for i, j in imports.pairs(shaderInputs) do
@@ -247,7 +249,7 @@ if localPlayer then
                 imports.destroyElement(self.cShader)
             end
         else
-            imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element)
+            if not self.shaderData.isStandalone then imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element) end
         end
         if self.shaderData.element then
             if not self.shaderData.isStandalone then 
