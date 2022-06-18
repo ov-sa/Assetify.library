@@ -69,6 +69,18 @@ getElementPosition = function(element, offX, offY, offZ)
     end
 end
 
+getDistanceBetweenPoints2D = function(x1, y1, x2, y2)
+    x1, y1, x2, y2 = imports.tonumber(x1), imports.tonumber(y1), imports.tonumber(x2), imports.tonumber(y2)
+    if not x1 or not y1 or not x2 or not y2 then return false end
+    return imports.math.sqrt(((x2 - x1)^2) + ((y2 - y1)^2))
+end
+
+getDistanceBetweenPoints3D = function(x1, y1, z1, x2, y2, z2)
+    x1, y1, z1, x2, y2, z2 = imports.tonumber(x1), imports.tonumber(y1), imports.tonumber(z1), imports.tonumber(x2), imports.tonumber(y2), imports.tonumber(z2)
+    if not x1 or not y1 or z1 or not x2 or not y2 or not z2 then return false end
+    return imports.math.sqrt(((x2 - x1)^2) + ((y2 - y1)^2) + ((z2 - z1)^2))
+end
+
 
 ---------------------
 --[[ Class: File ]]--
