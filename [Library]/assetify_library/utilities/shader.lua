@@ -153,17 +153,18 @@ if localPlayer then
         if not element or not shader.buffer.element[element] or (shaderCategory and not shader.buffer.element[element][shaderCategory]) then return false end
         if not shaderCategory then
             for i, j in imports.pairs(shader.buffer.element[element]) do
-                for k, v in imports.pairs(j) do
-                    if v then
-                        v:destroy()
-                    end
-                end
+                shader:clearElementBuffer(element, i)
             end
             shader.buffer.element[element] = nil
         else
-            for i, j in imports.pairs(shader.buffer.element[element][shaderCategory]) do
+            for i, j in imports.pairs(shader.buffer.element[element][shaderCategory].textured) do
                 if j then
                     j:destroy()
+                end
+            end
+            for i, j in imports.pairs(shader.buffer.element[element][shaderCategory].untextured) do
+                if i then
+                    i:destroy()
                 end
             end
             shader.buffer.element[element][shaderCategory] = nil
@@ -187,13 +188,15 @@ if localPlayer then
         return false
     end
 
-    function shader:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance)
+    function shader:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance, isStandalone)
         if not self or (self == shader) then return false end
         local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-        if not shaderCategory or not shaderName or (isExternalResource and shader.cache.remoteBlacklist[shaderName]) or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or not textureName or not shaderTextures or not shaderInputs or not rwCache or not shaderMaps then return false end
+        if not shaderCategory or not shaderName or (isExternalResource and shader.cache.remoteBlacklist[shaderName]) or (not shader.preLoaded[shaderName] and not shader.rwCache[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
         element = ((element and imports.isElement(element)) and element) or false
+        textureName = textureName or false
         shaderPriority = imports.tonumber(shaderPriority) or shader.cache.shaderPriority
         shaderDistance = imports.tonumber(shaderDistance) or shader.cache.shaderDistance
+        isStandalone = (isStandalone and true) or false
         self.isPreLoaded = (shader.preLoaded[shaderName] and true) or false
         self.cShader = (self.isPreLoaded and shader.preLoaded[shaderName])
         if not self.cShader then
@@ -201,7 +204,7 @@ if localPlayer then
             renderer:syncShader(self.cShader)
         end
         shader.buffer.shader[(self.cShader)] = true
-        if not self.isPreLoaded then rwCache.shader[textureName] = self.cShader end
+        if not self.isPreLoaded and not isStandalone then rwCache.shader[textureName] = self.cShader end
         for i, j in imports.pairs(shaderTextures) do
             if j and imports.isElement(rwCache.texture[j]) then
                 imports.dxSetShaderValue(self.cShader, i, rwCache.texture[j])
@@ -218,13 +221,20 @@ if localPlayer then
             shaderTextures = shaderTextures,
             shaderInputs = shaderInputs,
             shaderPriority = shaderPriority,
-            shaderDistance = shaderDistance
+            shaderDistance = shaderDistance,
+            isStandalone = isStandalone
         }
-        shader.buffer.element[(self.shaderData.element)] = shader.buffer.element[(self.shaderData.element)] or {}
-        local bufferCache = shader.buffer.element[(self.shaderData.element)]
-        bufferCache[shaderCategory] = bufferCache[shaderCategory] or {}
-        bufferCache[shaderCategory][textureName] = self
-        imports.engineApplyShaderToWorldTexture(self.cShader, textureName, element or nil)
+        if self.shaderData.element then
+            shader.buffer.element[(self.shaderData.element)] = shader.buffer.element[(self.shaderData.element)] or {}
+            local bufferCache = shader.buffer.element[(self.shaderData.element)]
+            bufferCache[shaderCategory] = bufferCache[shaderCategory] or {textured = {}, untextured = {}}
+            if not isStandalone then 
+                bufferCache[shaderCategory].textured[textureName] = self
+            else
+                bufferCache[shaderCategory].untextured[self] = true
+            end
+        end
+        if not isStandalone then imports.engineApplyShaderToWorldTexture(self.cShader, textureName, element) end
         return true
     end
 
@@ -240,7 +250,11 @@ if localPlayer then
             imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element)
         end
         if self.shaderData.element then
-            shader.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)][(self.shaderData.textureName)] = nil
+            if not self.shaderData.isStandalone then 
+                shader.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)].textured[(self.shaderData.textureName)] = nil
+            else
+                shader.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)].untextured[self] = nil
+            end
         end
         self = nil
         return true
