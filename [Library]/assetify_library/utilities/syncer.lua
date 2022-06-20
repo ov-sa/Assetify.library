@@ -62,6 +62,8 @@ syncer.__index = syncer
 network:create("Assetify:onLoad")
 network:create("Assetify:onUnload")
 network:create("Assetify:onModuleLoad")
+network:create("Assetify:onGlobalDataChange")
+network:create("Assetify:onEntityDataChange")
 syncer.execOnLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
@@ -245,18 +247,16 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:onGlobalDataChange")
     network:create("Assetify:onRecieveSyncedGlobalData"):on(function(data, value)
         if not data or (imports.type(data) ~= "string") then return false end
-        network:emit("Assetify:onGlobalDataChange", data, syncer.syncedGlobalDatas[data], value)
+        network:emit("Assetify:onGlobalDataChange", false, data, syncer.syncedGlobalDatas[data], value)
         syncer.syncedGlobalDatas[data] = value
     end)
 
-    network:create("Assetify:onEntityDataChange")
     network:create("Assetify:onRecieveSyncedEntityData"):on(function(element, data, value, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) or not data or (imports.type(data) ~= "string") then return false end
         syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
-        network:emit("Assetify:onEntityDataChange", element, data, syncer.syncedEntityDatas[element][data], value)
+        network:emit("Assetify:onEntityDataChange", false, element, data, syncer.syncedEntityDatas[element][data], value)
         syncer.syncedEntityDatas[element][data] = value
     end)
 
@@ -332,6 +332,7 @@ else
     function syncer:syncGlobalData(data, value, isSync, targetPlayer)
         if not data or (imports.type(data) ~= "string") then return false end
         if not targetPlayer then
+            network:emit("Assetify:onGlobalDataChange", false, data, syncer.syncedGlobalDatas[data], value)
             syncer.syncedGlobalDatas[data] = value
             local execWrapper = nil
             execWrapper = function()
@@ -360,6 +361,7 @@ else
             if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
             remoteSignature = imports.getElementType(element)
             syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
+            network:emit("Assetify:onEntityDataChange", false, element, data, syncer.syncedEntityDatas[element][data], value)
             syncer.syncedEntityDatas[element][data] = value
             local execWrapper = nil
             execWrapper = function()

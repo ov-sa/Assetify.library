@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_exporter.lua
+     Script: utilities: shaders: tex_grayscaler.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Exporter ]]--
+     Desc: Texture Grayscaler ]]--
 ----------------------------------------------------------------
 
 
@@ -14,7 +14,8 @@
 
 local imports = {
     pairs = pairs,
-    file = file
+    file = file,
+    string = string
 }
 
 
@@ -22,7 +23,7 @@ local imports = {
 --[[ Variables ]]--
 -------------------
 
-local identifier = "Assetify_TextureExporter"
+local identifier = "Assetify_TextureGrayscaler"
 local depDatas, dependencies = "", {
     helper = "utilities/shaders/helper.fx"
 }
@@ -40,7 +41,11 @@ end
 
 shaderRW[identifier] = {
     properties = {
-        disabled = {}
+        disabled = {
+            ["vSource0"] = true,
+            ["vSource1"] = true,
+            ["vSource2"] = true
+        }
     },
 
     exec = function()
@@ -49,19 +54,14 @@ shaderRW[identifier] = {
         -->> Variables <<--
         -------------------*/
 
-        texture renderLayer <string renderTarget = "yes";>;
+        float grayscaleIntensity = 1;
+        texture baseTexture;
         struct PSInput {
             float4 Position : POSITION0;
-            float4 Diffuse : COLOR0;
             float2 TexCoord : TEXCOORD0;
         };
-        struct Export {
-            float4 World : COLOR0;
-            float4 Diffuse : COLOR1;
-            float4 Emissive : COLOR2;
-        };
         sampler baseSampler = sampler_state {
-            Texture = (gTexture0);
+            Texture = baseTexture;
         };
 
 
@@ -69,24 +69,14 @@ shaderRW[identifier] = {
         -->> Handlers <<--
         ------------------*/
 
-        Export PSHandler(PSInput PS) {
-            Export output;
+        float4 PSHandler(PSInput PS) : COLOR0 {
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
-            if (vRenderingEnabled) {
-                if (vEmissiveSource) {
-                    output.Diffuse = 0;
-                    output.Emissive = sampledTexel;
-                } else {
-                    output.Diffuse = sampledTexel;
-                    output.Emissive = 0;
-                }
-            } else {
-                output.Diffuse = 0;
-                output.Emissive = 0;
-            }
-            sampledTexel.rgb *= MTAGetWeatherValue();
-            output.World = saturate(sampledTexel);
-            return output;
+            float averageTexel = (sampledTexel.r + sampledTexel.g + sampledTexel.b)/3;
+            float4 grayscaleTexel = float4(averageTexel, averageTexel, averageTexel, sampledTexel.a);
+            sampledTexel.rgb = pow(sampledTexel.rgb*1.5, 1.5);
+            sampledTexel = lerp(sampledTexel, grayscaleTexel, grayscaleIntensity);
+            if (vWeatherBlend) sampledTexel.a *= (1 - vWeatherBlend) + (vWeatherBlend*MTAGetWeatherValue());
+            return saturate(sampledTexel);
         }
 
 
@@ -98,7 +88,9 @@ shaderRW[identifier] = {
         {
             pass P0
             {
+                AlphaRef = 1;
                 AlphaBlendEnable = true;
+                FogEnable = false;
                 PixelShader = compile ps_2_0 PSHandler();
             }
         }

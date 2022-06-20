@@ -48,7 +48,7 @@ shader = {
 }
 shader.cache.__remoteBlacklist = {}
 for i, j in imports.pairs(shader.cache.remoteBlacklist) do
-    shader.cache.__remoteBlacklist[j] = true 
+    shader.cache.__remoteBlacklist[j] = true
 end
 shader.cache.remoteBlacklist = shader.cache.__remoteBlacklist
 shader.__index = shader
@@ -65,13 +65,7 @@ if localPlayer then
     }
     shader.rwCache = shaderRW
     shaderRW = nil
-    shader.preLoaded = {
-        ["Assetify_TextureClearer"] = imports.dxCreateShader(shader.rwCache["Assetify_TextureClearer"](), shader.cache.shaderPriority + 1, shader.cache.shaderDistance, false, "all")
-    }
-    for i, j in imports.pairs(shader.preLoaded) do
-        shader.buffer.shader[j] = true
-    end
-    imports.dxSetShaderValue(shader.preLoaded["Assetify_TextureClearer"], "baseTexture", shader.preLoadedTex.invisibleMap)
+    shader.preLoaded = {}
 
     function shader:create(...)
         local cShader = imports.setmetatable({}, {__index = self})
@@ -198,23 +192,8 @@ if localPlayer then
         shaderDistance = imports.tonumber(shaderDistance) or shader.cache.shaderDistance
         isStandalone = (isStandalone and true) or false
         self.isPreLoaded = (shader.preLoaded[shaderName] and true) or false
-        self.cShader = (self.isPreLoaded and shader.preLoaded[shaderName])
-        if not self.cShader then
-            self.cShader = imports.dxCreateShader(shader.rwCache[shaderName](shaderMaps), shaderPriority, shaderDistance, false, "all")
-            renderer:syncShader(self.cShader)
-        end
-        shader.buffer.shader[(self.cShader)] = true
-        if not self.isPreLoaded and not isStandalone then rwCache.shader[textureName] = self.cShader end
-        for i, j in imports.pairs(shaderTextures) do
-            if rwCache.texture then
-                if j and imports.isElement(rwCache.texture[j]) then
-                    imports.dxSetShaderValue(self.cShader, i, rwCache.texture[j])
-                end
-            end
-        end
-        for i, j in imports.pairs(shaderInputs) do
-            imports.dxSetShaderValue(self.cShader, i, j)
-        end
+        self.cShader = (self.isPreLoaded and shader.preLoaded[shaderName]) or imports.dxCreateShader(shader.rwCache[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, false, "all")
+        shader.buffer.shader[self] = true
         self.shaderData = {
             element = element,
             shaderCategory = shaderCategory,
@@ -226,6 +205,22 @@ if localPlayer then
             shaderDistance = shaderDistance,
             isStandalone = isStandalone
         }
+        if not self.isPreLoaded then
+            if not isStandalone then
+                rwCache.shader[textureName] = self.cShader
+            end
+            renderer:syncShader(self)
+        end
+        for i, j in imports.pairs(shaderTextures) do
+            if rwCache.texture then
+                if j and imports.isElement(rwCache.texture[j]) then
+                    self:setValue(i, rwCache.texture[j])
+                end
+            end
+        end
+        for i, j in imports.pairs(shaderInputs) do
+            self:setValue(i, j)
+        end
         if self.shaderData.element then
             shader.buffer.element[(self.shaderData.element)] = shader.buffer.element[(self.shaderData.element)] or {}
             local bufferCache = shader.buffer.element[(self.shaderData.element)]
@@ -245,7 +240,6 @@ if localPlayer then
         self.isUnloading = true
         if not self.preLoaded then
             if self.cShader and imports.isElement(self.cShader) then
-                shader.buffer.shader[(self.cShader)] = nil
                 imports.destroyElement(self.cShader)
             end
         else
@@ -258,7 +252,15 @@ if localPlayer then
                 shader.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)].untextured[self] = nil
             end
         end
+        shader.buffer.shader[self] = nil
         self = nil
         return true
     end
+
+    function shader:setValue(i, j)
+        if not self or (self == shader) or not i or (shader.rwCache[(self.shaderData.shaderName)].properties.disabled[i]) then return false end
+        return imports.dxSetShaderValue(self.cShader, i, j)
+    end
+
+    shader.preLoaded["Assetify_TextureClearer"] = shader:create(_, "Assetify-PreLoaded", "Assetify_TextureClearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.preLoadedTex.invisibleMap}}, _, _, shader.cache.shaderPriority + 1, shader.cache.shaderDistance, true)
 end

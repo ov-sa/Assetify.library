@@ -18,8 +18,6 @@ local imports = {
     isElement = isElement,
     destroyElement = destroyElement,
     setmetatable = setmetatable,
-    dxCreateShader = dxCreateShader,
-    dxSetShaderValue = dxSetShaderValue,
     engineRequestModel = engineRequestModel,
     engineLoadTXD = engineLoadTXD,
     engineLoadDFF = engineLoadDFF,
@@ -27,7 +25,6 @@ local imports = {
     engineImportTXD = engineImportTXD,
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
-    engineApplyShaderToWorldTexture = engineApplyShaderToWorldTexture,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
     setElementDimension = setElementDimension,
@@ -102,19 +99,12 @@ function light.planar:load(lightType, lightData, shaderInputs, isScoped, isDefau
         self.cStreamer = streamer:create(self.cModelInstance, "light", {self.cCollisionInstance}, self.syncRate)
     end
     self.cLight = self.cModelInstance
-    self.cShader = imports.dxCreateShader(shader.rwCache["Assetify_LightPlanar"](), shader.cache.shaderPriority, shader.cache.shaderDistance, false, "all")
-    renderer:syncShader(self.cShader)
+    self.cShader = shader:create(self.cLight, "Assetify-Planar-Light", "Assetify_LightPlanar", lightCache.textureName, {}, shaderInputs, {})
     light.planar.buffer[(self.cLight)] = self
-    shader.buffer.shader[(self.cShader)] = "light"
     self.lightType = lightType
-    for i, j in imports.pairs(shaderInputs) do
-        imports.dxSetShaderValue(self.cLight, i, j)
-    end
     self.lightData = lightData
-    self.lightData.shaderInputs = shaderInputs
     self:setResolution(self.lightData.resolution)
     self:setColor(self.lightData.color and self.lightData.color.r, self.lightData.color and self.lightData.color.g, self.lightData.color and self.lightData.color.b, self.lightData.color and self.lightData.color.a)
-    imports.engineApplyShaderToWorldTexture(self.cShader, lightCache.textureName, self.cLight)
     if isScoped then manager:setElementScoped(self.cLight) end
     return true
 end
@@ -132,10 +122,6 @@ function light.planar:unload()
     if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
         imports.destroyElement(self.cCollisionInstance)
     end
-    if self.cShader and imports.isElement(self.cShader) then
-        shader.buffer.shader[(self.cShader)] = nil
-        imports.destroyElement(self.cShader)
-    end
     self = nil
     return true
 end
@@ -143,14 +129,14 @@ end
 function light.planar:setResolution(resolution)
     if not self or (self == light.planar) then return false end
     self.lightData.resolution = imports.math.max(0, imports.tonumber(resolution) or 1)
-    imports.dxSetShaderValue(self.cShader, "lightResolution", self.lightData.resolution)
+    self.cShader:setValue("lightResolution", self.lightData.resolution)
     return true
 end
 
 function light.planar:setTexture(texture)
     if not self or (self == light.planar) then return false end
     self.lightData.texture = (self.lightData.texture or texture) or false
-    imports.dxSetShaderValue(self.cShader, "baseTexture", self.lightData.texture)
+    self.cShader:setValue("baseTexture", self.lightData.texture)
     return true
 end
 
@@ -158,6 +144,6 @@ function light.planar:setColor(r, g, b, a)
     if not self or (self == light.planar) then return false end
     self.lightData.color = self.lightData.color or {}
     self.lightData.color[1], self.lightData.color[2], self.lightData.color[3], self.lightData.color[4] = imports.math.max(0, imports.math.min(255, imports.tonumber(r) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(g) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(b) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(a) or 255))
-    imports.dxSetShaderValue(self.cShader, "lightColor", self.lightData.color[1]/255, self.lightData.color[2]/255, self.lightData.color[3]/255, self.lightData.color[4]/255)
+    self.cShader:setValue("lightColor", self.lightData.color[1]/255, self.lightData.color[2]/255, self.lightData.color[3]/255, self.lightData.color[4]/255)
     return true
 end
