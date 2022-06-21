@@ -272,7 +272,7 @@ if localPlayer then
                 return not imports.isElement(element)
             end, function()
                 if clumpMaps then
-                    local cAsset = manager:getData(assetType, assetName)
+                    local cAsset = manager:getData(assetType, assetName, syncer.librarySerial)
                     if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.clump then
                         for i, j in imports.pairs(clumpMaps) do
                             if cAsset.manifestData.shaderMaps.clump[i] and cAsset.manifestData.shaderMaps.clump[i][j] then
@@ -528,6 +528,31 @@ else
     function syncer:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
             thread:create(function(self)
+                local isLibraryVoid = true
+                for i, j in imports.pairs(settings.assetPacks) do
+                    if i ~= "module" then
+                        if j.assetPack then
+                            for k, v in imports.pairs(j.assetPack) do
+                                if k ~= "rwDatas" then
+                                    if syncModules then
+                                        syncer:syncData(player, i, k, false, v)
+                                    end
+                                else
+                                    for m, n in imports.pairs(v) do
+                                        isLibraryVoid = false
+                                        if syncModules then
+                                            syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
+                                        else
+                                            syncer:syncHash(player, i, m, n.unSynced.fileHash)
+                                        end
+                                        thread:pause()
+                                    end
+                                end
+                                thread:pause()
+                            end
+                        end
+                    end
+                end
                 if syncModules then
                     local isModuleVoid = true
                     network:emit("Assetify:onRecieveBandwidth", true, false, player, syncer.libraryBandwidth)
@@ -552,26 +577,6 @@ else
                         network:emit("Assetify:onRequestSyncPack", false, player)
                     end
                 else
-                    local isLibraryVoid = true
-                    for i, j in imports.pairs(settings.assetPacks) do
-                        if i ~= "module" then
-                            if j.assetPack then
-                                for k, v in imports.pairs(j.assetPack) do
-                                    if k ~= "rwDatas" then
-                                        syncer:syncData(player, i, k, false, v)
-                                    else
-                                        for m, n in imports.pairs(v) do
-                                            isLibraryVoid = false
-                                            syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
-                                            syncer:syncHash(player, i, m, n.unSynced.fileHash)
-                                            thread:pause()
-                                        end
-                                    end
-                                    thread:pause()
-                                end
-                            end
-                        end
-                    end
                     if isLibraryVoid then network:emit("Assetify:onLoad", true, false, player) end
                 end
             end):resume({

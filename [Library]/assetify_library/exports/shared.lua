@@ -37,8 +37,10 @@ function getLibraryAssets(assetType)
     if not syncer.isLibraryLoaded or not assetType or not settings.assetPacks[assetType] then return false end
     local packAssets = {}
     if localPlayer then
-        for i, j in imports.pairs(localPlayer and settings.assetPacks[assetType].rwDatas) do
-            imports.table.insert(packAssets, i)
+        if settings.assetPacks[assetType].rwDatas then
+            for i, j in imports.pairs(settings.assetPacks[assetType].rwDatas) do
+                imports.table.insert(packAssets, i)
+            end
         end
     else
         for i, j in imports.pairs(settings.assetPacks[assetType].assetPack.manifestData) do

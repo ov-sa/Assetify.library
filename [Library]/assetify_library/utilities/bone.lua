@@ -89,12 +89,12 @@ function bone:load(element, parent, boneData, remoteSignature)
     self.element = element
     self.parent = parent
     if not self:refresh(boneData, remoteSignature) then return false end
-    self.heartbeat = thread:createHeartbeat(function()
+    self.cHeartbeat = thread:createHeartbeat(function()
         return not imports.isElement(element)
     end, function()
         imports.setElementCollisionsEnabled(element, false)
         self.cStreamer = streamer:create(element, "bone", {parent}, self.boneData.syncRate)
-        self.heartbeat = nil
+        self.cHeartbeat = nil
     end, settings.downloader.buildRate)
     bone.buffer.element[element] = self
     bone.buffer.parent[parent] = bone.buffer.parent[parent] or {}
@@ -105,8 +105,8 @@ end
 function bone:unload()
     if not self or (self == bone) or self.isUnloading then return false end
     self.isUnloading = true
-    if self.heartbeat then
-        self.heartbeat:destroy()
+    if self.cHeartbeat then
+        self.cHeartbeat:destroy()
     end
     if self.cStreamer then
         self.cStreamer:destroy()
@@ -149,7 +149,7 @@ function bone:refresh(boneData, remoteSignature)
 end
 
 function bone:update()
-    if not self or (self == bone) or self.heartbeat then return false end
+    if not self or (self == bone) or self.cHeartbeat then return false end
     bone.cache.element[(self.parent)] = bone.cache.element[(self.parent)] or {}
     bone.cache.element[(self.parent)][(self.boneData.id)] = ((bone.cache.element[(self.parent)].streamTick == bone.cache.streamTick) and bone.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
     bone.cache.element[(self.parent)].streamTick = bone.cache.streamTick

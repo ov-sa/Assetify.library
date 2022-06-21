@@ -148,7 +148,7 @@ function streamer:allocate()
             end
         else
             if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer or not imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
-                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = imports.setTimer(onBoneUpdate, self.syncRate, 0, streamer.allocator[(self.syncRate)][(self.streamType)])
+                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = imports.setTimer(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
             end
         end
         streamBuffer[self] = streamer.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
@@ -213,7 +213,8 @@ onBoneStream = function(streamBuffer)
     return true
 end
 
-onBoneUpdate = function(streamBuffer)
+onBoneUpdate = function(syncRate, streamType)
+    local streamBuffer = (syncRate and streamType and streamer.allocator[syncRate][streamType]) or false
     streamBuffer = streamBuffer or (streamer.allocator[0] and streamer.allocator[0]["bone"]) or false
     local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
     if streamBuffer and streamBuffer[clientDimension] and streamBuffer[clientDimension][clientInterior] then

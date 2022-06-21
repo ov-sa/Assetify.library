@@ -93,7 +93,7 @@ if localPlayer then
         end
         if not self.cModelInstance then return false end
         if self.cCollisionInstance then imports.setElementAlpha(self.cCollisionInstance, 0) end
-        self.hearbeat = thread:createHeartbeat(function()
+        self.cHeartbeat = thread:createHeartbeat(function()
             if not targetDummy then
                 return false
             else
@@ -111,7 +111,7 @@ if localPlayer then
             if self.cCollisionInstance then
                 self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
             end
-            self.hearbeat = nil
+            self.cHeartbeat = nil
         end, settings.downloader.buildRate)
         self.cDummy = self.cCollisionInstance or self.cModelInstance
         dummy.buffer[(self.cDummy)] = self
@@ -121,8 +121,8 @@ if localPlayer then
     function dummy:unload()
         if not self or (self == dummy) or self.isUnloading then return false end
         self.isUnloading = true
-        if self.hearbeat then
-            self.hearbeat:destroy()
+        if self.cHeartbeat then
+            self.cHeartbeat:destroy()
         end
         if self.cStreamer then
             self.cStreamer:destroy()
@@ -139,6 +139,7 @@ if localPlayer then
     end
 else
     function dummy:create(assetType, assetName, assetClump, clumpMaps, dummyData)
+        if not dummyData then return false end
         local cAsset = manager:getData(assetType, assetName)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         local dummyType = settings.assetPacks[assetType].assetType
