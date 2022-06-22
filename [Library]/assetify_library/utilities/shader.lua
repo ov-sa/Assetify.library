@@ -18,7 +18,6 @@ local imports = {
     tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
-    setmetatable = setmetatable,
     dxCreateShader = dxCreateShader,
     dxCreateTexture = dxCreateTexture,
     dxSetShaderValue = dxSetShaderValue,
@@ -32,7 +31,7 @@ local imports = {
 --[[ Class: Shader ]]--
 -----------------------
 
-shader = {
+shader = class.create("shader", {
     cache = {
         validChannels = {
             {index = "red", channel = "r"},
@@ -45,13 +44,12 @@ shader = {
         },
         remoteBlacklist = {}
     }
-}
+})
 shader.cache.__remoteBlacklist = {}
 for i, j in imports.pairs(shader.cache.remoteBlacklist) do
     shader.cache.__remoteBlacklist[j] = true
 end
 shader.cache.remoteBlacklist = shader.cache.__remoteBlacklist
-shader.__index = shader
 
 if localPlayer then
     shader.cache.shaderPriority = 10000
@@ -68,9 +66,9 @@ if localPlayer then
     shader.preLoaded = {}
 
     function shader:create(...)
-        local cShader = imports.setmetatable({}, {__index = self})
-        if not cShader:load(...) then
-            cShader = nil
+        local cShader = self:createInstance()
+        if cShader and not cShader:load(...) then
+            cShader:destroyInstance()
             return false
         end
         return cShader
@@ -253,7 +251,7 @@ if localPlayer then
             end
         end
         shader.buffer.shader[self] = nil
-        self = nil
+        self:destroyInstance()
         return true
     end
 

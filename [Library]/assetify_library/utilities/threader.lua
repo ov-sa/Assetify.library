@@ -14,14 +14,12 @@
 
 local imports = {
     type = type,
-    unpack = unpack,
     tonumber = tonumber,
-    setmetatable = setmetatable,
-    collectgarbage = collectgarbage,
     setTimer = setTimer,
     isTimer = isTimer,
     killTimer = killTimer,
     coroutine = coroutine,
+    table = table,
     math = math
 }
 
@@ -30,24 +28,13 @@ local imports = {
 --[[ Class: Thread ]]--
 -----------------------
 
-thread = {
-    buffer = {}
-}
-thread.__index = thread
-
-function thread:isInstance(cThread)
-    if not self or (imports.type(cThread) ~= "table") then return false end
-    if self == thread then return (cThread.isThread and true) or false end
-    return (self.isThread and true) or false
-end
+thread = class.create("thread")
 
 function thread:create(exec)
-    if not exec or imports.type(exec) ~= "function" then return false end
-    local cThread = imports.setmetatable({}, {__index = self})
-    cThread.isThread = true
+    if not exec or (imports.type(exec) ~= "function") then return false end
+    local cThread = self:createInstance()
     cThread.syncRate = {}
     cThread.thread = imports.coroutine.create(exec)
-    thread.buffer[cThread] = true
     return cThread
 end
 
@@ -73,9 +60,7 @@ function thread:destroy()
     if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end
-    thread.buffer[self] = nil
-    self = nil
-    imports.collectgarbage()
+    self:destroyInstance()
     return true
 end
 
@@ -142,7 +127,7 @@ function thread:await(exec)
     thread:pause()
     local resolvedValues = self.awaitingValues
     self.awaitingValues = nil
-    return imports.unpack(resolvedValues)
+    return imports.table.unpack(resolvedValues)
 end
 
 function thread:resolve(...)

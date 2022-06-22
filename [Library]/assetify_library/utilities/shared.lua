@@ -19,6 +19,7 @@ local imports = {
     decodeString = decodeString,
     isElement = isElement,
     setmetatable = setmetatable,
+    collectgarbage = collectgarbage,
     getElementMatrix = getElementMatrix,
     getElementPosition = getElementPosition,
     fileExists = fileExists,
@@ -40,13 +41,6 @@ local imports = {
 ---------------
 --[[ Utils ]]--
 ---------------
-
-local __utf8_gsub = imports.utf8.gsub
-utf8.gsub = function(string, matchWord, replaceWord, isStrictcMatch, matchPrefix, matchPostfix)
-    matchPrefix, matchPostfix = matchPrefix or "", matchPostfix or ""
-    matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
-    return __utf8_gsub(string, matchWord, replaceWord)
-end
 
 decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
     if not decodeData or (imports.type(decodeData) ~= "string") then return false end
@@ -82,6 +76,57 @@ getDistanceBetweenPoints3D = function(x1, y1, z1, x2, y2, z2)
 end
 
 
+----------------------
+--[[ Class: Class ]]--
+----------------------
+
+class = {
+    create = function(type, parent)
+        parent = (parent and (imports.type(parent) == "table") and parent) or {}
+        parent.__C = {
+            type = type,
+            buffer = {}
+        }
+        parent.__index = parent
+        function parent:getType(instance)
+            if not self or ((self == parent) and (not instance or (imports.type(instance) ~= "table"))) then return false end
+            instance = ((self ~= parent) and self) or instance
+            return (instance.__C and instance.__C.type) or false
+        end
+        function parent:createInstance()
+            if not self or (imports.type(self) ~= "table") or not self.__C or self.__isChild then return false end
+            local instance = imports.setmetatable({}, {__index = self})
+            instance.__isChild = true
+            self.__C.buffer[instance] = true
+            return instance
+        end
+        function parent:destroyInstance()
+            if not self or (imports.type(self) ~= "table") or not self.__index or not self.__C or not self.__isChild then return false end
+            self.__C.buffer[self] = nil
+            self.__C = nil
+            self.__isChild = nil
+            self = nil
+            imports.collectgarbage()
+            return true
+        end
+        return parent
+    end,
+
+    destroy = function(instance)
+        if not instance or (imports.type(instance) ~= "table") or not instance.__C or instance.__isChild then return false end
+        for i, j in imports.pairs(instance.__C.buffer) do
+            if i then
+                i:destroyInstance()
+            end
+        end
+        instance.__C = nil
+        instance = nil
+        imports.collectgarbage()
+        return true
+    end
+}
+
+
 ---------------------
 --[[ Class: File ]]--
 ---------------------
@@ -111,20 +156,23 @@ file = {
 }
 
 
----------------------
---[[ Class: JSON ]]--
----------------------
+-----------------------
+--[[ Class: String ]]--
+-----------------------
 
-json = {
-    encode = imports.toJSON,
-    decode = imports.fromJSON
-}
+local __utf8_gsub = imports.utf8.gsub
+utf8.gsub = function(string, matchWord, replaceWord, isStrictcMatch, matchPrefix, matchPostfix)
+    matchPrefix, matchPostfix = matchPrefix or "", matchPostfix or ""
+    matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
+    return __utf8_gsub(string, matchWord, replaceWord)
+end
 
 
 ----------------------
 --[[ Class: Table ]]--
 ----------------------
 
+table.unpack = unpack
 table.clone = function(baseTable, isRecursive)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     local clonedTable = {}
@@ -137,6 +185,16 @@ table.clone = function(baseTable, isRecursive)
     end
     return clonedTable
 end
+
+
+---------------------
+--[[ Class: JSON ]]--
+---------------------
+
+json = {
+    encode = imports.toJSON,
+    decode = imports.fromJSON
+}
 
 
 ---------------------

@@ -12,5 +12,4 @@
 --[[ Class: Light ]]--
 ----------------------
 
-light = {}
-light.__index = light
+light = class.create("light")

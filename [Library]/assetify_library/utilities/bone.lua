@@ -16,7 +16,6 @@ local imports = {
     pairs = pairs,
     tonumber = tonumber,
     isElement = isElement,
-    setmetatable = setmetatable,
     getElementType = getElementType,
     setElementMatrix = setElementMatrix,
     setElementPosition = setElementPosition,
@@ -34,7 +33,7 @@ local imports = {
 --[[ Class: Bone ]]--
 ---------------------
 
-bone = {
+bone = class.create("bone", {
     ids = {
         ped = {1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 24, 25, 26, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 51, 52, 53, 54},
         vehicle = {}
@@ -46,8 +45,7 @@ bone = {
         element = {},
         parent = {}
     }
-}
-bone.__index = bone
+})
 
 for i, j in imports.pairs(bone.ids) do
     local indexes = {}
@@ -56,9 +54,9 @@ for i, j in imports.pairs(bone.ids) do
 end
 
 function bone:create(...)
-    local cBone = imports.setmetatable({}, {__index = self})
-    if not cBone:load(...) then
-        cBone = nil
+    local cBone = self:createInstance()
+    if cBone and not cBone:load(...) then
+        cBone:destroyInstance()
         return false
     end
     return cBone
@@ -113,7 +111,7 @@ function bone:unload()
     end
     bone.cache.element[(self.element)] = nil
     bone.buffer.element[(self.element)] = nil
-    self = nil
+    self:destroyInstance()
     return true
 end
 

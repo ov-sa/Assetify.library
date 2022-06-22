@@ -20,7 +20,6 @@ local imports = {
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     attachElements = attachElements,
-    setmetatable = setmetatable,
     getTickCount = getTickCount,
     isTimer = isTimer,
     setTimer = setTimer,
@@ -38,7 +37,7 @@ local imports = {
 --[[ Class: Streamer ]]--
 -------------------------
 
-streamer = {
+streamer = class.create("streamer", {
     buffer = {},
     cache = {
         clientCamera = imports.getCamera()
@@ -46,8 +45,7 @@ streamer = {
     allocator = {
         validStreams = {"dummy", "bone", "light"}
     }
-}
-streamer.__index = streamer
+})
 
 local onEntityStream, onBoneStream, onBoneUpdate = nil, nil, nil
 streamer.allocator.__validStreams = {}
@@ -59,9 +57,9 @@ streamer.allocator.validStreams = streamer.allocator.__validStreams
 streamer.allocator.__validStreams = nil
 
 function streamer:create(...)
-    local cStreamer = imports.setmetatable({}, {__index = self})
-    if not cStreamer:load(...) then
-        cStreamer = nil
+    local cStreamer = self:createInstance()
+    if cStreamer and not cStreamer:load(...) then
+        cStreamer:destroyInstance()
         return false
     end
     return cStreamer
@@ -106,7 +104,7 @@ function streamer:unload()
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.buffer[streamDimension][streamInterior][streamType][self] = nil
     self:deallocate()
-    self = nil
+    self:destroyInstance()
     return true
 end
 

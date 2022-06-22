@@ -40,8 +40,7 @@ local imports = {
 --[[ Class: Manager ]]--
 ------------------------
 
-manager = {}
-manager.__index = manager
+manager = class.create("manager")
 
 if localPlayer then
     manager.buffer = {

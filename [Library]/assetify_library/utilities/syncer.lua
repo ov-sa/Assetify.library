@@ -42,7 +42,7 @@ local imports = {
 --[[ Class: Syncer ]]--
 -----------------------
 
-syncer = {
+syncer = class.create("syncer", {
     libraryResource = imports.getThisResource(),
     isLibraryLoaded = false,
     isModuleLoaded = false,
@@ -53,11 +53,10 @@ syncer = {
     syncedAssetDummies = {},
     syncedBoneAttachments = {},
     syncedLights = {}
-}
+})
 syncer.libraryName = imports.getResourceName(syncer.libraryResource)
 syncer.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.librarySerial = imports.md5(imports.getResourceName(syncer.libraryResource)..":"..imports.tostring(syncer.libraryResource)..":"..imports.json.encode(imports.getRealTime()))
-syncer.__index = syncer
 
 network:create("Assetify:onLoad")
 network:create("Assetify:onUnload")

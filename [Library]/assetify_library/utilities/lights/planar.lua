@@ -17,7 +17,6 @@ local imports = {
     tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
-    setmetatable = setmetatable,
     engineRequestModel = engineRequestModel,
     engineLoadTXD = engineLoadTXD,
     engineLoadDFF = engineLoadDFF,
@@ -38,14 +37,14 @@ local imports = {
 --[[ Class: Shader ]]--
 -----------------------
 
-light.planar = {
+light.planar = class.create("planar", {
     cache = {
         validTypes = {
             {index = "planar_1x1", textureName = "assetify_light_planar"}
         }
     },
     buffer = {}
-}
+})
 for i = 1, #light.planar.cache.validTypes, 1 do
     local j = light.planar.cache.validTypes[i]
     local modelPath = "utilities/rw/"..j.index.."/"
@@ -59,12 +58,11 @@ for i = 1, #light.planar.cache.validTypes, 1 do
     light.planar.cache.validTypes[(j.index)] = j
     light.planar.cache.validTypes[(j.index)].index = nil
 end
-light.planar.__index = light.planar
 
 function light.planar:create(...)
-    local cLight = imports.setmetatable({}, {__index = self})
-    if not cLight:load(...) then
-        cLight = nil
+    local cLight = self:createInstance()
+    if cLight and not cLight:load(...) then
+        cLight:destroyInstance()
         return false
     end
     return cLight
@@ -122,7 +120,7 @@ function light.planar:unload()
     if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
         imports.destroyElement(self.cCollisionInstance)
     end
-    self = nil
+    self:destroyInstance()
     return true
 end
 

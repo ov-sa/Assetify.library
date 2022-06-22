@@ -19,7 +19,6 @@ local imports = {
     isElement = isElement,
     attachElements = attachElements,
     destroyElement = destroyElement,
-    setmetatable = setmetatable,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
     setElementDoubleSided = setElementDoubleSided,
@@ -32,13 +31,12 @@ local imports = {
 --[[ Class: Scene ]]--
 ----------------------
 
-scene = {}
-scene.__index = scene
+scene = class.create("scene")
 
 function scene:create(...)
-    local cScene = imports.setmetatable({}, {__index = self})
-    if not cScene:load(...) then
-        cScene = nil
+    local cScene = self:createInstance()
+    if cScene and not cScene:load(...) then
+        cScene:destroyInstance()
         return false
     end
     return cScene
@@ -91,6 +89,6 @@ function scene:unload()
     if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
         imports.destroyElement(self.cCollisionInstance)
     end
-    self = nil
+    self:destroyInstance()
     return true
 end

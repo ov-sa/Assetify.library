@@ -25,7 +25,6 @@ local imports = {
     tostring = tostring,
     isElement = isElement,
     destroyElement = destroyElement,
-    setmetatable = setmetatable,
     setTimer = setTimer,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
@@ -49,7 +48,7 @@ local imports = {
 --[[ Class: Asset ]]--
 ----------------------
 
-asset = {
+asset = class.create("asset", {
     references = {
         root = ((settings.downloader.isAccessSafe and "@") or "").."files/assets/",
         manifest = "manifest",
@@ -65,8 +64,7 @@ asset = {
         interior = {0, 255},
         streamRange = 170
     }
-}
-asset.__index = asset
+})
 
 if localPlayer then
     asset.rwAssets = {
@@ -75,9 +73,9 @@ if localPlayer then
     }
 
     function asset:create(...)
-        local cAsset = imports.setmetatable({}, {__index = self})
-        if not cAsset:load(...) then
-            cAsset = nil
+        local cAsset = self:createInstance()
+        if cAsset and not cAsset:load(...) then
+            cAsset:destroyInstance()
             return false
         end
         return cAsset
@@ -230,7 +228,7 @@ if localPlayer then
                 end
             end
         end
-        self = nil
+        self:destroyInstance()
         if callback and (imports.type(callback) == "function") then
             callback(true)
         end

@@ -32,15 +32,14 @@ local imports = {
 --[[ Class: Renderer ]]--
 -------------------------
 
-renderer = {
+renderer = class.create("renderer", {
     cache = {
         isVirtualRendering = false,
         isTimeSynced = false,
         serverTick = 60*60*12,
         minuteDuration = 60
     }
-}
-renderer.__index = renderer
+})
 
 if localPlayer then
     renderer.resolution = {imports.guiGetScreenSize()}

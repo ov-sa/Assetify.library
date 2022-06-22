@@ -15,12 +15,9 @@
 local imports = {
     type = type,
     pairs = pairs,
-    unpack = unpack,
     md5 = md5,
     tonumber = tonumber,
     tostring = tostring,
-    setmetatable = setmetatable,
-    collectgarbage = collectgarbage,
     isElement = isElement,
     getElementType = getElementType,
     getThisResource = getThisResource,
@@ -39,7 +36,7 @@ local imports = {
 --[[ Class: Network ]]--
 ------------------------
 
-network = {
+network = class.create("network", {
     identifier = imports.md5(imports.getResourceName(imports.getThisResource())),
     isServerInstance = (not localPlayer and true) or false,
     bandwidth = 1250000,
@@ -47,8 +44,7 @@ network = {
     cache = {
         execSerials = {}
     }
-}
-network.__index = network
+})
 
 imports.addEvent("Assetify:Network:API", true)
 imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
@@ -60,9 +56,9 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
                 if i and (imports.type(i) == "function") then
                     thread:create(function(self)
                         if not j.isAsync then
-                            i(imports.unpack(payload.processArgs))
+                            i(imports.table.unpack(payload.processArgs))
                         else
-                            i(self, imports.unpack(payload.processArgs))
+                            i(self, imports.table.unpack(payload.processArgs))
                         end
                     end):resume()
                 end
@@ -77,9 +73,9 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
                 payload.isRestricted = true
                 thread:create(function(self)
                     if not cNetwork.handler.isAsync then
-                        payload.processArgs = {cNetwork.handler.exec(imports.unpack(payload.processArgs))}
+                        payload.processArgs = {cNetwork.handler.exec(imports.table.unpack(payload.processArgs))}
                     else
-                        payload.processArgs = {cNetwork.handler.exec(self, imports.unpack(payload.processArgs))}
+                        payload.processArgs = {cNetwork.handler.exec(self, imports.table.unpack(payload.processArgs))}
                     end
                     if not payload.isRemote then
                         imports.triggerEvent("Assetify:Network:API", resourceRoot, serial, payload)
@@ -102,7 +98,7 @@ imports.addEventHandler("Assetify:Network:API", root, function(serial, payload)
             end
         else
             if network.cache.execSerials[(payload.execSerial)] then
-                network.cache.execSerials[(payload.execSerial)](imports.unpack(payload.processArgs))
+                network.cache.execSerials[(payload.execSerial)](imports.table.unpack(payload.processArgs))
                 network:deserializeExec(payload.execSerial)
             end
         end
@@ -118,9 +114,9 @@ network.fetchArg = function(index, pool)
 end
 
 function network:create(...)
-    local cNetwork = imports.setmetatable({}, {__index = self})
-    if not cNetwork:load(...) then
-        cNetwork = nil
+    local cNetwork = self:createInstance()
+    if cNetwork and not cNetwork:load(...) then
+        cNetwork:destroyInstance()
         return false
     end
     return cNetwork
@@ -145,8 +141,7 @@ end
 function network:unload()
     if not self or (self == network) then return false end
     network.buffer[(self.name)] = nil
-    self = nil
-    imports.collectgarbage()
+    self:destroyInstance()
     return true
 end
 
@@ -252,7 +247,7 @@ function network:emit(...)
 end
 
 function network:emitCallback(cThread, ...)
-    if not self or not cThread or not thread:isInstance(cThread) then return false end
+    if not self or not cThread or (thread:getType(cThread) ~= "thread") then return false end
     local cThread = cThread
     local cArgs, cExec = {...}, function(...) return cThread:resolve(...) end
     local payload = {

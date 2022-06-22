@@ -16,7 +16,6 @@ local imports = {
     tonumber = tonumber,
     isElement = isElement,
     destroyElement = destroyElement,
-    setmetatable = setmetatable,
     createObject = createObject,
     createPed = createPed,
     createVehicle = createVehicle,
@@ -32,16 +31,15 @@ local imports = {
 --[[ Class: Dummy ]]--
 ----------------------
 
-dummy = {
+dummy = class.create("dummy", {
     buffer = {}
-}
-dummy.__index = dummy
+})
 
 if localPlayer then
     function dummy:create(...)
-        local cDummy = imports.setmetatable({}, {__index = self})
-        if not cDummy:load(...) then
-            cDummy = nil
+        local cDummy = self:createInstance()
+        if cDummy and not cDummy:load(...) then
+            cDummy:destroyInstance()
             return false
         end
         return cDummy
@@ -133,8 +131,8 @@ if localPlayer then
         if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
             imports.destroyElement(self.cCollisionInstance)
         end
-        dummy.buffer[self] = nil
-        self = nil
+        dummy.buffer[self] = nil --TODO: NEEDS ATTENTION DOESN'T MATCH WITH DEF
+        self:destroyInstance()
         return true
     end
 else
