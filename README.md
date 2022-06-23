@@ -21,6 +21,7 @@
 * Completely Performance-Friendly
 * Gamemode Perspective
 * UE inspired Unlimited & Configurable Asset Packs
+* Built-In Timer
 * Built-In Threader
 * Built-In Networker
 * Built-In Scheduler
