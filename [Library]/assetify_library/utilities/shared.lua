@@ -156,9 +156,9 @@ file = {
 }
 
 
------------------------
---[[ Class: String ]]--
------------------------
+---------------------
+--[[ Class: UTF8 ]]--
+---------------------
 
 local __utf8_gsub = imports.utf8.gsub
 utf8.gsub = function(string, matchWord, replaceWord, isStrictcMatch, matchPrefix, matchPostfix)

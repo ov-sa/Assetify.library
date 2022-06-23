@@ -26,11 +26,24 @@ local imports = {
 -------------------
 
 local bundler = {}
+local parseModules = {
+    ["timer"] = "assetify.timer",
+    ["thread"] = "assetify.thread",
+    ["network"] = "assetify.network"
+}
 
 
 -----------------------------------
 --[[ Function: Imports Modules ]]--
 -----------------------------------
+
+local function parse(rw)
+    if not rw or (imports.type(rw) ~= "string") then return false end
+    for i, j in pairs(parseModules) do
+        rw = imports.utf8.gsub(rw, i, j, true, "(", ".:)")
+    end
+    return rw
+end
 
 function import(...)
     local args = {...}
@@ -228,7 +241,7 @@ bundler["timer"] = {
     module = "timer",
     rw = [[
         if not assetify.timer then
-            ]]..imports.utf8.gsub(imports.file.read("utilities/timer.lua"), "timer", "assetify.timer", true, "(", ".:)")..[[
+            ]]..parse(imports.file.read("utilities/timer.lua"))..[[
         end
     ]]
 }
@@ -238,7 +251,7 @@ bundler["threader"] = {
     rw = [[
         if not assetify.thread then
             ]]..bundler["timer"].rw..[[
-            ]]..imports.utf8.gsub(imports.file.read("utilities/threader.lua"), "thread", "assetify.thread", true, "(", ".:)")..[[
+            ]]..parse(imports.file.read("utilities/threader.lua"))..[[
         end
     ]]
 }
@@ -248,7 +261,7 @@ bundler["networker"] = {
     rw = [[
         if not assetify.network then
             ]]..bundler["threader"].rw..[[
-            ]]..imports.utf8.gsub(imports.utf8.gsub(imports.file.read("utilities/networker.lua"), "thread", "assetify.thread", true, "(", ".:)"), "network", "assetify.network", true, "(", ".:)")..[[
+            ]]..parse(imports.file.read("utilities/networker.lua"))..[[
         end
     ]]
 }
