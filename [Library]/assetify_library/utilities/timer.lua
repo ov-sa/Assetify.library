@@ -55,7 +55,7 @@ function timer:load(exec, interval, executions, ...)
     self.timer = imports.setTimer(function()
         self.currentExec = self.currentExec + 1
         self.exec(imports.table.unpack(self.arguments))
-        if self.currentExec >= self.executions then
+        if (self.executions > 0) and (self.currentExec >= self.executions) then
             self:destroy()
         end
     end, self.interval, self.executions)
@@ -70,4 +70,3 @@ function timer:unload()
     self:destroyInstance()
     return true
 end
-
