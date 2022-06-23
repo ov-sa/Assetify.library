@@ -25,7 +25,6 @@ local imports = {
     tostring = tostring,
     isElement = isElement,
     destroyElement = destroyElement,
-    setTimer = setTimer,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
     engineFreeModel = engineFreeModel,

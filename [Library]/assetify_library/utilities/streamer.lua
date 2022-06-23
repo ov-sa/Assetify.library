@@ -21,9 +21,6 @@ local imports = {
     removeEventHandler = removeEventHandler,
     attachElements = attachElements,
     getTickCount = getTickCount,
-    isTimer = isTimer,
-    setTimer = setTimer,
-    killTimer = killTimer,
     isElementOnScreen = isElementOnScreen,
     getElementDimension = getElementDimension,
     getElementInterior = getElementInterior,
@@ -145,8 +142,8 @@ function streamer:allocate()
                 imports.addEventHandler("onClientPedsProcessed", root, onBoneUpdate)
             end
         else
-            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer or not imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
-                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = imports.setTimer(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
+            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer or (streamer.allocator[(self.syncRate)][(self.streamType)].cTimer:getType() ~= "timer") then
+                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = timer:create(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
             end
         end
         streamBuffer[self] = streamer.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
@@ -172,8 +169,8 @@ function streamer:deallocate()
                     streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             else
-                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer and imports.isTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer) then
-                    imports.killTimer(streamer.allocator[(self.syncRate)][(self.streamType)].cTimer)
+                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer:destroyInstance()
                     streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             end
@@ -223,12 +220,12 @@ end
 
 network:fetch("Assetify:onLoad"):on(function()
     streamer:update(imports.getElementDimension(localPlayer))
-    imports.setTimer(function()
+    timer:create(function()
         if streamer.cache.isCameraTranslated then return false end
         local velX, velY, velZ = imports.getElementVelocity(streamer.cache.clientCamera)
         streamer.cache.isCameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
     end, settings.streamer.cameraSyncRate, 0)
-    imports.setTimer(function()
+    timer:create(function()
         if not streamer.cache.isCameraTranslated then return false end
         local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
         if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then

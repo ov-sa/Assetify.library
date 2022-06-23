@@ -15,9 +15,6 @@
 local imports = {
     type = type,
     tonumber = tonumber,
-    setTimer = setTimer,
-    isTimer = isTimer,
-    killTimer = killTimer,
     coroutine = coroutine,
     table = table,
     math = math
@@ -57,9 +54,7 @@ end
 
 function thread:destroy()
     if not self or (self == thread) then return false end
-    if self.timer and imports.isTimer(self.timer) then
-        imports.killTimer(self.timer)
-    end
+    if self.timer then self.timer:destroyInstance() end
     self:destroyInstance()
     return true
 end
@@ -82,7 +77,7 @@ function thread:resume(syncRate)
     self.syncRate.executions = (syncRate and imports.tonumber(syncRate.executions)) or false
     self.syncRate.frames = (self.syncRate.executions and syncRate and imports.tonumber(syncRate.frames)) or false
     if self.syncRate.executions and self.syncRate.frames then
-        self.timer = imports.setTimer(function()
+        self.timer = timer:create(function()
             if self.isAwaiting then return false end
             if self:status() == "suspended" then
                 for i = 1, self.syncRate.executions, 1 do
@@ -95,9 +90,7 @@ function thread:resume(syncRate)
         end, self.syncRate.frames, 0)
     else
         if self.isAwaiting then return false end
-        if self.timer and imports.isTimer(self.timer) then
-            imports.killTimer(self.timer)
-        end
+        if self.timer then self.timer:destroyInstance() end
         if self:status() == "suspended" then
             imports.coroutine.resume(self.thread, self)
         end
@@ -109,9 +102,9 @@ end
 function thread:sleep(duration)
     duration = imports.math.max(0, imports.tonumber(duration) or 0)
     if not self or (self == thread) then return false end
-    if self.timer and imports.isTimer(self.timer) then return false end
+    if self.timer and (self.timer:getType() == "timer") then return false end
     self.isAwaiting = "sleep"
-    self.timer = imports.setTimer(function()
+    self.timer = timer:create(function()
         self.isAwaiting = nil
         self:resume()
     end, duration, 1)
@@ -135,8 +128,7 @@ function thread:resolve(...)
     if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
     self.isAwaiting = nil
     self.awaitingValues = {...}
-    local self = self
-    imports.setTimer(function()
+    timer:create(function()
         self:resume()
     end, 1, 1)
     return true

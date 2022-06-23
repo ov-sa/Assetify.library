@@ -14,7 +14,6 @@
 
 local imports = {
     pairs = pairs,
-    setTimer = setTimer,
     addEventHandler = addEventHandler
 }
 
@@ -43,7 +42,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
                 if assetType == "module" then
                     network:emit("Assetify:onModuleLoad", false)
                 end
-                imports.setTimer(function()
+                timer:create(function()
                     self:resume()
                 end, 1, 1)
             end)

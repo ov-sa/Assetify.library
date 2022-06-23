@@ -224,10 +224,20 @@ bundler["core"] = {
     ]]
 }
 
+bundler["timer"] = {
+    module = "timer",
+    rw = [[
+        if not assetify.timer then
+            ]]..imports.utf8.gsub(imports.file.read("utilities/timer.lua"), "timer", "assetify.timer", true, "(", ".:)")..[[
+        end
+    ]]
+}
+
 bundler["threader"] = {
     module = "thread",
     rw = [[
         if not assetify.thread then
+            ]]..bundler["timer"].rw..[[
             ]]..imports.utf8.gsub(imports.file.read("utilities/threader.lua"), "thread", "assetify.thread", true, "(", ".:)")..[[
         end
     ]]
