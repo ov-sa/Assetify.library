@@ -692,8 +692,11 @@ else
         local __source = source
         thread:create(function(self)
             local source = __source
-            syncer.syncedGlobalDatas[source] = nil
-            syncer.syncedEntityDatas[source] = nil
+            if syncer.syncedEntityDatas[source] ~= nil then
+                timer:create(function(source)
+                    syncer.syncedEntityDatas[source] = nil
+                end, settings.syncer.persistenceDuration, 1, source)
+            end
             syncer.syncedElements[source] = nil
             syncer.syncedAssetDummies[source] = nil
             syncer.syncedLights[source] = nil

@@ -31,6 +31,10 @@ settings = {
         unsyncDimension = 65535 
     },
 
+    syncer = {
+        persistenceDuration = 30*1000
+    },
+
     renderer = {
         resolution = 1
     }
