@@ -95,8 +95,9 @@ end
 --[[ Bundler ]]--
 -----------------
 
-bundler["imports"] = imports.file.read("utilities/shared.lua")..[[
+bundler["imports"] = [[
     if not assetify then
+        ]]..imports.file.read("utilities/shared.lua")..[[
         assetify = {
             imports = {
                 resourceName = "]]..syncer.libraryName..[[",

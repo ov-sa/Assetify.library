@@ -109,7 +109,7 @@ network.fetchArg = function(index, pool)
     index = imports.tonumber(index) or 1
     if not pool or (imports.type(pool) ~= "table") then return false end
     local argValue = pool[index]
-    if (index > 0) and (index <= #pool) then imports.table.remove(pool, index) end
+    imports.table.remove(pool, index)
     return argValue
 end
 

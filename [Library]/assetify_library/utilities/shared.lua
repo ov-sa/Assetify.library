@@ -175,38 +175,44 @@ end
 --[[ Class: Table ]]--
 ----------------------
 
-local __table_insert = imports.table.insert
-local __table_remove = imports.table.remove
-table.insert = function(baseTable, ...)
+table.insert = function(baseTable, index, data, isForced)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
+    if index and (isForced or (data ~= nil)) then
+        index = imports.tonumber(index)
+        if not index then return false end
+    else
+        data, index = index, nil
+    end
     baseTable.__N = baseTable.__N or #baseTable
-    __table_insert(baseTable, ...)
+    index = index or (baseTable.__N + 1)
+    if (index <= 0) or (index > (baseTable.__N + 1)) then return false end
+    if index <= baseTable.__N then
+        for i = baseTable.__N, index, -1 do
+            baseTable[(i + 1)] = baseTable[i]
+            baseTable[i] = nil
+        end
+    end
+    baseTable[index] = data
     baseTable.__N = baseTable.__N + 1
     return true
 end
 table.remove = function(baseTable, index)
-    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
+    index = imports.tonumber(index)
+    if not baseTable or (imports.type(baseTable) ~= "table") or not index then return false end
     baseTable.__N = baseTable.__N or #baseTable
-    if not baseTable[index] and (index <= baseTable.__N) then
-        local __baseTable = {}
-        baseTable[index] = nil
+    if (index <= 0) or (index > baseTable.__N) then return false end
+    baseTable[index] = nil
+    if index < baseTable.__N then
         for i = index + 1, baseTable.__N, 1 do
-            __baseTable[(i - 1)] = baseTable[i]
+            baseTable[(i - 1)] = baseTable[i]
             baseTable[i] = nil
         end
-        for i, j in imports.pairs(__baseTable) do
-            baseTable[i] = j
-        end
-        __baseTable = nil
-        imports.collectgarbage()
-    else
-        __table_remove(baseTable, index)
     end
     baseTable.__N = baseTable.__N - 1
     return true
 end
 table.pack = function(...)
-    return {__N = imports.select("#", ...), ...}
+    return {...}
 end
 table.unpack = function(baseTable)
     return imports.unpack(baseTable, 1, baseTable.__N or #baseTable)
