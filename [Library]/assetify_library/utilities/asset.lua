@@ -36,6 +36,7 @@ local imports = {
     engineReplaceModel = engineReplaceModel,
     engineReplaceCOL = engineReplaceCOL,
     file = file,
+    utf8 = utf8,
     json = json,
     table = table,
     string = string,
@@ -239,8 +240,9 @@ else
         manifestData = (manifestData and imports.json.decode(manifestData)) or false
         if manifestData then
             for i, j in imports.pairs(manifestData) do
-                if j and (imports.type(j) == "string") then
-                    
+                local url = imports.file.parseURL(j, "json")
+                if url then
+                    manifestData[i] = asset:buildManifest(url)
                 end
             end
         end

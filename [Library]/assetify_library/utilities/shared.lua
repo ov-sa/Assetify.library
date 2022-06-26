@@ -141,6 +141,18 @@ file = {
     exists = imports.fileExists,
     delete = imports.fileDelete,
 
+    parseURL = function(path, extension)
+        if not path or not extension or (imports.type(path) ~= "string") or (imports.type(extension) ~= "string") then return false end
+        local _, startN = imports.utf8.find(path, "@/")
+        local endN = imports.utf8.find(path, "."..extension)
+        startN, endN = (startN and (startN + 1)) or startN, (endN and (endN - 1)) or endN
+        if startN and endN then
+            local url = imports.utf8.sub(path, startN, endN)
+            if imports.string.match(url, "%w") then return url.."."..extension end
+        end
+        return false
+    end,
+
     read = function(path)
         if not path or not imports.fileExists(path) then return false end
         local cFile = imports.fileOpen(path, true)
