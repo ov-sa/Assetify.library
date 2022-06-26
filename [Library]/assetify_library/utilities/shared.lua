@@ -148,7 +148,7 @@ file = {
         startN, endN = (startN and (startN + 1)) or startN, (endN and (endN - 1)) or endN
         if startN and endN then
             local url = imports.utf8.sub(path, startN, endN)
-            if imports.string.match(url, "%w") then return url.."."..extension end
+            if imports.string.match(url, "%w") then return url.."."..extension, imports.string.match(url, "(.*[/\\])") or "" end
         end
         return false
     end,

@@ -235,14 +235,15 @@ if localPlayer then
         return true
     end
 else
-    function asset:buildManifest(manifestPath)
-        local manifestData = imports.file.read(manifestPath)
+    function asset:buildManifest(assetPath, manifestPath)
+        local manifestData = imports.file.read(assetPath..manifestPath)
         manifestData = (manifestData and imports.json.decode(manifestData)) or false
         if manifestData then
             for i, j in imports.pairs(manifestData) do
-                local url = imports.file.parseURL(j, "json")
-                if url then
-                    manifestData[i] = asset:buildManifest(url)
+                local url, directory = imports.file.parseURL(j, "json")
+                if url and directory then
+                    url = imports.string.sub(url, #directory + 1)
+                    manifestData[i] = asset:buildManifest(assetPath..directory, url)
                 end
             end
         end
@@ -358,7 +359,7 @@ else
                 for i = 1, #cAssetPack.manifestData, 1 do
                     local assetName = cAssetPack.manifestData[i]
                     local assetPath = (asset.references.root)..imports.string.lower(assetType).."/"..assetName.."/"
-                    local assetManifestData = asset:buildManifest(assetPath..(asset.references.asset)..".json")
+                    local assetManifestData = asset:buildManifest(assetPath, (asset.references.asset)..".json")
                     if assetManifestData then
                         assetManifestData.streamRange = imports.math.max(imports.tonumber(assetManifestData.streamRange) or 0, asset.ranges.streamRange)
                         assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
