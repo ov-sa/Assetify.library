@@ -46,7 +46,8 @@ shader = class.create("shader", {
     }
 })
 shader.cache.__remoteBlacklist = {}
-for i, j in imports.pairs(shader.cache.remoteBlacklist) do
+for i = 1, #shader.cache.remoteBlacklist, 1 do
+    local j = shader.cache.remoteBlacklist[i]
     shader.cache.__remoteBlacklist[j] = true
 end
 shader.cache.remoteBlacklist = shader.cache.__remoteBlacklist
