@@ -175,13 +175,13 @@ end
 --[[ Class: Table ]]--
 ----------------------
 
-table.insert = function(baseTable, index, data, isForced)
+table.insert = function(baseTable, index, value, isForced)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
-    if index and (isForced or (data ~= nil)) then
+    if index and (isForced or (value ~= nil)) then
         index = imports.tonumber(index)
         if not index then return false end
     else
-        data, index = index, nil
+        value, index = index, nil
     end
     baseTable.__N = baseTable.__N or #baseTable
     index = index or (baseTable.__N + 1)
@@ -192,7 +192,7 @@ table.insert = function(baseTable, index, data, isForced)
             baseTable[i] = nil
         end
     end
-    baseTable[index] = data
+    baseTable[index] = value
     baseTable.__N = baseTable.__N + 1
     return true
 end
