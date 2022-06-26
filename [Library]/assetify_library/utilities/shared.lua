@@ -196,6 +196,7 @@ table.insert = function(baseTable, index, value, isForced)
     baseTable.__N = baseTable.__N + 1
     return true
 end
+
 table.remove = function(baseTable, index)
     index = imports.tonumber(index)
     if not baseTable or (imports.type(baseTable) ~= "table") or not index then return false end
@@ -211,13 +212,16 @@ table.remove = function(baseTable, index)
     baseTable.__N = baseTable.__N - 1
     return true
 end
+
 table.pack = function(...)
     return {...}
 end
+
 table.unpack = function(baseTable)
     return imports.unpack(baseTable, 1, baseTable.__N or #baseTable)
 end
 unpack = table.unpack
+
 table.clone = function(baseTable, isRecursive)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     local __baseTable = {}
