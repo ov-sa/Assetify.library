@@ -39,7 +39,6 @@ local imports = {
     string = string,
     math = math
 }
-unpack = nil
 
 
 ---------------
@@ -210,8 +209,9 @@ table.pack = function(...)
     return {__N = imports.select("#", ...), ...}
 end
 table.unpack = function(baseTable)
-    return imports.unpack(baseTable, 1, table.maxn(baseTable) or #baseTable)
+    return imports.unpack(baseTable, 1, baseTable.__N or #baseTable)
 end
+unpack = table.unpack
 table.clone = function(baseTable, isRecursive)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     local __baseTable = {}

@@ -85,7 +85,7 @@ function import(...)
             end
         end
         if isCompleteFetch then return assetify
-        else return unpack(genReturns) end
+        else return table.unpack(genReturns) end
         ]]
     end
 end
