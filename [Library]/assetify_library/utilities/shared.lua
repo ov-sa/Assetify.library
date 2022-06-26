@@ -91,11 +91,13 @@ class = {
             buffer = {}
         }
         parent.__index = parent
+    
         function parent:getType(instance)
             if not self or ((self == parent) and (not instance or (imports.type(instance) ~= "table"))) then return false end
             instance = ((self ~= parent) and self) or instance
             return (instance.__C and instance.__C.type) or false
         end
+    
         function parent:createInstance()
             if not self or (imports.type(self) ~= "table") or not self.__C or self.__isChild then return false end
             local instance = imports.setmetatable({}, {__index = self})
@@ -103,6 +105,7 @@ class = {
             self.__C.buffer[instance] = true
             return instance
         end
+    
         function parent:destroyInstance()
             if not self or (imports.type(self) ~= "table") or not self.__index or not self.__C or not self.__isChild then return false end
             self.__C.buffer[self] = nil
