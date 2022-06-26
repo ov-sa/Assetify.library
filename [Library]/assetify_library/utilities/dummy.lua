@@ -125,13 +125,13 @@ if localPlayer then
         if self.cStreamer then
             self.cStreamer:destroy()
         end
+        dummy.buffer[(self.cDummy)] = nil
         if self.cModelInstance and imports.isElement(self.cModelInstance) then
             imports.destroyElement(self.cModelInstance)
         end
         if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
             imports.destroyElement(self.cCollisionInstance)
         end
-        dummy.buffer[self] = nil --TODO: NEEDS ATTENTION DOESN'T MATCH WITH DEF
         self:destroyInstance()
         return true
     end
