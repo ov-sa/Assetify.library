@@ -47,19 +47,19 @@ end
 
 function import(...)
     local cArgs = imports.table.pack(...)
-    if args[1] == true then
-        imports.table.remove(args, 1)
+    if cArgs[1] == true then
+        imports.table.remove(cArgs, 1)
         local buildImports, genImports, __genImports = {}, {}, {}
         local isCompleteFetch = false
-        if (#args <= 0) then
+        if (#cArgs <= 0) then
             imports.table.insert(buildImports, "core")
-        elseif args[1] == "*" then
+        elseif cArgs[1] == "*" then
             isCompleteFetch = true
             for i, j in imports.pairs(bundler) do
                 imports.table.insert(buildImports, i)
             end
         else
-            buildImports = args
+            buildImports = cArgs
         end
         for i = 1, #buildImports, 1 do
             local j = buildImports[i]
@@ -72,9 +72,9 @@ function import(...)
         return genImports, isCompleteFetch
     else
         local cArgs = imports.table.pack(...)
-        args = ((#args > 0) and ", \""..imports.table.concat(args, "\", \"").."\"") or ""
+        cArgs = ((#cArgs > 0) and ", \""..imports.table.concat(cArgs, "\", \"").."\"") or ""
         return [[
-        local genImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..args..[[)
+        local genImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..cArgs..[[)
         if not genImports then return false end
         local genReturns = (not isCompleteFetch and {}) or false
         for i = 1, #genImports, 1 do

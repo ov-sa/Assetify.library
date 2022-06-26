@@ -66,7 +66,7 @@ function setElementAsset(element, assetType, ...)
     elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
     if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
     local cArgs = imports.table.pack(...)
-    return syncer:syncElementModel(element, assetType, arguments[1], arguments[2], arguments[3], arguments[4])
+    return syncer:syncElementModel(element, assetType, cArgs[1], cArgs[2], cArgs[3], cArgs[4])
 end
 
 function getElementAssetInfo(element)
@@ -95,12 +95,12 @@ end
 
 function createAssetDummy(...)
     local cArgs = imports.table.pack(...)
-    return syncer:syncAssetDummy(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5])
+    return syncer:syncAssetDummy(cArgs[1], cArgs[2], cArgs[3], cArgs[4], cArgs[5])
 end
 
 function setBoneAttachment(...)
     local cArgs = imports.table.pack(...)
-    return syncer:syncBoneAttachment(arguments[1], arguments[2], arguments[3])
+    return syncer:syncBoneAttachment(cArgs[1], cArgs[2], cArgs[3])
 end
 
 function setBoneDetachment(element)
@@ -109,7 +109,7 @@ end
 
 function setBoneRefreshment(...)
     local cArgs = imports.table.pack(...)
-    return syncer:syncBoneRefreshment(arguments[1], arguments[2])
+    return syncer:syncBoneRefreshment(cArgs[1], cArgs[2])
 end
 
 function clearBoneAttachment(element)
