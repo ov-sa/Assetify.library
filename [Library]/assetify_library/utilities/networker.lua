@@ -205,7 +205,7 @@ end
 
 function network:emit(...)
     if not self then return false end
-    local cArgs = {...}
+    local cArgs = imports.table.pack(...)
     local payload = {
         isRemote = false,
         isRestricted = false,
@@ -249,7 +249,7 @@ end
 function network:emitCallback(cThread, ...)
     if not self or not cThread or (thread:getType(cThread) ~= "thread") then return false end
     local cThread = cThread
-    local cArgs, cExec = {...}, function(...) return cThread:resolve(...) end
+    local cArgs, cExec = imports.table.pack(...), function(...) return cThread:resolve(...) end
     local payload = {
         isRemote = false,
         isRestricted = false,

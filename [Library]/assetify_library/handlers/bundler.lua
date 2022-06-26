@@ -46,7 +46,7 @@ local function parse(rw)
 end
 
 function import(...)
-    local args = {...}
+    local cArgs = imports.table.pack(...)
     if args[1] == true then
         imports.table.remove(args, 1)
         local buildImports, genImports, __genImports = {}, {}, {}
@@ -71,7 +71,7 @@ function import(...)
         if #genImports <= 0 then return false end
         return genImports, isCompleteFetch
     else
-        local args = {...}
+        local cArgs = imports.table.pack(...)
         args = ((#args > 0) and ", \""..imports.table.concat(args, "\", \"").."\"") or ""
         return [[
         local genImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..args..[[)

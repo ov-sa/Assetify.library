@@ -127,7 +127,7 @@ function thread:resolve(...)
     if not self or (self == thread) then return false end
     if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
     self.isAwaiting = nil
-    self.awaitingValues = {...}
+    self.awaitingValues = imports.table.pack(...)
     timer:create(function()
         self:resume()
     end, 1, 1)

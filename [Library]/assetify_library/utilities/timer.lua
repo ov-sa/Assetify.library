@@ -51,7 +51,7 @@ function timer:load(exec, interval, executions, ...)
     self.exec = exec
     self.currentExec = 0
     self.interval, self.executions = interval, executions
-    self.arguments = {...}
+    self.arguments = imports.table.pack(...)
     self.timer = imports.setTimer(function()
         self.currentExec = self.currentExec + 1
         self.exec(imports.table.unpack(self.arguments))

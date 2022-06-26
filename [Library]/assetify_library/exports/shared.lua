@@ -65,7 +65,7 @@ function setElementAsset(element, assetType, ...)
     local elementType = imports.getElementType(element)
     elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
     if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
-    local arguments = {...}
+    local cArgs = imports.table.pack(...)
     return syncer:syncElementModel(element, assetType, arguments[1], arguments[2], arguments[3], arguments[4])
 end
 
@@ -94,12 +94,12 @@ function getEntityData(element, data)
 end
 
 function createAssetDummy(...)
-    local arguments = {...}
+    local cArgs = imports.table.pack(...)
     return syncer:syncAssetDummy(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5])
 end
 
 function setBoneAttachment(...)
-    local arguments = {...}
+    local cArgs = imports.table.pack(...)
     return syncer:syncBoneAttachment(arguments[1], arguments[2], arguments[3])
 end
 
@@ -108,7 +108,7 @@ function setBoneDetachment(element)
 end
 
 function setBoneRefreshment(...)
-    local arguments = {...}
+    local cArgs = imports.table.pack(...)
     return syncer:syncBoneRefreshment(arguments[1], arguments[2])
 end
 
