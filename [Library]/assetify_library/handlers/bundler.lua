@@ -40,7 +40,7 @@ local parseModules = {
 local function parse(rw)
     if not rw or (imports.type(rw) ~= "string") then return false end
     for i, j in pairs(parseModules) do
-        rw = imports.utf8.gsub(rw, i, j, true, "(", ".:)")
+        rw = imports.utf8.gsub(rw, i, j, _, true, "(", ".:)")
     end
     return rw
 end

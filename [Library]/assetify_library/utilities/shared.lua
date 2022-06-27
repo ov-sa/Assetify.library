@@ -15,6 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    split = split,
     tonumber = tonumber,
     select = select,
     unpack = unpack,
@@ -138,19 +139,65 @@ class = {
 ---------------------
 
 file = {
+    validPointers = {rootDir = "~/", localDir = "@/"},
     exists = imports.fileExists,
     delete = imports.fileDelete,
 
-    parseURL = function(path, extension)
-        if not path or not extension or (imports.type(path) ~= "string") or (imports.type(extension) ~= "string") then return false end
-        local _, startN = imports.utf8.find(path, "@/")
-        local endN = imports.utf8.find(path, "."..extension)
-        startN, endN = (startN and (startN + 1)) or startN, (endN and (endN - 1)) or endN
-        if startN and endN then
-            local url = imports.utf8.sub(path, startN, endN)
-            if imports.string.match(url, "%w") then return url.."."..extension, imports.string.match(url, "(.*[/\\])") or "" end
+    parseURL = function(path)
+        if not path or (imports.type(path) ~= "string") then return false end
+        local extension = imports.utf8.match(path, "^.+%.(.+)$")
+        extension = (extension and imports.utf8.match(extension, "%w") and extension) or false
+        local pointer, pointerEndN = nil, nil
+        for i, j in imports.pairs(file.validPointers) do
+            local startN, endN = imports.utf8.find(path, j)
+            if startN and endN and (startN == 1) then
+                pointer, pointerEndN = i, endN + 1
+                break
+            end
+        end
+        local url = imports.utf8.sub(path, pointerEndN or 1, #path - ((extension and (#extension + 1)) or 0))
+        if imports.utf8.match(url, "%w") then
+            local cURL = {
+                pointer = pointer or false,
+                url = (extension and (url.."."..extension)) or url,
+                extension = extension,
+                directory = imports.utf8.match(url, "(.*[/\\])") or false
+            }
+            cURL.file = (cURL.extension and imports.utf8.sub(cURL.url, (cURL.directory and (#cURL.directory + 1)) or 1)) or false
+            return cURL
         end
         return false
+    end,
+
+    resolveURL = function(path, chroot)
+        if not path or (imports.type(path) ~= "string") or (chroot and (imports.type(chroot) ~= "string")) then return false end
+        local cURL = file.parseURL(path)
+        if not cURL then return false end
+        cURL.url = (cURL.pointer and imports.utf8.gsub(cURL.url, file.validPointers[(cURL.pointer)], "")) or cURL.url
+        local cDirs = imports.split(cURL.url, "/")
+        if #cDirs > 0 then
+            if chroot then
+                chroot = file.parseURL(((imports.utf8.sub(chroot, #chroot) ~= "/") and chroot.."/") or chroot)
+                chroot = (chroot and chroot.pointer and imports.utf8.gsub(chroot.url, file.validPointers[(chroot.pointer)], "")) or chroot
+            end
+            cURL.url = false
+            local vDirs = {}
+            for i = 1, #cDirs, 1 do
+                local j = cDirs[i]
+                if j == "..." then
+                    if not chroot or (chroot ~= cURL.url) then
+                        imports.table.remove(vDirs, vDirs.__N)
+                    end
+                else
+                    imports.table.insert(vDirs, j)
+                end
+                cURL.url = imports.table.concat(vDirs, "/")
+                local __cURL = file.parseURL(cURL.url)
+                cURL.url = (__cURL and not __cURL.file and cURL.url.."/") or cURL.url
+            end
+            cURL.url = ((cURL.pointer and file.validPointers[(cURL.pointer)]) or "")..(cURL.url or "")
+        end
+        return cURL.url
     end,
 
     read = function(path)
@@ -179,10 +226,13 @@ file = {
 ---------------------
 
 local __utf8_gsub = imports.utf8.gsub
-utf8.gsub = function(string, matchWord, replaceWord, isStrictcMatch, matchPrefix, matchPostfix)
+utf8.gsub = function(string, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
+    if not matchWord then
+        print(string)
+    end
     matchPrefix, matchPostfix = matchPrefix or "", matchPostfix or ""
     matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
-    return __utf8_gsub(string, matchWord, replaceWord)
+    return __utf8_gsub(string, matchWord, replaceWord, matchLimit)
 end
 
 
