@@ -143,6 +143,25 @@ file = {
     exists = imports.fileExists,
     delete = imports.fileDelete,
 
+    read = function(path)
+        if not path or not imports.fileExists(path) then return false end
+        local cFile = imports.fileOpen(path, true)
+        if not cFile then return false end
+        local size = imports.fileGetSize(cFile)
+        local data = imports.fileRead(cFile, size)
+        imports.fileClose(cFile)
+        return data, size
+    end,
+
+    write = function(path, data)
+        if not path or not data then return false end
+        local cFile = imports.fileCreate(path)
+        if not cFile then return false end
+        imports.fileWrite(cFile, data)
+        imports.fileClose(cFile)    
+        return true
+    end,
+
     parseURL = function(path)
         if not path or (imports.type(path) ~= "string") then return false end
         local extension = imports.utf8.match(path, "^.+%.(.+)$")
@@ -198,25 +217,6 @@ file = {
             cURL.url = ((cURL.pointer and file.validPointers[(cURL.pointer)]) or "")..(cURL.url or "")
         end
         return cURL.url
-    end,
-
-    read = function(path)
-        if not path or not imports.fileExists(path) then return false end
-        local cFile = imports.fileOpen(path, true)
-        if not cFile then return false end
-        local size = imports.fileGetSize(cFile)
-        local data = imports.fileRead(cFile, size)
-        imports.fileClose(cFile)
-        return data, size
-    end,
-
-    write = function(path, data)
-        if not path or not data then return false end
-        local cFile = imports.fileCreate(path)
-        if not cFile then return false end
-        imports.fileWrite(cFile, data)
-        imports.fileClose(cFile)    
-        return true
     end
 }
 
