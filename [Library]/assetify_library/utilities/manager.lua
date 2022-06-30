@@ -30,7 +30,6 @@ local imports = {
     playSound3D = playSound3D,
     setSoundVolume = setSoundVolume,
     collectgarbage = collectgarbage,
-    table = table,
     string = string,
     quat = quat
 }
@@ -85,7 +84,7 @@ if localPlayer then
                 local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
                 local unSynced = cAsset.unSynced
                 if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
-                    cAsset = imports.table.clone(cAsset, true)
+                    cAsset = table:clone(cAsset, true)
                     cAsset.manifestData.encryptKey = nil
                     cAsset.unSynced = nil
                 end
@@ -427,7 +426,7 @@ else
                 if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
                     cAsset = cAsset.synced
                     if cAsset.manifestData.encryptKey then
-                        cAsset = imports.table.clone(cAsset, true)
+                        cAsset = table:clone(cAsset, true)
                         cAsset.manifestData.encryptKey = nil
                     end
                 end

@@ -16,8 +16,7 @@ local imports = {
     type = type,
     pairs = pairs,
     isElement = isElement,
-    getElementType = getElementType,
-    table = table
+    getElementType = getElementType
 }
 
 
@@ -39,13 +38,13 @@ function getLibraryAssets(assetType)
     if localPlayer then
         if settings.assetPacks[assetType].rwDatas then
             for i, j in imports.pairs(settings.assetPacks[assetType].rwDatas) do
-                imports.table.insert(packAssets, i)
+                table:insert(packAssets, i)
             end
         end
     else
         for i, j in imports.pairs(settings.assetPacks[assetType].assetPack.manifestData) do
             if settings.assetPacks[assetType].assetPack.rwDatas[j] then
-                imports.table.insert(packAssets, j)
+                table:insert(packAssets, j)
             end
         end
     end
@@ -65,7 +64,7 @@ function setElementAsset(element, assetType, ...)
     local elementType = imports.getElementType(element)
     elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
     if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
-    local cArgs = imports.table.pack(...)
+    local cArgs = table:pack(...)
     return syncer:syncElementModel(element, assetType, cArgs[1], cArgs[2], cArgs[3], cArgs[4])
 end
 
@@ -94,12 +93,12 @@ function getEntityData(element, data)
 end
 
 function createAssetDummy(...)
-    local cArgs = imports.table.pack(...)
+    local cArgs = table:pack(...)
     return syncer:syncAssetDummy(cArgs[1], cArgs[2], cArgs[3], cArgs[4], cArgs[5])
 end
 
 function setBoneAttachment(...)
-    local cArgs = imports.table.pack(...)
+    local cArgs = table:pack(...)
     return syncer:syncBoneAttachment(cArgs[1], cArgs[2], cArgs[3])
 end
 
@@ -108,7 +107,7 @@ function setBoneDetachment(element)
 end
 
 function setBoneRefreshment(...)
-    local cArgs = imports.table.pack(...)
+    local cArgs = table:pack(...)
     return syncer:syncBoneRefreshment(cArgs[1], cArgs[2])
 end
 

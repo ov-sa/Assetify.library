@@ -51,17 +51,17 @@ local function parse(rw, module)
 end
 
 function import(...)
-    local cArgs = imports.table.pack(...)
+    local cArgs = imports.table:pack(...)
     if cArgs[1] == true then
-        imports.table.remove(cArgs, 1)
+        imports.table:remove(cArgs, 1)
         local buildImports, genImports, __genImports = {}, {}, {}
         local isCompleteFetch = false
         if (#cArgs <= 0) then
-            imports.table.insert(buildImports, "core")
+            imports.table:insert(buildImports, "core")
         elseif cArgs[1] == "*" then
             isCompleteFetch = true
             for i, j in imports.pairs(bundler) do
-                imports.table.insert(buildImports, i)
+                imports.table:insert(buildImports, i)
             end
         else
             buildImports = cArgs
@@ -70,14 +70,14 @@ function import(...)
             local j = buildImports[i]
             if (j ~= "imports") and bundler[j] and not __genImports[j] then
                 __genImports[j] = true
-                imports.table.insert(genImports, {index = bundler[j].module or j, rw = bundler["imports"]..bundler[j].rw})
+                imports.table:insert(genImports, {index = bundler[j].module or j, rw = bundler["imports"]..bundler[j].rw})
             end
         end
         if #genImports <= 0 then return false end
         return genImports, isCompleteFetch
     else
-        local cArgs = imports.table.pack(...)
-        cArgs = ((#cArgs > 0) and ", \""..imports.table.concat(cArgs, "\", \"").."\"") or ""
+        local cArgs = imports.table:pack(...)
+        cArgs = ((#cArgs > 0) and ", \""..imports.table:concat(cArgs, "\", \"").."\"") or ""
         return [[
         local genImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..cArgs..[[)
         if not genImports then return false end
@@ -321,13 +321,13 @@ bundler["scheduler"] = {
 
                 execScheduleOnLoad = function(execFunc)
                     if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
-                    assetify.imports.table.insert(assetify.scheduler.buffer.execOnLoad, execFunc)
+                    assetify.imports.table:insert(assetify.scheduler.buffer.execOnLoad, execFunc)
                     return true
                 end,
 
                 execScheduleOnModuleLoad = function(execFunc)
                     if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
-                    assetify.imports.table.insert(assetify.scheduler.buffer.execOnModuleLoad, execFunc)
+                    assetify.imports.table:insert(assetify.scheduler.buffer.execOnModuleLoad, execFunc)
                     return true
                 end,
 

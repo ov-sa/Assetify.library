@@ -16,7 +16,6 @@ local imports = {
     type = type,
     tonumber = tonumber,
     coroutine = coroutine,
-    table = table,
     math = math
 }
 
@@ -123,14 +122,14 @@ function thread.public:await(exec)
     thread.public:pause()
     local resolvedValues = self.awaitingValues
     self.awaitingValues = nil
-    return imports.table.unpack(resolvedValues)
+    return table:unpack(resolvedValues)
 end
 
 function thread.public:resolve(...)
     if not self or (self == thread.public) then return false end
     if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
     self.isAwaiting = nil
-    self.awaitingValues = imports.table.pack(...)
+    self.awaitingValues = table:pack(...)
     timer:create(function()
         self:resume()
     end, 1, 1)

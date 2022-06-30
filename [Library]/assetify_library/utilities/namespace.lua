@@ -16,8 +16,7 @@ local imports = {
     type = type,
     pairs = pairs,
     setmetatable = setmetatable,
-    collectgarbage = collectgarbage,
-    table = table
+    collectgarbage = collectgarbage
 }
 
 

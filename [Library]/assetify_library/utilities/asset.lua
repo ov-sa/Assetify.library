@@ -37,7 +37,6 @@ local imports = {
     engineReplaceCOL = engineReplaceCOL,
     utf8 = utf8,
     json = json,
-    table = table,
     string = string,
     math = math
 }
@@ -353,7 +352,7 @@ else
 
     function asset.public:buildPack(assetType, assetPack, callback)
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
-        local cAssetPack = imports.table.clone(assetPack, true)
+        local cAssetPack = table:clone(assetPack, true)
         cAssetPack.manifestData = file:read((asset.public.references.root)..imports.string.lower(assetType).."/"..(asset.public.references.manifest)..".json")
         cAssetPack.manifestData = (cAssetPack.manifestData and imports.json.decode(cAssetPack.manifestData)) or false
         if cAssetPack.manifestData then
@@ -387,7 +386,7 @@ else
                             }
                         }
                         if assetType == "module" then
-                            imports.table.insert(syncer.libraryModules, assetName)
+                            table:insert(syncer.libraryModules, assetName)
                             assetManifestData.streamRange = false
                             assetManifestData.enableLODs = false
                             assetManifestData.assetClumps = false

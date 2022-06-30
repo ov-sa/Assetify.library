@@ -16,8 +16,6 @@ local imports = {
     type = type,
     pairs = pairs,
     tonumber = tonumber,
-    select = select,
-    unpack = unpack,
     decodeString = decodeString,
     setmetatable = setmetatable,
     getElementMatrix = getElementMatrix,
@@ -81,71 +79,6 @@ utf8.gsub = function(string, matchWord, replaceWord, matchLimit, isStrictcMatch,
     matchPrefix, matchPostfix = matchPrefix or "", matchPostfix or ""
     matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
     return __utf8_gsub(string, matchWord, replaceWord, matchLimit)
-end
-
-
-----------------------
---[[ Class: Table ]]--
-----------------------
-
-table.insert = function(baseTable, index, value, isForced)
-    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
-    if index and (isForced or (value ~= nil)) then
-        index = imports.tonumber(index)
-        if not index then return false end
-    else
-        value, index = index, nil
-    end
-    baseTable.__N = baseTable.__N or #baseTable
-    index = index or (baseTable.__N + 1)
-    if (index <= 0) or (index > (baseTable.__N + 1)) then return false end
-    if index <= baseTable.__N then
-        for i = baseTable.__N, index, -1 do
-            baseTable[(i + 1)] = baseTable[i]
-            baseTable[i] = nil
-        end
-    end
-    baseTable[index] = value
-    baseTable.__N = baseTable.__N + 1
-    return true
-end
-
-table.remove = function(baseTable, index)
-    index = imports.tonumber(index)
-    if not baseTable or (imports.type(baseTable) ~= "table") or not index then return false end
-    baseTable.__N = baseTable.__N or #baseTable
-    if (index <= 0) or (index > baseTable.__N) then return false end
-    baseTable[index] = nil
-    if index < baseTable.__N then
-        for i = index + 1, baseTable.__N, 1 do
-            baseTable[(i - 1)] = baseTable[i]
-            baseTable[i] = nil
-        end
-    end
-    baseTable.__N = baseTable.__N - 1
-    return true
-end
-
-table.pack = function(...)
-    return {...}
-end
-
-table.unpack = function(baseTable)
-    return imports.unpack(baseTable, 1, baseTable.__N or #baseTable)
-end
-unpack = table.unpack
-
-table.clone = function(baseTable, isRecursive)
-    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
-    local __baseTable = {}
-    for i, j in imports.pairs(baseTable) do
-        if (imports.type(j) == "table") and isRecursive then
-            __baseTable[i] = table.clone(j, isRecursive)
-        else
-            __baseTable[i] = j
-        end
-    end
-    return __baseTable
 end
 
 

@@ -14,6 +14,7 @@
     <file src="utilities/rw/planar_1x1/collision.rw"/>
     <script src="utilities/shared.lua" type="shared"/>
     <script src="utilities/namespace.lua" type="shared"/>
+    <script src="utilities/table.lua" type="shared"/>
     <script src="utilities/file.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <file src="utilities/shaders/helper.fx"/>

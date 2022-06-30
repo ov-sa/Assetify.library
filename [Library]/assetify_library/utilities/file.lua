@@ -4,7 +4,7 @@
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Namespace Utilities ]]--
+     Desc: File Utilities ]]--
 ----------------------------------------------------------------
 
 
@@ -25,8 +25,7 @@ local imports = {
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
     fileClose = fileClose,
-    utf8 = utf8,
-    table = table
+    utf8 = utf8
 }
 
 
@@ -114,12 +113,12 @@ function file.public:resolveURL(path, chroot)
             local j = cDirs[i]
             if j == "..." then
                 if not chroot or (chroot ~= cURL.url) then
-                    imports.table.remove(vDirs, vDirs.__N)
+                    table:remove(vDirs, vDirs.__T.length)
                 end
             else
-                imports.table.insert(vDirs, j)
+                table:insert(vDirs, j)
             end
-            cURL.url = imports.table.concat(vDirs, "/")
+            cURL.url = imports.table:concat(vDirs, "/")
             local __cURL = file.public:parseURL(cURL.url)
             cURL.url = (__cURL and not __cURL.file and cURL.url.."/") or cURL.url
         end

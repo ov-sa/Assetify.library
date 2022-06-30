@@ -18,7 +18,6 @@ local imports = {
     setTimer = setTimer,
     isTimer = isTimer,
     killTimer = killTimer,
-    table = table,
     math = math
 }
 
@@ -51,10 +50,10 @@ function timer.public:load(exec, interval, executions, ...)
     self.exec = exec
     self.currentExec = 0
     self.interval, self.executions = interval, executions
-    self.arguments = imports.table.pack(...)
+    self.arguments = table:pack(...)
     self.timer = imports.setTimer(function()
         self.currentExec = self.currentExec + 1
-        self.exec(imports.table.unpack(self.arguments))
+        self.exec(table:unpack(self.arguments))
         if (self.executions > 0) and (self.currentExec >= self.executions) then
             self:destroy()
         end
