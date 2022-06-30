@@ -23,8 +23,8 @@
 * Completely Performance-Friendly
 * Gamemode Perspective
 * UE inspired Unlimited & Configurable Asset Packs
-* Built-In Table library
 * Built-In Namespace & Class library
+* Built-In Table library
 * Built-In File library
 * Built-In Timer
 * Built-In Threader
