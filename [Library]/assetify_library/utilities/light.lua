@@ -12,4 +12,4 @@
 --[[ Class: Light ]]--
 ----------------------
 
-light = class.create("light")
+local light = namespace:create("light")
