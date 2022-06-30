@@ -42,7 +42,7 @@ local imports = {
 --[[ Class: Syncer ]]--
 -----------------------
 
-syncer = class.create("syncer", {
+local syncer = class:create("syncer", {
     libraryResource = imports.getThisResource(),
     isLibraryLoaded = false,
     isModuleLoaded = false,
@@ -54,16 +54,16 @@ syncer = class.create("syncer", {
     syncedBoneAttachments = {},
     syncedLights = {}
 })
-syncer.libraryName = imports.getResourceName(syncer.libraryResource)
-syncer.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
-syncer.librarySerial = imports.md5(syncer.libraryName..":"..imports.tostring(syncer.libraryResource)..":"..imports.json.encode(imports.getRealTime()))
+syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
+syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
+syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..imports.json.encode(imports.getRealTime()))
 
 network:create("Assetify:onLoad")
 network:create("Assetify:onUnload")
 network:create("Assetify:onModuleLoad")
 network:create("Assetify:onGlobalDataChange")
 network:create("Assetify:onEntityDataChange")
-syncer.execOnLoad = function(execFunc)
+syncer.private.execOnLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
@@ -72,7 +72,7 @@ syncer.execOnLoad = function(execFunc)
     network:fetch("Assetify:onLoad"):on(execWrapper)
     return true
 end
-syncer.execOnModuleLoad = function(execFunc)
+syncer.private.execOnModuleLoad = function(execFunc)
     local execWrapper = nil
     execWrapper = function()
         execFunc()
@@ -81,46 +81,46 @@ syncer.execOnModuleLoad = function(execFunc)
     network:fetch("Assetify:onModuleLoad"):on(execWrapper)
     return true
 end
-syncer.execOnLoad(function() syncer.isLibraryLoaded = true end)
-syncer.execOnModuleLoad(function() syncer.isModuleLoaded = true end)
+syncer.private.execOnLoad(function() syncer.public.isLibraryLoaded = true end)
+syncer.private.execOnModuleLoad(function() syncer.public.isModuleLoaded = true end)
 
 if localPlayer then
-    syncer.scheduledAssets = {}
+    syncer.public.scheduledAssets = {}
     settings.assetPacks = {}
     network:create("Assetify:onAssetLoad")
     network:create("Assetify:onAssetUnload")
 
-    function syncer:syncElementModel(...)
+    function syncer.public:syncElementModel(...)
         return network:emit("Assetify:onRecieveSyncedElement", false, ...)
     end
 
-    function syncer:syncAssetDummy(...)
+    function syncer.public:syncAssetDummy(...)
         return dummy:create(...)
     end
 
-    function syncer:syncGlobalData(...)
+    function syncer.public:syncGlobalData(...)
         return network:emit("Assetify:onRecieveSyncedGlobalData", false, ...)
     end
 
-    function syncer:syncEntityData(element, data, value)
+    function syncer.public:syncEntityData(element, data, value)
         return network:emit("Assetify:onRecieveSyncedEntityData", false, element, data, value)
     end
 
-    function syncer:syncBoneAttachment(...)
+    function syncer.public:syncBoneAttachment(...)
         return bone:create(...)
     end
 
-    function syncer:syncBoneDetachment(element, ...)
+    function syncer.public:syncBoneDetachment(element, ...)
         if not element or not bone.buffer.element[element] then return false end
         return bone.buffer.element[element]:destroy()
     end
 
-    function syncer:syncBoneRefreshment(element, ...)
+    function syncer.public:syncBoneRefreshment(element, ...)
         if not element or not bone.buffer.element[element] then return false end
         return bone.buffer.element[element]:refresh(...)
     end
 
-    function syncer:syncClearBoneAttachment(...)
+    function syncer.public:syncClearBoneAttachment(...)
         return bone:clearElementBuffer(...)
     end
 
@@ -129,12 +129,12 @@ if localPlayer then
     end)
 
     network:create("Assetify:onRecieveBandwidth"):on(function(bandwidth)
-        syncer.libraryBandwidth = bandwidth
+        syncer.public.libraryBandwidth = bandwidth
     end)
 
     network:create("Assetify:onRecieveHash"):on(function(assetType, assetName, hashes)
-        if not syncer.scheduledAssets[assetType] then syncer.scheduledAssets[assetType] = {} end
-        syncer.scheduledAssets[assetType][assetName] = syncer.scheduledAssets[assetType][assetName] or {
+        if not syncer.public.scheduledAssets[assetType] then syncer.public.scheduledAssets[assetType] = {} end
+        syncer.public.scheduledAssets[assetType][assetName] = syncer.public.scheduledAssets[assetType][assetName] or {
             assetSize = 0
         }
         thread:create(function(self)
@@ -144,8 +144,8 @@ if localPlayer then
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
-                    syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
+                    syncer.public.scheduledAssets[assetType][assetName].assetSize = syncer.public.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
+                    syncer.public.__libraryBandwidth = (syncer.public.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[i]
                 end
                 fileData = nil
                 thread:pause()
@@ -179,8 +179,8 @@ if localPlayer then
 
     network:create("Assetify:onRecieveContent"):on(function(assetType, assetName, contentPath, ...)
         if assetType and assetName then
-            syncer.scheduledAssets[assetType][assetName].assetSize = syncer.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
-            syncer.__libraryBandwidth = (syncer.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+            syncer.public.scheduledAssets[assetType][assetName].assetSize = syncer.public.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
+            syncer.public.__libraryBandwidth = (syncer.public.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
         end
         imports.file.write(contentPath, ...)
         imports.collectgarbage()
@@ -188,8 +188,8 @@ if localPlayer then
 
     network:create("Assetify:onRecieveState"):on(function(assetType, assetName)
         local isTypeVoid = true
-        syncer.scheduledAssets[assetType][assetName] = nil
-        for i, j in imports.pairs(syncer.scheduledAssets[assetType]) do
+        syncer.public.scheduledAssets[assetType][assetName] = nil
+        for i, j in imports.pairs(syncer.public.scheduledAssets[assetType]) do
             if j then
                 isTypeVoid = false
                 break
@@ -197,8 +197,8 @@ if localPlayer then
         end
         if isTypeVoid then
             local isSyncDone = true
-            syncer.scheduledAssets[assetType] = nil
-            for i, j in imports.pairs(syncer.scheduledAssets) do
+            syncer.public.scheduledAssets[assetType] = nil
+            for i, j in imports.pairs(syncer.public.scheduledAssets) do
                 if j then
                     isSyncDone = false
                     break
@@ -222,7 +222,7 @@ if localPlayer then
                         frames = 1
                     })
                 else
-                    syncer.scheduledAssets = nil
+                    syncer.public.scheduledAssets = nil
                     thread:create(function(self)
                         for i, j in imports.pairs(settings.assetPacks) do
                             if i ~= "module" then
@@ -248,16 +248,16 @@ if localPlayer then
 
     network:create("Assetify:onRecieveSyncedGlobalData"):on(function(data, value)
         if not data or (imports.type(data) ~= "string") then return false end
-        local __value = syncer.syncedGlobalDatas[data]
-        syncer.syncedGlobalDatas[data] = value
+        local __value = syncer.public.syncedGlobalDatas[data]
+        syncer.public.syncedGlobalDatas[data] = value
         network:emit("Assetify:onGlobalDataChange", false, data, __value, value)
     end)
 
     network:create("Assetify:onRecieveSyncedEntityData"):on(function(element, data, value, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) or not data or (imports.type(data) ~= "string") then return false end
-        syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
-        local __value = syncer.syncedEntityDatas[element][data]
-        syncer.syncedEntityDatas[element][data] = value
+        syncer.public.syncedEntityDatas[element] = syncer.public.syncedEntityDatas[element] or {}
+        local __value = syncer.public.syncedEntityDatas[element][data]
+        syncer.public.syncedEntityDatas[element][data] = value
         network:emit("Assetify:onEntityDataChange", false, element, data, __value, value)
     end)
 
@@ -265,13 +265,13 @@ if localPlayer then
         if not element or (not remoteSignature and not imports.isElement(element)) then return false end
         local modelID = manager:getID(assetType, assetName, assetClump)
         if modelID then
-            syncer.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
+            syncer.public.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
             shader:clearElementBuffer(element, "clump")
             thread:createHeartbeat(function()
                 return not imports.isElement(element)
             end, function()
                 if clumpMaps then
-                    local cAsset = manager:getData(assetType, assetName, syncer.librarySerial)
+                    local cAsset = manager:getData(assetType, assetName, syncer.public.librarySerial)
                     if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.clump then
                         for i, j in imports.pairs(clumpMaps) do
                             if cAsset.manifestData.shaderMaps.clump[i] and cAsset.manifestData.shaderMaps.clump[i][j] then
@@ -285,11 +285,11 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:onRecieveAssetDummy"):on(function(...) syncer:syncAssetDummy(...) end)
-    network:create("Assetify:onRecieveBoneAttachment"):on(function(...) syncer:syncBoneAttachment(...) end)
-    network:create("Assetify:onRecieveBoneDetachment"):on(function(...) syncer:syncBoneDetachment(...) end)
-    network:create("Assetify:onRecieveBoneRefreshment"):on(function(...) syncer:syncBoneRefreshment(...) end)
-    network:create("Assetify:onRecieveClearBoneAttachment"):on(function(...) syncer:syncClearBoneAttachment(...) end)
+    network:create("Assetify:onRecieveAssetDummy"):on(function(...) syncer.public:syncAssetDummy(...) end)
+    network:create("Assetify:onRecieveBoneAttachment"):on(function(...) syncer.public:syncBoneAttachment(...) end)
+    network:create("Assetify:onRecieveBoneDetachment"):on(function(...) syncer.public:syncBoneDetachment(...) end)
+    network:create("Assetify:onRecieveBoneRefreshment"):on(function(...) syncer.public:syncBoneRefreshment(...) end)
+    network:create("Assetify:onRecieveClearBoneAttachment"):on(function(...) syncer.public:syncClearBoneAttachment(...) end)
     imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
     imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
     network:create("Assetify:onElementDestroy"):on(function(source)
@@ -298,7 +298,7 @@ if localPlayer then
         dummy:clearElementBuffer(source)
         bone:clearElementBuffer(source)
         manager:clearElementBuffer(source)
-        syncer.syncedEntityDatas[source] = nil
+        syncer.public.syncedEntityDatas[source] = nil
         for i, j in imports.pairs(light) do
             if j and (imports.type(j) == "table") and j.clearElementBuffer then
                 j:clearElementBuffer(source)
@@ -309,37 +309,36 @@ if localPlayer then
         network:emit("Assetify:onElementDestroy", false, source)
     end)
 else
-    syncer.libraryVersion = imports.getResourceInfo(resource, "version")
-    syncer.libraryVersion = (syncer.libraryVersion and "v."..syncer.libraryVersion) or syncer.libraryVersion
-    syncer.loadedClients = {}
-    syncer.scheduledClients = {}
+    syncer.public.libraryVersion = imports.getResourceInfo(resource, "version")
+    syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or syncer.public.libraryVersion
+    syncer.public.loadedClients, syncer.public.scheduledClients = {}, {}
 
-    function syncer:syncHash(player, ...)
+    function syncer.public:syncHash(player, ...)
         return network:emit("Assetify:onRecieveHash", true, false, player, ...)
     end
 
-    function syncer:syncData(player, ...)
+    function syncer.public:syncData(player, ...)
         return network:emit("Assetify:onRecieveData", true, false, player, ...)
     end
 
-    function syncer:syncContent(player, ...)
+    function syncer.public:syncContent(player, ...)
         return network:emit("Assetify:onRecieveContent", true, false, player, ...)
     end
 
-    function syncer:syncState(player, ...)
+    function syncer.public:syncState(player, ...)
         return network:emit("Assetify:onRecieveState", true, false, player, ...)
     end
 
-    function syncer:syncGlobalData(data, value, isSync, targetPlayer)
+    function syncer.public:syncGlobalData(data, value, isSync, targetPlayer)
         if not data or (imports.type(data) ~= "string") then return false end
         if not targetPlayer then
-            local __value = syncer.syncedGlobalDatas[data]
-            syncer.syncedGlobalDatas[data] = value
+            local __value = syncer.public.syncedGlobalDatas[data]
+            syncer.public.syncedGlobalDatas[data] = value
             network:emit("Assetify:onGlobalDataChange", false, data, __value, value)
             local execWrapper = nil
             execWrapper = function()
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncGlobalData(data, value, isSync, i)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncGlobalData(data, value, isSync, i)
                     if not isSync then thread:pause() end
                 end
                 execWrapper = nil
@@ -358,18 +357,18 @@ else
         return true
     end
 
-    function syncer:syncEntityData(element, data, value, isSync, targetPlayer, remoteSignature)
+    function syncer.public:syncEntityData(element, data, value, isSync, targetPlayer, remoteSignature)
         if not targetPlayer then
             if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
             remoteSignature = imports.getElementType(element)
-            syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
-            local __value = syncer.syncedEntityDatas[element][data]
-            syncer.syncedEntityDatas[element][data] = value
+            syncer.public.syncedEntityDatas[element] = syncer.public.syncedEntityDatas[element] or {}
+            local __value = syncer.public.syncedEntityDatas[element][data]
+            syncer.public.syncedEntityDatas[element][data] = value
             network:emit("Assetify:onEntityDataChange", false, element, data, __value, value)
             local execWrapper = nil
             execWrapper = function()
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncEntityData(element, data, value, isSync, i, remoteSignature)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncEntityData(element, data, value, isSync, i, remoteSignature)
                     if not isSync then thread:pause() end
                 end
                 execWrapper = nil
@@ -388,16 +387,16 @@ else
         return true
     end
 
-    function syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, targetPlayer, remoteSignature)
+    function syncer.public:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, targetPlayer, remoteSignature)
         if not targetPlayer then
             if not element or not imports.isElement(element) then return false end
             local cAsset = manager:getData(assetType, assetName)
             if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
             remoteSignature = imports.getElementType(element)
-            syncer.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
+            syncer.public.syncedElements[element] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps}
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, i, remoteSignature)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncElementModel(element, assetType, assetName, assetClump, clumpMaps, i, remoteSignature)
                     thread:pause()
                 end
             end):resume({
@@ -410,15 +409,15 @@ else
         return true
     end
 
-    function syncer:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer, targetDummy, remoteSignature)    
+    function syncer.public:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer, targetDummy, remoteSignature)    
         if not targetPlayer then
             targetDummy = dummy:create(assetType, assetName, assetClump, clumpMaps, dummyData)
             if not targetDummy then return false end
             remoteSignature = imports.getElementType(targetDummy)
-            syncer.syncedAssetDummies[targetDummy] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps, dummyData = dummyData}
+            syncer.public.syncedAssetDummies[targetDummy] = {type = assetType, name = assetName, clump = assetClump, clumpMaps = clumpMaps, dummyData = dummyData}
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, i, targetDummy, remoteSignature)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncAssetDummy(assetType, assetName, assetClump, clumpMaps, dummyData, i, targetDummy, remoteSignature)
                     thread:pause()
                 end
             end):resume({
@@ -432,7 +431,7 @@ else
         return true
     end
 
-    function syncer:syncBoneAttachment(element, parent, boneData, targetPlayer, remoteSignature)
+    function syncer.public:syncBoneAttachment(element, parent, boneData, targetPlayer, remoteSignature)
         if not targetPlayer then
             if not element or not imports.isElement(element) or not parent or not imports.isElement(parent) or not boneData then return false end
             remoteSignature = {
@@ -440,10 +439,10 @@ else
                 elementType = imports.getElementType(element),
                 elementRotation = {imports.getElementRotation(element, "ZYX")}
             }
-            syncer.syncedBoneAttachments[element] = {parent = parent, boneData = boneData}
+            syncer.public.syncedBoneAttachments[element] = {parent = parent, boneData = boneData}
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncBoneAttachment(element, parent, boneData, i, remoteSignature)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncBoneAttachment(element, parent, boneData, i, remoteSignature)
                     thread:pause()
                 end
             end):resume({
@@ -456,13 +455,13 @@ else
         return true
     end
 
-    function syncer:syncBoneDetachment(element, targetPlayer)
+    function syncer.public:syncBoneDetachment(element, targetPlayer)
         if not targetPlayer then
-            if not element or not imports.isElement(element) or not syncer.syncedBoneAttachments[element] then return false end
-            syncer.syncedBoneAttachments[element] = nil
+            if not element or not imports.isElement(element) or not syncer.public.syncedBoneAttachments[element] then return false end
+            syncer.public.syncedBoneAttachments[element] = nil
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncBoneDetachment(element, i)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncBoneDetachment(element, i)
                     thread:pause()
                 end
             end):resume({
@@ -475,17 +474,17 @@ else
         return true
     end
 
-    function syncer:syncBoneRefreshment(element, boneData, targetPlayer, remoteSignature)
+    function syncer.public:syncBoneRefreshment(element, boneData, targetPlayer, remoteSignature)
         if not targetPlayer then
-            if not element or not imports.isElement(element) or not boneData or not syncer.syncedBoneAttachments[element] then return false end
+            if not element or not imports.isElement(element) or not boneData or not syncer.public.syncedBoneAttachments[element] then return false end
             remoteSignature = {
                 elementType = imports.getElementType(element),
                 elementRotation = {imports.getElementRotation(element, "ZYX")}
             }
-            syncer.syncedBoneAttachments[element].boneData = boneData
+            syncer.public.syncedBoneAttachments[element].boneData = boneData
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncBoneRefreshment(element, boneData, i, remoteSignature)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncBoneRefreshment(element, boneData, i, remoteSignature)
                     thread:pause()
                 end
             end):resume({
@@ -498,20 +497,20 @@ else
         return true
     end
 
-    function syncer:syncClearBoneAttachment(element, targetPlayer)
+    function syncer.public:syncClearBoneAttachment(element, targetPlayer)
         if not targetPlayer then
             if not element or not imports.isElement(element) then return false end
-            if syncer.syncedBoneAttachments[element] then
-                syncer.syncedBoneAttachments[element] = nil                                
+            if syncer.public.syncedBoneAttachments[element] then
+                syncer.public.syncedBoneAttachments[element] = nil                                
             end
-            for i, j in imports.pairs(syncer.syncedBoneAttachments) do
+            for i, j in imports.pairs(syncer.public.syncedBoneAttachments) do
                 if j and (j.parent == element) then
-                    syncer.syncedBoneAttachments[i] = nil
+                    syncer.public.syncedBoneAttachments[i] = nil
                 end
             end
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.loadedClients) do
-                    syncer:syncClearBoneAttachment(element, i)
+                for i, j in imports.pairs(syncer.public.loadedClients) do
+                    syncer.public:syncClearBoneAttachment(element, i)
                     thread:pause()
                 end
             end):resume({
@@ -524,7 +523,7 @@ else
         return true
     end
 
-    function syncer:syncPack(player, assetDatas, syncModules)
+    function syncer.public:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
             thread:create(function(self)
                 local isLibraryVoid = true
@@ -534,15 +533,15 @@ else
                             for k, v in imports.pairs(j.assetPack) do
                                 if k ~= "rwDatas" then
                                     if syncModules then
-                                        syncer:syncData(player, i, k, false, v)
+                                        syncer.public:syncData(player, i, k, false, v)
                                     end
                                 else
                                     for m, n in imports.pairs(v) do
                                         isLibraryVoid = false
                                         if syncModules then
-                                            syncer:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
+                                            syncer.public:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
                                         else
-                                            syncer:syncHash(player, i, m, n.unSynced.fileHash)
+                                            syncer.public:syncHash(player, i, m, n.unSynced.fileHash)
                                         end
                                         thread:pause()
                                     end
@@ -554,17 +553,17 @@ else
                 end
                 if syncModules then
                     local isModuleVoid = true
-                    network:emit("Assetify:onRecieveBandwidth", true, false, player, syncer.libraryBandwidth)
+                    network:emit("Assetify:onRecieveBandwidth", true, false, player, syncer.public.libraryBandwidth)
                     self:await(network:emitCallback(self, "Assetify:onRequestPreSyncPool", false, player))
                     if settings.assetPacks["module"] and settings.assetPacks["module"].assetPack then
                         for i, j in imports.pairs(settings.assetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
-                                syncer:syncData(player, "module", i, false, j)
+                                syncer.public:syncData(player, "module", i, false, j)
                             else
                                 for k, v in imports.pairs(j) do
                                     isModuleVoid = false
-                                    syncer:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
-                                    syncer:syncHash(player, "module", k, v.unSynced.fileHash)
+                                    syncer.public:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
+                                    syncer.public:syncHash(player, "module", k, v.unSynced.fileHash)
                                     thread:pause()
                                 end
                             end
@@ -587,15 +586,15 @@ else
                 local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(cAsset.synced) do
                     if i ~= "assetSize" then
-                        syncer:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                        syncer.public:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
                     end
                     thread:pause()
                 end
                 for i, j in imports.pairs(assetDatas.hashes) do
-                    syncer:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
+                    syncer.public:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
                     thread:pause()
                 end
-                syncer:syncState(player, assetDatas.type, assetDatas.name)
+                syncer.public:syncState(player, assetDatas.type, assetDatas.name)
             end):resume({
                 executions = settings.downloader.syncRate,
                 frames = 1
@@ -605,7 +604,7 @@ else
     end
 
     network:create("Assetify:onRecieveHash"):on(function(source, assetType, assetName, hashes)
-        syncer:syncPack(source, {
+        syncer.public:syncPack(source, {
             type = assetType,
             name = assetName,
             hashes = hashes
@@ -613,20 +612,20 @@ else
     end)
 
     network:create("Assetify:onRequestSyncPack"):on(function(source)
-        syncer:syncPack(source)
+        syncer.public:syncPack(source)
     end)
 
     network:create("Assetify:onRequestPreSyncPool", true):on(function(__self, source)
         local __source = source
         thread:create(function(self)
             local source = __source
-            for i, j in imports.pairs(syncer.syncedGlobalDatas) do
-                syncer:syncGlobalData(i, j, false, source)
+            for i, j in imports.pairs(syncer.public.syncedGlobalDatas) do
+                syncer.public:syncGlobalData(i, j, false, source)
                 thread:pause()
             end
-            for i, j in imports.pairs(syncer.syncedEntityDatas) do
+            for i, j in imports.pairs(syncer.public.syncedEntityDatas) do
                 for k, v in imports.pairs(j) do
-                    syncer:syncEntityData(i, k, v, false, source)
+                    syncer.public:syncEntityData(i, k, v, false, source)
                     thread:pause()
                 end
                 thread:pause()
@@ -644,21 +643,21 @@ else
         local __source = source
         thread:create(function(self)
             local source = __source
-            for i, j in imports.pairs(syncer.syncedElements) do
+            for i, j in imports.pairs(syncer.public.syncedElements) do
                 if j then
-                    syncer:syncElementModel(i, j.type, j.name, j.clump, j.clumpMaps, source)
+                    syncer.public:syncElementModel(i, j.type, j.name, j.clump, j.clumpMaps, source)
                 end
                 thread:pause()
             end
-            for i, j in imports.pairs(syncer.syncedAssetDummies) do
+            for i, j in imports.pairs(syncer.public.syncedAssetDummies) do
                 if j then
-                    syncer:syncAssetDummy(j.type, j.name, j.clump, j.clumpMaps, j.dummyData, i, source)
+                    syncer.public:syncAssetDummy(j.type, j.name, j.clump, j.clumpMaps, j.dummyData, i, source)
                 end
                 thread:pause()
             end
-            for i, j in imports.pairs(syncer.syncedBoneAttachments) do
+            for i, j in imports.pairs(syncer.public.syncedBoneAttachments) do
                 if j then
-                    syncer:syncBoneAttachment(i, j.parent, j.boneData, source)
+                    syncer.public:syncBoneAttachment(i, j.parent, j.boneData, source)
                 end
                 thread:pause()
             end
@@ -668,40 +667,40 @@ else
         })
     end)
 
-    imports.fetchRemote(syncer.librarySource, function(response, status)
+    imports.fetchRemote(syncer.public.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return false end
         response = imports.json.decode(response)
-        if response and response.tag_name and (syncer.libraryVersion ~= response.tag_name) then
+        if response and response.tag_name and (syncer.public.libraryVersion ~= response.tag_name) then
             imports.outputDebugString("[Assetify]: Latest version available - "..response.tag_name, 3)
         end
     end)
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
         if imports.getResourceRootElement(resourceElement) == resourceRoot then
-            if syncer.isLibraryLoaded then
-                syncer.loadedClients[source] = true
-                syncer:syncPack(source, _, true)
+            if syncer.public.isLibraryLoaded then
+                syncer.public.loadedClients[source] = true
+                syncer.public:syncPack(source, _, true)
             else
-                syncer.scheduledClients[source] = true
+                syncer.public.scheduledClients[source] = true
             end
         end
     end)
     imports.addEventHandler("onElementModelChange", root, function()
-        syncer.syncedElements[source] = nil
+        syncer.public.syncedElements[source] = nil
     end)
     imports.addEventHandler("onElementDestroy", root, function()
         local __source = source
         thread:create(function(self)
             local source = __source
-            if syncer.syncedEntityDatas[source] ~= nil then
+            if syncer.public.syncedEntityDatas[source] ~= nil then
                 timer:create(function(source)
-                    syncer.syncedEntityDatas[source] = nil
+                    syncer.public.syncedEntityDatas[source] = nil
                 end, settings.syncer.persistenceDuration, 1, source)
             end
-            syncer.syncedElements[source] = nil
-            syncer.syncedAssetDummies[source] = nil
-            syncer.syncedLights[source] = nil
-            syncer:syncClearBoneAttachment(source)
-            for i, j in imports.pairs(syncer.loadedClients) do
+            syncer.public.syncedElements[source] = nil
+            syncer.public.syncedAssetDummies[source] = nil
+            syncer.public.syncedLights[source] = nil
+            syncer.public:syncClearBoneAttachment(source)
+            for i, j in imports.pairs(syncer.public.loadedClients) do
                 network:emit("Assetify:onElementDestroy", true, false, i, source)
                 thread:pause()
             end
@@ -711,7 +710,7 @@ else
         })
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
-        syncer.loadedClients[source] = nil
-        syncer.scheduledClients[source] = nil
+        syncer.public.loadedClients[source] = nil
+        syncer.public.scheduledClients[source] = nil
     end)
 end
