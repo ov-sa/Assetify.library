@@ -40,28 +40,28 @@ local imports = {
 --[[ Class: Manager ]]--
 ------------------------
 
-manager = class.create("manager")
+local manager = class:create("manager")
 
 if localPlayer then
-    manager.buffer = {
+    manager.private.buffer = {
         instance = {},
         scoped = {}
     }
 
-    function manager:setElementScoped(element)
+    function manager.public:setElementScoped(element)
         if not sourceResource or (sourceResource == resource) then return false end
-        manager.buffer.instance[element] = sourceResource
-        manager.buffer.scoped[sourceResource] = manager.buffer.scoped[sourceResource] or {}
-        manager.buffer.scoped[sourceResource][element] = true
+        manager.private.buffer.instance[element] = sourceResource
+        manager.private.buffer.scoped[sourceResource] = manager.private.buffer.scoped[sourceResource] or {}
+        manager.private.buffer.scoped[sourceResource][element] = true
         return true
     end
 
-    function manager:clearElementBuffer(element, isResource)
+    function manager.public:clearElementBuffer(element, isResource)
         if not element then return false end
         if isResource then
-            local resourceScope = manager.buffer.scoped[element]
+            local resourceScope = manager.private.buffer.scoped[element]
             if not resourceScope then return false end
-            manager.buffer.scoped[element] = nil
+            manager.private.buffer.scoped[element] = nil
             for i, j in imports.pairs(resourceScope) do
                 if i and imports.isElement(i) then
                     imports.destroyElement(i)
@@ -69,15 +69,15 @@ if localPlayer then
             end
         else
             if not imports.isElement(element) then return false end
-            local elementScope = manager.buffer.instance[element]
-            if not elementScope or not manager.buffer.scoped[elementScope] then return false end
-            manager.buffer.scoped[elementScope][element] = nil
-            manager.buffer.instance[element] = nil
+            local elementScope = manager.private.buffer.instance[element]
+            if not elementScope or not manager.private.buffer.scoped[elementScope] then return false end
+            manager.private.buffer.scoped[elementScope][element] = nil
+            manager.private.buffer.instance[element] = nil
         end
         return true
     end
 
-    function manager:getData(assetType, assetName, isInternal)
+    function manager.public:getData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
         if settings.assetPacks[assetType] then
             local cAsset = settings.assetPacks[assetType].rwDatas[assetName]
@@ -99,9 +99,9 @@ if localPlayer then
         return false
     end
 
-    function manager:getID(assetType, assetName, assetClump)
+    function manager.public:getID(assetType, assetName, assetClump)
         if (assetType == "module") or (assetType == "animation") or (assetType == "sound") then return false end
-        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
+        local cAsset, isLoaded = manager.public:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded or imports.type(cAsset.unSynced) ~= "table" then return false end
         if cAsset.manifestData.assetClumps then
             return (assetClump and cAsset.manifestData.assetClumps[assetClump] and cAsset.unSynced.assetCache[assetClump] and cAsset.unSynced.assetCache[assetClump].cAsset and cAsset.unSynced.assetCache[assetClump].cAsset.synced and cAsset.unSynced.assetCache[assetClump].cAsset.synced.modelID) or false
@@ -110,13 +110,13 @@ if localPlayer then
         end
     end
 
-    function manager:isLoaded(assetType, assetName)
-        local cAsset, isLoaded = manager:getData(assetType, assetName)
+    function manager.public:isLoaded(assetType, assetName)
+        local cAsset, isLoaded = manager.public:getData(assetType, assetName)
         return (cAsset and isLoaded and true) or false
     end
 
-    function manager:getDep(assetType, assetName, depType, depIndex, depSubIndex)
-        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
+    function manager.public:getDep(assetType, assetName, depType, depIndex, depSubIndex)
+        local cAsset, isLoaded = manager.public:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if not depType or not depIndex or not cAsset.manifestData.assetDeps or not cAsset.manifestData.assetDeps[depType] or not cAsset.manifestData.assetDeps[depType][depIndex] or ((imports.type(cAsset.manifestData.assetDeps[depType][depIndex]) == "table") and (not depSubIndex or not cAsset.manifestData.assetDeps[depType][depIndex][depSubIndex])) then return false end
         if depSubIndex then
@@ -126,8 +126,8 @@ if localPlayer then
         end
     end
 
-    function manager:load(assetType, assetName)
-        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
+    function manager.public:load(assetType, assetName)
+        local cAsset, isLoaded = manager.public:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or isLoaded then return false end
         local cAssetPack = settings.assetPacks[assetType]
         local assetPath = (asset.references.root)..assetType.."/"..assetName.."/"
@@ -285,8 +285,8 @@ if localPlayer then
         return false
     end
 
-    function manager:unload(assetType, assetName)
-        local cAsset, isLoaded = manager:getData(assetType, assetName, syncer.librarySerial)
+    function manager.public:unload(assetType, assetName)
+        local cAsset, isLoaded = manager.public:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if assetType == "sound" then
             thread:create(function(self)
@@ -361,13 +361,13 @@ if localPlayer then
     end
 
     imports.addEventHandler("onClientResourceStop", root, function(stoppedResource)
-        manager:clearElementBuffer(stoppedResource, true)
+        manager.public:clearElementBuffer(stoppedResource, true)
     end)
 
-    function manager:loadAnim(element, assetName)
+    function manager.public:loadAnim(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
-        local cAsset, isLoaded = manager:getData("animation", assetName)
+        local cAsset, isLoaded = manager.public:getData("animation", assetName)
         if not cAsset or not isLoaded then return false end
         if cAsset.manifestData.assetAnimations then
             for i = 1, #cAsset.manifestData.assetAnimations, 1 do
@@ -378,10 +378,10 @@ if localPlayer then
         return true
     end
 
-    function manager:unloadAnim(element, assetName)
+    function manager.public:unloadAnim(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
-        local cAsset, isLoaded = manager:getData("animation", assetName)
+        local cAsset, isLoaded = manager.public:getData("animation", assetName)
         if not cAsset or not isLoaded then return false end
         if cAsset.manifestData.assetAnimations then
             for i = 1, #cAsset.manifestData.assetAnimations, 1 do
@@ -392,33 +392,33 @@ if localPlayer then
         return true
     end
 
-    function manager:playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    function manager.public:playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
-        local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
+        local cAsset, isLoaded = manager.public:getData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
         local cSound = imports.playSound(cAsset.unSynced.rwCache.sound[(cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
         if cSound then
             if soundVolume then imports.setSoundVolume(cSound, soundVolume) end
-            if isScoped then manager:setElementScoped(cSound) end
+            if isScoped then manager.public:setElementScoped(cSound) end
         end
         return cSound
     end
 
-    function manager:playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    function manager.public:playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
-        local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
+        local cAsset, isLoaded = manager.public:getData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
         local cSound = imports.playSound3D(cAsset.unSynced.rwCache.sound[(cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
         if cSound then
             if soundVolume then imports.setSoundVolume(cSound, soundVolume) end
-            if isScoped then manager:setElementScoped(cSound) end
+            if isScoped then manager.public:setElementScoped(cSound) end
         end
         return cSound
     end
 else
-    function manager:getData(assetType, assetName, isInternal)
+    function manager.public:getData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
         if settings.assetPacks[assetType] then
             local cAsset = settings.assetPacks[assetType].assetPack.rwDatas[assetName]
@@ -437,8 +437,8 @@ else
         return false
     end
 
-    function manager:getDep(assetType, assetName, depType, depIndex, depSubIndex)
-        local cAsset = manager:getData(assetType, assetName, syncer.librarySerial)
+    function manager.public:getDep(assetType, assetName, depType, depIndex, depSubIndex)
+        local cAsset = manager.public:getData(assetType, assetName, syncer.librarySerial)
         if not cAsset then return false end
         if not depType or not depIndex or not cAsset.synced.manifestData.assetDeps or not cAsset.synced.manifestData.assetDeps[depType] or not cAsset.synced.manifestData.assetDeps[depType][depIndex] or ((imports.type(cAsset.synced.manifestData.assetDeps[depType][depIndex]) == "table") and (not depSubIndex or not cAsset.synced.manifestData.assetDeps[depType][depIndex][depSubIndex])) then return false end
         return (depSubIndex and cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex][depSubIndex])]) or cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex])] or false
