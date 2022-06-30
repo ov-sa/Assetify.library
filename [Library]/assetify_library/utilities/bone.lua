@@ -33,7 +33,7 @@ local imports = {
 --[[ Class: Bone ]]--
 ---------------------
 
-bone = class.create("bone", {
+local bone = class:create("bone", {
     ids = {
         ped = {1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 24, 25, 26, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 51, 52, 53, 54},
         vehicle = {}
@@ -46,14 +46,13 @@ bone = class.create("bone", {
         parent = {}
     }
 })
-
-for i, j in imports.pairs(bone.ids) do
+for i, j in imports.pairs(bone.public.ids) do
     local indexes = {}
     for k = 1, #j, 1 do indexes[(j[k])] = true end
-    bone.ids[i] = indexes
+    bone.public.ids[i] = indexes
 end
 
-function bone:create(...)
+function bone.public:create(...)
     local cBone = self:createInstance()
     if cBone and not cBone:load(...) then
         cBone:destroyInstance()
@@ -62,28 +61,28 @@ function bone:create(...)
     return cBone
 end
 
-function bone:destroy(...)
-    if not self or (self == bone) then return false end
+function bone.public:destroy(...)
+    if not self or (self == bone.public) then return false end
     return self:unload(...)
 end
 
-function bone:clearElementBuffer(element)
+function bone.public:clearElementBuffer(element)
     if not element then return false end
-    if bone.buffer.element[element] then
-        bone.buffer.element[element]:destroy()
+    if bone.public.buffer.element[element] then
+        bone.public.buffer.element[element]:destroy()
     end
-    if bone.buffer.parent[element] then
-        for i, j in imports.pairs(bone.buffer.parent[element]) do
+    if bone.public.buffer.parent[element] then
+        for i, j in imports.pairs(bone.public.buffer.parent[element]) do
             i:destroy()
         end
     end
-    bone.buffer.parent[element] = nil
+    bone.public.buffer.parent[element] = nil
     return true
 end
 
-function bone:load(element, parent, boneData, remoteSignature)
-    if not self or (self == bone) then return false end
-    if not element or (not remoteSignature and not imports.isElement(element)) or not parent or (not remoteSignature and not imports.isElement(parent)) or not boneData or (element == parent) or bone.buffer.element[element] then return false end
+function bone.public:load(element, parent, boneData, remoteSignature)
+    if not self or (self == bone.public) then return false end
+    if not element or (not remoteSignature and not imports.isElement(element)) or not parent or (not remoteSignature and not imports.isElement(parent)) or not boneData or (element == parent) or bone.public.buffer.element[element] then return false end
     self.element = element
     self.parent = parent
     if not self:refresh(boneData, remoteSignature) then return false end
@@ -94,14 +93,14 @@ function bone:load(element, parent, boneData, remoteSignature)
         self.cStreamer = streamer:create(element, "bone", {parent}, self.boneData.syncRate)
         self.cHeartbeat = nil
     end, settings.downloader.buildRate)
-    bone.buffer.element[element] = self
-    bone.buffer.parent[parent] = bone.buffer.parent[parent] or {}
-    bone.buffer.parent[parent][self] = true
+    bone.public.buffer.element[element] = self
+    bone.public.buffer.parent[parent] = bone.public.buffer.parent[parent] or {}
+    bone.public.buffer.parent[parent][self] = true
     return true
 end
 
-function bone:unload()
-    if not self or (self == bone) or self.isUnloading then return false end
+function bone.public:unload()
+    if not self or (self == bone.public) or self.isUnloading then return false end
     self.isUnloading = true
     if self.cHeartbeat then
         self.cHeartbeat:destroy()
@@ -109,19 +108,19 @@ function bone:unload()
     if self.cStreamer then
         self.cStreamer:destroy()
     end
-    bone.cache.element[(self.element)] = nil
-    bone.buffer.element[(self.element)] = nil
+    bone.public.cache.element[(self.element)] = nil
+    bone.public.buffer.element[(self.element)] = nil
     self:destroyInstance()
     return true
 end
 
-function bone:refresh(boneData, remoteSignature)
-    if not self or (self == bone) then return false end
+function bone.public:refresh(boneData, remoteSignature)
+    if not self or (self == bone.public) then return false end
     self.parentType = self.parentType or remoteSignature.parentType or imports.getElementType(self.parent)
     self.parentType = ((self.parentType == "player") and "ped") or self.parentType
-    if not self.parentType or not bone.ids[(self.parentType)] then return false end
+    if not self.parentType or not bone.public.ids[(self.parentType)] then return false end
     boneData.id = imports.tonumber(boneData.id)
-    if not boneData.id or not bone.ids[(self.parentType)][(boneData.id)] then return false end
+    if not boneData.id or not bone.public.ids[(self.parentType)][(boneData.id)] then return false end
     boneData.position, boneData.rotation = boneData.position or {}, boneData.rotation or {}
     boneData.position.x, boneData.position.y, boneData.position.z = imports.tonumber(boneData.position.x) or 0, imports.tonumber(boneData.position.y) or 0, imports.tonumber(boneData.position.z) or 0
     boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.tonumber(boneData.rotation.x) or 0, imports.tonumber(boneData.rotation.y) or 0, imports.tonumber(boneData.rotation.z) or 0
@@ -146,11 +145,11 @@ function bone:refresh(boneData, remoteSignature)
     return true
 end
 
-function bone:update()
-    if not self or (self == bone) or self.cHeartbeat then return false end
-    bone.cache.element[(self.parent)] = bone.cache.element[(self.parent)] or {}
-    bone.cache.element[(self.parent)][(self.boneData.id)] = ((bone.cache.element[(self.parent)].streamTick == bone.cache.streamTick) and bone.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
-    bone.cache.element[(self.parent)].streamTick = bone.cache.streamTick
-    imports.setElementMatrix(self.element, imports.matrix.transform(bone.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z))
+function bone.public:update()
+    if not self or (self == bone.public) or self.cHeartbeat then return false end
+    bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
+    bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
+    bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick
+    imports.setElementMatrix(self.element, imports.matrix.transform(bone.public.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z))
     return true
 end
