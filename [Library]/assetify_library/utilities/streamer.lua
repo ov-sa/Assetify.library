@@ -34,26 +34,24 @@ local imports = {
 --[[ Class: Streamer ]]--
 -------------------------
 
-streamer = class.create("streamer", {
-    buffer = {},
-    cache = {
-        clientCamera = imports.getCamera()
-    },
-    allocator = {
-        validStreams = {"dummy", "bone", "light"}
-    }
-})
-
-local onEntityStream, onBoneStream, onBoneUpdate = nil, nil, nil
-streamer.allocator.__validStreams = {}
-for i = 1, #streamer.allocator.validStreams, 1 do
-    local j = streamer.allocator.validStreams[i]
-    streamer.allocator.__validStreams[j] = true
+local streamer = class:create("streamer")
+streamer.private.buffer = {}
+streamer.private.cache = {
+    clientCamera = imports.getCamera()
+}
+streamer.private.allocator = {
+    validStreams = {"dummy", "bone", "light"}
+}
+streamer.private.allocator.__validStreams = {}
+for i = 1, #streamer.private.allocator.validStreams, 1 do
+    local j = streamer.private.allocator.validStreams[i]
+    streamer.private.allocator.__validStreams[j] = true
 end
-streamer.allocator.validStreams = streamer.allocator.__validStreams
-streamer.allocator.__validStreams = nil
+streamer.private.allocator.validStreams = streamer.private.allocator.__validStreams
+streamer.private.allocator.__validStreams = nil
+local onEntityStream, onBoneStream, onBoneUpdate = nil, nil, nil
 
-function streamer:create(...)
+function streamer.public:create(...)
     local cStreamer = self:createInstance()
     if cStreamer and not cStreamer:load(...) then
         cStreamer:destroyInstance()
@@ -62,13 +60,13 @@ function streamer:create(...)
     return cStreamer
 end
 
-function streamer:destroy(...)
-    if not self or (self == streamer) then return false end
+function streamer.public:destroy(...)
+    if not self or (self == streamer.public) then return false end
     return self:unload(...)
 end
 
-function streamer:load(streamerInstance, streamType, occlusionInstances, syncRate)
-    if not self or (self == streamer) then return false end
+function streamer.public:load(streamerInstance, streamType, occlusionInstances, syncRate)
+    if not self or (self == streamer.public) then return false end
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
     local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
     self.streamer = streamerInstance
@@ -84,94 +82,94 @@ function streamer:load(streamerInstance, streamType, occlusionInstances, syncRat
         imports.setElementDimension(streamerInstance, streamDimension)
         imports.setElementInterior(streamerInstance, streamInterior)
     end
-    streamer.buffer[streamDimension] = streamer.buffer[streamDimension] or {}
-    streamer.buffer[streamDimension][streamInterior] = streamer.buffer[streamDimension][streamInterior] or {}
-    streamer.buffer[streamDimension][streamInterior][streamType] = streamer.buffer[streamDimension][streamInterior][streamType] or {}
-    streamer.buffer[streamDimension][streamInterior][streamType][self] = {
+    streamer.private.buffer[streamDimension] = streamer.private.buffer[streamDimension] or {}
+    streamer.private.buffer[streamDimension][streamInterior] = streamer.private.buffer[streamDimension][streamInterior] or {}
+    streamer.private.buffer[streamDimension][streamInterior][streamType] = streamer.private.buffer[streamDimension][streamInterior][streamType] or {}
+    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = {
         isStreamed = false
     }
     self:allocate()
     return true
 end
 
-function streamer:unload()
-    if not self or (self == streamer) or self.isUnloading then return false end
+function streamer.public:unload()
+    if not self or (self == streamer.public) or self.isUnloading then return false end
     self.isUnloading = true
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
-    streamer.buffer[streamDimension][streamInterior][streamType][self] = nil
+    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = nil
     self:deallocate()
     self:destroyInstance()
     return true
 end
 
-function streamer:update(clientDimension, clientInterior)
+function streamer.public:update(clientDimension, clientInterior)
     if not clientDimension and not clientInterior then return false end
     local currentDimension, currentInterior = imports.getElementDimension(localPlayer), imports.getElementInterior(localPlayer)
     clientDimension, clientInterior = clientDimension or _clientDimension, clientInterior or clientInterior
-    if streamer.waterBuffer then
-        imports.setElementDimension(streamer.waterBuffer, currentDimension)
-        imports.setElementInterior(streamer.waterBuffer, currentInterior)
+    if streamer.public.waterBuffer then
+        imports.setElementDimension(streamer.public.waterBuffer, currentDimension)
+        imports.setElementInterior(streamer.public.waterBuffer, currentInterior)
     end
-    if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
-        for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
+    if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
+        for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
             if j then
-                imports.setElementDimension(i.streamer, settings.streamer.unsyncDimension)
+                imports.setElementDimension(i.streamer.public, settings.streamer.unsyncDimension)
             end
         end
     end
-    streamer.cache.isCameraTranslated = true
-    streamer.cache.clientWorld = streamer.cache.clientWorld or {}
-    streamer.cache.clientWorld.dimension = currentDimension
-    streamer.cache.clientWorld.interior = currentInterior
+    streamer.private.cache.isCameraTranslated = true
+    streamer.private.cache.clientWorld = streamer.private.cache.clientWorld or {}
+    streamer.private.cache.clientWorld.dimension = currentDimension
+    streamer.private.cache.clientWorld.interior = currentInterior
     return true
 end
 
-function streamer:allocate()
-    if not self or (self == streamer) then return false end
-    if not streamer.allocator.validStreams[(self.streamType)] then return false end
-    streamer.allocator[(self.syncRate)] = streamer.allocator[(self.syncRate)] or {}
-    streamer.allocator[(self.syncRate)][(self.streamType)] = streamer.allocator[(self.syncRate)][(self.streamType)] or {}
-    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or {}
-    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] or {}
-    local streamBuffer = streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]
+function streamer.public:allocate()
+    if not self or (self == streamer.public) then return false end
+    if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
+    streamer.private.allocator[(self.syncRate)] = streamer.private.allocator[(self.syncRate)] or {}
+    streamer.private.allocator[(self.syncRate)][(self.streamType)] = streamer.private.allocator[(self.syncRate)][(self.streamType)] or {}
+    streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] = streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or {}
+    streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] = streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] or {}
+    local streamBuffer = streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]
     if self.streamType == "bone" then
         if self.syncRate <= 0 then
-            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
-                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = true
+            if not streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = true
                 imports.addEventHandler("onClientPedsProcessed", root, onBoneUpdate)
             end
         else
-            if not streamer.allocator[(self.syncRate)][(self.streamType)].cTimer or (streamer.allocator[(self.syncRate)][(self.streamType)].cTimer:getType() ~= "timer") then
-                streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = timer:create(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
+            if not streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer or not timer:isInstance(streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer) then
+                streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = timer:create(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
             end
         end
-        streamBuffer[self] = streamer.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
+        streamBuffer[self] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
     end
     return true
 end
 
-function streamer:deallocate()
-    if not self or (self == streamer) then return false end
-    if not streamer.allocator.validStreams[(self.streamType)] then return false end
-    if not streamer.allocator[(self.syncRate)] or not streamer.allocator[(self.syncRate)][(self.streamType)] or not streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or not streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] then return false end
+function streamer.public:deallocate()
+    if not self or (self == streamer.public) then return false end
+    if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
+    if not streamer.private.allocator[(self.syncRate)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] then return false end
     local isAllocatorVoid = true
-    streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)][self] = nil
-    for i, j in imports.pairs(streamer.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]) do
+    streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)][self] = nil
+    for i, j in imports.pairs(streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]) do
         isAllocatorVoid = false
         break
     end
     if isAllocatorVoid then
         if self.streamType == "bone" then
             if self.syncRate <= 0 then
-                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
                     imports.removeEventHandler("onClientPedsProcessed", root, onBoneUpdate)
-                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
+                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             else
-                if streamer.allocator[(self.syncRate)][(self.streamType)].cTimer then
-                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer:destroyInstance()
-                    streamer.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
+                if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer:destroyInstance()
+                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             end
         end
@@ -191,7 +189,7 @@ onEntityStream = function(streamBuffer)
                     break
                 end
             end
-            imports.setElementDimension(i.streamer, (j.isStreamed and streamer.cache.clientWorld.dimension) or settings.streamer.unsyncDimension)
+            imports.setElementDimension(i.streamer, (j.isStreamed and streamer.private.cache.clientWorld.dimension) or settings.streamer.unsyncDimension)
         end
     end
     return true
@@ -209,9 +207,9 @@ onBoneStream = function(streamBuffer)
 end
 
 onBoneUpdate = function(syncRate, streamType)
-    local streamBuffer = (syncRate and streamType and streamer.allocator[syncRate][streamType]) or false
-    streamBuffer = streamBuffer or (streamer.allocator[0] and streamer.allocator[0]["bone"]) or false
-    local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
+    local streamBuffer = (syncRate and streamType and streamer.private.allocator[syncRate][streamType]) or false
+    streamBuffer = streamBuffer or (streamer.private.allocator[0] and streamer.private.allocator[0]["bone"]) or false
+    local clientDimension, clientInterior = streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior
     if streamBuffer and streamBuffer[clientDimension] and streamBuffer[clientDimension][clientInterior] then
         onBoneStream(streamBuffer[clientDimension][clientInterior])
     end
@@ -219,25 +217,25 @@ onBoneUpdate = function(syncRate, streamType)
 end
 
 network:fetch("Assetify:onLoad"):on(function()
-    streamer:update(imports.getElementDimension(localPlayer))
+    streamer.public:update(imports.getElementDimension(localPlayer))
     timer:create(function()
-        if streamer.cache.isCameraTranslated then return false end
-        local velX, velY, velZ = imports.getElementVelocity(streamer.cache.clientCamera)
-        streamer.cache.isCameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
+        if streamer.private.cache.isCameraTranslated then return false end
+        local velX, velY, velZ = imports.getElementVelocity(streamer.private.cache.clientCamera)
+        streamer.private.cache.isCameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
     end, settings.streamer.cameraSyncRate, 0)
     timer:create(function()
-        if not streamer.cache.isCameraTranslated then return false end
-        local clientDimension, clientInterior = streamer.cache.clientWorld.dimension, streamer.cache.clientWorld.interior
-        if streamer.buffer[clientDimension] and streamer.buffer[clientDimension][clientInterior] then
-            for i, j in imports.pairs(streamer.buffer[clientDimension][clientInterior]) do
+        if not streamer.private.cache.isCameraTranslated then return false end
+        local clientDimension, clientInterior = streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior
+        if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
+            for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
                 onEntityStream(j)
             end
         end
-        if streamer.buffer[-1] and streamer.buffer[-1][clientInterior] then
-            for i, j in imports.pairs(streamer.buffer[-1][clientInterior]) do
+        if streamer.private.buffer[-1] and streamer.private.buffer[-1][clientInterior] then
+            for i, j in imports.pairs(streamer.private.buffer[-1][clientInterior]) do
                 onEntityStream(j)
             end
         end
-        streamer.cache.isCameraTranslated = false
+        streamer.private.cache.isCameraTranslated = false
     end, settings.streamer.syncRate, 0)
 end)
