@@ -37,11 +37,17 @@ local parseModules = {
 --[[ Function: Imports Modules ]]--
 -----------------------------------
 
-local function parse(rw)
-    if not rw or (imports.type(rw) ~= "string") then return false end
+local function parse(rw, module)
+    if not rw or (imports.type(rw) ~= "string") or not module then return false end
     for i, j in pairs(parseModules) do
-        rw = imports.utf8.gsub(rw, i, j, _, true, "(", ".:)")
+        if i ~= module then
+            rw = imports.utf8.gsub(rw, i, j, _, true, "(", ".:)")
+        end
     end
+    rw = rw..[[
+        _G.]]..module..[[ = nil
+        assetify.]]..module..[[ = ]]..module..[[.public
+    ]]
     return rw
 end
 
@@ -97,7 +103,12 @@ end
 
 bundler["imports"] = [[
     if not assetify then
-        ]]..imports.file.read("utilities/shared.lua")..[[
+        if true then
+            ]]..imports.file.read("utilities/shared.lua")..[[
+        end
+        if true then
+            ]]..imports.file.read("utilities/namespace.lua")..[[
+        end
         assetify = {
             imports = {
                 resourceName = "]]..syncer.libraryName..[[",
@@ -242,7 +253,7 @@ bundler["timer"] = {
     module = "timer",
     rw = [[
         if not assetify.timer then
-            ]]..parse(imports.file.read("utilities/timer.lua"))..[[
+            ]]..parse(imports.file.read("utilities/timer.lua"), "timer")..[[
         end
     ]]
 }
@@ -252,7 +263,7 @@ bundler["threader"] = {
     rw = [[
         if not assetify.thread then
             ]]..bundler["timer"].rw..[[
-            ]]..parse(imports.file.read("utilities/threader.lua"))..[[
+            ]]..parse(imports.file.read("utilities/threader.lua"), "thread")..[[
         end
     ]]
 }
@@ -262,7 +273,7 @@ bundler["networker"] = {
     rw = [[
         if not assetify.network then
             ]]..bundler["threader"].rw..[[
-            ]]..parse(imports.file.read("utilities/networker.lua"))..[[
+            ]]..parse(imports.file.read("utilities/networker.lua"), "network")..[[
         end
     ]]
 }
