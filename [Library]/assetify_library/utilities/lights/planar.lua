@@ -37,16 +37,16 @@ local imports = {
 --[[ Class: Shader ]]--
 -----------------------
 
-light.planar = class.create("planar", {
+local planar = class:create("planar", {
     cache = {
         validTypes = {
             {index = "planar_1x1", textureName = "assetify_light_planar"}
         }
     },
     buffer = {}
-})
-for i = 1, #light.planar.cache.validTypes, 1 do
-    local j = light.planar.cache.validTypes[i]
+}, "light")
+for i = 1, #planar.private.cache.validTypes, 1 do
+    local j = planar.private.cache.validTypes[i]
     local modelPath = "utilities/rw/"..j.index.."/"
     j.modelID, j.collisionID = imports.engineRequestModel("object"), imports.engineRequestModel("object")
     imports.engineImportTXD(imports.engineLoadTXD(modelPath.."dict.rw"), j.modelID)
@@ -54,12 +54,12 @@ for i = 1, #light.planar.cache.validTypes, 1 do
     imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.modelID)
     imports.clearModel(j.collisionID)
     imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.collisionID)
-    light.planar.cache.validTypes[i] = nil
-    light.planar.cache.validTypes[(j.index)] = j
-    light.planar.cache.validTypes[(j.index)].index = nil
+    planar.private.cache.validTypes[i] = nil
+    planar.private.cache.validTypes[(j.index)] = j
+    planar.private.cache.validTypes[(j.index)].index = nil
 end
 
-function light.planar:create(...)
+function planar.public:create(...)
     local cLight = self:createInstance()
     if cLight and not cLight:load(...) then
         cLight:destroyInstance()
@@ -68,21 +68,21 @@ function light.planar:create(...)
     return cLight
 end
 
-function light.planar:destroy(...)
-    if not self or (self == light.planar) then return false end
+function planar.public:destroy(...)
+    if not self or (self == planar.public) then return false end
     return self:unload(...)
 end
 
-function light.planar:clearElementBuffer(element)
-    if not element or not light.planar.buffer[element] then return false end
-    light.planar.buffer[element]:destroy()
+function planar.public:clearElementBuffer(element)
+    if not element or not planar.public.buffer[element] then return false end
+    planar.public.buffer[element]:destroy()
     return true
 end
 
-function light.planar:load(lightType, lightData, shaderInputs, isScoped, isDefaultStreamer)
-    if not self or (self == light.planar) then return false end
+function planar.public:load(lightType, lightData, shaderInputs, isScoped, isDefaultStreamer)
+    if not self or (self == planar.public) then return false end
     if not lightType or not lightData or not shaderInputs then return false end
-    local lightCache = light.planar.cache.validTypes[lightType]
+    local lightCache = planar.private.cache.validTypes[lightType]
     if not lightCache then return false end
     lightData.position, lightData.rotation = lightData.position or {}, lightData.rotation or {}
     lightData.position.x, lightData.position.y, lightData.position.z = imports.tonumber(lightData.position.x) or 0, imports.tonumber(lightData.position.y) or 0, imports.tonumber(lightData.position.z) or 0
@@ -98,7 +98,7 @@ function light.planar:load(lightType, lightData, shaderInputs, isScoped, isDefau
     end
     self.cLight = self.cModelInstance
     self.cShader = shader:create(self.cLight, "Assetify-Planar-Light", "Assetify_LightPlanar", lightCache.textureName, {}, shaderInputs, {})
-    light.planar.buffer[(self.cLight)] = self
+    planar.public.buffer[(self.cLight)] = self
     self.lightType = lightType
     self.lightData = lightData
     self:setResolution(self.lightData.resolution)
@@ -107,14 +107,14 @@ function light.planar:load(lightType, lightData, shaderInputs, isScoped, isDefau
     return true
 end
 
-function light.planar:unload()
-    if not self or (self == light.planar) or self.isUnloading then return false end
+function planar.public:unload()
+    if not self or (self == planar.public) or self.isUnloading then return false end
     self.isUnloading = true
     if self.cStreamer then
         self.cStreamer:destroy()
     end
     if self.cModelInstance and imports.isElement(self.cModelInstance) then
-        light.planar.buffer[(self.cModelInstance)] = nil
+        planar.public.buffer[(self.cModelInstance)] = nil
         imports.destroyElement(self.cModelInstance)
     end
     if self.cCollisionInstance and imports.isElement(self.cCollisionInstance) then
@@ -124,22 +124,22 @@ function light.planar:unload()
     return true
 end
 
-function light.planar:setResolution(resolution)
-    if not self or (self == light.planar) then return false end
+function planar.public:setResolution(resolution)
+    if not self or (self == planar.public) then return false end
     self.lightData.resolution = imports.math.max(0, imports.tonumber(resolution) or 1)
     self.cShader:setValue("lightResolution", self.lightData.resolution)
     return true
 end
 
-function light.planar:setTexture(texture)
-    if not self or (self == light.planar) then return false end
+function planar.public:setTexture(texture)
+    if not self or (self == planar.public) then return false end
     self.lightData.texture = (self.lightData.texture or texture) or false
     self.cShader:setValue("baseTexture", self.lightData.texture)
     return true
 end
 
-function light.planar:setColor(r, g, b, a)
-    if not self or (self == light.planar) then return false end
+function planar.public:setColor(r, g, b, a)
+    if not self or (self == planar.public) then return false end
     self.lightData.color = self.lightData.color or {}
     self.lightData.color[1], self.lightData.color[2], self.lightData.color[3], self.lightData.color[4] = imports.math.max(0, imports.math.min(255, imports.tonumber(r) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(g) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(b) or 255)), imports.math.max(0, imports.math.min(255, imports.tonumber(a) or 255))
     self.cShader:setValue("lightColor", self.lightData.color[1]/255, self.lightData.color[2]/255, self.lightData.color[3]/255, self.lightData.color[4]/255)
