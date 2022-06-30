@@ -109,6 +109,9 @@ bundler["imports"] = [[
             ]]..file:read("utilities/namespace.lua")..[[
         end
         if true then
+            ]]..file:read("utilities/table.lua")..[[
+        end
+        if true then
             ]]..file:read("utilities/file.lua")..[[
         end
         assetify = {
