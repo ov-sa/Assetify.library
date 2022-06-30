@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="4.4.0"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="4.5.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -13,6 +13,7 @@
     <file src="utilities/rw/planar_1x1/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/collision.rw"/>
     <script src="utilities/shared.lua" type="shared"/>
+    <script src="utilities/namespace.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
