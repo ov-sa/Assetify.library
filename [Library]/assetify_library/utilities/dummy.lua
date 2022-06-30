@@ -31,12 +31,12 @@ local imports = {
 --[[ Class: Dummy ]]--
 ----------------------
 
-dummy = class.create("dummy", {
+local dummy = class:create("dummy", {
     buffer = {}
 })
 
 if localPlayer then
-    function dummy:create(...)
+    function dummy.public:create(...)
         local cDummy = self:createInstance()
         if cDummy and not cDummy:load(...) then
             cDummy:destroyInstance()
@@ -45,19 +45,19 @@ if localPlayer then
         return cDummy
     end
 
-    function dummy:destroy(...)
-        if not self or (self == dummy) then return false end
+    function dummy.public:destroy(...)
+        if not self or (self == dummy.public) then return false end
         return self:unload(...)
     end
 
-    function dummy:clearElementBuffer(element)
-        if not element or not dummy.buffer[element] then return false end
-        dummy.buffer[element]:destroy()
+    function dummy.public:clearElementBuffer(element)
+        if not element or not dummy.public.buffer[element] then return false end
+        dummy.public.buffer[element]:destroy()
         return true
     end
 
-    function dummy:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, remoteSignature)
-        if not self or (self == dummy) then return false end
+    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, remoteSignature)
+        if not self or (self == dummy.public) then return false end
         if not dummyData then return false end
         targetDummy = (remoteSignature and targetDummy) or false
         local cAsset, cData = manager:getData(assetType, assetName, syncer.librarySerial)
@@ -112,12 +112,12 @@ if localPlayer then
             self.cHeartbeat = nil
         end, settings.downloader.buildRate)
         self.cDummy = self.cCollisionInstance or self.cModelInstance
-        dummy.buffer[(self.cDummy)] = self
+        dummy.public.buffer[(self.cDummy)] = self
         return true
     end
 
-    function dummy:unload()
-        if not self or (self == dummy) or self.isUnloading then return false end
+    function dummy.public:unload()
+        if not self or (self == dummy.public) or self.isUnloading then return false end
         self.isUnloading = true
         if self.cHeartbeat then
             self.cHeartbeat:destroy()
@@ -125,7 +125,7 @@ if localPlayer then
         if self.cStreamer then
             self.cStreamer:destroy()
         end
-        dummy.buffer[(self.cDummy)] = nil
+        dummy.public.buffer[(self.cDummy)] = nil
         if self.cModelInstance and imports.isElement(self.cModelInstance) then
             imports.destroyElement(self.cModelInstance)
         end
@@ -136,7 +136,7 @@ if localPlayer then
         return true
     end
 else
-    function dummy:create(assetType, assetName, assetClump, clumpMaps, dummyData)
+    function dummy.public:create(assetType, assetName, assetClump, clumpMaps, dummyData)
         if not dummyData then return false end
         local cAsset = manager:getData(assetType, assetName)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
