@@ -13,8 +13,7 @@
 -----------------
 
 local imports = {
-    pairs = pairs,
-    file = file
+    pairs = pairs
 }
 
 
@@ -25,7 +24,7 @@ local imports = {
 local identifier = "Assetify_TextureClearer"
 local depDatas, dependencies = "", {}
 for i, j in imports.pairs(dependencies) do
-    local depData = imports.file.read(j)
+    local depData = file:read(j)
     if depData then
         depDatas = depDatas.."\n"..depData
     end

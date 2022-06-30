@@ -14,7 +14,6 @@
 
 local imports = {
     pairs = pairs,
-    file = file,
     string = string
 }
 
@@ -28,7 +27,7 @@ local depDatas, dependencies = "", {
     helper = "utilities/shaders/helper.fx"
 }
 for i, j in imports.pairs(dependencies) do
-    local depData = imports.file.read(j)
+    local depData = file:read(j)
     if depData then
         depDatas = depDatas.."\n"..depData
     end

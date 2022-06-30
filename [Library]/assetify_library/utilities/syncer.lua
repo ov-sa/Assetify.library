@@ -8,6 +8,7 @@
 ----------------------------------------------------------------
 
 
+--TODO: UPDATE
 -----------------
 --[[ Imports ]]--
 -----------------
@@ -33,7 +34,6 @@ local imports = {
     getResourceRootElement = getResourceRootElement,
     fetchRemote = fetchRemote,
     loadAsset = loadAsset,
-    file = file,
     json = json
 }
 
@@ -140,7 +140,7 @@ if localPlayer then
         thread:create(function(self)
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
-                local fileData = imports.file.read(i)
+                local fileData = file:read(i)
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
@@ -182,7 +182,7 @@ if localPlayer then
             syncer.public.scheduledAssets[assetType][assetName].assetSize = syncer.public.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
             syncer.public.__libraryBandwidth = (syncer.public.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
         end
-        imports.file.write(contentPath, ...)
+        file:write(contentPath, ...)
         imports.collectgarbage()
     end)
 

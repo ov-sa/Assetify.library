@@ -8,6 +8,7 @@
 ----------------------------------------------------------------
 
 
+--TODO: UPDATE
 -----------------
 --[[ Imports ]]--
 -----------------
@@ -29,7 +30,6 @@ local imports = {
     playSound3D = playSound3D,
     setSoundVolume = setSoundVolume,
     collectgarbage = collectgarbage,
-    file = file,
     table = table,
     string = string,
     quat = quat
@@ -200,10 +200,10 @@ if localPlayer then
             return true
         elseif assetType == "scene" then
             thread:create(function(self)
-                local sceneIPLData = imports.file.read(assetPath..(asset.references.scene)..".ipl")
+                local sceneIPLData = file:read(assetPath..(asset.references.scene)..".ipl")
                 sceneIPLData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIPLData, {key = cAsset.manifestData.encryptKey})) or sceneIPLData
                 if sceneIPLData then
-                    local sceneIDEData = (cAsset.sceneIDE and imports.file.read(assetPath..(asset.references.scene)..".ide")) or false
+                    local sceneIDEData = (cAsset.sceneIDE and file:read(assetPath..(asset.references.scene)..".ide")) or false
                     if sceneIDEData then
                         sceneIDEData = (cAsset.manifestData.encryptKey and imports.decodeString("tea", sceneIDEData, {key = cAsset.manifestData.encryptKey})) or sceneIDEData
                     end
@@ -259,8 +259,8 @@ if localPlayer then
                 for i, j in imports.pairs(cAsset.manifestData.assetClumps) do
                     cAsset.unSynced.assetCache[i] = {}
                     local clumpTXD, clumpDFF, clumpCOL = assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", assetPath.."clump/"..j.."/"..(asset.references.asset)..".col"
-                    clumpTXD = (imports.file.exists(clumpTXD) and clumpTXD) or assetPath..(asset.references.asset)..".txd"
-                    clumpCOL = (imports.file.exists(clumpCOL) and clumpCOL) or assetPath..(asset.references.asset)..".col"
+                    clumpTXD = (file:exists(clumpTXD) and clumpTXD) or assetPath..(asset.references.asset)..".txd"
+                    clumpCOL = (file:exists(clumpCOL) and clumpCOL) or assetPath..(asset.references.asset)..".col"
                     asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
                         txd = clumpTXD,
                         dff = clumpDFF,

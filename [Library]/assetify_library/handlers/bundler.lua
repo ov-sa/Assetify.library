@@ -16,8 +16,7 @@ local imports = {
     type = type,
     pairs = pairs,
     utf8 = utf8,
-    table = table,
-    file = file
+    table = table
 }
 
 
@@ -104,10 +103,13 @@ end
 bundler["imports"] = [[
     if not assetify then
         if true then
-            ]]..imports.file.read("utilities/shared.lua")..[[
+            ]]..file:read("utilities/shared.lua")..[[
         end
         if true then
-            ]]..imports.file.read("utilities/namespace.lua")..[[
+            ]]..file:read("utilities/namespace.lua")..[[
+        end
+        if true then
+            ]]..file:read("utilities/file.lua")..[[
         end
         assetify = {
             imports = {
@@ -253,7 +255,7 @@ bundler["timer"] = {
     module = "timer",
     rw = [[
         if not assetify.timer then
-            ]]..parse(imports.file.read("utilities/timer.lua"), "timer")..[[
+            ]]..parse(file:read("utilities/timer.lua"), "timer")..[[
         end
     ]]
 }
@@ -263,7 +265,7 @@ bundler["threader"] = {
     rw = [[
         if not assetify.thread then
             ]]..bundler["timer"].rw..[[
-            ]]..parse(imports.file.read("utilities/threader.lua"), "thread")..[[
+            ]]..parse(file:read("utilities/threader.lua"), "thread")..[[
         end
     ]]
 }
@@ -273,7 +275,7 @@ bundler["networker"] = {
     rw = [[
         if not assetify.network then
             ]]..bundler["threader"].rw..[[
-            ]]..parse(imports.file.read("utilities/networker.lua"), "network")..[[
+            ]]..parse(file:read("utilities/networker.lua"), "network")..[[
         end
     ]]
 }
