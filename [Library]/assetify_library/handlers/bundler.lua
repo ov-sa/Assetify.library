@@ -28,7 +28,8 @@ local parseUtils = {
     "utilities/sandbox/shared.lua",
     "utilities/sandbox/table.lua",
     "utilities/sandbox/math/index.lua",
-    "utilities/sandbox/math/quat.lua"
+    "utilities/sandbox/math/quat.lua",
+    "utilities/sandbox/string.lua"
 }
 local parseModules = {
     ["namespace"] = {module = "namespacer", namespace = "assetify.namespace", path = "utilities/sandbox/namespacer.lua", endpoints = {"namespace", "class"}},
