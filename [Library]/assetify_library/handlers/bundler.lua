@@ -25,6 +25,14 @@ local imports = {
 -------------------
 
 local bundler = {}
+local parseUtils = {
+    "utilities/sandbox/shared.lua",
+    "utilities/sandbox/namespace.lua",
+    "utilities/sandbox/table.lua",
+    "utilities/sandbox/file.lua",
+    "utilities/sandbox/math/index.lua",
+    "utilities/sandbox/math/quat.lua"
+}
 local parseModules = {
     ["timer"] = "assetify.timer",
     ["thread"] = "assetify.thread",
@@ -32,11 +40,24 @@ local parseModules = {
 }
 
 
------------------------------------
---[[ Function: Imports Modules ]]--
------------------------------------
+--------------------------------------------
+--[[ Functions: Imports Utils & Modules ]]--
+--------------------------------------------
 
-local function parse(rw, module)
+local function parseUtil()
+    local rw = ""
+    for i = 1, #parseUtils, 1 do
+        local j = parseUtils[i]
+        rw = rw..[[
+            if true then
+                ]]..file:read(j)..[[
+            end
+        ]]
+    end
+    return rw
+end
+
+local function parseModule(rw, module)
     if not rw or (imports.type(rw) ~= "string") or not module then return false end
     for i, j in pairs(parseModules) do
         if i ~= module then
@@ -102,21 +123,7 @@ end
 
 bundler["imports"] = [[
     if not assetify then
-        if true then
-            ]]..file:read("utilities/shared.lua")..[[
-        end
-        if true then
-            ]]..file:read("utilities/namespace.lua")..[[
-        end
-        if true then
-            ]]..file:read("utilities/table.lua")..[[
-        end
-        if true then
-            ]]..file:read("utilities/file.lua")..[[
-        end
-        if true then
-            ]]..file:read("utilities/quat.lua")..[[
-        end
+        ]]..parseUtil()..[[
         assetify = {
             imports = {
                 resourceName = "]]..syncer.libraryName..[[",
@@ -261,7 +268,7 @@ bundler["timer"] = {
     module = "timer",
     rw = [[
         if not assetify.timer then
-            ]]..parse(file:read("utilities/timer.lua"), "timer")..[[
+            ]]..parseModule(file:read("utilities/sandbox/timer.lua"), "timer")..[[
         end
     ]]
 }
@@ -271,7 +278,7 @@ bundler["threader"] = {
     rw = [[
         if not assetify.thread then
             ]]..bundler["timer"].rw..[[
-            ]]..parse(file:read("utilities/threader.lua"), "thread")..[[
+            ]]..parseModule(file:read("utilities/sandbox/threader.lua"), "thread")..[[
         end
     ]]
 }
@@ -281,7 +288,7 @@ bundler["networker"] = {
     rw = [[
         if not assetify.network then
             ]]..bundler["threader"].rw..[[
-            ]]..parse(file:read("utilities/networker.lua"), "network")..[[
+            ]]..parseModule(file:read("utilities/sandbox/networker.lua"), "network")..[[
         end
     ]]
 }

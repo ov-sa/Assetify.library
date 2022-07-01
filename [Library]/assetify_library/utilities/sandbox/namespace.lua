@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: namespace.lua
+     Script: utilities: sandbox: namespace.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -35,7 +35,7 @@ local namespace = nil
 
 function class:create(type, parent, nspace)
     if self ~= class then return false end
-    if not type or (imports.type(type) ~= "string") or (parent and (imports.type(parent) ~= "table") or buffer.instances[parent]) or buffer.types[type] then return false end
+    if not type or (imports.type(type) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) or buffer.types[type] then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
     if nspace and not namespace.private.types[nspace] then return false end
     parent = parent or {}
@@ -105,10 +105,10 @@ namespace = class:create("namespace")
 namespace.private.types = {}
 namespace.private.classes = {}
 
-function namespace.public:create(type)
-    if (self ~= namespace.public) and (self ~= namespace.private) then return false end
+function namespace.public:create(type, parent)
+    if (self ~= namespace.public) and (self ~= namespace.private) or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) then return false end
     if not type or (imports.type(type) ~= "string") or namespace.private.types[type] then return false end
-    local parent = {}
+    local parent = parent or {}
     _G[type] = parent
     local cNamespace = self:createInstance()
     namespace.private.classes[type] = {}

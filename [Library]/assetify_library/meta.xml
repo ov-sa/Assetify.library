@@ -12,11 +12,12 @@
     <file src="utilities/rw/planar_1x1/dict.rw"/>
     <file src="utilities/rw/planar_1x1/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/collision.rw"/>
-    <script src="utilities/shared.lua" type="shared"/>
-    <script src="utilities/namespace.lua" type="shared"/>
-    <script src="utilities/table.lua" type="shared"/>
-    <script src="utilities/file.lua" type="shared"/>
-    <script src="utilities/quat.lua" type="shared"/>
+    <script src="utilities/sandbox/shared.lua" type="shared"/>
+    <script src="utilities/sandbox/namespace.lua" type="shared"/>
+    <script src="utilities/sandbox/table.lua" type="shared"/>
+    <script src="utilities/sandbox/file.lua" type="shared"/>
+    <script src="utilities/sandbox/math/index.lua" type="shared"/>
+    <script src="utilities/sandbox/math/quat.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
@@ -31,9 +32,9 @@
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
-    <script src="utilities/timer.lua" type="shared"/>
-    <script src="utilities/threader.lua" type="shared"/>
-    <script src="utilities/networker.lua" type="shared"/>
+    <script src="utilities/sandbox/timer.lua" type="shared"/>
+    <script src="utilities/sandbox/threader.lua" type="shared"/>
+    <script src="utilities/sandbox/networker.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/dummy.lua" type="shared"/>
     <script src="utilities/syncer.lua" type="shared"/>

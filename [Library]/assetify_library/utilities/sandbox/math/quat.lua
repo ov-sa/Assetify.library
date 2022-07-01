@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify LibraquatRHS.y
-     Script: utilities: file.lua
+     Script: utilities: sandbox: math: quat.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -22,7 +22,7 @@ local imports = {
 --[[ Class: Quat ]]--
 ---------------------
 
-local quat = class:create("quat")
+local quat = class:create("quat", _, "math")
 
 quat.public.__call = function(_, x, y, z, w)
     x, y, z, w = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z), imports.tonumber(w)
@@ -73,7 +73,7 @@ function quat.public:scale(scale)
     scale = imports.tonumber(scale)
     if not scale then return false end
     self.x, self.y, self.z, self.w = self.x*scale, self.y*scale, self.z*scale, self.w*scale
-    return true
+    return self
 end
 
 function quat.public:setAngleAxis(x, y, z, angle)
@@ -83,7 +83,7 @@ function quat.public:setAngleAxis(x, y, z, angle)
     angle = angle*0.5
     local sine, cosine = imports.math.sin(angle), imports.math.cos(angle)
     self.x, self.y, self.z, self.w = self.x*sine, self.y*sine, self.z*sine, cosine
-    return true
+    return self
 end
 
 function quat.public:fromAngleAxis(x, y, z, angle)
@@ -96,6 +96,7 @@ function quat.public:fromAngleAxis(x, y, z, angle)
 end
 
 function quat.public:toEuler(x, y, z, w)
+    if not quat.public:isInstance(self) then return false end
     x, y, z = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z)
     if not w or not x or not y or not z then return false end
     local sinX, sinY, sinZ = 2*((w*x) + (y*z)), 2*((w*y) - (z*x)), 2*((w*z) + (x*y))
