@@ -46,7 +46,7 @@ if localPlayer then
     end
 
     function dummy.public:destroy(...)
-        if not self or (self == dummy.public) then return false end
+        if not dummy.public:isInstance(self) then return false end
         return self:unload(...)
     end
 
@@ -57,7 +57,7 @@ if localPlayer then
     end
 
     function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetDummy, remoteSignature)
-        if not self or (self == dummy.public) then return false end
+        if not dummy.public:isInstance(self) then return false end
         if not dummyData then return false end
         targetDummy = (remoteSignature and targetDummy) or false
         local cAsset, cData = manager:getData(assetType, assetName, syncer.librarySerial)
@@ -117,7 +117,7 @@ if localPlayer then
     end
 
     function dummy.public:unload()
-        if not self or (self == dummy.public) or self.isUnloading then return false end
+        if not dummy.public:isInstance(self) or self.isUnloading then return false end
         self.isUnloading = true
         if self.cHeartbeat then
             self.cHeartbeat:destroy()

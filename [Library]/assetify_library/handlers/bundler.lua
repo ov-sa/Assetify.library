@@ -114,6 +114,9 @@ bundler["imports"] = [[
         if true then
             ]]..file:read("utilities/file.lua")..[[
         end
+        if true then
+            ]]..file:read("utilities/quat.lua")..[[
+        end
         assetify = {
             imports = {
                 resourceName = "]]..syncer.libraryName..[[",

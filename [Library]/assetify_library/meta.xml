@@ -16,6 +16,7 @@
     <script src="utilities/namespace.lua" type="shared"/>
     <script src="utilities/table.lua" type="shared"/>
     <script src="utilities/file.lua" type="shared"/>
+    <script src="utilities/quat.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>

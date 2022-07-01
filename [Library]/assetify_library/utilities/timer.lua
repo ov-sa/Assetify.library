@@ -38,12 +38,12 @@ function timer.public:create(...)
 end
 
 function timer.public:destroy(...)
-    if not self or (self == timer.public) then return false end
+    if not timer.public:isInstance(self) then return false end
     return self:unload(...)
 end
 
 function timer.public:load(exec, interval, executions, ...)
-    if not self or (self == timer.public) then return false end
+    if not timer.public:isInstance(self) then return false end
     interval, executions = imports.tonumber(interval), imports.tonumber(executions)
     if not exec or (imports.type(exec) ~= "function") or not interval or not executions then return false end
     interval, executions = imports.math.max(1, interval), imports.math.max(0, executions)
@@ -62,7 +62,7 @@ function timer.public:load(exec, interval, executions, ...)
 end
 
 function timer.public:unload()
-    if not self or (self == timer.public) then return false end
+    if not timer.public:isInstance(self) then return false end
     if self.timer and imports.isTimer(self.timer) then
         imports.killTimer(self.timer)
     end

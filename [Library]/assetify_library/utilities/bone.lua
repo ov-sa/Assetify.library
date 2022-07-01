@@ -62,7 +62,7 @@ function bone.public:create(...)
 end
 
 function bone.public:destroy(...)
-    if not self or (self == bone.public) then return false end
+    if not bone.public:isInstance(self) then return false end
     return self:unload(...)
 end
 
@@ -81,7 +81,7 @@ function bone.public:clearElementBuffer(element)
 end
 
 function bone.public:load(element, parent, boneData, remoteSignature)
-    if not self or (self == bone.public) then return false end
+    if not bone.public:isInstance(self) then return false end
     if not element or (not remoteSignature and not imports.isElement(element)) or not parent or (not remoteSignature and not imports.isElement(parent)) or not boneData or (element == parent) or bone.public.buffer.element[element] then return false end
     self.element = element
     self.parent = parent
@@ -100,7 +100,7 @@ function bone.public:load(element, parent, boneData, remoteSignature)
 end
 
 function bone.public:unload()
-    if not self or (self == bone.public) or self.isUnloading then return false end
+    if not bone.public:isInstance(self) or self.isUnloading then return false end
     self.isUnloading = true
     if self.cHeartbeat then
         self.cHeartbeat:destroy()
@@ -115,7 +115,7 @@ function bone.public:unload()
 end
 
 function bone.public:refresh(boneData, remoteSignature)
-    if not self or (self == bone.public) then return false end
+    if not bone.public:isInstance(self) then return false end
     self.parentType = self.parentType or remoteSignature.parentType or imports.getElementType(self.parent)
     self.parentType = ((self.parentType == "player") and "ped") or self.parentType
     if not self.parentType or not bone.public.ids[(self.parentType)] then return false end
@@ -146,7 +146,7 @@ function bone.public:refresh(boneData, remoteSignature)
 end
 
 function bone.public:update()
-    if not self or (self == bone.public) or self.cHeartbeat then return false end
+    if not bone.public:isInstance(self) or self.cHeartbeat then return false end
     bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
     bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
     bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick

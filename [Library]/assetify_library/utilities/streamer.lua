@@ -62,12 +62,12 @@ function streamer.public:create(...)
 end
 
 function streamer.public:destroy(...)
-    if not self or (self == streamer.public) then return false end
+    if not streamer.public:isInstance(self) then return false end
     return self:unload(...)
 end
 
 function streamer.public:load(streamerInstance, streamType, occlusionInstances, syncRate)
-    if not self or (self == streamer.public) then return false end
+    if not streamer.public:isInstance(self) then return false end
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
     local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
     self.streamer = streamerInstance
@@ -94,7 +94,7 @@ function streamer.public:load(streamerInstance, streamType, occlusionInstances, 
 end
 
 function streamer.public:unload()
-    if not self or (self == streamer.public) or self.isUnloading then return false end
+    if not streamer.public:isInstance(self) or self.isUnloading then return false end
     self.isUnloading = true
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
@@ -127,7 +127,7 @@ function streamer.public:update(clientDimension, clientInterior)
 end
 
 function streamer.public:allocate()
-    if not self or (self == streamer.public) then return false end
+    if not streamer.public:isInstance(self) then return false end
     if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
     streamer.private.allocator[(self.syncRate)] = streamer.private.allocator[(self.syncRate)] or {}
     streamer.private.allocator[(self.syncRate)][(self.streamType)] = streamer.private.allocator[(self.syncRate)][(self.streamType)] or {}
@@ -151,7 +151,7 @@ function streamer.public:allocate()
 end
 
 function streamer.public:deallocate()
-    if not self or (self == streamer.public) then return false end
+    if not streamer.public:isInstance(self) then return false end
     if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
     if not streamer.private.allocator[(self.syncRate)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] then return false end
     local isAllocatorVoid = true

@@ -43,12 +43,12 @@ function scene.public:create(...)
 end
 
 function scene.public:destroy(...)
-    if not self or (self == scene.public) then return false end
+    if not scene.public:isInstance(self) then return false end
     return self:unload(...)
 end
 
 function scene.public:load(cAsset, sceneManifest, sceneData)
-    if not self or (self == scene.public) then return false end
+    if not scene.public:isInstance(self) then return false end
     if not cAsset or not sceneManifest or not sceneData or not cAsset.synced then return false end
     local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffset and sceneManifest.sceneOffset.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
     self.cStreamerInstance = imports.createObject(cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.enableLODs and cAsset.synced.collisionID and true) or false)
@@ -75,7 +75,7 @@ function scene.public:load(cAsset, sceneManifest, sceneData)
 end
 
 function scene.public:unload()
-    if not self or (self == scene.public) or self.isUnloading then return false end
+    if not scene.public:isInstance(self) or self.isUnloading then return false end
     self.isUnloading = true
     if self.cStreamer then
         self.cStreamer:destroy()

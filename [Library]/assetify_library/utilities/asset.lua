@@ -100,7 +100,7 @@ if localPlayer then
     end
 
     function asset.public:destroy(...)
-        if not self or (self == asset.public) then return false end
+        if not asset.public:isInstance(self) then return false end
         return self:unload(...)
     end
 
@@ -115,7 +115,7 @@ if localPlayer then
     end
 
     function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
-        if not self or (self == asset.public) then return false end
+        if not asset.public:isInstance(self) then return false end
         if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local loadState = false
         if assetType == "module" then
@@ -207,7 +207,7 @@ if localPlayer then
     end
 
     function asset.public:unload(rwCache, callback)
-        if not self or (self == asset.public) or self.isUnloading then return false end
+        if not asset.public:isInstance(self) or self.isUnloading then return false end
         if not rwCache then return false end
         self.isUnloading = true
         if self.synced then

@@ -121,12 +121,12 @@ function network.public:create(...)
 end
 
 function network.public:destroy(...)
-    if not self or (self == network.public) then return false end
+    if not network.public:isInstance(self) then return false end
     return self:unload(...)
 end
 
 function network.public:load(name, isCallback)
-    if not self or (self == network.public) then return false end
+    if not network.public:isInstance(self) then return false end
     if not name or (imports.type(name) ~= "string") or network.private.buffer[name] then return false end
     self.name = name
     self.owner = network.public.identifier
@@ -137,14 +137,14 @@ function network.public:load(name, isCallback)
 end
 
 function network.public:unload()
-    if not self or (self == network.public) then return false end
+    if not network.public:isInstance(self) then return false end
     network.private.buffer[(self.name)] = nil
     self:destroyInstance()
     return true
 end
 
 function network.public:fetch(name, isRemote)
-    if not self or (self ~= network.public) then return false end
+    if self ~= network.public then return false end
     local cNetwork = network.private.buffer[name] or false
     if not cNetwork and isRemote then
         cNetwork = network.public:create(name)
@@ -153,7 +153,7 @@ function network.public:fetch(name, isRemote)
 end
 
 function network.public:serializeExec(exec)
-    if not self or (self ~= network.public) then return false end
+    if self ~= network.public then return false end
     if not exec or (imports.type(exec) ~= "function") then return false end
     local cSerial = imports.md5(network.public.identifier..":"..imports.tostring(exec))
     network.private.cache.execSerials[cSerial] = exec
@@ -161,13 +161,13 @@ function network.public:serializeExec(exec)
 end
 
 function network.public:deserializeExec(serial)
-    if not self or (self ~= network.public) then return false end
+    if self ~= network.public then return false end
     network.private.cache.execSerials[serial] = nil
     return true
 end
 
 function network.public:on(exec, isAsync)
-    if not self or (self == network.public) then return false end
+    if not network.public:isInstance(self) then return false end
     if not exec or (imports.type(exec) ~= "function") then return false end
     isAsync = (isAsync and true) or false
     if self.isCallback then
@@ -185,7 +185,7 @@ function network.public:on(exec, isAsync)
 end
 
 function network.public:off(exec)
-    if not self or (self == network.public) then return false end
+    if not network.public:isInstance(self) then return false end
     if not exec or (imports.type(exec) ~= "function") then return false end
     if self.isCallback then
         if self.handler and (self.handler == exec) then

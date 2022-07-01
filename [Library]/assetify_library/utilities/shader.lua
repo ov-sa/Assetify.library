@@ -120,7 +120,7 @@ if localPlayer then
     end
 
     function shader.public:destroy(...)
-        if not self or (self == shader.public) then return false end
+        if not shader.public:isInstance(self) then return false end
         return self:unload(...)
     end
 
@@ -183,7 +183,7 @@ if localPlayer then
     end
 
     function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance, isStandalone)
-        if not self or (self == shader.public) then return false end
+        if not shader.public:isInstance(self) then return false end
         local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         if not shaderCategory or not shaderName or (isExternalResource and shader.public.cache.remoteBlacklist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shader.public.rwCache[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
         element = ((element and imports.isElement(element)) and element) or false
@@ -236,7 +236,7 @@ if localPlayer then
     end
 
     function shader.public:unload()
-        if not self or (self == shader.public) or self.isUnloading then return false end
+        if not shader.public:isInstance(self) or self.isUnloading then return false end
         self.isUnloading = true
         if not self.preLoaded then
             if self.cShader and imports.isElement(self.cShader) then
@@ -258,7 +258,7 @@ if localPlayer then
     end
 
     function shader.public:setValue(i, j)
-        if not self or (self == shader.public) or not i or (shader.public.rwCache[(self.shaderData.shaderName)].properties.disabled[i]) then return false end
+        if not shader.public:isInstance(self) or not i or (shader.public.rwCache[(self.shaderData.shaderName)].properties.disabled[i]) then return false end
         return imports.dxSetShaderValue(self.cShader, i, j)
     end
 

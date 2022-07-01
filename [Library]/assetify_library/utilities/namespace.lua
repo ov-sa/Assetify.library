@@ -34,7 +34,7 @@ class.__index = class
 local namespace = nil
 
 function class:create(type, parent, nspace)
-    if not self or (self ~= class) then return false end
+    if self ~= class then return false end
     if not type or (imports.type(type) ~= "string") or (parent and (imports.type(parent) ~= "table") or buffer.instances[parent]) or buffer.types[type] then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
     if nspace and not namespace.private.types[nspace] then return false end
@@ -53,15 +53,15 @@ function class:create(type, parent, nspace)
         return (buffer.parents[self] and buffer.instances[self].type) or (buffer.instances[(buffer.instances[self])].type) or false
     end
     function parent:isInstance(instance)
-        if not self or (self ~= parent) or not buffer.parents[parent] then return false end
+        if (self ~= parent) or not buffer.parents[parent] then return false end
         return (buffer.parents[parent][instance] and true) or false
     end
     function parent:createInstance()
-        if not self or (self ~= parent) or not buffer.parents[parent] then return false end
+        if (self ~= parent) or not buffer.parents[parent] then return false end
         local cInstance = imports.setmetatable({}, {__index = self})
         buffer.instances[cInstance], buffer.parents[self][cInstance] = parent, true
         function cInstance:destroyInstance()
-            if not self or (self ~= cInstance) or not buffer.instances[self] then return false end
+            if (self ~= cInstance) or not buffer.instances[self] then return false end
             buffer.instances[self], buffer.parents[parent][self] = nil, nil
             self = nil
             imports.collectgarbage()
@@ -73,7 +73,7 @@ function class:create(type, parent, nspace)
 end
 
 function class:destroy(instance)
-    if not self or (self ~= class) then return false end
+    if self ~= class then return false end
     if not instance or (imports.type(instance) ~= "table") or not buffer.parents[instance] then return false end
     for i, j in imports.pairs(buffer.parents[instance]) do
         if i then
@@ -106,7 +106,7 @@ namespace.private.types = {}
 namespace.private.classes = {}
 
 function namespace.public:create(type)
-    if not self or ((self ~= namespace.public) and (self ~= namespace.private)) then return false end
+    if (self ~= namespace.public) and (self ~= namespace.private) then return false end
     if not type or (imports.type(type) ~= "string") or namespace.private.types[type] then return false end
     local parent = {}
     _G[type] = parent
@@ -117,7 +117,7 @@ function namespace.public:create(type)
 end
 
 function namespace.public:destroy(type)
-    if not self or ((self ~= namespace.public) and (self ~= namespace.private)) then return false end
+    if (self ~= namespace.public) and (self ~= namespace.private) then return false end
     if not type or (imports.type(type) ~= "string") or not namespace.private.types[type] then return false end
     if _G[type] and (_G[type] == namespace.private.types[type].public) then
         _G[type] = nil

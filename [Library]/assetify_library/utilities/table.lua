@@ -28,7 +28,7 @@ local imports = {
 
 local table = class:create("table", table)
 
- function table.public:pack(...)
+function table.public:pack(...)
     return {__T = {
         length = imports.select("#", ...)
     }, ...}
