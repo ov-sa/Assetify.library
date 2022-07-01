@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: sandbox: file.lua
+     Script: utilities: sandbox: filesystem.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -118,7 +118,7 @@ function file.public:resolveURL(path, chroot)
             else
                 table:insert(vDirs, j)
             end
-            cURL.url = imports.table:concat(vDirs, "/")
+            cURL.url = table:concat(vDirs, "/")
             local __cURL = file.public:parseURL(cURL.url)
             cURL.url = (__cURL and not __cURL.file and cURL.url.."/") or cURL.url
         end

@@ -13,9 +13,9 @@
     <file src="utilities/rw/planar_1x1/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/collision.rw"/>
     <script src="utilities/sandbox/shared.lua" type="shared"/>
-    <script src="utilities/sandbox/namespace.lua" type="shared"/>
+    <script src="utilities/sandbox/namespacer.lua" type="shared"/>
     <script src="utilities/sandbox/table.lua" type="shared"/>
-    <script src="utilities/sandbox/file.lua" type="shared"/>
+    <script src="utilities/sandbox/filesystem.lua" type="shared"/>
     <script src="utilities/sandbox/math/index.lua" type="shared"/>
     <script src="utilities/sandbox/math/quat.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>

@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    setmetatable = setmetatable,
     tonumber = tonumber,
     math = math
 }
@@ -23,6 +24,7 @@ local imports = {
 ---------------------
 
 local quat = class:create("quat", _, "math")
+imports.setmetatable(quat.public, quat.public)
 
 quat.public.__call = function(_, x, y, z, w)
     x, y, z, w = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z), imports.tonumber(w)
@@ -95,12 +97,10 @@ function quat.public:fromAngleAxis(x, y, z, angle)
     return cQuat
 end
 
-function quat.public:toEuler(x, y, z, w)
+function quat.public:toEuler()
     if not quat.public:isInstance(self) then return false end
-    x, y, z = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z)
-    if not w or not x or not y or not z then return false end
-    local sinX, sinY, sinZ = 2*((w*x) + (y*z)), 2*((w*y) - (z*x)), 2*((w*z) + (x*y))
-    local cosX, cosY, cosZ = 1 - (2*((x*x) + (y*y))), imports.math.min(imports.math.max(sinY, -1), 1), 1 - (2*((y*y) + (z*z)))
+    local sinX, sinY, sinZ = 2*((self.w*self.x) + (self.y*self.z)), 2*((self.w*self.y) - (self.z*self.x)), 2*((self.w*self.z) + (self.x*self.y))
+    local cosX, cosY, cosZ = 1 - (2*((self.x*self.x) + (self.y*self.y))), imports.math.min(imports.math.max(sinY, -1), 1), 1 - (2*((self.y*self.y) + (self.z*self.z)))
     return imports.math.deg(imports.math.atan2(sinX, cosX)), imports.math.deg(imports.math.asin(cosY)), imports.math.deg(imports.math.atan2(sinZ, cosZ))
 end
 

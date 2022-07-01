@@ -51,8 +51,9 @@ function table.public:clone(baseTable, isRecursive)
     return __baseTable
 end
 
+local __table_concat = imports.table.concat
 function table.public:concat(...)
-    return imports.table.concat(...)
+    return __table_concat(...)
 end
 
 function table.public:insert(baseTable, index, value, isForced)

@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: sandbox: namespace.lua
+     Script: utilities: sandbox: namespacer.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -47,7 +47,7 @@ function class:create(type, parent, nspace)
         _G[type] = parent
     end
     buffer.types[type] = true
-    buffer.parents[parent], buffer.instances[parent] = {}, {type = type, namespace = nspace, public = parent, private = imports.setmetatable({}, {__index = parent})}
+    buffer.parents[parent], buffer.instances[parent] = {}, {type = type, nspace = nspace, public = parent, private = imports.setmetatable({}, {__index = parent})}
     function parent:getType()
         if not self or not buffer.instances[self] then return false end
         return (buffer.parents[self] and buffer.instances[self].type) or (buffer.instances[(buffer.instances[self])].type) or false
@@ -80,16 +80,17 @@ function class:destroy(instance)
             i:destroyInstance()
         end
     end
-    if buffer.instances[instance].namespace then
-        if namespace.private.types[namespace] and namespace.private.types[namespace][(buffer.instances[instance].type)] and (namespace.private.types[namespace][(buffer.instances[instance].type)] == buffer.instances[instance].public) then
-            namespace.private.types[namespace][(buffer.instances[instance].type)] = nil
+    local type, nspace = buffer.instances[instance].type, buffer.instances[instance].nspace
+    if buffer.instances[instance].nspace then
+        if namespace.private.types[nspace] and namespace.private.types[nspace][type] and (namespace.private.types[nspace][type] == buffer.instances[instance].public) then
+            namespace.private.types[nspace][type] = nil
         end
     else
-        if _G[(buffer.instances[instance].type)] and (_G[(buffer.instances[instance].type)] == buffer.instances[instance].public) then
-            _G[(buffer.instances[instance].type)] = nil
+        if _G[type] and (_G[type] == buffer.instances[instance].public) then
+            _G[type] = nil
         end
     end
-    buffer.types[(buffer.instances[instance].type)] = nil
+    buffer.types[type] = nil
     buffer.instances[instance], buffer.parents[instance] = nil, nil
     instance = nil
     imports.collectgarbage()
