@@ -473,7 +473,7 @@ else
                                     end
                                 end
                             else
-                                local debugTXDExistence = not file:exists(assetPath..(asset.references.asset)..".txd")
+                                local debugTXDExistence = not file:exists(assetPath..(asset.public.references.asset)..".txd")
                                 if assetManifestData.assetClumps then
                                     for i, j in imports.pairs(assetManifestData.assetClumps) do
                                         debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath.."clump/"..j.."/"..(asset.public.references.asset)..".txd") and true) or debugTXDExistence

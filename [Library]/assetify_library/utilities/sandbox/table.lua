@@ -35,6 +35,7 @@ function table.public:pack(...)
 end
 
 function table.public:unpack(baseTable)
+    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     return imports.unpack(baseTable, 1, (baseTable.__T and baseTable.__T.length) or #baseTable)
 end
 
