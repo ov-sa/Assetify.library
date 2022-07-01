@@ -24,6 +24,8 @@
 * Gamemode Perspective
 * UE inspired Unlimited & Configurable Asset Packs
 * Built-In Table library
+* Built-In Math library
+* Built-In String library
 * Built-In Namespacer (Inclusive of `Class` simulator)
 * Built-In File System
 * Built-In Timer
