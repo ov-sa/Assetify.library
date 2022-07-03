@@ -127,11 +127,11 @@ function bone.public:refresh(boneData, remoteSignature)
         if self.boneData then prev_rotX, prev_rotY, prev_rotZ = self.boneData.rotation.x, self.boneData.rotation.y, self.boneData.rotation.z
         else prev_rotX, prev_rotY, prev_rotZ = remoteSignature.elementRotation or imports.getElementRotation(self.element, "ZYX") end
         local rotQuat = imports.math.quat:fromEuler(prev_rotX, prev_rotY, prev_rotZ)
-        local xQuat, yQuat, zQuat = imports.math.quat:fromAngleAxis(1, 0, 0, boneData.rotation.x), imports.math.quat:fromAngleAxis(0, 1, 0, boneData.rotation.y), imports.math.quat:fromAngleAxis(0, 0, 1, boneData.rotation.z)
+        local xQuat, yQuat, zQuat = imports.math.quat:fromAxisAngle(1, 0, 0, boneData.rotation.x), imports.math.quat:fromAxisAngle(0, 1, 0, boneData.rotation.y), imports.math.quat:fromAxisAngle(0, 0, 1, boneData.rotation.z)
         local __rotQuat = xQuat*yQuat*zQuat
         rotQuat = __rotQuat*rotQuat
         boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = rotQuat:toEuler()
-        rotQuat:destroyInstance(); xQuat:destroyInstance(); yQuat:destroyInstance(); zQuat:destroyInstance()
+        rotQuat:destroy(); xQuat:destroy(); yQuat:destroy(); zQuat:destroy()
     end
     boneData.rotationMatrix = imports.matrix.fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
     boneData.syncRate = imports.tonumber(boneData.syncRate) or settings.streamer.boneSyncRate

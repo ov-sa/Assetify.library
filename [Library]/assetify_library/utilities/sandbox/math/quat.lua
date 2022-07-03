@@ -34,6 +34,12 @@ quat.public.__call = function(_, x, y, z, w)
     return cQuat
 end
 
+function quat.public:destroy()
+    if not quat.public:isInstance(self) then return false end
+    self:destroyInstance()
+    return true
+end
+
 quat.public.__add = function(quatLHS, quatRHS)
     return quat.public:isInstance(quatLHS) and quat.public:isInstance(quatRHS) and quat.public(
         quatLHS.x + quatRHS.x,
@@ -78,7 +84,7 @@ function quat.public:scale(scale)
     return self
 end
 
-function quat.public:setAngleAxis(x, y, z, angle)
+function quat.public:setAxisAngle(x, y, z, angle)
     if not quat.public:isInstance(self) then return false end
     x, y, z, angle = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z), imports.tonumber(angle)
     if not x or not y or not z or not angle then return false end
@@ -88,12 +94,12 @@ function quat.public:setAngleAxis(x, y, z, angle)
     return self
 end
 
-function quat.public:fromAngleAxis(x, y, z, angle)
+function quat.public:fromAxisAngle(x, y, z, angle)
     if (self ~= quat.public) or (self ~= quat.private) then return false end
     x, y, z, angle = imports.tonumber(x), imports.tonumber(y), imports.tonumber(z), imports.tonumber(angle)
     if not x or not y or not z or not angle then return false end
     local cQuat = quat.public(0, 0, 0, 0)
-    cQuat:setAngleAxis(x, y, z, angle)
+    cQuat:setAxisAngle(x, y, z, angle)
     return cQuat
 end
 

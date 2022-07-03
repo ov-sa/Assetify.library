@@ -229,7 +229,7 @@ if localPlayer then
                         }
                         local cQuat = imports.math.quat(imports.tonumber(imports.gettok(unparsedIPLDatas[i], 7, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 8, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 9, asset.separators.IPL)), imports.tonumber(imports.gettok(unparsedIPLDatas[i], 10, asset.separators.IPL)))
                         sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = cQuat:toEuler()
-                        cQuat:destroyInstance()
+                        cQuat:destroy()
                         if not cAsset.manifestData.sceneMapped then
                             asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
                                 txd = (parsedIDEDatas and parsedIDEDatas[childName] and assetPath.."txd/"..(parsedIDEDatas[childName][1])..".txd") or assetPath..(asset.references.asset)..".txd",
