@@ -6,16 +6,13 @@
         <right name="function.fetchRemote" access="true"/>
     </aclrequest>
 
-    <!-- Exports, Settings & Utilities -->
-    <file src="utilities/rw/dict.rw"/>
-    <file src="utilities/rw/buffer.rw"/>
-    <file src="utilities/rw/planar_1x1/dict.rw"/>
-    <file src="utilities/rw/planar_1x1/buffer.rw"/>
-    <file src="utilities/rw/planar_1x1/collision.rw"/>
+    <!-- Utilities: Exports & Settings -->
     <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
+
+    <!-- Utilities: Sandbox -->
     <script src="utilities/sandbox/shared.lua" type="shared"/>
     <script src="utilities/sandbox/namespacer.lua" type="shared"/>
     <script src="utilities/sandbox/table.lua" type="shared"/>
@@ -27,6 +24,13 @@
     <script src="utilities/sandbox/timer.lua" type="shared"/>
     <script src="utilities/sandbox/threader.lua" type="shared"/>
     <script src="utilities/sandbox/networker.lua" type="shared"/>
+
+    <!-- Utilities: Shaders -->
+    <file src="utilities/rw/dict.rw"/>
+    <file src="utilities/rw/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/dict.rw"/>
+    <file src="utilities/rw/planar_1x1/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/collision.rw"/>
     <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
     <script src="utilities/shaders/tex_changer.lua" type="client"/>
@@ -36,9 +40,11 @@
     <script src="utilities/shaders/tex_mapper.lua" type="client"/>
     <script src="utilities/shaders/tex_exporter.lua" type="client"/>
     <script src="utilities/shaders/light_planar.lua" type="client"/>
+
+    <!-- Utilities -->
+    <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/asset.lua" type="shared"/>
     <script src="utilities/dummy.lua" type="shared"/>
-    <script src="utilities/syncer.lua" type="shared"/>
     <script src="utilities/renderer.lua" type="shared"/>
     <script src="utilities/shader.lua" type="shared"/>
     <script src="utilities/manager.lua" type="shared"/>

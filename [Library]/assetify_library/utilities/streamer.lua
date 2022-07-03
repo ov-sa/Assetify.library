@@ -36,12 +36,12 @@ local imports = {
 -------------------------
 
 local streamer = class:create("streamer")
+streamer.private.allocator = {
+    validStreams = {"dummy", "bone", "light"}
+}
 streamer.private.buffer = {}
 streamer.private.cache = {
     clientCamera = imports.getCamera()
-}
-streamer.private.allocator = {
-    validStreams = {"dummy", "bone", "light"}
 }
 streamer.private.allocator.__validStreams = {}
 for i = 1, #streamer.private.allocator.validStreams, 1 do
@@ -50,7 +50,6 @@ for i = 1, #streamer.private.allocator.validStreams, 1 do
 end
 streamer.private.allocator.validStreams = streamer.private.allocator.__validStreams
 streamer.private.allocator.__validStreams = nil
-local onEntityStream, onBoneStream, onBoneUpdate = nil, nil, nil
 
 function streamer.public:create(...)
     local cStreamer = self:createInstance()
@@ -138,11 +137,11 @@ function streamer.public:allocate()
         if self.syncRate <= 0 then
             if not streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
                 streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = true
-                imports.addEventHandler("onClientPedsProcessed", root, onBoneUpdate)
+                imports.addEventHandler("onClientPedsProcessed", root, streamer.private.onBoneUpdate)
             end
         else
             if not streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer or not timer:isInstance(streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer) then
-                streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = timer:create(onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
+                streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = timer:create(streamer.private.onBoneUpdate, self.syncRate, 0, self.syncRate, self.streamType)
             end
         end
         streamBuffer[self] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self]
@@ -164,7 +163,7 @@ function streamer.public:deallocate()
         if self.streamType == "bone" then
             if self.syncRate <= 0 then
                 if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
-                    imports.removeEventHandler("onClientPedsProcessed", root, onBoneUpdate)
+                    imports.removeEventHandler("onClientPedsProcessed", root, streamer.private.onBoneUpdate)
                     streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
                 end
             else
@@ -178,7 +177,7 @@ function streamer.public:deallocate()
     return true
 end
 
-onEntityStream = function(streamBuffer)
+streamer.private.onEntityStream = function(streamBuffer)
     if not streamBuffer then return false end
     for i, j in imports.pairs(streamBuffer) do
         if j then
@@ -196,7 +195,7 @@ onEntityStream = function(streamBuffer)
     return true
 end
 
-onBoneStream = function(streamBuffer)
+streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
     for i, j in imports.pairs(streamBuffer) do
         if j and j.isStreamed then
@@ -207,12 +206,12 @@ onBoneStream = function(streamBuffer)
     return true
 end
 
-onBoneUpdate = function(syncRate, streamType)
+streamer.private.onBoneUpdate = function(syncRate, streamType)
     local streamBuffer = (syncRate and streamType and streamer.private.allocator[syncRate][streamType]) or false
     streamBuffer = streamBuffer or (streamer.private.allocator[0] and streamer.private.allocator[0]["bone"]) or false
     local clientDimension, clientInterior = streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior
     if streamBuffer and streamBuffer[clientDimension] and streamBuffer[clientDimension][clientInterior] then
-        onBoneStream(streamBuffer[clientDimension][clientInterior])
+        streamer.private.onBoneStream(streamBuffer[clientDimension][clientInterior])
     end
     return true
 end
@@ -229,12 +228,12 @@ network:fetch("Assetify:onLoad"):on(function()
         local clientDimension, clientInterior = streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior
         if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
             for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
-                onEntityStream(j)
+                streamer.private.onEntityStream(j)
             end
         end
         if streamer.private.buffer[-1] and streamer.private.buffer[-1][clientInterior] then
             for i, j in imports.pairs(streamer.private.buffer[-1][clientInterior]) do
-                onEntityStream(j)
+                streamer.private.onEntityStream(j)
             end
         end
         streamer.private.cache.isCameraTranslated = false
