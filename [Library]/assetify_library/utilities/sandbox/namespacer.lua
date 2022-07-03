@@ -59,7 +59,7 @@ function class:create(type, parent, nspace)
     function parent:createInstance()
         if (self ~= parent) or not buffer.parents[parent] then return false end
         local cInstance = imports.setmetatable({}, {__index = self})
-        buffer.instances[cInstance], buffer.parents[self][cInstance] = parent, true
+        buffer.instances[cInstance], buffer.parents[parent][cInstance] = parent, true
         function cInstance:destroyInstance()
             if (self ~= cInstance) or not buffer.instances[self] then return false end
             buffer.instances[self], buffer.parents[parent][self] = nil, nil

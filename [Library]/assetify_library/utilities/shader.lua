@@ -152,14 +152,10 @@ if localPlayer then
             shader.public.buffer.element[element] = nil
         else
             for i, j in imports.pairs(shader.public.buffer.element[element][shaderCategory].textured) do
-                if j then
-                    j:destroy()
-                end
+                if j then j:destroy() end
             end
             for i, j in imports.pairs(shader.public.buffer.element[element][shaderCategory].untextured) do
-                if i then
-                    i:destroy()
-                end
+                if i then i:destroy() end
             end
             shader.public.buffer.element[element][shaderCategory] = nil
         end
