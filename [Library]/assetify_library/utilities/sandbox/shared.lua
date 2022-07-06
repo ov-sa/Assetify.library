@@ -14,15 +14,12 @@
 
 local imports = {
     type = type,
-    pairs = pairs,
     tonumber = tonumber,
-    decodeString = decodeString,
-    setmetatable = setmetatable,
+    getLocalPlayer = getLocalPlayer,
+    isElement = isElement,
+    destroyElement = destroyElement,
     getElementMatrix = getElementMatrix,
     getElementPosition = getElementPosition,
-    toJSON = toJSON,
-    fromJSON = fromJSON,
-    utf8 = utf8,
     table = table,
     string = string,
     math = math
@@ -33,15 +30,10 @@ local imports = {
 --[[ Utils ]]--
 ---------------
 
-decodeString = function(decodeType, decodeData, decodeOptions, removeNull)
-    if not decodeData or (imports.type(decodeData) ~= "string") then return false end
-    local rawString = imports.decodeString(decodeType, decodeData, decodeOptions)
-    if not rawString then return false end
-    if removeNull then
-        rawString = imports.utf8.gsub(rawString, imports.utf8.char(0), "")
-    end
-    return rawString
-end
+
+localPlayer = (imports.getLocalPlayer and imports.getLocalPlayer()) or false
+isElement = function(element) return (element and imports.isElement(element)) or false end
+destroyElement = function(element) return (isElement(element) and imports.destroyElement(element)) or false end
 
 getElementPosition = function(element, offX, offY, offZ)
     if not offX or not offY or not offZ then
@@ -65,31 +57,6 @@ getDistanceBetweenPoints3D = function(x1, y1, z1, x2, y2, z2)
     if not x1 or not y1 or not z1 or not x2 or not y2 or not z2 then return false end
     return imports.math.sqrt(((x2 - x1)^2) + ((y2 - y1)^2) + ((z2 - z1)^2))
 end
-
-
----------------------
---[[ Class: UTF8 ]]--
----------------------
-
-local __utf8_gsub = imports.utf8.gsub
-utf8.gsub = function(string, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
-    if not matchWord then
-        print(string)
-    end
-    matchPrefix, matchPostfix = matchPrefix or "", matchPostfix or ""
-    matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
-    return __utf8_gsub(string, matchWord, replaceWord, matchLimit)
-end
-
-
----------------------
---[[ Class: JSON ]]--
----------------------
-
-json = {
-    encode = imports.toJSON,
-    decode = imports.fromJSON
-}
 
 
 ---------------------
@@ -129,7 +96,8 @@ end
 --[[ Class: Matrix ]]--
 -----------------------
 
-matrix = {
+--TODO: MAKE CLASS
+math.matrix = {
     fromPosition = function(posX, posY, posZ, rotX, rotY, rotZ)
         if not posX or not posY or not posZ or not rotX or not rotY or not rotZ then return false end
         rotX, rotY, rotZ = imports.math.rad(rotX), imports.math.rad(rotY), imports.math.rad(rotZ)

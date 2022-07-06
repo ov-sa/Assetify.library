@@ -16,9 +16,10 @@ local imports = {
     type = type,
     pairs = pairs,
     tonumber = tonumber,
+    toJSON = toJSON,
+    fromJSON = fromJSON,
     select = select,
-    unpack = unpack,
-    table = table
+    unpack = unpack
 }
 
 
@@ -39,6 +40,14 @@ function table.public:unpack(baseTable)
     return imports.unpack(baseTable, 1, (baseTable.__T and baseTable.__T.length) or #baseTable)
 end
 
+function table.public:encode(baseTable)
+    return (baseTable and (imports.type(baseTable) == "table") and imports.toJSON(baseTable)) or false
+end
+
+function table.public:decode(baseString)
+    return (baseString and (imports.type(baseString) == "string") and imports.fromJSON(baseString)) or false
+end
+
 function table.public:clone(baseTable, isRecursive)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
     local __baseTable = {}
@@ -52,9 +61,26 @@ function table.public:clone(baseTable, isRecursive)
     return __baseTable
 end
 
-local __table_concat = imports.table.concat
-function table.public:concat(...)
-    return __table_concat(...)
+local __table_concat = table.concat
+function table.public:concat(baseTable, separator, startIndex, endIndex)
+    return __table_concat(baseTable, separator, startIndex, endIndex)
+end
+
+function table.public:keys(baseTable)
+    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
+    local indexCache, __baseTable = {}, {}
+    for i, j in imports.pairs(baseTable) do
+        if i ~= "__T" then
+            indexCache[i] = true
+            table.public:insert(__baseTable, i)
+        end
+    end
+    for i = 1, (baseTable.__T and baseTable.__T.length) or #baseTable, 1 do
+        if not indexCache[i] then
+            table.public:insert(__baseTable, i)
+        end
+    end
+    return __baseTable
 end
 
 function table.public:insert(baseTable, index, value, isForced)
@@ -94,6 +120,14 @@ function table.public:remove(baseTable, index)
         end
     end
     baseTable.__T.length = baseTable.__T.length - 1
+    return true
+end
+
+function table.public:forEach(baseTable, exec)
+    if not baseTable or (imports.type(baseTable) ~= "table") or not exec or (imports.type(exec) ~= "function") then return false end
+    for i = 1, (baseTable.__T and baseTable.__T.length) or #baseTable, 1 do
+        exec(i, baseTable[i])
+    end
     return true
 end
 

@@ -47,10 +47,7 @@ function thread.public:createHeartbeat(conditionExec, exec, rate)
         exec()
         conditionExec, exec = nil, nil
     end)
-    cThread:resume({
-        executions = 1,
-        frames = rate
-    })
+    cThread:resume({executions = 1, frames = rate})
     return cThread
 end
 

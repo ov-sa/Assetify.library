@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers. loader.lua
+     Script: handlers: builder: client.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Laoder Handler ]]--
+     Desc: Builder Handler ]]--
 ----------------------------------------------------------------
 
 
@@ -15,25 +15,19 @@
 local imports = {
     pairs = pairs,
     addEventHandler = addEventHandler,
-    triggerEvent = triggerEvent,
     setWaterLevel = setWaterLevel
 }
 
 
------------------------------------------------
---[[ Events: On Client Resource Start/Stop ]]--
------------------------------------------------
+--------------------------
+--[[ Builder Handlers ]]--
+--------------------------
 
 imports.addEventHandler("onClientResourceStart", resourceRoot, function()
-    if settings.GTA.clearWorld then
-        clearWorld()
-    else
-        restoreWorld()
-    end
+    if settings.GTA.clearWorld then manager.API.World:clearWorld()
+    else manager.API.World:restoreWorld() end
     if settings.GTA.waterLevel then
-        if streamer.waterBuffer then
-            imports.setWaterLevel(streamer.waterBuffer, settings.GTA.waterLevel)
-        end
+        if streamer.waterBuffer then imports.setWaterLevel(streamer.waterBuffer, settings.GTA.waterLevel) end
         imports.setWaterLevel(settings.GTA.waterLevel, true, true, true, true)
     end
 end)

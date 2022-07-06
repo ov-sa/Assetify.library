@@ -53,10 +53,10 @@ function timer.public:load(exec, interval, executions, ...)
     self.arguments = table:pack(...)
     self.timer = imports.setTimer(function()
         self.currentExec = self.currentExec + 1
-        self.exec(table:unpack(self.arguments))
         if (self.executions > 0) and (self.currentExec >= self.executions) then
             self:destroy()
         end
+        self.exec(table:unpack(self.arguments))
     end, self.interval, self.executions)
     return self
 end

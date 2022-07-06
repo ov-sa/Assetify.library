@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: streamer.lua
+     Script: utilities: engine: streamer.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -17,7 +17,6 @@ local imports = {
     pairs = pairs,
     getCamera = getCamera,
     isElement = isElement,
-    destroyElement = destroyElement,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     attachElements = attachElements,
@@ -37,19 +36,16 @@ local imports = {
 
 local streamer = class:create("streamer")
 streamer.private.allocator = {
-    validStreams = {"dummy", "bone", "light"}
+    validStreams = {
+        ["dummy"] = {},
+        ["bone"] = {skipAttachment = false},
+        ["light"] = {}
+    }
 }
 streamer.private.buffer = {}
 streamer.private.cache = {
     clientCamera = imports.getCamera()
 }
-streamer.private.allocator.__validStreams = {}
-for i = 1, #streamer.private.allocator.validStreams, 1 do
-    local j = streamer.private.allocator.validStreams[i]
-    streamer.private.allocator.__validStreams[j] = true
-end
-streamer.private.allocator.validStreams = streamer.private.allocator.__validStreams
-streamer.private.allocator.__validStreams = nil
 
 function streamer.public:create(...)
     local cStreamer = self:createInstance()
@@ -70,13 +66,11 @@ function streamer.public:load(streamerInstance, streamType, occlusionInstances, 
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
     local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
     self.streamer = streamerInstance
-    self.streamType = streamType
-    self.occlusions = occlusionInstances
-    self.dimension = streamDimension
-    self.interior = streamInterior
+    self.streamType, self.occlusions = streamType, occlusionInstances
+    self.dimension, self.interior = streamDimension, streamInterior
     self.syncRate = syncRate or settings.streamer.syncRate
     if streamerInstance ~= occlusionInstances[1] then
-        if streamType ~= "bone" then
+        if not streamer.private.allocator.validStreams[streamType] or not streamer.private.allocator.validStreams[streamType].skipAttachment then
             imports.attachElements(streamerInstance, occlusionInstances[1])
         end
         imports.setElementDimension(streamerInstance, streamDimension)
@@ -85,16 +79,13 @@ function streamer.public:load(streamerInstance, streamType, occlusionInstances, 
     streamer.private.buffer[streamDimension] = streamer.private.buffer[streamDimension] or {}
     streamer.private.buffer[streamDimension][streamInterior] = streamer.private.buffer[streamDimension][streamInterior] or {}
     streamer.private.buffer[streamDimension][streamInterior][streamType] = streamer.private.buffer[streamDimension][streamInterior][streamType] or {}
-    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = {
-        isStreamed = false
-    }
+    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = {isStreamed = false}
     self:allocate()
     return true
 end
 
 function streamer.public:unload()
-    if not streamer.public:isInstance(self) or self.isUnloading then return false end
-    self.isUnloading = true
+    if not streamer.public:isInstance(self) then return false end
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.private.buffer[streamDimension][streamInterior][streamType][self] = nil
@@ -124,6 +115,8 @@ function streamer.public:update(clientDimension, clientInterior)
     streamer.private.cache.clientWorld.interior = currentInterior
     return true
 end
+imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
+imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
 
 function streamer.public:allocate()
     if not streamer.public:isInstance(self) then return false end

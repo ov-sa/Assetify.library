@@ -1,12 +1,17 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="4.5.0"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="5.0.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
     </aclrequest>
 
     <!-- Utilities: Exports & Settings -->
+    <file src="utilities/rw/dict.rw"/>
+    <file src="utilities/rw/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/dict.rw"/>
+    <file src="utilities/rw/planar_1x1/buffer.rw"/>
+    <file src="utilities/rw/planar_1x1/collision.rw"/>
     <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
@@ -24,13 +29,11 @@
     <script src="utilities/sandbox/timer.lua" type="shared"/>
     <script src="utilities/sandbox/threader.lua" type="shared"/>
     <script src="utilities/sandbox/networker.lua" type="shared"/>
+    <script src="utilities/engine/syncer.lua" type="shared"/>
+    <script src="utilities/sandbox/datasystem.lua" type="shared"/>
+    <script src="utilities/sandbox/downloader.lua" type="shared"/>
 
     <!-- Utilities: Shaders -->
-    <file src="utilities/rw/dict.rw"/>
-    <file src="utilities/rw/buffer.rw"/>
-    <file src="utilities/rw/planar_1x1/dict.rw"/>
-    <file src="utilities/rw/planar_1x1/buffer.rw"/>
-    <file src="utilities/rw/planar_1x1/collision.rw"/>
     <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
     <script src="utilities/shaders/tex_changer.lua" type="client"/>
@@ -41,23 +44,28 @@
     <script src="utilities/shaders/tex_exporter.lua" type="client"/>
     <script src="utilities/shaders/light_planar.lua" type="client"/>
 
-    <!-- Utilities -->
-    <script src="utilities/syncer.lua" type="shared"/>
-    <script src="utilities/asset.lua" type="shared"/>
-    <script src="utilities/dummy.lua" type="shared"/>
-    <script src="utilities/renderer.lua" type="shared"/>
-    <script src="utilities/shader.lua" type="shared"/>
-    <script src="utilities/manager.lua" type="shared"/>
-    <script src="utilities/scene.lua" type="client"/>
-    <script src="utilities/bone.lua" type="client"/>
-    <script src="utilities/streamer.lua" type="client"/>
-    <script src="utilities/light.lua" type="client"/>
-    <script src="utilities/lights/planar.lua" type="client"/>
+    <!-- Utilities: Engin -->
+    <script src="utilities/engine/asset.lua" type="shared"/>
+    <script src="utilities/engine/dummy.lua" type="shared"/>
+    <script src="utilities/engine/renderer.lua" type="shared"/>
+    <script src="utilities/engine/shader.lua" type="shared"/>
+    <script src="utilities/engine/manager.lua" type="shared"/>
+    <script src="utilities/engine/scene.lua" type="shared"/>
+    <script src="utilities/engine/bone.lua" type="shared"/>
+    <script src="utilities/engine/streamer.lua" type="client"/>
+    <script src="utilities/engine/light.lua" type="client"/>
+    <script src="utilities/engine/lights/planar.lua" type="client"/>
 
     <!-- Handlers -->
-    <script src="handlers/builder.lua" type="server"/>
+    <script src="handlers/builder/server.lua" type="server"/>
+    <script src="handlers/builder/client.lua" type="client"/>
     <script src="handlers/bundler.lua" type="shared"/>
-    <script src="handlers/loader.lua" type="client"/>
+    <script src="handlers/api/world/shared.lua" type="shared"/>
+    <script src="handlers/api/world/client.lua" type="client"/>
+    <script src="handlers/api/anim/shared.lua" type="shared"/>
+    <script src="handlers/api/anim/client.lua" type="client"/>
+    <script src="handlers/api/sound/shared.lua" type="shared"/>
+    <script src="handlers/api/sound/client.lua" type="client"/>
 
     <!-- Exports -->
     <export function="import" type="shared"/>

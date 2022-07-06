@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: builder.lua
+     Script: handlers: builder: server.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -14,13 +14,15 @@
 
 local imports = {
     pairs = pairs,
+    fetchRemote = fetchRemote,
+    outputDebugString = outputDebugString,
     addEventHandler = addEventHandler
 }
 
 
-----------------------------------
---[[ Event: On Resource Start ]]--
-----------------------------------
+--------------------------
+--[[ Builder Handlers ]]--
+--------------------------
 
 local function onLibraryLoaded()
     network:emit("Assetify:onLoad", false)
@@ -32,16 +34,20 @@ local function onLibraryLoaded()
 end
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
+    imports.fetchRemote(syncer.librarySource, function(response, status)
+        if not response or not status or (status ~= 0) then return false end
+        response = table:decode(response)
+        if response and response.tag_name and (syncer.libraryVersion ~= response.tag_name) then
+            imports.outputDebugString("[Assetify]: Latest version available - "..response.tag_name, 3)
+        end
+    end)
+
     thread:create(function(self)
         syncer.libraryModules = {}
-        if not settings.assetPacks["module"] then
-            network:emit("Assetify:onModuleLoad", false)
-        end
+        if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
         for i, j in imports.pairs(settings.assetPacks) do
             asset:buildPack(i, j, function(state, assetType)
-                if assetType == "module" then
-                    network:emit("Assetify:onModuleLoad", false)
-                end
+                if assetType == "module" then network:emit("Assetify:onModuleLoad", false) end
                 timer:create(function()
                     self:resume()
                 end, 1, 1)
