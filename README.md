@@ -23,15 +23,11 @@
 * Completely Performance-Friendly
 * Gamemode Perspective
 * UE inspired Unlimited & Configurable Asset Packs
-* Built-In Table library
-* Built-In Math library
-* Built-In String library
 * Built-In Namespacer (Inclusive of `Class` simulator)
+* Built-In Table, Math, String library
 * Built-In File System
-* Built-In Timer
-* Built-In Threader
-* Built-In Networker
-* Built-In Scheduler
+* Built-In Timer & Threader
+* Built-In Networker & Scheduler
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
