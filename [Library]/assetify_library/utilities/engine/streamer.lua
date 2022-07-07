@@ -154,17 +154,14 @@ function streamer.public:deallocate()
     end
     if isAllocatorVoid then
         if self.streamType == "bone" then
-            if self.syncRate <= 0 then
-                if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
+            if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
+                if self.syncRate <= 0 then
                     imports.removeEventHandler("onClientPedsProcessed", root, streamer.private.onBoneUpdate)
-                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
-                end
-            else
-                if streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer then
-                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer:destroyInstance()
-                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
+                else
+                    streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer:destroy()
                 end
             end
+            streamer.private.allocator[(self.syncRate)][(self.streamType)].cTimer = nil
         end
     end
     return true
