@@ -130,7 +130,7 @@ if localPlayer then
             end
         else
             if not assetPack.assetType then return false end
-            local modelID, collisionID = false, false
+            local modelID, lodID, collisionID = false, false, false
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
                 if modelID then
@@ -139,8 +139,12 @@ if localPlayer then
                         imports.engineFreeModel(modelID)
                         return false
                     else
+                        if rwPaths.lod then
+                            rwCache.lod[(rwPaths.lod)] = (not rwCache.lod[(rwPaths.lod)] and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(file:read(rwPaths.lod), assetManifest.encryptKey) or rwPaths.lod)) or false
+                            lodID = (rwCache.lod[(rwPaths.lod)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
+                        end
                         rwCache.col[(rwPaths.col)] = (not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(file:read(rwPaths.col), assetManifest.encryptKey) or rwPaths.col)) or false
-                        collisionID = collisionID or (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or collisionID
+                        collisionID = (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
                         imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
                         if collisionID then
                             imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange)
@@ -152,22 +156,21 @@ if localPlayer then
                 rwCache.txd[(rwPaths.txd)] = (not rwCache.txd[(rwPaths.txd)] and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(file:read(rwPaths.txd), assetManifest.encryptKey) or rwPaths.txd)) or false
                 if rwCache.txd[(rwPaths.txd)] then
                     imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
+                    if lodID then imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], lodID) end
                 end
                 imports.engineReplaceModel(rwCache.dff[(rwPaths.dff)], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
+                if lodID then imports.engineReplaceModel(rwCache.lod[(rwPaths.lod)], lodID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency) end
                 if collisionID then
-                    imports.engineImportTXD(asset.public.rwAssets.txd, collisionID)
-                    imports.engineReplaceModel(asset.public.rwAssets.dff, collisionID, false)
-                end
-                if rwCache.col[(rwPaths.col)] then
                     imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
-                    if collisionID then
-                        imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
-                    end
+                    if lodID then imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], lodID) end
+                    manager.API.World:clearModel(collisionID)
+                    imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
                 end
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
                 self.synced = {
                     modelID = modelID,
+                    lodID = lodID,
                     collisionID = collisionID
                 }
                 loadState = true
@@ -184,6 +187,7 @@ if localPlayer then
         if not rwCache then return false end
         if self.synced then
             if self.synced.modelID then imports.engineFreeModel(self.synced.modelID) end
+            if self.synced.lodID then imports.engineFreeModel(self.synced.lodID) end
             if self.synced.collisionID then imports.engineFreeModel(self.synced.collisionID) end
         end
         if self.rwPaths then
@@ -419,8 +423,8 @@ else
                                         cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
                                         for k = 1, #sceneIPLDatas, 1 do
                                             local v = sceneIPLDatas[k]
-                                            asset.public:buildFile(assetPath.."dff/lod/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             asset.public:buildFile(assetPath.."dff/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetPath.."dff/lod/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             asset.public:buildFile(assetPath.."col/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             if sceneIDEDatas and sceneIDEDatas[(v[2])] then
                                                 asset.public:buildFile(assetPath.."txd/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
