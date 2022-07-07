@@ -52,9 +52,10 @@ local asset = class:create("asset", {
 })
 
 function asset.public:readFile(filePath, encryptKey, ...)
-    if not filePath or (imports.type(filePath) ~= "string") then return false end
+    if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
+    if not encryptKey then return filePath end
     local rw = file:read(filePath)
-    return (rw and encryptKey and string.decode("tea", rw, {key = encryptKey}, ...)) or rw
+    return (rw and string.decode("tea", rw, {key = encryptKey}, ...)) or false
 end
 
 if localPlayer then
@@ -83,7 +84,7 @@ if localPlayer then
                     rwCache[i][k] = {}
                     if k ~= "server" then
                         for m, n in imports.pairs(v) do
-                            rwCache[i][k][m] = asset.public:readFile(file:read(n), encryptKey, true)
+                            rwCache[i][k][m] = asset.public:readFile(n, encryptKey, true)
                         end
                     end
                 end
@@ -115,14 +116,14 @@ if localPlayer then
             self.rwPaths = rwPaths
             loadState = true
         elseif assetType == "animation" then
-            rwCache.ifp[(rwPaths.ifp)] = (rwPaths.ifp and not rwCache.ifp[(rwPaths.ifp)] and imports.engineLoadIFP(asset.public:readFile(file:read(rwPaths.ifp), assetManifest.encryptKey) or rwPaths.ifp, assetType.."."..assetName)) or false
+            rwCache.ifp[(rwPaths.ifp)] = (rwPaths.ifp and not rwCache.ifp[(rwPaths.ifp)] and imports.engineLoadIFP(asset.public:readFile(rwPaths.ifp, assetManifest.encryptKey), assetType.."."..assetName)) or false
             if rwCache.ifp[(rwPaths.ifp)] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
                 loadState = true
             end
         elseif assetType == "sound" then
-            rwCache.sound[(rwPaths.sound)] = (rwPaths.sound and not rwCache.sound[(rwPaths.sound)] and asset.public:readFile(file:read(rwPaths.sound), assetManifest.encryptKey) or rwPaths.sound) or false
+            rwCache.sound[(rwPaths.sound)] = (rwPaths.sound and not rwCache.sound[(rwPaths.sound)] and asset.public:readFile(rwPaths.sound, assetManifest.encryptKey)) or false
             if rwCache.sound[(rwPaths.sound)] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
@@ -134,16 +135,16 @@ if localPlayer then
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
                 if modelID then
-                    rwCache.dff[(rwPaths.dff)] = (not rwCache.dff[(rwPaths.dff)] and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(file:read(rwPaths.dff), assetManifest.encryptKey) or rwPaths.dff)) or false
+                    rwCache.dff[(rwPaths.dff)] = (not rwCache.dff[(rwPaths.dff)] and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(rwPaths.dff, assetManifest.encryptKey))) or false
                     if not rwCache.dff[(rwPaths.dff)] then
                         imports.engineFreeModel(modelID)
                         return false
                     else
                         if rwPaths.lod then
-                            rwCache.lod[(rwPaths.lod)] = (not rwCache.lod[(rwPaths.lod)] and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(file:read(rwPaths.lod), assetManifest.encryptKey) or rwPaths.lod)) or false
+                            rwCache.lod[(rwPaths.lod)] = (not rwCache.lod[(rwPaths.lod)] and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(rwPaths.lod, assetManifest.encryptKey))) or false
                             lodID = (rwCache.lod[(rwPaths.lod)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
                         end
-                        rwCache.col[(rwPaths.col)] = (not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(file:read(rwPaths.col), assetManifest.encryptKey) or rwPaths.col)) or false
+                        rwCache.col[(rwPaths.col)] = (not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(rwPaths.col, assetManifest.encryptKey))) or false
                         collisionID = (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
                         imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
                         if lodID then imports.engineSetModelLODDistance(lodID, asset.public.ranges.streamRange) end
@@ -152,7 +153,7 @@ if localPlayer then
                 end
             end
             if modelID then
-                rwCache.txd[(rwPaths.txd)] = (not rwCache.txd[(rwPaths.txd)] and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(file:read(rwPaths.txd), assetManifest.encryptKey) or rwPaths.txd)) or false
+                rwCache.txd[(rwPaths.txd)] = (not rwCache.txd[(rwPaths.txd)] and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(rwPaths.txd, assetManifest.encryptKey))) or false
                 if rwCache.txd[(rwPaths.txd)] then
                     imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
                     if lodID then imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], lodID) end

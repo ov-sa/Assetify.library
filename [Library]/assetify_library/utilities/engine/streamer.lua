@@ -8,7 +8,6 @@
 ----------------------------------------------------------------
 
 
---TODO: UPDATE
 -----------------
 --[[ Imports ]]--
 -----------------
@@ -38,7 +37,7 @@ local streamer = class:create("streamer")
 streamer.private.allocator = {
     validStreams = {
         ["dummy"] = {},
-        ["bone"] = {skipAttachment = false},
+        ["bone"] = {skipAttachment = true},
         ["light"] = {}
     }
 }
@@ -115,8 +114,8 @@ function streamer.public:update(clientDimension, clientInterior)
     streamer.private.cache.clientWorld.interior = currentInterior
     return true
 end
-imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer:update(dimension) end)
-imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer:update(_, interior) end)
+imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer.public:update(dimension) end)
+imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)
 
 function streamer.public:allocate()
     if not streamer.public:isInstance(self) then return false end

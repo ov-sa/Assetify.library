@@ -23,7 +23,9 @@ local imports = {
     createPed = createPed,
     createVehicle = createVehicle,
     setElementAlpha = setElementAlpha,
+    setElementModel = setElementModel,
     setElementDoubleSided = setElementDoubleSided,
+    setElementCollisionsEnabled = setElementCollisionsEnabled,
     setElementDimension = setElementDimension,
     setElementInterior = setElementInterior
 }
@@ -46,6 +48,7 @@ function dummy.private:validateOffset(instance, dummyData)
     dummyData.position, dummyData.rotation = dummyData.position or {}, dummyData.rotation or {}
     dummyData.position.x, dummyData.position.y, dummyData.position.z = imports.tonumber(dummyData.position.x) or 0, imports.tonumber(dummyData.position.y) or 0, imports.tonumber(dummyData.position.z) or 0
     dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z = imports.tonumber(dummyData.rotation.x) or 0, imports.tonumber(dummyData.rotation.y) or 0, imports.tonumber(dummyData.rotation.z) or 0
+    dummyData.dimension, dummyData.interior = imports.tonumber(dummyData.dimension) or 0, imports.tonumber(dummyData.interior) or 0
     return true
 end
 
@@ -83,19 +86,24 @@ if localPlayer then
         self.assetType, self.assetName, self.assetClump, self.clumpMaps = assetType, assetName, assetClump, clumpMaps
         self.dummyData = dummyData
         self.syncRate = imports.tonumber(dummyData.syncRate)
-        self.cModelInstance = (remoteSignature and remoteSignature.element) or false
+        if remoteSignature then
+            if cData.collisionID then
+                self.cCollisionInstance = remoteSignature.element
+            else
+                self.cModelInstance = remoteSignature.element
+            end
+        end
         if dummyType == "object" then
-            self.cModelInstance = self.cModelInstance or imports.createObject(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-            self.cCollisionInstance = (cData.collisionID and imports.createObject(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)) or false
+            self.cModelInstance = self.cModelInstance or imports.createObject(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z) or false
+            self.cCollisionInstance = self.cCollisionInstance or (cData.collisionID and imports.createObject(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)) or false
         elseif dummyType == "ped" then
-            self.cModelInstance = self.cModelInstance or imports.createPed(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)
-            self.cCollisionInstance = (cData.collisionID and imports.createPed(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)) or false
+            self.cModelInstance = self.cModelInstance or imports.createPed(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z) or false
+            self.cCollisionInstance = self.cCollisionInstance or (cData.collisionID and imports.createPed(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.z)) or false
         elseif dummyType == "vehicle" then
-            self.cModelInstance = self.cModelInstance or imports.createVehicle(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
-            self.cCollisionInstance = (cData.collisionID and imports.createVehicle(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)) or false
+            self.cModelInstance = self.cModelInstance or imports.createVehicle(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z) or false
+            self.cCollisionInstance = self.cCollisionInstance or (cData.collisionID and imports.createVehicle(cData.collisionID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)) or false
         end
         if not self.cModelInstance then return false end
-        if self.cCollisionInstance then imports.setElementAlpha(self.cCollisionInstance, 0) end
         self.cDummy = self.cCollisionInstance or self.cModelInstance
         dummy.public.buffer[(self.cDummy)] = self
         self.cHeartbeat = thread:createHeartbeat(function()
@@ -107,13 +115,15 @@ if localPlayer then
         end, function()
             if dummyType == "object" then imports.setElementDoubleSided(self.cModelInstance, true) end
             network:emit("Assetify:Syncer:onSyncElementModel", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remoteSignature)
-            if self.cModelInstance then
-                imports.setElementAlpha(self.cModelInstance, 255)
-            else
-                imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
-                imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
-            end
+            imports.setElementAlpha(self.cModelInstance, 255)
+            imports.setElementCollisionsEnabled(self.cModelInstance, false)
+            imports.setElementDimension(self.cModelInstance, dummyData.dimension)
+            imports.setElementInterior(self.cModelInstance, dummyData.interior)
             if self.cCollisionInstance then
+                imports.setElementAlpha(self.cCollisionInstance, 0)
+                imports.setElementModel(self.cCollisionInstance, cData.collisionID)
+                imports.setElementDimension(self.cCollisionInstance, dummyData.dimension)
+                imports.setElementInterior(self.cCollisionInstance, dummyData.interior)
                 self.cStreamer = streamer:create(self.cModelInstance, "dummy", {self.cCollisionInstance}, self.syncRate)
             end
             self.cHeartbeat = nil
@@ -132,7 +142,7 @@ if localPlayer then
         return true
     end
 else
-    function dummy.public:create(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer)
+    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer)
         if not dummy.public:isInstance(self) or self.isUnloading then return false end
         if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, self.remoteSignature) end
         local cAsset = manager:getAssetData(assetType, assetName)
@@ -158,8 +168,8 @@ else
         self.cDummy = self.cModelInstance
         dummy.public.buffer[(self.cDummy)] = self
         imports.setElementAlpha(self.cModelInstance, 0)
-        imports.setElementDimension(self.cModelInstance, imports.tonumber(dummyData.dimension) or 0)
-        imports.setElementInterior(self.cModelInstance, imports.tonumber(dummyData.interior) or 0)
+        imports.setElementDimension(self.cModelInstance, dummyData.dimension)
+        imports.setElementInterior(self.cModelInstance, dummyData.interior)
         thread:create(function(__self)
             for i, j in imports.pairs(syncer.public.loadedClients) do
                 self:load(_, _, _, _, _, i)

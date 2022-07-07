@@ -86,9 +86,7 @@ if localPlayer then
             end
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
-                return false
-            end
+            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
             local vSource0, vSource1, vSource2 = (renderer.public.isVirtualRendering and renderer.public.virtualSource) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.diffuse) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.emissive) or false
             syncShader:setValue("vResolution", (renderer.public.isVirtualRendering and renderer.public.resolution) or false)
             syncShader:setValue("vRenderingEnabled", (renderer.public.isVirtualRendering and true) or false)
@@ -114,9 +112,7 @@ if localPlayer then
             end
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
-                return false
-            end
+            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
             syncShader:setValue("gTimeSync", renderer.public.isTimeSynced)
         end
         return true
@@ -131,9 +127,7 @@ if localPlayer then
             end
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
-                return false
-            end
+            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
             syncShader:setValue("gServerTick", renderer.public.serverTick)
         end
         return true
@@ -147,9 +141,7 @@ if localPlayer then
             end
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
-                return false
-            end
+            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
             syncShader:setValue("gMinuteDuration", renderer.public.minuteDuration)
         end
         return true

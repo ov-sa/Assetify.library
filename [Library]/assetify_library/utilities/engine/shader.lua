@@ -149,7 +149,7 @@ if localPlayer then
         if texturePath then
             if encryptKey then
                 local cTexturePath = texturePath..".tmp"
-                if file:write(cTexturePath, asset:readFile(file:read(texturePath), encryptKey)) then
+                if file:write(cTexturePath, asset:readFile(texturePath, encryptKey)) then
                     local cTexture = imports.dxCreateTexture(cTexturePath, "dxt5", true)
                     file:delete(cTexturePath)
                     return cTexture

@@ -47,11 +47,11 @@ if localPlayer then
         network:emit("Assetify:onEntityDataChange", false, element, data, __value, value)
         return true
     end
-    network:create("Assetify:onRecieveSyncedGlobalData"):on(function(...) syncer.public:syncGlobalData(...) end)
-    network:create("Assetify:onRecieveSyncedEntityData"):on(function(...) syncer.public:syncEntityData(...) end)
+    network:create("Assetify:Syncer:onSyncGlobalData"):on(function(...) syncer.public:syncGlobalData(...) end)
+    network:create("Assetify:Syncer:onSyncEntityData"):on(function(...) syncer.public:syncEntityData(...) end)
 else
     function syncer.public:syncGlobalData(data, value, isSync, targetPlayer)
-        if not targetPlayer then return network:emit("Assetify:onRecieveSyncedGlobalData", true, false, targetPlayer, data, value) end
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncGlobalData", true, false, targetPlayer, data, value) end
         if not data or (imports.type(data) ~= "string") then return false end
         local __value = syncer.public.syncedGlobalDatas[data]
         syncer.public.syncedGlobalDatas[data] = value
@@ -59,7 +59,7 @@ else
         local execWrapper = nil
         execWrapper = function()
             for i, j in imports.pairs(syncer.public.loadedClients) do
-                syncer.public:syncGlobalData(data, value, isSync, i)
+                syncer.public:syncGlobalData(data, value, _, i)
                 if not isSync then thread:pause() end
             end
             execWrapper = nil
@@ -73,9 +73,11 @@ else
     end
 
     function syncer.public:syncEntityData(element, data, value, isSync, targetPlayer, remoteSignature)
-        if not targetPlayer then return network:emit("Assetify:onRecieveSyncedEntityData", true, false, targetPlayer, element, data, value, remoteSignature) end
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncEntityData", true, false, targetPlayer, element, data, value, remoteSignature) end
         if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-        remoteSignature = imports.getElementType(element)
+        remoteSignature = {
+            elementType = imports.getElementType(element)
+        }
         syncer.public.syncedEntityDatas[element] = syncer.public.syncedEntityDatas[element] or {}
         local __value = syncer.public.syncedEntityDatas[element][data]
         syncer.public.syncedEntityDatas[element][data] = value
@@ -83,7 +85,7 @@ else
         local execWrapper = nil
         execWrapper = function()
             for i, j in imports.pairs(syncer.public.loadedClients) do
-                syncer.public:syncEntityData(element, data, value, isSync, i, remoteSignature)
+                syncer.public:syncEntityData(element, data, value, _, i, remoteSignature)
                 if not isSync then thread:pause() end
             end
             execWrapper = nil

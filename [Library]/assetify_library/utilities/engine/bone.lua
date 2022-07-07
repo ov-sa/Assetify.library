@@ -70,7 +70,9 @@ function bone.private:validateOffset(instance, boneData)
         rotQuat:destroy(); xQuat:destroy(); yQuat:destroy(); zQuat:destroy()
         boneData.rotation.isRelative = false
     end
-    boneData.rotationMatrix = math.matrix:fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
+    local cMatrix = math.matrix:fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
+    boneData.rotationMatrix = cMatrix.rows
+    cMatrix:destroy()
     return true
 end
 
@@ -155,15 +157,36 @@ if localPlayer then
     function bone.public:update()
         if not bone.public:isInstance(self) or self.cHeartbeat then return false end
         bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
-        local isUptoDate = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)] and true) or false
-        if not isUptoDate then
-            if bone.public.cache.element[(self.parent)][(self.boneData.id)] then bone.public.cache.element[(self.parent)][(self.boneData.id)]:destroy() end
-            bone.public.cache.element[(self.parent)][(self.boneData.id)] = math.matrix(imports.getElementBoneMatrix(self.parent, self.boneData.id))
-        end
+        bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
         bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick
-        local cMatrix = bone.public.cache.element[(self.parent)][(self.boneData.id)]:transform(self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z)
-        imports.setElementMatrix(self.element, cMatrix.rows)
-        cMatrix:destroy()
+        local cMatrix, rotationMatrix = bone.public.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix
+        local offX, offY, offZ = self.boneData.position.x, self.boneData.position.y, self.boneData.position.z
+        imports.setElementMatrix(self.element, {
+            {
+                (cMatrix[2][1]*rotationMatrix[1][2]) + (cMatrix[1][1]*rotationMatrix[1][1]) + (rotationMatrix[1][3]*cMatrix[3][1]),
+                (cMatrix[3][2]*rotationMatrix[1][3]) + (cMatrix[1][2]*rotationMatrix[1][1]) + (cMatrix[2][2]*rotationMatrix[1][2]),
+                (cMatrix[2][3]*rotationMatrix[1][2]) + (cMatrix[3][3]*rotationMatrix[1][3]) + (rotationMatrix[1][1]*cMatrix[1][3]),
+                0
+            },
+            {
+                (rotationMatrix[2][3]*cMatrix[3][1]) + (cMatrix[2][1]*rotationMatrix[2][2]) + (rotationMatrix[2][1]*cMatrix[1][1]),
+                (cMatrix[3][2]*rotationMatrix[2][3]) + (cMatrix[2][2]*rotationMatrix[2][2]) + (cMatrix[1][2]*rotationMatrix[2][1]),
+                (rotationMatrix[2][1]*cMatrix[1][3]) + (cMatrix[3][3]*rotationMatrix[2][3]) + (cMatrix[2][3]*rotationMatrix[2][2]),
+                0
+            },
+            {
+                (cMatrix[2][1]*rotationMatrix[3][2]) + (rotationMatrix[3][3]*cMatrix[3][1]) + (rotationMatrix[3][1]*cMatrix[1][1]),
+                (cMatrix[3][2]*rotationMatrix[3][3]) + (cMatrix[2][2]*rotationMatrix[3][2]) + (rotationMatrix[3][1]*cMatrix[1][2]),
+                (rotationMatrix[3][1]*cMatrix[1][3]) + (cMatrix[3][3]*rotationMatrix[3][3]) + (cMatrix[2][3]*rotationMatrix[3][2]),
+                0
+            },
+            {
+                (offZ*cMatrix[1][1]) + (offY*cMatrix[2][1]) - (offX*cMatrix[3][1]) + cMatrix[4][1],
+                (offZ*cMatrix[1][2]) + (offY*cMatrix[2][2]) - (offX*cMatrix[3][2]) + cMatrix[4][2],
+                (offZ*cMatrix[1][3]) + (offY*cMatrix[2][3]) - (offX*cMatrix[3][3]) + cMatrix[4][3],
+                1
+            }
+        })
         return true
     end
 else
