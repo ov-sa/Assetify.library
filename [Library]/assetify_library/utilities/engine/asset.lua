@@ -146,9 +146,8 @@ if localPlayer then
                         rwCache.col[(rwPaths.col)] = (not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(file:read(rwPaths.col), assetManifest.encryptKey) or rwPaths.col)) or false
                         collisionID = (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
                         imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
-                        if collisionID then
-                            imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange)
-                        end
+                        if lodID then imports.engineSetModelLODDistance(lodID, asset.public.ranges.streamRange) end
+                        if collisionID then imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange) end
                     end
                 end
             end
