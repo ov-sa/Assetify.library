@@ -96,3 +96,14 @@ else
         return true
     end
 end
+
+
+---------------------
+--[[ API Syncers ]]--
+---------------------
+
+network:fetch("Assetify:onElementDestroy"):on(function(self, source)
+    if not syncer.public.isLibraryBooted or not source then return false end
+    if syncer.public.syncedEntityDatas[source] ~= nil then self:sleep(settings.syncer.persistenceDuration) end
+    syncer.public.syncedEntityDatas[source] = nil
+end, {isAsync = true})

@@ -53,10 +53,14 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
             for i, j in imports.pairs(cNetwork.handlers) do
                 if i and (imports.type(i) == "function") then
                     thread:create(function(self)
-                        if not j.isAsync then
+                        if not j.config.isAsync then
                             i(table:unpack(payload.processArgs))
                         else
                             i(self, table:unpack(payload.processArgs))
+                        end
+                        j.config.subscriptionCount = (j.config.subscriptionLimit and (j.config.subscriptionCount + 1)) or false
+                        if j.config.subscriptionLimit and (j.config.subscriptionCount >= j.config.subscriptionLimit) then
+                            cNetwork:off(i)
                         end
                     end):resume()
                 end
@@ -70,7 +74,7 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
                 payload.isSignal = true
                 payload.isRestricted = true
                 thread:create(function(self)
-                    if not cNetwork.handler.isAsync then
+                    if not cNetwork.handler.config.isAsync then
                         payload.processArgs = {cNetwork.handler.exec(table:unpack(payload.processArgs))}
                     else
                         payload.processArgs = {cNetwork.handler.exec(self, table:unpack(payload.processArgs))}
@@ -166,18 +170,22 @@ function network.public:deserializeExec(serial)
     return true
 end
 
-function network.public:on(exec, isAsync)
+function network.public:on(exec, config)
     if not network.public:isInstance(self) then return false end
     if not exec or (imports.type(exec) ~= "function") then return false end
-    isAsync = (isAsync and true) or false
+    config = (config and (imports.type(config) == "table") and config) or {}
+    config.isAsync = (config.isAsync and true) or false
+    config.subscriptionLimit = (not self.isCallback and imports.tonumber(config.subscriptionLimit)) or false
+    config.subscriptionLimit = (config.subscriptionLimit and math.max(1, config.subscriptionLimit)) or config.subscriptionLimit
+    config.subscriptionCount = (config.subscriptionLimit and 0) or false
     if self.isCallback then
         if not self.handler then
-            self.handler = {exec = exec, isAsync = isAsync}
+            self.handler = {exec = exec, config = config}
             return true
         end
     else
         if not self.handlers[exec] then
-            self.handlers[exec] = {isAsync = isAsync}
+            self.handlers[exec] = {config = config}
             return true
         end
     end

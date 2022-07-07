@@ -70,7 +70,7 @@ function bone.private:validateOffset(instance, boneData)
         rotQuat:destroy(); xQuat:destroy(); yQuat:destroy(); zQuat:destroy()
         boneData.rotation.isRelative = false
     end
-    boneData.rotationMatrix = math.matrix.fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
+    boneData.rotationMatrix = math.matrix:fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
     return true
 end
 
@@ -155,9 +155,15 @@ if localPlayer then
     function bone.public:update()
         if not bone.public:isInstance(self) or self.cHeartbeat then return false end
         bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
-        bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
+        local isUptoDate = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)] and true) or false
+        if not isUptoDate then
+            if bone.public.cache.element[(self.parent)][(self.boneData.id)] then bone.public.cache.element[(self.parent)][(self.boneData.id)]:destroy() end
+            bone.public.cache.element[(self.parent)][(self.boneData.id)] = math.matrix(imports.getElementBoneMatrix(self.parent, self.boneData.id))
+        end
         bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick
-        imports.setElementMatrix(self.element, math.matrix.transform(bone.public.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z))
+        local cMatrix = bone.public.cache.element[(self.parent)][(self.boneData.id)]:transform(self.boneData.rotationMatrix, self.boneData.position.x, self.boneData.position.y, self.boneData.position.z)
+        imports.setElementMatrix(self.element, cMatrix.rows)
+        cMatrix:destroy()
         return true
     end
 else
@@ -243,7 +249,7 @@ else
             if j and not j.isUnloading then network:emit("Assetify:Bone:onAttachment", true, false, source, self.element, self.parent, self.boneData, self.remoteSignature) end
             thread:pause()
         end
-    end, true)
+    end, {isAsync = true})
 end
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.public.isLibraryBooted or not source then return false end

@@ -12,7 +12,6 @@
     <file src="utilities/rw/planar_1x1/dict.rw"/>
     <file src="utilities/rw/planar_1x1/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/collision.rw"/>
-    <script src="exports/shared.lua" type="shared"/>
     <script src="exports/client.lua" type="client"/>
     <script src="settings/shared.lua" type="shared"/>
     <script src="settings/server.lua" type="server"/>
@@ -24,6 +23,7 @@
     <script src="utilities/sandbox/filesystem.lua" type="shared"/>
     <script src="utilities/sandbox/math/index.lua" type="shared"/>
     <script src="utilities/sandbox/math/quat.lua" type="shared"/>
+    <script src="utilities/sandbox/math/matrix.lua" type="shared"/>
     <script src="utilities/sandbox/string.lua" type="shared"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <script src="utilities/sandbox/timer.lua" type="shared"/>
@@ -60,15 +60,22 @@
     <script src="handlers/builder/server.lua" type="server"/>
     <script src="handlers/builder/client.lua" type="client"/>
     <script src="handlers/bundler.lua" type="shared"/>
+    <script src="handlers/api/library/exports.lua" type="shared"/>
+    <script src="handlers/api/library/shared.lua" type="shared"/>
+    <script src="handlers/api/library/client.lua" type="client"/>
+    <script src="handlers/api/world/exports.lua" type="shared"/>
     <script src="handlers/api/world/shared.lua" type="shared"/>
     <script src="handlers/api/world/client.lua" type="client"/>
+    <script src="handlers/api/anim/exports.lua" type="shared"/>
     <script src="handlers/api/anim/shared.lua" type="shared"/>
     <script src="handlers/api/anim/client.lua" type="client"/>
+    <script src="handlers/api/sound/exports.lua" type="shared"/>
     <script src="handlers/api/sound/shared.lua" type="shared"/>
     <script src="handlers/api/sound/client.lua" type="client"/>
 
     <!-- Exports -->
     <export function="import" type="shared"/>
+    <export function="isLibraryBooted" type="shared"/>
     <export function="isLibraryLoaded" type="shared"/>
     <export function="isModuleLoaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
@@ -90,13 +97,13 @@
     <export function="isAssetLoaded" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
-    <export function="loadAnim" type="client"/>
-    <export function="unloadAnim" type="client"/>
     <export function="createShader" type="client"/>
     <export function="clearWorld" type="client"/>
     <export function="restoreWorld" type="client"/>
     <export function="clearModel" type="client"/>
     <export function="restoreModel" type="client"/>
+    <export function="loadAnim" type="client"/>
+    <export function="unloadAnim" type="client"/>
     <export function="playSoundAsset" type="client"/>
     <export function="playSoundAsset3D" type="client"/>
     <export function="isRendererVirtualRendering" type="client"/>

@@ -101,7 +101,7 @@ if localPlayer then
                     thread:create(function(self)
                         if settings.assetPacks["module"].autoLoad and settings.assetPacks["module"].rwDatas then
                             for i, j in imports.pairs(settings.assetPacks["module"].rwDatas) do
-                                if j then manager:load("module", i) end
+                                if j then manager:loadAsset("module", i) end
                                 thread:pause()
                             end
                         end
@@ -114,7 +114,7 @@ if localPlayer then
                             if i ~= "module" then
                                 if j.autoLoad and j.rwDatas then
                                     for k, v in imports.pairs(j.rwDatas) do
-                                        if v then manager:load(i, k) end
+                                        if v then manager:loadAsset(i, k) end
                                         thread:pause()
                                     end
                                 end

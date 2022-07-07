@@ -73,7 +73,7 @@ end
 if localPlayer then
     function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, remoteSignature)
         if not dummy.public:isInstance(self) then return false end
-        local cAsset, cData = manager:getData(assetType, assetName, syncer.librarySerial)
+        local cAsset, cData = manager:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         if assetClump then cData = cAsset.unSynced.assetCache[assetClump].cAsset.synced end
         if not cAsset or not cData then return false end
@@ -106,7 +106,7 @@ if localPlayer then
             end
         end, function()
             if dummyType == "object" then imports.setElementDoubleSided(self.cModelInstance, true) end
-            network:emit("Assetify:Syncer:onSyncElementIdentity", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remoteSignature)
+            network:emit("Assetify:Syncer:onSyncElementModel", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remoteSignature)
             if self.cModelInstance then
                 imports.setElementAlpha(self.cModelInstance, 255)
             else
@@ -135,7 +135,7 @@ else
     function dummy.public:create(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer)
         if not dummy.public:isInstance(self) or self.isUnloading then return false end
         if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, self.remoteSignature) end
-        local cAsset = manager:getData(assetType, assetName)
+        local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end
@@ -204,7 +204,7 @@ else
             if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, self.remoteSignature) end
             thread:pause()
         end
-    end, true)
+    end, {isAsync = true})
 end
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.public.isLibraryBooted or not source then return false end

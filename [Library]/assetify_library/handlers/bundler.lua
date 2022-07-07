@@ -234,6 +234,10 @@ bundler.rw["core"] = {
             end
         end
         
+        assetify.__core.isBooted = function()
+            return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryBooted")
+        end
+
         assetify.__core.isLoaded = function()
             return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "isLibraryLoaded")
         end
@@ -293,36 +297,34 @@ bundler.rw["scheduler"] = {
     rw = [[
         ]]..bundler.rw["networker"].rw..[[
         assetify.scheduler = {
-            buffer = {execOnLoad = {}, execOnModuleLoad = {}},
+            buffer = {execOnBoot = {}, execOnLoad = {}, execOnModuleLoad = {}},
+            execOnBoot = function(execFunc)
+                if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                local isBooted = assetify.isBooted()
+                if isBooted then execFunc()
+                else assetify.network:fetch("Assetify:onBoot", true):on(execFunc, {subscriptionLimit = 1}) end
+                return true
+            end,
+
             execOnLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                 local isLoaded = assetify.isLoaded()
-                if isLoaded then
-                    execFunc()
-                else
-                    local execWrapper = nil
-                    execWrapper = function()
-                        execFunc()
-                        assetify.network:fetch("Assetify:onLoad"):off(execWrapper)
-                    end
-                    assetify.network:fetch("Assetify:onLoad", true):on(execWrapper)
-                end
+                if isLoaded then execFunc()
+                else assetify.network:fetch("Assetify:onLoad", true):on(execFunc, {subscriptionLimit = 1}) end
                 return true
             end,
 
             execOnModuleLoad = function(execFunc)
                 if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
                 local isModuleLoaded = assetify.isModuleLoaded()
-                if isModuleLoaded then
-                    execFunc()
-                else
-                    local execWrapper = nil
-                    execWrapper = function()
-                        execFunc()
-                        assetify.network:fetch("Assetify:onModuleLoad"):off(execWrapper)
-                    end
-                    assetify.network:fetch("Assetify:onModuleLoad", true):on(execWrapper)
-                end
+                if isModuleLoaded then execFunc()
+                else assetify.network:fetch("Assetify:onModuleLoad", true):on(execFunc, {subscriptionLimit = 1}) end
+                return true
+            end,
+
+            execScheduleOnBoot = function(execFunc)
+                if not execFunc or (assetify.imports.type(execFunc) ~= "function") then return false end
+                assetify.imports.table:insert(assetify.scheduler.buffer.execOnBoot, execOnBoot)
                 return true
             end,
 

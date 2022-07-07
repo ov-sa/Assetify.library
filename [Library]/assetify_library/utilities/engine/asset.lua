@@ -115,17 +115,15 @@ if localPlayer then
             self.rwPaths = rwPaths
             loadState = true
         elseif assetType == "animation" then
-            if rwPaths.ifp and not rwCache.ifp[(rwPaths.ifp)] then
-                rwCache.ifp[(rwPaths.ifp)] = imports.engineLoadIFP(asset.public:readFile(file:read(rwPaths.ifp), assetManifest.encryptKey) or rwPaths.ifp, assetType.."."..assetName)
-                if rwCache.ifp[(rwPaths.ifp)] then
-                    assetData.cAsset = self
-                    self.rwPaths = rwPaths
-                    loadState = true
-                end
+            rwCache.ifp[(rwPaths.ifp)] = (rwPaths.ifp and not rwCache.ifp[(rwPaths.ifp)] and imports.engineLoadIFP(asset.public:readFile(file:read(rwPaths.ifp), assetManifest.encryptKey) or rwPaths.ifp, assetType.."."..assetName)) or false
+            if rwCache.ifp[(rwPaths.ifp)] then
+                assetData.cAsset = self
+                self.rwPaths = rwPaths
+                loadState = true
             end
         elseif assetType == "sound" then
-            if rwPaths.sound and not rwCache.sound[(rwPaths.sound)] then
-                rwCache.sound[(rwPaths.sound)] = asset.public:readFile(file:read(rwPaths.sound), assetManifest.encryptKey) or rwPaths.sound
+            rwCache.sound[(rwPaths.sound)] = (rwPaths.sound and not rwCache.sound[(rwPaths.sound)] and asset.public:readFile(file:read(rwPaths.sound), assetManifest.encryptKey) or rwPaths.sound) or false
+            if rwCache.sound[(rwPaths.sound)] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
                 loadState = true
@@ -136,39 +134,22 @@ if localPlayer then
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
                 if modelID then
-                    if assetManifest.assetClumps or (assetType == "scene") then
-                        collisionID = imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)
-                    end
-                    if not rwCache.dff[(rwPaths.dff)] and file:exists(rwPaths.dff) then
-                        imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
-                        rwCache.dff[(rwPaths.dff)] = imports.engineLoadDFF(asset.public:readFile(file:read(rwPaths.dff), assetManifest.encryptKey) or rwPaths.dff)
-                    end
+                    rwCache.dff[(rwPaths.dff)] = (not rwCache.dff[(rwPaths.dff)] and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(file:read(rwPaths.dff), assetManifest.encryptKey) or rwPaths.dff)) or false
                     if not rwCache.dff[(rwPaths.dff)] then
                         imports.engineFreeModel(modelID)
-                        if collisionID then
-                            imports.engineFreeModel(collisionID)
-                            collisionID = false
-                        end
                         return false
                     else
-                        if not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) then
-                            if collisionID then
-                                imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange)
-                            end
-                            rwCache.col[(rwPaths.col)] = imports.engineLoadCOL(asset.public:readFile(file:read(rwPaths.col), assetManifest.encryptKey) or rwPaths.col)
-                        else
-                            if collisionID then
-                                imports.engineFreeModel(collisionID)
-                                collisionID = false
-                            end
+                        rwCache.col[(rwPaths.col)] = (not rwCache.col[(rwPaths.col)] and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(file:read(rwPaths.col), assetManifest.encryptKey) or rwPaths.col)) or false
+                        collisionID = collisionID or (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or collisionID
+                        imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
+                        if collisionID then
+                            imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange)
                         end
                     end
                 end
             end
             if modelID then
-                if not rwCache.txd[(rwPaths.txd)] and file:exists(rwPaths.txd) then
-                    rwCache.txd[(rwPaths.txd)] = imports.engineLoadTXD(asset.public:readFile(file:read(rwPaths.txd), assetManifest.encryptKey) or rwPaths.txd)
-                end
+                rwCache.txd[(rwPaths.txd)] = (not rwCache.txd[(rwPaths.txd)] and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(file:read(rwPaths.txd), assetManifest.encryptKey) or rwPaths.txd)) or false
                 if rwCache.txd[(rwPaths.txd)] then
                     imports.engineImportTXD(rwCache.txd[(rwPaths.txd)], modelID)
                 end
@@ -202,12 +183,8 @@ if localPlayer then
         if not asset.public:isInstance(self) then return false end
         if not rwCache then return false end
         if self.synced then
-            if self.synced.modelID then
-                imports.engineFreeModel(self.synced.modelID)
-            end
-            if self.synced.collisionID then
-                imports.engineFreeModel(self.synced.collisionID)
-            end
+            if self.synced.modelID then imports.engineFreeModel(self.synced.modelID) end
+            if self.synced.collisionID then imports.engineFreeModel(self.synced.collisionID) end
         end
         if self.rwPaths then
             for i, j in imports.pairs(self.rwPaths) do

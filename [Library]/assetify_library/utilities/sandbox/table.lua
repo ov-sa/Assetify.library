@@ -61,7 +61,7 @@ function table.public:clone(baseTable, isRecursive)
     return __baseTable
 end
 
-local __table_concat = table.concat
+local __table_concat = table.public.concat
 function table.public:concat(baseTable, separator, startIndex, endIndex)
     return __table_concat(baseTable, separator, startIndex, endIndex)
 end

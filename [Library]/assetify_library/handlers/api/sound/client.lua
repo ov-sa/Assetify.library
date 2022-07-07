@@ -25,7 +25,7 @@ local imports = {
 
 function manager.API.Sound:playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
     if not syncer.isLibraryLoaded then return false end
-    local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
+    local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
     if not cAsset or not isLoaded then return false end
     if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
     local cSound = imports.playSound(cAsset.unSynced.rwCache.sound[(cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)
@@ -38,7 +38,7 @@ end
 
 function manager.API.Sound:playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
     if not syncer.isLibraryLoaded then return false end
-    local cAsset, isLoaded = manager:getData("sound", assetName, syncer.librarySerial)
+    local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
     if not cAsset or not isLoaded then return false end
     if not cAsset.manifestData.assetSounds or not cAsset.unSynced.assetCache[soundCategory] or not cAsset.unSynced.assetCache[soundCategory][soundIndex] or not cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset then return false end
     local cSound = imports.playSound3D(cAsset.unSynced.rwCache.sound[(cAsset.unSynced.assetCache[soundCategory][soundIndex].cAsset.rwPaths.sound)], ...)

@@ -1,5 +1,5 @@
 ----------------------------------------------------------------
---[[ Resource: Assetify LibraquatRHS.y
+--[[ Resource: Assetify Library
      Script: utilities: sandbox: math: index.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса

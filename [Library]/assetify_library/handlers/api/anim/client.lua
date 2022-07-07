@@ -26,7 +26,7 @@ local imports = {
 function manager.API.Anim:loadAnim(element, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not element or not imports.isElement(element) then return false end
-    local cAsset, isLoaded = manager:getData("animation", assetName)
+    local cAsset, isLoaded = manager:getAssetData("animation", assetName)
     if not cAsset or not isLoaded then return false end
     if cAsset.manifestData.assetAnimations then
         for i = 1, #cAsset.manifestData.assetAnimations, 1 do
@@ -40,7 +40,7 @@ end
 function manager.API.Anim:unloadAnim(element, assetName)
     if not syncer.isLibraryLoaded then return false end
     if not element or not imports.isElement(element) then return false end
-    local cAsset, isLoaded = manager:getData("animation", assetName)
+    local cAsset, isLoaded = manager:getAssetData("animation", assetName)
     if not cAsset or not isLoaded then return false end
     if cAsset.manifestData.assetAnimations then
         for i = 1, #cAsset.manifestData.assetAnimations, 1 do
