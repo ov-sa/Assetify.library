@@ -7,7 +7,7 @@
      Desc: Asset Utilities ]]--
 ----------------------------------------------------------------
 
---TODO: UPDATE
+
 -----------------
 --[[ Imports ]]--
 -----------------
@@ -107,7 +107,7 @@ if localPlayer then
         return true
     end
 
-    function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, callback)
+    function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths)
         if not asset.public:isInstance(self) then return false end
         if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local loadState = false
@@ -176,13 +176,10 @@ if localPlayer then
                 loadState = true
             end
         end
-        if callback and (imports.type(callback) == "function") then
-            callback(loadState)
-        end
         return loadState
     end
 
-    function asset.public:unload(rwCache, callback)
+    function asset.public:unload(rwCache)
         if not asset.public:isInstance(self) then return false end
         if not rwCache then return false end
         if self.synced then
@@ -197,9 +194,6 @@ if localPlayer then
             end
         end
         self:destroyInstance()
-        if callback and (imports.type(callback) == "function") then
-            callback(true)
-        end
         return true
     end
 else
@@ -460,18 +454,14 @@ else
                     end
                 end
                 assetPack.assetPack = cAssetPack
-                if callback and (imports.type(callback) == "function") then
-                    callback(true, assetType)
-                end
+                execFunction(callback, true, assetType)
             end):resume({
                 executions = settings.downloader.buildRate,
                 frames = 1
             })
             return true
         end
-        if callback and (imports.type(callback) == "function") then
-            callback(false, assetType)
-        end
+        execFunction(callback, false, assetType)
         return false
     end
 end

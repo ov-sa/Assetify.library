@@ -110,7 +110,8 @@ if localPlayer then
                 self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance})
             end
         end
-        cAsset.cScene = self
+        cAsset.cScenes = cAsset.cScenes or {}
+        cAsset.cScenes[self] = true
         return true
     end
 

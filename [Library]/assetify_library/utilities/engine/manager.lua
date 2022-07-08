@@ -33,7 +33,7 @@ local manager = class:create("manager", {
     API = {}
 })
 manager.private.rwFormat = {
-    assetCache = {},
+    assetRef = {}, assetCache = {},
     rwCache = {
         ifp = {}, sound = {}, txd = {}, dff = {}, lod = {}, col = {}, map = {}, dep = {}
     }
@@ -221,7 +221,6 @@ if localPlayer then
                     local sceneIDEDatas = scene:parseIDE(asset:readFile(assetPath..(asset.references.scene)..".ide", cAsset.manifestData.encryptKey))
                     for i = 1, #sceneIPLDatas, 1 do
                         local j = sceneIPLDatas[i]
-                        cAsset.unSynced.assetCache[i] = {}
                         local sceneData = {
                             position = {x = imports.tonumber(j[4]), y = imports.tonumber(j[5]), z = imports.tonumber(j[6])},
                             rotation = {}
@@ -230,17 +229,19 @@ if localPlayer then
                         sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = cQuat:toEuler()
                         cQuat:destroy()
                         if not cAsset.manifestData.sceneMapped then
-                            asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
-                                txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath.."txd/"..(sceneIDEDatas[(j[2])][1])..".txd") or assetPath..(asset.references.asset)..".txd",
-                                dff = assetPath.."dff/"..j[2]..".dff",
-                                lod = assetPath.."dff/lod/"..j[2]..".dff",
-                                col = assetPath.."col/"..j[2]..".col"
-                            }, function(state)
-                                if state then
-                                    scene:create(cAsset.unSynced.assetCache[i].cAsset, cAsset.manifestData, sceneData)
-                                end
-                            end)
+                            if not cAsset.unSynced.assetRef[(j[2])] then
+                                cAsset.unSynced.assetCache[i] = {}
+                                asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
+                                    txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath.."txd/"..(sceneIDEDatas[(j[2])][1])..".txd") or assetPath..(asset.references.asset)..".txd",
+                                    dff = assetPath.."dff/"..j[2]..".dff",
+                                    lod = assetPath.."dff/lod/"..j[2]..".dff",
+                                    col = assetPath.."col/"..j[2]..".col"
+                                })
+                                cAsset.unSynced.assetRef[(j[2])] = cAsset.unSynced.assetCache[i].cAsset
+                            end
+                            scene:create(cAsset.unSynced.assetRef[(j[2])], cAsset.manifestData, sceneData)
                         else
+                            cAsset.unSynced.assetCache[i] = {}
                             sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.x) or 0), sceneData.position.y + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.y) or 0), sceneData.position.z + ((cAsset.manifestData.sceneOffset and cAsset.manifestData.sceneOffset.z) or 0)
                             sceneData.dimension = cAsset.manifestData.sceneDimension
                             sceneData.interior = cAsset.manifestData.sceneInterior
@@ -295,7 +296,9 @@ if localPlayer then
             thread:create(function(self)
                 for i, j in imports.pairs(cAsset.unSynced.assetCache) do
                     if j.cAsset then
-                        if j.cAsset.cScene then j.cAsset.cScene:destroy() end
+                        for i, j in imports.pairs(j.cAsset.cScenes) do
+                            if i and j then i:destroy() end
+                        end
                         j.cAsset:destroy(cAsset.unSynced.rwCache)
                     end
                     if j.cDummy then j.cDummy:destroy() end

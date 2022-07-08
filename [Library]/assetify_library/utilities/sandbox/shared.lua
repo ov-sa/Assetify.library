@@ -34,6 +34,7 @@ local imports = {
 localPlayer = (imports.getLocalPlayer and imports.getLocalPlayer()) or false
 isElement = function(element) return (element and imports.isElement(element)) or false end
 destroyElement = function(element) return (isElement(element) and imports.destroyElement(element)) or false end
+execFunction = function(exec, ...) if not exec or (imports.type(exec) ~= "function") then return false end return exec(...) end
 
 getElementPosition = function(element, offX, offY, offZ)
     if not offX or not offY or not offZ then
