@@ -178,7 +178,7 @@ if localPlayer then
         self.id = #mapper.buffer.index + 1
         self.element = cDummy
         self.assetName = assetName
-        imports.table:insert(mapper.buffer.index, self)
+        imports.table.insert(mapper.buffer.index, self)
         mapper.buffer.element[(self.element)] = self
         imports.beautify.gridlist.setRowData(mapper.ui.sceneWnd.propLst.element, imports.beautify.gridlist.addRow(mapper.ui.sceneWnd.propLst.element), 1, "#"..(self.id).."  ━━  "..(self.assetName))
         if retargetFocus then mapper.isTargettingDummy = self.element end
@@ -190,7 +190,7 @@ if localPlayer then
         for i = self.id + 1, #mapper.buffer.index, 1 do
             mapper.buffer.index[i].id = mapper.buffer.index[i].id - 1
         end
-        imports.table:remove(mapper.buffer.index, self.id)
+        imports.table.remove(mapper.buffer.index, self.id)
         mapper.buffer.element[(self.element)] = nil
         imports.beautify.gridlist.removeRow(mapper.ui.sceneWnd.propLst.element, self.id)
         self = nil
@@ -317,7 +317,7 @@ if localPlayer then
             if mapper.translationMode then
                 local selectedAxis, validAxes = 0, {}
                 for i, j in imports.pairs(mapper.axis.validAxes) do
-                    imports.table:insert(validAxes, i)
+                    imports.table.insert(validAxes, i)
                     if mapper.translationMode.axis == i then
                         selectedAxis = #validAxes
                     end
@@ -475,7 +475,7 @@ else
                 end
             end
             sceneName = imports.tostring(sceneName)
-            imports.table:insert(mapper.rwAssets[(mapper.cacheManifestPath)], sceneName)
+            imports.table.insert(mapper.rwAssets[(mapper.cacheManifestPath)], sceneName)
             imports.file:write(mapper.cacheManifestPath, imports.toJSON(mapper.rwAssets[(mapper.cacheManifestPath)]))
             mapper.syncCacheManifest(source)
             mapper.loadScene(source, sceneName, true)
@@ -489,7 +489,7 @@ else
     imports.addEventHandler("Assetify:Mapper:onDeleteScene", root, function(sceneName)
         local sceneCache, sceneIndex = mapper.fetchSceneCache(sceneName)
         if not sceneCache then return false end
-        imports.table:remove(mapper.rwAssets[(mapper.cacheManifestPath)], sceneIndex)
+        imports.table.remove(mapper.rwAssets[(mapper.cacheManifestPath)], sceneIndex)
         imports.file:write(mapper.cacheManifestPath, imports.toJSON(mapper.rwAssets[(mapper.cacheManifestPath)]))
         local sceneIPLPath = sceneCache.."scene.ipl"
         imports.file:delete(sceneIPLPath)

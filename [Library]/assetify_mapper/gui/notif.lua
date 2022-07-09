@@ -67,7 +67,7 @@ mapper.ui.notif.renderUI = function()
             imports.beautify.native.drawText(j.text, notif_offsetX, notif_offsetY, notif_offsetX + j.width, notif_offsetY + mapper.ui.notif.height, imports.tocolor(j.fontColor[1], j.fontColor[2], j.fontColor[3], j.fontColor[4]*j.alphaPercent), 1, mapper.ui.notif.font, "center", "center", true, false, false, false, true)
             if j.slideStatus == "backward" then
                 if imports.math.round(j.alphaPercent, 2) == 0 then
-                    imports.table:remove(mapper.ui.notif.buffer, i)
+                    imports.table.remove(mapper.ui.notif.buffer, i)
                 end
             end
         end
@@ -81,7 +81,7 @@ end
 
 imports.addEvent("Assetify:Mapper:onNotification", true)
 imports.addEventHandler("Assetify:Mapper:onNotification", root, function(message, color)
-    imports.table:insert(mapper.ui.notif.buffer, {
+    imports.table.insert(mapper.ui.notif.buffer, {
         text = message,
         width = imports.beautify.native.getTextWidth(message, 1, mapper.ui.notif.font),
         fontColor = color,
