@@ -56,7 +56,7 @@ function scene.public:parseIPL(rw)
         local data = string.split(rw[i], scene.private.separators.IPL)
         data[2] = (data[2] and string.gsub(data[2], "%s", "")) or data[2]
         if data[2] then
-            table:insert(result, data)
+            table.insert(result, data)
         end
     end
     return result

@@ -154,7 +154,7 @@ if localPlayer then
         return true
     end
 
-    function bone.public:update()
+    function bone.public.update(self)
         if not bone.public:isInstance(self) or self.cHeartbeat then return false end
         bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
         bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
@@ -256,9 +256,9 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public:syncBoneAttachment(length, ...) return bone.public:create(table:unpack(table:pack(...), length or 3)) end
+function syncer.public:syncBoneAttachment(length, ...) return bone.public:create(table.unpack(table.pack(...), length or 3)) end
 function syncer.public:syncBoneDetachment(length, element) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:destroy() end
-function syncer.public:syncBoneRefreshment(length, element, ...) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:refresh(table:unpack(table:pack(...), length or 1)) end
+function syncer.public:syncBoneRefreshment(length, element, ...) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:refresh(table.unpack(table.pack(...), length or 1)) end
 function syncer.public:syncClearBoneAttachment(length, ...) return bone.public:clearElementBuffer(...) end
 if localPlayer then
     network:create("Assetify:Bone:onAttachment"):on(function(...) syncer.public:syncBoneAttachment(4, ...) end)

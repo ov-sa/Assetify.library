@@ -78,15 +78,17 @@ if localPlayer then
         for i, j in imports.pairs(assetDeps) do
             rwCache[i] = {}
             for k, v in imports.pairs(j) do
-                if i == "texture" then
-                    rwCache[i][k] = shader:loadTex(v, encryptKey)
-                elseif i == "script" then
+                if i == "script" then
                     rwCache[i][k] = {}
                     if k ~= "server" then
                         for m, n in imports.pairs(v) do
                             rwCache[i][k][m] = asset.public:readFile(n, encryptKey, true)
                         end
                     end
+                elseif i == "texture" then
+                    rwCache[i][k] = shader:loadTex(v, encryptKey)
+                else
+                    rwCache[i][k] = asset.public:readFile(v, encryptKey)
                 end
             end
         end
@@ -163,7 +165,7 @@ if localPlayer then
                 if collisionID then
                     imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], modelID)
                     if lodID then imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], lodID) end
-                    manager.API.World:clearModel(collisionID)
+                    manager.API.World.clearModel(collisionID)
                     imports.engineReplaceCOL(rwCache.col[(rwPaths.col)], collisionID)
                 end
                 assetData.cAsset = self
@@ -200,7 +202,7 @@ else
     function asset.public:buildManifest(rootPath, localPath, manifestPath)
         localPath = localPath or rootPath
         local manifestData = file:read(localPath..manifestPath)
-        manifestData = (manifestData and table:decode(manifestData)) or false
+        manifestData = (manifestData and table.decode(manifestData)) or false
         if manifestData then
             for i, j in imports.pairs(manifestData) do
                 local cURL = file:parseURL(j)
@@ -316,9 +318,9 @@ else
 
     function asset.public:buildPack(assetType, assetPack, callback)
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
-        local cAssetPack = table:clone(assetPack, true)
+        local cAssetPack = table.clone(assetPack, true)
         cAssetPack.manifestData = file:read((asset.public.references.root)..string.lower(assetType).."/"..(asset.public.references.manifest)..".json")
-        cAssetPack.manifestData = (cAssetPack.manifestData and table:decode(cAssetPack.manifestData)) or false
+        cAssetPack.manifestData = (cAssetPack.manifestData and table.decode(cAssetPack.manifestData)) or false
         if cAssetPack.manifestData then
             cAssetPack.rwDatas = {}
             thread:create(function(self)
@@ -350,7 +352,7 @@ else
                             }
                         }
                         if assetType == "module" then
-                            table:insert(syncer.libraryModules, assetName)
+                            table.insert(syncer.libraryModules, assetName)
                             assetManifestData.streamRange = false
                             assetManifestData.enableLODs = false
                             assetManifestData.assetClumps = false

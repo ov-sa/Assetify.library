@@ -13,8 +13,7 @@
 -----------------
 
 local imports = {
-    pairs = pairs,
-    string = string
+    pairs = pairs
 }
 
 

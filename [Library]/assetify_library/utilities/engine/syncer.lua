@@ -43,7 +43,7 @@ local syncer = class:create("syncer", {
 })
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
-syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table:encode(imports.getRealTime()))
+syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
 
 network:create("Assetify:onBoot")
 network:create("Assetify:onLoad")
@@ -136,7 +136,7 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public:syncElementModel(length, ...) return syncer.private:setElementModel(table:unpack(table:pack(...), length or 5)) end
+function syncer.public:syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public:syncElementModel(6, ...) end)
     network:fetch("Assetify:onElementDestroy"):on(function(source)

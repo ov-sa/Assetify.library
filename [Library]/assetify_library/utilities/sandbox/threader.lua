@@ -128,7 +128,7 @@ function thread.public:await(exec)
     thread.public:pause()
     local resolvedValues = self.awaitingValues
     self.awaitingValues = nil
-    return table:unpack(resolvedValues)
+    return table.unpack(resolvedValues)
 end
 
 function thread.public:resolve(...)
@@ -136,7 +136,7 @@ function thread.public:resolve(...)
     if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
     timer:create(function(...)
         self.isAwaiting = nil
-        self.awaitingValues = table:pack(...)
+        self.awaitingValues = table.pack(...)
         thread.private.resume(self)
     end, 1, 1, ...)
     return true

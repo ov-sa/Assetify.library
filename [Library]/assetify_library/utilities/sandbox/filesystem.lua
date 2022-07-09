@@ -111,12 +111,12 @@ function file.public:resolveURL(path, chroot)
             local j = cDirs[i]
             if j == "..." then
                 if not chroot or (chroot ~= cURL.url) then
-                    table:remove(vDirs, vDirs.__T.length)
+                    table.remove(vDirs, vDirs.__T.length)
                 end
             else
-                table:insert(vDirs, j)
+                table.insert(vDirs, j)
             end
-            cURL.url = table:concat(vDirs, "/")
+            cURL.url = table.concat(vDirs, "/")
             local __cURL = file.public:parseURL(cURL.url)
             cURL.url = (__cURL and not __cURL.file and cURL.url.."/") or cURL.url
         end

@@ -23,7 +23,7 @@ local imports = {
 --[[ APIs: Sound ]]--
 ---------------------
 
-function manager.API.Sound:playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+function manager.API.Sound.playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
     if not syncer.isLibraryLoaded then return false end
     local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
     if not cAsset or not isLoaded then return false end
@@ -36,7 +36,7 @@ function manager.API.Sound:playSound(assetName, soundCategory, soundIndex, sound
     return cSound
 end
 
-function manager.API.Sound:playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+function manager.API.Sound.playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
     if not syncer.isLibraryLoaded then return false end
     local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
     if not cAsset or not isLoaded then return false end

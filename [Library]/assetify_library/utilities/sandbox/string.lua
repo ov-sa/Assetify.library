@@ -15,6 +15,9 @@
 local imports = {
     type = type,
     pairs = pairs,
+    tostring = tostring,
+    tonumber = tonumber,
+    loadstring = loadstring,
     string = string,
     encodeString = encodeString,
     decodeString = decodeString
@@ -38,6 +41,14 @@ function string.public.gsub(baseString, matchWord, replaceWord, matchLimit, isSt
     return __string_gsub(baseString, matchWord, replaceWord, matchLimit)
 end
 
+function string.public.parse(baseString)
+    if not baseString then return false end
+    if imports.tostring(baseString) == "nil" then return
+    elseif imports.tostring(baseString) == "false" then return false
+    elseif imports.tostring(baseString) == "true" then return true
+    else return imports.tonumber(baseString) or baseString end
+end
+
 function string.public.encode(type, baseString, options)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     return imports.encodeString(type, baseString, options)
@@ -55,8 +66,13 @@ function string.public.split(baseString, separator)
     local result = {}
     for matchValue in string.public.gmatch(baseString, "(.-)"..separator) do
         if #string.public.gsub(matchValue, "%s", "") > 0 then
-            table:insert(result, matchValue)
+            table.insert(result, matchValue)
         end
     end
     return result
+end
+
+function string.public.kern(baseString, kerner)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    return string.public.sub(string.public.gsub(baseString, ".", (kerner or " ").."%0"), 2)
 end

@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="5.0.1"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="5.0.2"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -17,7 +17,7 @@
     <script src="settings/server.lua" type="server"/>
 
     <!-- Utilities: Sandbox -->
-    <script src="utilities/sandbox/shared.lua" type="shared"/>
+    <script src="utilities/sandbox/index.lua" type="shared"/>
     <script src="utilities/sandbox/namespacer.lua" type="shared"/>
     <script src="utilities/sandbox/table.lua" type="shared"/>
     <script src="utilities/sandbox/filesystem.lua" type="shared"/>
@@ -25,7 +25,6 @@
     <script src="utilities/sandbox/math/quat.lua" type="shared"/>
     <script src="utilities/sandbox/math/matrix.lua" type="shared"/>
     <script src="utilities/sandbox/string.lua" type="shared"/>
-    <script src="utilities/shaders/index.lua" type="client"/>
     <script src="utilities/sandbox/timer.lua" type="shared"/>
     <script src="utilities/sandbox/threader.lua" type="shared"/>
     <script src="utilities/sandbox/networker.lua" type="shared"/>
@@ -35,6 +34,7 @@
 
     <!-- Utilities: Shaders -->
     <file src="utilities/shaders/helper.fx"/>
+    <script src="utilities/shaders/index.lua" type="client"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
     <script src="utilities/shaders/tex_changer.lua" type="client"/>
     <script src="utilities/shaders/tex_shadower.lua" type="client"/>
@@ -44,7 +44,7 @@
     <script src="utilities/shaders/tex_exporter.lua" type="client"/>
     <script src="utilities/shaders/light_planar.lua" type="client"/>
 
-    <!-- Utilities: Engin -->
+    <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
     <script src="utilities/engine/dummy.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>

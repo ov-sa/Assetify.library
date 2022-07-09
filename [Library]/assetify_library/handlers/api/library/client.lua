@@ -12,71 +12,71 @@
 --[[ APIs: Library ]]--
 -----------------------
 
-function manager.API.Library:getAssetID(...)
+function manager.API.Library.getAssetID(...)
     return manager:getAssetID(...)
 end
 
-function manager.API.Library:isAssetLoaded(...)
+function manager.API.Library.isAssetLoaded(...)
     return manager:isAssetLoaded(...)
 end
 
-function manager.API.Library:loadAsset(...)
+function manager.API.Library.loadAsset(...)
     return manager:loadAsset(...)
 end
 
-function manager.API.Library:unloadAsset(...)
+function manager.API.Library.unloadAsset(...)
     return manager:unloadAsset(...)
 end
 
-function manager.API.Library:createShader(...)
+function manager.API.Library.createShader(...)
     local cShader = shader:create(...)
     return cShader.cShader
 end
 
-function manager.API.Library:isRendererVirtualRendering()
+function manager.API.Library.isRendererVirtualRendering()
     return renderer.isVirtualRendering
 end
 
-function manager.API.Library:setRendererVirtualRendering(...)
+function manager.API.Library.setRendererVirtualRendering(...)
     return renderer:setVirtualRendering(...)
 end
 
-function manager.API.Library:getRendererVirtualSource()
+function manager.API.Library.getRendererVirtualSource()
     return (renderer.isVirtualRendering and renderer.virtualSource) or false
 end
 
-function manager.API.Library:getRendererVirtualRTs()
+function manager.API.Library.getRendererVirtualRTs()
     return (renderer.isVirtualRendering and renderer.virtualRTs) or false
 end
 
-function manager.API.Library:setRendererTimeSync(...)
+function manager.API.Library.setRendererTimeSync(...)
     return renderer:setTimeSync(...)
 end
 
-function manager.API.Library:setRendererServerTick(...)
+function manager.API.Library.setRendererServerTick(...)
     return renderer:setServerTick(...)
 end
 
-function manager.API.Library:setRendererMinuteDuration(...)
+function manager.API.Library.setRendererMinuteDuration(...)
     return renderer:setMinuteDuration(...)
 end
 
-function manager.API.Library:createPlanarLight(...)
+function manager.API.Library.createPlanarLight(...)
     local cLight = light.planar:create(...)
     return (cLight and cLight.cLight) or false
 end
 
-function manager.API.Library:setPlanarLightResolution(...)
+function manager.API.Library.setPlanarLightResolution(...)
     if not light.planar.buffer[cLight] then return false end
     return light.planar.buffer[cLight]:setResolution(...)
 end
 
-function manager.API.Library:setPlanarLightTexture(...)
+function manager.API.Library.setPlanarLightTexture(...)
     if not light.planar.buffer[cLight] then return false end
     return light.planar.buffer[cLight]:setTexture(...)
 end
 
-function manager.API.Library:setPlanarLightColor(...)
+function manager.API.Library.setPlanarLightColor(...)
     if not light.planar.buffer[cLight] then return false end
     return light.planar.buffer[cLight]:setColor(...)
 end

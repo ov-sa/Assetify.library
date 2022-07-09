@@ -51,7 +51,7 @@ syncer.private.execOnBoot(function()
         imports.engineImportTXD(imports.engineLoadTXD(modelPath.."dict.rw"), j.modelID)
         imports.engineReplaceModel(imports.engineLoadDFF(modelPath.."buffer.rw"), j.modelID, true)
         imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.modelID)
-        manager.API.World:clearModel(j.collisionID)
+        manager.API.World.clearModel(j.collisionID)
         imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.collisionID)
         planar.private.cache.validTypes[i] = nil
         planar.private.cache.validTypes[(j.index)] = j

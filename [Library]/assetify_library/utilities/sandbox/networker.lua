@@ -54,9 +54,9 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
                 if i and (imports.type(i) == "function") then
                     thread:create(function(self)
                         if not j.config.isAsync then
-                            i(table:unpack(payload.processArgs))
+                            i(table.unpack(payload.processArgs))
                         else
-                            i(self, table:unpack(payload.processArgs))
+                            i(self, table.unpack(payload.processArgs))
                         end
                         j.config.subscriptionCount = (j.config.subscriptionLimit and (j.config.subscriptionCount + 1)) or false
                         if j.config.subscriptionLimit and (j.config.subscriptionCount >= j.config.subscriptionLimit) then
@@ -75,9 +75,9 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
                 payload.isRestricted = true
                 thread:create(function(self)
                     if not cNetwork.handler.config.isAsync then
-                        payload.processArgs = {cNetwork.handler.exec(table:unpack(payload.processArgs))}
+                        payload.processArgs = {cNetwork.handler.exec(table.unpack(payload.processArgs))}
                     else
-                        payload.processArgs = {cNetwork.handler.exec(self, table:unpack(payload.processArgs))}
+                        payload.processArgs = {cNetwork.handler.exec(self, table.unpack(payload.processArgs))}
                     end
                     if not payload.isRemote then
                         imports.triggerEvent("Assetify:Networker:API", resourceRoot, serial, payload)
@@ -100,7 +100,7 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
             end
         else
             if network.private.cache.execSerials[(payload.execSerial)] then
-                network.private.cache.execSerials[(payload.execSerial)](table:unpack(payload.processArgs))
+                network.private.cache.execSerials[(payload.execSerial)](table.unpack(payload.processArgs))
                 network.public:deserializeExec(payload.execSerial)
             end
         end
@@ -111,7 +111,7 @@ function network.private:fetchArg(index, pool)
     index = imports.tonumber(index) or 1
     if not pool or (imports.type(pool) ~= "table") then return false end
     local argValue = pool[index]
-    table:remove(pool, index)
+    table.remove(pool, index)
     return argValue
 end
 
@@ -211,7 +211,7 @@ end
 
 function network.public:emit(...)
     if not self then return false end
-    local cArgs = table:pack(...)
+    local cArgs = table.pack(...)
     local payload = {
         isRemote = false,
         isRestricted = false,
@@ -255,7 +255,7 @@ end
 function network.public:emitCallback(cThread, ...)
     if not self or not cThread or not thread:isInstance(cThread) then return false end
     local cThread = cThread
-    local cArgs, cExec = table:pack(...), function(...) return cThread:resolve(...) end
+    local cArgs, cExec = table.pack(...), function(...) return cThread:resolve(...) end
     local payload = {
         isRemote = false,
         isRestricted = false,

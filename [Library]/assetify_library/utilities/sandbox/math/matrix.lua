@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: sandbox: math: matrix.lua
+     Script: utilities: sandbox: math. matrix.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -70,7 +70,7 @@ matrix.public.__add = function(matrixLHS, matrixRHS)
             rows[i][k] = matrixLHS.rows[i][k] + matrixRHS.rows[i][k]
         end
     end
-    return matrix.public(table:unpack(rows))
+    return matrix.public(table.unpack(rows))
 end
 
 matrix.public.__sub = function(matrixLHS, matrixRHS)
@@ -82,7 +82,7 @@ matrix.public.__sub = function(matrixLHS, matrixRHS)
             rows[i][k] = matrixLHS.rows[i][k] - matrixRHS.rows[i][k]
         end
     end
-    return matrix.public(table:unpack(rows))
+    return matrix.public(table.unpack(rows))
 end
 
 matrix.public.__mul = function(matrixLHS, matrixRHS)
@@ -94,7 +94,7 @@ matrix.public.__mul = function(matrixLHS, matrixRHS)
             rows[i][k] = matrixLHS.rows[i][k] * matrixRHS.rows[i][k]
         end
     end
-    return matrix.public(table:unpack(rows))
+    return matrix.public(table.unpack(rows))
 end
 
 matrix.public.__div = function(matrixLHS, matrixRHS)
@@ -106,7 +106,7 @@ matrix.public.__div = function(matrixLHS, matrixRHS)
             rows[i][k] = matrixLHS.rows[i][k] / matrixRHS.rows[i][k]
         end
     end
-    return matrix.public(table:unpack(rows))
+    return matrix.public(table.unpack(rows))
 end
 
 function matrix.public:scale(scale)
