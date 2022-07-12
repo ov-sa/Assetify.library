@@ -26,10 +26,10 @@ local imports = {
 
 local math = namespace:create("math", math)
 
-function math.public.round(number, decimals)
-    number = imports.tonumber(number)
-    if not number then return false end
-    return imports.tonumber(string.format("%."..(imports.tonumber(decimals) or 0).."f", number))
+function math.public.round(value, decimals)
+    value = imports.tonumber(value)
+    if not value then return false end
+    return imports.tonumber(string.format("%."..(imports.tonumber(decimals) or 0).."f", value))
 end
 
 function math.public.percent(value, percent)
