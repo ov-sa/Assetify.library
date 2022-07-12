@@ -109,7 +109,7 @@ if localPlayer then
 else
     syncer.public.libraryVersion = imports.getResourceInfo(resource, "version")
     syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or syncer.public.libraryVersion
-    syncer.public.loadedClients, syncer.public.scheduledClients = {}, {}
+    syncer.public.loadedClients, syncer.private.scheduledClients = {}, {}
 
     function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, targetPlayer)
         if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementModel", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps, remoteSignature) end
@@ -157,7 +157,7 @@ else
                 syncer.public.loadedClients[source] = true
                 syncer.private:syncPack(source, _, true)
             else
-                syncer.public.scheduledClients[source] = true
+                syncer.private.scheduledClients[source] = true
             end
         end
     end)
@@ -204,6 +204,6 @@ else
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
         syncer.public.loadedClients[source] = nil
-        syncer.public.scheduledClients[source] = nil
+        syncer.private.scheduledClients[source] = nil
     end)
 end

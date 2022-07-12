@@ -117,7 +117,7 @@ if localPlayer then
         end, function()
             imports.setElementCollisionsEnabled(element, false)
             self.cDummy = dummy:fetchInstance(element)
-            if self.cDummy then self.cDummy:pause() end
+            if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:pause() end
             self.cElement = (self.cDummy and self.cDummy.cModelInstance) or element
             self.cStreamer = streamer:create(self.cElement, "bone", {parent}, self.boneData.syncRate)
             self.cHeartbeat = nil
@@ -132,7 +132,7 @@ if localPlayer then
         if not bone.public:isInstance(self) then return false end
         if self.cHeartbeat then self.cHeartbeat:destroy() end
         if self.cStreamer then self.cStreamer:destroy() end
-        if self.cDummy then self.cDummy:resume() end
+        if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:resume() end
         bone.public.cache.element[(self.element)] = nil
         bone.public.buffer.element[(self.element)] = nil
         self:destroyInstance()
