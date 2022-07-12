@@ -66,7 +66,7 @@ settings.assetPacks = {
         assetBase = 1337,
         assetTransparency = false
     },
-
+    
     ["loot"] = {
         autoLoad = true,
         assetType = "object",

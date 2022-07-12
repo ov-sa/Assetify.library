@@ -34,6 +34,7 @@ local imports = {
 local table = class:create("table", table)
 table.private.inspectTypes = {
     raw = {
+        ["nil"] = true,
         ["string"] = true,
         ["number"] = true,
         ["boolean"] = true

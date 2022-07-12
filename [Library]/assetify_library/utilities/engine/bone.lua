@@ -115,16 +115,18 @@ if localPlayer then
         self.cHeartbeat = thread:createHeartbeat(function()
             return not imports.isElement(element)
         end, function()
-            imports.setElementCollisionsEnabled(element, false)
-            self.cDummy = dummy:fetchInstance(element)
+            self.cDummy = dummy:fetchInstance(self.element)
             if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:pause() end
-            self.cElement = (self.cDummy and self.cDummy.cModelInstance) or element
-            self.cStreamer = streamer:create(self.cElement, "bone", {parent}, self.boneData.syncRate)
+            self.cElement = (self.cDummy and self.cDummy.cModelInstance) or self.element
+            imports.setElementCollisionsEnabled(self.cElement, false)
+            self.cStreamer = streamer:create(self.cElement, "bone", {parent})
+            bone.public.buffer.element[(self.cElement)] = self
             self.cHeartbeat = nil
         end, settings.downloader.buildRate)
-        bone.public.buffer.element[element] = self
-        bone.public.buffer.parent[parent] = bone.public.buffer.parent[parent] or {}
-        bone.public.buffer.parent[parent][self] = true
+        bone.public.buffer.element[(self.element)] = self
+        bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
+        bone.public.buffer.parent[(self.parent)] = bone.public.buffer.parent[(self.parent)] or {}
+        bone.public.buffer.parent[(self.parent)][self] = true
         return true
     end
 
@@ -135,6 +137,7 @@ if localPlayer then
         if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:resume() end
         bone.public.cache.element[(self.element)] = nil
         bone.public.buffer.element[(self.element)] = nil
+        bone.public.buffer.element[(self.cElement)] = nil
         self:destroyInstance()
         return true
     end
@@ -147,24 +150,16 @@ if localPlayer then
         boneData.id = imports.tonumber(boneData.id)
         if not boneData.id or not bone.public.ids[(self.parentType)][(boneData.id)] then return false end
         bone.private:validateOffset(self, boneData)
-        boneData.syncRate = imports.tonumber(boneData.syncRate) or settings.streamer.boneSyncRate
-        local isSyncRateModified = self.boneData and (self.boneData.syncRate ~= boneData.syncRate)
         self.boneData = boneData
-        if isSyncRateModified then
-            self.cStreamer.syncRate = self.boneData.syncRate
-            self.cStreamer:deallocate()
-            self.cStreamer:allocate()
-        end
         return true
     end
 
     function bone.public.update(self)
         if not bone.public:isInstance(self) or self.cHeartbeat then return false end
-        bone.public.cache.element[(self.parent)] = bone.public.cache.element[(self.parent)] or {}
-        bone.public.cache.element[(self.parent)][(self.boneData.id)] = ((bone.public.cache.element[(self.parent)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
-        bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick
+        bone.public.cache.element[(self.parent)][(self.boneData.id)] = (bone.public.cache.element[(self.parent)][(self.boneData.id)] and (bone.public.cache.element[(self.parent)][(self.boneData.id)].streamTick == bone.public.cache.streamTick) and bone.public.cache.element[(self.parent)][(self.boneData.id)]) or imports.getElementBoneMatrix(self.parent, self.boneData.id)
         local cMatrix, rotationMatrix = bone.public.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix
         local offX, offY, offZ = self.boneData.position.x, self.boneData.position.y, self.boneData.position.z
+        cMatrix.streamTick = bone.public.cache.streamTick
         imports.setElementMatrix(self.cElement, {
             {
                 (cMatrix[2][1]*rotationMatrix[1][2]) + (cMatrix[1][1]*rotationMatrix[1][1]) + (rotationMatrix[1][3]*cMatrix[3][1]),
@@ -241,7 +236,6 @@ else
         boneData.id = imports.tonumber(boneData.id)
         if not boneData.id or not bone.public.ids[(self.parentType)][(boneData.id)] then return false end
         bone.private:validateOffset(self, boneData)
-        boneData.syncRate = imports.tonumber(boneData.syncRate) or settings.streamer.boneSyncRate
         self.boneData = boneData
         if not skipSync then
             thread:create(function(__self)

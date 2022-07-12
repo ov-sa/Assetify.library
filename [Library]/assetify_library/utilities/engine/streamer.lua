@@ -22,9 +22,12 @@ local imports = {
     detachElements = detachElements,
     getTickCount = getTickCount,
     isElementOnScreen = isElementOnScreen,
+    getElementCollisionsEnabled = getElementCollisionsEnabled,
+    setElementCollisionsEnabled = setElementCollisionsEnabled,
+    getElementPosition = getElementPosition,
     getElementDimension = getElementDimension,
-    getElementInterior = getElementInterior,
     setElementDimension = setElementDimension,
+    getElementInterior = getElementInterior,
     setElementInterior = setElementInterior,
     getElementVelocity = getElementVelocity
 }
@@ -38,13 +41,13 @@ local streamer = class:create("streamer")
 streamer.private.allocator = {
     validStreams = {
         ["dummy"] = {desyncOccclusionsOnPause = true},
-        ["bone"] = {skipAttachment = true},
+        ["bone"] = {skipAttachment = true, dynamicStreamAllocation = true},
         ["light"] = {desyncOccclusionsOnPause = true}
     }
 }
 streamer.private.buffer = {}
 streamer.private.cache = {
-    clientCamera = imports.getCamera()
+    clientCamera = getCamera()
 }
 
 function streamer.public:create(...)
@@ -64,20 +67,17 @@ end
 function streamer.public:load(streamerInstance, streamType, occlusionInstances, syncRate)
     if not streamer.public:isInstance(self) then return false end
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
-    local streamDimension, streamInterior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
-    self.streamer = streamerInstance
+    self.streamer, self.isStreamerCollidable = streamerInstance, imports.getElementCollisionsEnabled(streamerInstance)
     self.streamType, self.occlusions = streamType, occlusionInstances
-    self.dimension, self.interior = streamDimension, streamInterior
-    self.syncRate = syncRate or settings.streamer.syncRate
+    self.dimension, self.interior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
+    self.syncRate = settings.streamer.streamRate
     self:resume()
     return true
 end
 
 function streamer.public:unload()
     if not streamer.public:isInstance(self) then return false end
-    local streamType = self.streamType
-    local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
-    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = nil
+    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = nil
     self:pause()
     self:destroyInstance()
     return true
@@ -98,6 +98,7 @@ function streamer.public:resume()
         end
     end
     self.isResumed = true
+    imports.setElementCollisionsEnabled(self.streamer, self.isStreamerCollidable)
     streamer.private.buffer[(self.dimension)] = streamer.private.buffer[(self.dimension)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)] = streamer.private.buffer[(self.dimension)][(self.interior)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] or {}
@@ -113,13 +114,13 @@ function streamer.public:pause()
     streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = nil
     if self.streamer ~= self.occlusions[1] then
         if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
-            Imports.detachElements(self.streamer, self.occlusions[1])
+            imports.detachElements(self.streamer)
         end
-        imports.setElementDimension(self.streamer, self.unsyncDimension)
+        imports.setElementDimension(self.streamer, settings.streamer.unsyncDimension)
     end
     if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
         for i = 1, #self.occlusions do
-            imports.setElementDimension(self.occlusions[i], self.unsyncDimension)
+            imports.setElementDimension(self.occlusions[i], settings.streamer.unsyncDimension)
         end
     end
     return true
@@ -210,6 +211,15 @@ streamer.private.onEntityStream = function(streamBuffer)
                 end
             end
             imports.setElementDimension(i.streamer, (j.isStreamed and streamer.private.cache.clientWorld.dimension) or settings.streamer.unsyncDimension)
+            if streamer.private.allocator.validStreams[(i.streamType)] and streamer.private.allocator.validStreams[(i.streamType)].dynamicStreamAllocation then
+                local viewDistance = math.findDistance3D(streamer.private.cache.cameraLocation.x, streamer.private.cache.cameraLocation.y, streamer.private.cache.cameraLocation.z, imports.getElementPosition(i.streamer)) - settings.streamer.streamDelimiter[1]
+                local syncRate = ((viewDistance <= 0) and 0) or math.min(settings.streamer.streamRate, math.round(((viewDistance/settings.streamer.streamDelimiter[2])*settings.streamer.streamRate)/settings.streamer.streamDelimiter[3])*settings.streamer.streamDelimiter[3])
+                if syncRate ~= i.syncRate then
+                    i:deallocate()
+                    i.syncRate = syncRate
+                    i:allocate()
+                end
+            end
         end
     end
     return true
@@ -217,12 +227,12 @@ end
 
 streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
+    bone.cache.streamTick = imports.getTickCount()
     for i, j in imports.pairs(streamBuffer) do
         if j and j.isStreamed then
             bone.update(bone.buffer.element[(i.streamer)])
         end
     end
-    bone.cache.streamTick = imports.getTickCount()
     return true
 end
 
@@ -245,6 +255,8 @@ network:fetch("Assetify:onLoad"):on(function()
     end, settings.streamer.cameraSyncRate, 0)
     timer:create(function()
         if not streamer.private.cache.isCameraTranslated then return false end
+        streamer.private.cache.cameraLocation = streamer.private.cache.cameraLocation or {}
+        streamer.private.cache.cameraLocation.x, streamer.private.cache.cameraLocation.y, streamer.private.cache.cameraLocation.z = imports.getElementPosition(streamer.private.cache.clientCamera)
         local clientDimension, clientInterior = streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior
         if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
             for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
