@@ -19,6 +19,7 @@ local imports = {
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     attachElements = attachElements,
+    detachElements = detachElements,
     getTickCount = getTickCount,
     isElementOnScreen = isElementOnScreen,
     getElementDimension = getElementDimension,
@@ -36,9 +37,9 @@ local imports = {
 local streamer = class:create("streamer")
 streamer.private.allocator = {
     validStreams = {
-        ["dummy"] = {},
+        ["dummy"] = {desyncOccclusionsOnPause = true},
         ["bone"] = {skipAttachment = true},
-        ["light"] = {}
+        ["light"] = {desyncOccclusionsOnPause = true}
     }
 }
 streamer.private.buffer = {}
@@ -68,18 +69,7 @@ function streamer.public:load(streamerInstance, streamType, occlusionInstances, 
     self.streamType, self.occlusions = streamType, occlusionInstances
     self.dimension, self.interior = streamDimension, streamInterior
     self.syncRate = syncRate or settings.streamer.syncRate
-    if streamerInstance ~= occlusionInstances[1] then
-        if not streamer.private.allocator.validStreams[streamType] or not streamer.private.allocator.validStreams[streamType].skipAttachment then
-            imports.attachElements(streamerInstance, occlusionInstances[1])
-        end
-        imports.setElementDimension(streamerInstance, streamDimension)
-        imports.setElementInterior(streamerInstance, streamInterior)
-    end
-    streamer.private.buffer[streamDimension] = streamer.private.buffer[streamDimension] or {}
-    streamer.private.buffer[streamDimension][streamInterior] = streamer.private.buffer[streamDimension][streamInterior] or {}
-    streamer.private.buffer[streamDimension][streamInterior][streamType] = streamer.private.buffer[streamDimension][streamInterior][streamType] or {}
-    streamer.private.buffer[streamDimension][streamInterior][streamType][self] = {isStreamed = false}
-    self:allocate()
+    self:resume()
     return true
 end
 
@@ -88,8 +78,50 @@ function streamer.public:unload()
     local streamType = self.streamType
     local streamDimension, streamInterior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     streamer.private.buffer[streamDimension][streamInterior][streamType][self] = nil
-    self:deallocate()
+    self:pause()
     self:destroyInstance()
+    return true
+end
+
+function streamer.public:resume()
+    if not streamer.public:isInstance(self) or self.isResumed then return false end
+    if self.streamer ~= self.occlusions[1] then
+        if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
+            imports.attachElements(self.streamer, self.occlusions[1])
+        end
+        imports.setElementDimension(self.streamer, self.dimension)
+        imports.setElementInterior(self.streamer, self.interior)
+    end
+    if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
+        for i = 1, #self.occlusions do
+            imports.setElementDimension(self.occlusions[i], self.dimension)
+        end
+    end
+    self.isResumed = true
+    streamer.private.buffer[(self.dimension)] = streamer.private.buffer[(self.dimension)] or {}
+    streamer.private.buffer[(self.dimension)][(self.interior)] = streamer.private.buffer[(self.dimension)][(self.interior)] or {}
+    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] or {}
+    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = {isStreamed = false}
+    self:allocate()
+    return true
+end
+
+function streamer.public:pause()
+    if not streamer.public:isInstance(self) or not self.isResumed then return false end
+    self:deallocate()
+    self.isResumed = false
+    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = nil
+    if self.streamer ~= self.occlusions[1] then
+        if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
+            Imports.detachElements(self.streamer, self.occlusions[1])
+        end
+        imports.setElementDimension(self.streamer, self.unsyncDimension)
+    end
+    if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
+        for i = 1, #self.occlusions do
+            imports.setElementDimension(self.occlusions[i], self.unsyncDimension)
+        end
+    end
     return true
 end
 
@@ -103,23 +135,21 @@ function streamer.public:update(clientDimension, clientInterior)
     end
     if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
         for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
-            if j then
-                imports.setElementDimension(i.streamer.public, settings.streamer.unsyncDimension)
-            end
+            if j then imports.setElementDimension(i.streamer, settings.streamer.unsyncDimension) end
         end
     end
     streamer.private.cache.isCameraTranslated = true
     streamer.private.cache.clientWorld = streamer.private.cache.clientWorld or {}
-    streamer.private.cache.clientWorld.dimension = currentDimension
-    streamer.private.cache.clientWorld.interior = currentInterior
+    streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior = currentDimension, currentInterior
     return true
 end
 imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer.public:update(dimension) end)
 imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)
 
 function streamer.public:allocate()
-    if not streamer.public:isInstance(self) then return false end
+    if not streamer.public:isInstance(self) or not self.isResumed or self.isAllocated then return false end
     if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
+    self.isAllocated = true
     streamer.private.allocator[(self.syncRate)] = streamer.private.allocator[(self.syncRate)] or {}
     streamer.private.allocator[(self.syncRate)][(self.streamType)] = streamer.private.allocator[(self.syncRate)][(self.streamType)] or {}
     streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] = streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or {}
@@ -142,10 +172,11 @@ function streamer.public:allocate()
 end
 
 function streamer.public:deallocate()
-    if not streamer.public:isInstance(self) then return false end
+    if not streamer.public:isInstance(self) or not self.isResumed or not self.isAllocated then return false end
     if not streamer.private.allocator.validStreams[(self.streamType)] then return false end
     if not streamer.private.allocator[(self.syncRate)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)] or not streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)] then return false end
     local isAllocatorVoid = true
+    self.isAllocated = false
     streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)][self] = nil
     for i, j in imports.pairs(streamer.private.allocator[(self.syncRate)][(self.streamType)][(self.dimension)][(self.interior)]) do
         isAllocatorVoid = false

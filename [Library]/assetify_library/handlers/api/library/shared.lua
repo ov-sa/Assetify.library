@@ -39,7 +39,7 @@ function manager.API.Library.getAssetDep(...)
 end
 
 function manager.API.Library.setElementAsset(...)
-    return syncer:syncElementModel(_, ...)
+    return syncer.syncElementModel(_, ...)
 end
 
 function manager.API.Library.getElementAssetInfo(element)
@@ -48,7 +48,7 @@ function manager.API.Library.getElementAssetInfo(element)
 end
 
 function manager.API.Library.setGlobalData(...)
-    return syncer:syncGlobalData(...)
+    return syncer.syncGlobalData(...)
 end
 
 function manager.API.Library.getGlobalData(data)
@@ -56,7 +56,7 @@ function manager.API.Library.getGlobalData(data)
 end
 
 function manager.API.Library.setEntityData(...)
-    return syncer:syncEntityData(table.unpack(table.pack(...), 3))
+    return syncer.syncEntityData(table.unpack(table.pack(...), 3))
 end
 
 function manager.API.Library.getEntityData(element, data)
@@ -64,16 +64,16 @@ function manager.API.Library.getEntityData(element, data)
 end
 
 function manager.API.Library.createAssetDummy(...)
-    local cDummy = syncer:syncDummySpawn(_, ...)
+    local cDummy = syncer.syncDummySpawn(_, ...)
     return (cDummy and cDummy.cDummy) or false
 end
 
 function manager.API.Library.setBoneAttachment(...)
-    return syncer:syncBoneAttachment(_, ...)
+    return syncer.syncBoneAttachment(_, ...)
 end
 
 function manager.API.Library.syncBoneDetachment(...)
-    return syncer:syncBoneDetachment(_, ...)
+    return syncer.syncBoneDetachment(_, ...)
 end
 
 function manager.API.Library.setBoneRefreshment(...)
@@ -81,5 +81,5 @@ function manager.API.Library.setBoneRefreshment(...)
 end
 
 function manager.API.Library.clearBoneAttachment(...)
-    return syncer:syncClearBoneAttachment(_, ...)
+    return syncer.syncClearBoneAttachment(_, ...)
 end

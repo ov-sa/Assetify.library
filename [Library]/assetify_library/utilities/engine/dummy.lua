@@ -39,7 +39,7 @@ local dummy = class:create("dummy", {
     buffer = {}
 })
 
-function dummy.private:fetchInstance(element)
+function dummy.public:fetchInstance(element)
     return (element and dummy.public.buffer[element]) or false
 end
 
@@ -67,7 +67,7 @@ function dummy.public:destroy(...)
 end
 
 function dummy.public:clearElementBuffer(element)
-    local cDummy = dummy.private:fetchInstance(element)
+    local cDummy = dummy.public:fetchInstance(element)
     if not cDummy then return false end
     cDummy:destroy()
     return true
@@ -202,11 +202,11 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public:syncDummySpawn(length, ...) return dummy.public:create(table.unpack(table.pack(...), length or 5)) end
-function syncer.public:syncDummyDespawn(length, element) local cDummy = dummy.private:fetchInstance(element); if not cDummy then return false end; return cDummy:destroy() end
+function syncer.public.syncDummySpawn(length, ...) return dummy.public:create(table.unpack(table.pack(...), length or 5)) end
+function syncer.public.syncDummyDespawn(length, element) local cDummy = dummy.public:fetchInstance(element); if not cDummy then return false end; return cDummy:destroy() end
 if localPlayer then
-    network:create("Assetify:Dummy:onSpawn"):on(function(...) syncer.public:syncDummySpawn(6, ...) end)
-    network:create("Assetify:Dummy:onDespawn"):on(function(...) syncer.public:syncDummySpawn(_, ...) end)
+    network:create("Assetify:Dummy:onSpawn"):on(function(...) syncer.public.syncDummySpawn(6, ...) end)
+    network:create("Assetify:Dummy:onDespawn"):on(function(...) syncer.public.syncDummySpawn(_, ...) end)
 else
     network:fetch("Assetify:Downloader:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})

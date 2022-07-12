@@ -127,14 +127,14 @@ if localPlayer then
         end
     end)
 else
-    function syncer.public:syncHash(player, ...) return network:emit("Assetify:Downloader:onRecieveHash", true, false, player, ...) end
-    function syncer.public:syncData(player, ...) return network:emit("Assetify:Downloader:onRecieveData", true, false, player, ...) end
-    function syncer.public:syncContent(player, ...) return network:emit("Assetify:Downloader:onRecieveContent", true, false, player, ...) end
-    function syncer.public:syncState(player, ...) return network:emit("Assetify:Downloader:onRecieveState", true, false, player, ...) end
-    network:create("Assetify:Downloader:onRecieveHash"):on(function(source, assetType, assetName, hashes) syncer.public:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
-    network:create("Assetify:Downloader:onRequestSyncPack"):on(function(source) syncer.public:syncPack(source) end)
+    function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onRecieveHash", true, false, player, ...) end
+    function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onRecieveData", true, false, player, ...) end
+    function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onRecieveContent", true, false, player, ...) end
+    function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onRecieveState", true, false, player, ...) end
+    network:create("Assetify:Downloader:onRecieveHash"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
+    network:create("Assetify:Downloader:onRequestSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
-    function syncer.public:syncPack(player, assetDatas, syncModules)
+    function syncer.private:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
             thread:create(function(self)
                 local isLibraryVoid = true
@@ -144,15 +144,15 @@ else
                             for k, v in imports.pairs(j.assetPack) do
                                 if k ~= "rwDatas" then
                                     if syncModules then
-                                        syncer.public:syncData(player, i, k, false, v)
+                                        syncer.private:syncData(player, i, k, false, v)
                                     end
                                 else
                                     for m, n in imports.pairs(v) do
                                         isLibraryVoid = false
                                         if syncModules then
-                                            syncer.public:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
+                                            syncer.private:syncData(player, i, "rwDatas", {m, "assetSize"}, n.synced.assetSize)
                                         else
-                                            syncer.public:syncHash(player, i, m, n.unSynced.fileHash)
+                                            syncer.private:syncHash(player, i, m, n.unSynced.fileHash)
                                         end
                                         thread:pause()
                                     end
@@ -169,12 +169,12 @@ else
                     if settings.assetPacks["module"] and settings.assetPacks["module"].assetPack then
                         for i, j in imports.pairs(settings.assetPacks["module"].assetPack) do
                             if i ~= "rwDatas" then
-                                syncer.public:syncData(player, "module", i, false, j)
+                                syncer.private:syncData(player, "module", i, false, j)
                             else
                                 for k, v in imports.pairs(j) do
                                     isModuleVoid = false
-                                    syncer.public:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
-                                    syncer.public:syncHash(player, "module", k, v.unSynced.fileHash)
+                                    syncer.private:syncData(player, "module", "rwDatas", {k, "assetSize"}, v.synced.assetSize)
+                                    syncer.private:syncHash(player, "module", k, v.unSynced.fileHash)
                                     thread:pause()
                                 end
                             end
@@ -194,15 +194,15 @@ else
                 local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(cAsset.synced) do
                     if i ~= "assetSize" then
-                        syncer.public:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                        syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
                     end
                     thread:pause()
                 end
                 for i, j in imports.pairs(assetDatas.hashes) do
-                    syncer.public:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
+                    syncer.private:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
                     thread:pause()
                 end
-                syncer.public:syncState(player, assetDatas.type, assetDatas.name)
+                syncer.private:syncState(player, assetDatas.type, assetDatas.name)
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         end
         return true

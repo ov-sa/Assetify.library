@@ -116,7 +116,10 @@ if localPlayer then
             return not imports.isElement(element)
         end, function()
             imports.setElementCollisionsEnabled(element, false)
-            self.cStreamer = streamer:create(element, "bone", {parent}, self.boneData.syncRate)
+            self.cDummy = dummy:fetchInstance(element)
+            if self.cDummy then self.cDummy:pause() end
+            self.cElement = (self.cDummy and self.cDummy.cModelInstance) or element
+            self.cStreamer = streamer:create(self.cElement, "bone", {parent}, self.boneData.syncRate)
             self.cHeartbeat = nil
         end, settings.downloader.buildRate)
         bone.public.buffer.element[element] = self
@@ -129,6 +132,7 @@ if localPlayer then
         if not bone.public:isInstance(self) then return false end
         if self.cHeartbeat then self.cHeartbeat:destroy() end
         if self.cStreamer then self.cStreamer:destroy() end
+        if self.cDummy then self.cDummy:resume() end
         bone.public.cache.element[(self.element)] = nil
         bone.public.buffer.element[(self.element)] = nil
         self:destroyInstance()
@@ -161,7 +165,7 @@ if localPlayer then
         bone.public.cache.element[(self.parent)].streamTick = bone.public.cache.streamTick
         local cMatrix, rotationMatrix = bone.public.cache.element[(self.parent)][(self.boneData.id)], self.boneData.rotationMatrix
         local offX, offY, offZ = self.boneData.position.x, self.boneData.position.y, self.boneData.position.z
-        imports.setElementMatrix(self.element, {
+        imports.setElementMatrix(self.cElement, {
             {
                 (cMatrix[2][1]*rotationMatrix[1][2]) + (cMatrix[1][1]*rotationMatrix[1][1]) + (rotationMatrix[1][3]*cMatrix[3][1]),
                 (cMatrix[3][2]*rotationMatrix[1][3]) + (cMatrix[1][2]*rotationMatrix[1][1]) + (cMatrix[2][2]*rotationMatrix[1][2]),
@@ -256,15 +260,15 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public:syncBoneAttachment(length, ...) return bone.public:create(table.unpack(table.pack(...), length or 3)) end
-function syncer.public:syncBoneDetachment(length, element) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:destroy() end
-function syncer.public:syncBoneRefreshment(length, element, ...) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:refresh(table.unpack(table.pack(...), length or 1)) end
-function syncer.public:syncClearBoneAttachment(length, ...) return bone.public:clearElementBuffer(...) end
+function syncer.public.syncBoneAttachment(length, ...) return bone.public:create(table.unpack(table.pack(...), length or 3)) end
+function syncer.public.syncBoneDetachment(length, element) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:destroy() end
+function syncer.public.syncBoneRefreshment(length, element, ...) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:refresh(table.unpack(table.pack(...), length or 1)) end
+function syncer.public.syncClearBoneAttachment(length, ...) return bone.public:clearElementBuffer(...) end
 if localPlayer then
-    network:create("Assetify:Bone:onAttachment"):on(function(...) syncer.public:syncBoneAttachment(4, ...) end)
-    network:create("Assetify:Bone:onDetachment"):on(function(...) syncer.public:syncBoneDetachment(_, ...) end)
-    network:create("Assetify:Bone:onRefreshment"):on(function(...) syncer.public:syncBoneRefreshment(2, ...) end)
-    network:create("Assetify:Bone:onClearAttachment"):on(function(...) syncer.public:syncClearBoneAttachment(_, ...) end)
+    network:create("Assetify:Bone:onAttachment"):on(function(...) syncer.public.syncBoneAttachment(4, ...) end)
+    network:create("Assetify:Bone:onDetachment"):on(function(...) syncer.public.syncBoneDetachment(_, ...) end)
+    network:create("Assetify:Bone:onRefreshment"):on(function(...) syncer.public.syncBoneRefreshment(2, ...) end)
+    network:create("Assetify:Bone:onClearAttachment"):on(function(...) syncer.public.syncClearBoneAttachment(_, ...) end)
 else
     network:fetch("Assetify:Downloader:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})

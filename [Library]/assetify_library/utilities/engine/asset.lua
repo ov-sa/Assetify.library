@@ -55,7 +55,7 @@ function asset.public:readFile(filePath, encryptKey, ...)
     if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
     if not encryptKey then return filePath end
     local rw = file:read(filePath)
-    return (rw and string.decode("tea", rw, {key = encryptKey}, ...)) or false
+    return (rw and string.decode(rw, "tea", {key = encryptKey}, ...)) or false
 end
 
 if localPlayer then
@@ -227,7 +227,7 @@ else
                     filePointer.synced.assetSize.file[filePath] = builtFileSize
                     filePointer.synced.assetSize.total = filePointer.synced.assetSize.total + filePointer.synced.assetSize.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.assetSize.file[filePath]
-                    filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode("tea", builtFileData, {key = encryptKey})) or builtFileData
+                    filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end

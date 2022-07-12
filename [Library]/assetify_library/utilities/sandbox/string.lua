@@ -49,12 +49,12 @@ function string.public.parse(baseString)
     else return imports.tonumber(baseString) or baseString end
 end
 
-function string.public.encode(type, baseString, options)
+function string.public.encode(baseString, type, options)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     return imports.encodeString(type, baseString, options)
 end
 
-function string.public.decode(type, baseString, options, clipNull)
+function string.public.decode(baseString, type, options, clipNull)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     baseString = imports.decodeString(type, baseString, options)
     return (baseString and clipNull and string.public.gsub(baseString, string.public.char(0), "")) or baseString

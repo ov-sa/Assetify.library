@@ -136,9 +136,9 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public:syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
+function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
 if localPlayer then
-    network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public:syncElementModel(6, ...) end)
+    network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
     network:fetch("Assetify:onElementDestroy"):on(function(source)
         if not syncer.public.isLibraryBooted or not source then return false end
         shader:clearElementBuffer(source)
@@ -155,7 +155,7 @@ else
         if imports.getResourceRootElement(resourceElement) == resourceRoot then
             if syncer.public.isLibraryLoaded then
                 syncer.public.loadedClients[source] = true
-                syncer.public:syncPack(source, _, true)
+                syncer.private:syncPack(source, _, true)
             else
                 syncer.public.scheduledClients[source] = true
             end
@@ -166,12 +166,12 @@ else
         thread:create(function(self)
             local source = __source
             for i, j in imports.pairs(syncer.public.syncedGlobalDatas) do
-                syncer.public:syncGlobalData(i, j, false, source)
+                syncer.public.syncGlobalData(i, j, false, source)
                 thread:pause()
             end
             for i, j in imports.pairs(syncer.public.syncedEntityDatas) do
                 for k, v in imports.pairs(j) do
-                    syncer.public:syncEntityData(i, k, v, false, source)
+                    syncer.public.syncEntityData(i, k, v, false, source)
                     thread:pause()
                 end
                 thread:pause()
@@ -184,7 +184,7 @@ else
     network:create("Assetify:Downloader:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
-            if j then syncer.public:syncElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, source) end
+            if j then syncer.public.syncElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, source) end
             thread:pause()
         end
     end, {isAsync = true})
