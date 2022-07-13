@@ -25,21 +25,19 @@ local imports = {
 --[[ Builder Handlers ]]--
 --------------------------
 
-local function onLibraryLoaded()
-    network:emit("Assetify:onLoad", false)
-    for i, j in imports.pairs(syncer.private.scheduledClients) do
-        syncer.private:syncPack(i, _, true)
-        syncer.public.loadedClients[i] = true
-        syncer.private.scheduledClients[i] = nil
-    end
-end
-
 imports.addEventHandler("onResourceStart", resourceRoot, function()
     imports.fetchRemote(syncer.public.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return false end
         response = table.decode(response)
-        if response and response.tag_name and (syncer.public.libraryVersion ~= response.tag_name) then
-            imports.outputDebugString("[Assetify]: Latest version available - "..response.tag_name, 3)
+        if response and response.tag_name and (syncer.private.libraryVersion ~= response.tag_name) then
+            syncer.private.libraryVersionSource = string.gsub(syncer.private.libraryVersionSource, syncer.private.libraryVersion, response.tag_name, 1)
+            imports.outputDebugString("[Assetify]: "..((settings.library.autoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name, 3)
+            if settings.library.autoUpdate then
+                for i = 1, #syncer.private.libraryResources, 1 do
+                    local j = syncer.private.libraryResources[i]
+                    syncer.private:updateLibrary(j.ref, ":"..(j.name or j.ref).."/")
+                end
+            end
         end
     end)
 
@@ -55,7 +53,12 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
             end)
             thread:pause()
         end
-        onLibraryLoaded()
+        network:emit("Assetify:onLoad", false)
+        for i, j in imports.pairs(syncer.private.scheduledClients) do
+            syncer.private:syncPack(i, _, true)
+            syncer.public.loadedClients[i] = true
+            syncer.private.scheduledClients[i] = nil
+        end
     end):resume()
 end)
 
