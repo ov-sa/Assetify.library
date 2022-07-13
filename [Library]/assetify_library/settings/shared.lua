@@ -18,6 +18,10 @@ settings = {
         waterLevel = 0.01
     },
 
+    library = {
+        autoUpdate = true
+    },
+
     downloader = {
         isAccessSafe = true,
         syncRate = 50,

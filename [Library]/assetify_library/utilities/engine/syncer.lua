@@ -18,10 +18,14 @@ local imports = {
     md5 = md5,
     tostring = tostring,
     isElement = isElement,
+    fetchRemote = fetchRemote,
+    restartResource = restartResource,
+    outputDebugString = outputDebugString,
     getElementType = getElementType,
     getRealTime = getRealTime,
     getThisResource = getThisResource,
     getResourceName = getResourceName,
+    getResourceFromName = getResourceFromName,
     getResourceInfo = getResourceInfo,
     setElementModel = setElementModel,
     addEventHandler = addEventHandler,
@@ -107,9 +111,63 @@ if localPlayer then
         return true
     end
 else
-    syncer.public.libraryVersion = imports.getResourceInfo(resource, "version")
-    syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or syncer.public.libraryVersion
+    syncer.private.libraryResources = {
+        updateTags = {"file", "script"},
+        skipUpdatePaths = {
+            ["settings/shared.lua"] = true,
+            ["settings/server.lua"] = true
+        },
+        {name = syncer.public.libraryName, ref = "assetify_library"},
+        --TODO: Integrate Later
+        --{ref = "assetify_mapper"}
+    }
+    syncer.private.libraryVersion = imports.getResourceInfo(resource, "version")
+    syncer.private.libraryVersion = (syncer.private.libraryVersion and "v."..syncer.private.libraryVersion) or "N/A"
+    syncer.private.libraryVersionSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/"..syncer.private.libraryVersion.."/[Library]/"
     syncer.public.loadedClients, syncer.private.scheduledClients = {}, {}
+
+    function syncer.private:updateLibrary(resourceName, resourcePointer, resourceThread, responsePointer, isUpdationStatus)
+        if isUpdationStatus ~= nil then
+            imports.outputDebugString("[Assetify]: "..((isUpdationStatus and "Auto-updation successfully completed; Rebooting!") or "Auto-updation failed due to connectivity issues; Try again later..."), 3)
+            if isUpdationStatus then
+                local resourceREF = imports.getResourceFromName(resourceName)
+                if resourceREF then imports.restartResource(resourceREF) end
+            end
+            return true
+        end
+        if not responsePointer then
+            local resourceMeta = syncer.private.libraryVersionSource..resourceName.."/meta.xml"
+            imports.fetchRemote(resourceMeta, function(response, status)
+                if not response or not status or (status ~= 0) then return syncer.private:updateLibrary(_, _, _, _, false) end
+                thread:create(function(self)
+                    for i = 1, #syncer.private.libraryResources.updateTags, 1 do
+                        for j in string.gmatch(response, "<".. syncer.private.libraryResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
+                            if #string.gsub(j, "%s", "") > 0 then
+                                if not syncer.private.libraryResources.skipUpdatePaths[j] then
+                                    syncer.private:updateLibrary(_, _, self, {syncer.private.libraryVersionSource..resourceName.."/"..j, resourcePointer..j})
+                                    self:pause()
+                                end
+                            end
+                        end
+                    end
+                    syncer.private:updateLibrary(_, _, self, {resourceMeta, resourcePointer.."meta.xml", response})
+                    syncer.private:updateLibrary(resourceName, _, _, _, true)
+                end):resume()
+            end)
+        else
+            if responsePointer[3] then
+                file:write(responsePointer[2], responsePointer[3])
+                resourceThread:resume()
+            else
+                imports.fetchRemote(responsePointer[1], function(response, status)
+                    if not response or not status or (status ~= 0) then syncer.private:updateLibrary(_, _, _, _, false); return resourceThread:destroy() end
+                    file:write(responsePointer[2], response)
+                    resourceThread:resume()
+                end)
+            end
+        end
+        return true
+    end
 
     function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, targetPlayer)
         if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementModel", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps, remoteSignature) end

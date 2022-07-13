@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: sandbox: downloader.lua
+     Script: utilities: engine: downloader.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -27,8 +27,8 @@ local imports = {
 
 if localPlayer then
     syncer.private.execOnLoad(function() network:emit("Assetify:Downloader:onPostSyncPool", true, false, localPlayer) end)
-    network:create("Assetify:Downloader:onRecieveBandwidth"):on(function(bandwidth) syncer.public.libraryBandwidth = bandwidth end)
-    network:create("Assetify:Downloader:onRecieveHash"):on(function(assetType, assetName, hashes)
+    network:create("Assetify:Downloader:onSyncBandwidth"):on(function(bandwidth) syncer.public.libraryBandwidth = bandwidth end)
+    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes)
         if not syncer.public.scheduledAssets[assetType] then syncer.public.scheduledAssets[assetType] = {} end
         syncer.public.scheduledAssets[assetType][assetName] = syncer.public.scheduledAssets[assetType][assetName] or {assetSize = 0}
         thread:create(function(self)
@@ -44,12 +44,12 @@ if localPlayer then
                 fileData = nil
                 thread:pause()
             end
-            network:emit("Assetify:Downloader:onRecieveHash", true, true, localPlayer, assetType, assetName, fetchFiles)
+            network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles)
             imports.collectgarbage()
         end):resume({executions = settings.downloader.buildRate, frames = 1})
     end)
 
-    network:create("Assetify:Downloader:onRecieveData"):on(function(assetType, baseIndex, subIndexes, indexData)
+    network:create("Assetify:Downloader:onSyncData"):on(function(assetType, baseIndex, subIndexes, indexData)
         if not settings.assetPacks[assetType] then settings.assetPacks[assetType] = {} end
         if not subIndexes then
             settings.assetPacks[assetType][baseIndex] = indexData
@@ -68,7 +68,7 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onRecieveContent"):on(function(assetType, assetName, contentPath, ...)
+    network:create("Assetify:Downloader:onSyncContent"):on(function(assetType, assetName, contentPath, ...)
         if assetType and assetName then
             syncer.public.scheduledAssets[assetType][assetName].assetSize = syncer.public.scheduledAssets[assetType][assetName].assetSize + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
             syncer.public.__libraryBandwidth = (syncer.public.__libraryBandwidth or 0) + settings.assetPacks[assetType].rwDatas[assetName].assetSize.file[contentPath]
@@ -77,16 +77,16 @@ if localPlayer then
         imports.collectgarbage()
     end)
 
-    network:create("Assetify:Downloader:onRecieveState"):on(function(assetType, assetName)
-        local isTypeVoid = true
+    network:create("Assetify:Downloader:onSyncState"):on(function(assetType, assetName)
+        local isPackVoid = true
         syncer.public.scheduledAssets[assetType][assetName] = nil
         for i, j in imports.pairs(syncer.public.scheduledAssets[assetType]) do
             if j then
-                isTypeVoid = false
+                isPackVoid = false
                 break
             end
         end
-        if isTypeVoid then
+        if isPackVoid then
             local isSyncDone = true
             syncer.public.scheduledAssets[assetType] = nil
             for i, j in imports.pairs(syncer.public.scheduledAssets) do
@@ -97,7 +97,7 @@ if localPlayer then
             end
             if isSyncDone then
                 if assetType == "module" then
-                    network:emit("Assetify:Downloader:onRequestSyncPack", true, false, localPlayer)
+                    network:emit("Assetify:Downloader:onSyncPack", true, false, localPlayer)
                     thread:create(function(self)
                         if settings.assetPacks["module"].autoLoad and settings.assetPacks["module"].rwDatas then
                             for i, j in imports.pairs(settings.assetPacks["module"].rwDatas) do
@@ -127,12 +127,12 @@ if localPlayer then
         end
     end)
 else
-    function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onRecieveHash", true, false, player, ...) end
-    function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onRecieveData", true, false, player, ...) end
-    function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onRecieveContent", true, false, player, ...) end
-    function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onRecieveState", true, false, player, ...) end
-    network:create("Assetify:Downloader:onRecieveHash"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
-    network:create("Assetify:Downloader:onRequestSyncPack"):on(function(source) syncer.private:syncPack(source) end)
+    function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onSyncHash", true, false, player, ...) end
+    function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, false, player, ...) end
+    function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onSyncContent", true, false, player, ...) end
+    function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, false, player, ...) end
+    network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
+    network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
     function syncer.private:syncPack(player, assetDatas, syncModules)
         if not assetDatas then
@@ -164,7 +164,7 @@ else
                 end
                 if syncModules then
                     local isModuleVoid = true
-                    network:emit("Assetify:Downloader:onRecieveBandwidth", true, false, player, syncer.public.libraryBandwidth)
+                    network:emit("Assetify:Downloader:onSyncBandwidth", true, false, player, syncer.public.libraryBandwidth)
                     self:await(network:emitCallback(self, "Assetify:onRequestPreSyncPool", false, player))
                     if settings.assetPacks["module"] and settings.assetPacks["module"].assetPack then
                         for i, j in imports.pairs(settings.assetPacks["module"].assetPack) do
@@ -183,7 +183,7 @@ else
                     end
                     if isModuleVoid then
                         network:emit("Assetify:onModuleLoad", true, false, player)
-                        network:emit("Assetify:Downloader:onRequestSyncPack", false, player)
+                        network:emit("Assetify:Downloader:onSyncPack", false, player)
                     end
                 else
                     if isLibraryVoid then network:emit("Assetify:onLoad", true, false, player) end
