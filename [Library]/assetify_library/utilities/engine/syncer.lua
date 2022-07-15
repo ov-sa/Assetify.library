@@ -115,14 +115,24 @@ if localPlayer then
 else
     syncer.private.libraryResources = {
         updateTags = {"file", "script"},
-        skipUpdatePaths = {
-            ["settings/shared.lua"] = true,
-            ["settings/server.lua"] = true
+        {
+            resourceName = syncer.public.libraryName,
+            resourceBackup = {
+                ["settings/shared.lua"] = true,
+                ["settings/server.lua"] = true
+            }
         },
-        {name = syncer.public.libraryName, ref = "assetify_library"},
         --TODO: Integrate Later
-        --{ref = "assetify_mapper"}
+        --[[
+        {
+            resourceName = "assetify_mapper"
+        }
+        ]]
     }
+    for i = 1, #syncer.private.libraryResources, 1 do
+        local j = syncer.private.libraryResources[i]
+        j.resourcePointer = ":"..j.resourceName.."/"
+    end
     syncer.private.libraryVersion = imports.getResourceInfo(resource, "version")
     syncer.private.libraryVersion = (syncer.private.libraryVersion and "v."..syncer.private.libraryVersion) or "N/A"
     syncer.private.libraryVersionSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/"..syncer.private.libraryVersion.."/[Library]/"
@@ -166,41 +176,44 @@ else
         end
     end, {isAsync = true})
 
-    function syncer.private:updateLibrary(resourceName, resourcePointer, resourceThread, responsePointer, isUpdationStatus)
+    function syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, resourceThread, responsePointer, isUpdationStatus)
         if isUpdationStatus ~= nil then
             imports.outputDebugString("[Assetify]: "..((isUpdationStatus and "Auto-updation successfully completed; Rebooting!") or "Auto-updation failed due to connectivity issues; Try again later..."), 3)
             if isUpdationStatus then
-                local resourceREF = imports.getResourceFromName(resourceName)
-                if resourceREF then imports.restartResource(resourceREF) end
+                local __resource = imports.getResourceFromName(resourceREF.resourceName)
+                if __resource then imports.restartResource(__resource) end
             end
             return true
         end
         if not responsePointer then
-            local resourceMeta = syncer.private.libraryVersionSource..resourceName.."/meta.xml"
+            local resourceMeta = syncer.private.libraryVersionSource..(resourceREF.resourceName).."/meta.xml"
             imports.fetchRemote(resourceMeta, function(response, status)
-                if not response or not status or (status ~= 0) then return syncer.private:updateLibrary(_, _, _, _, false) end
+                if not response or not status or (status ~= 0) then return syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, _, _, false) end
                 thread:create(function(self)
                     for i = 1, #syncer.private.libraryResources.updateTags, 1 do
                         for j in string.gmatch(response, "<".. syncer.private.libraryResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                             if #string.gsub(j, "%s", "") > 0 then
-                                if not syncer.private.libraryResources.skipUpdatePaths[j] then
-                                    syncer.private:updateLibrary(_, _, self, {syncer.private.libraryVersionSource..resourceName.."/"..j, resourcePointer..j})
+                                if not isBackwardsCompatible or not resourceREF.resourceBackup or not resourceREF.resourceBackup[j] then
+                                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {syncer.private.libraryVersionSource..(resourceREF.resourceName).."/"..j, resourceREF.resourcePointer..j})
                                     self:pause()
                                 end
                             end
                         end
                     end
-                    syncer.private:updateLibrary(_, _, self, {resourceMeta, resourcePointer.."meta.xml", response})
-                    syncer.private:updateLibrary(resourceName, _, _, _, true)
+                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {resourceMeta, resourceREF.resourcePointer.."meta.xml", response})
+                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, _, _, true)
                 end):resume()
             end)
         else
+            local isBackupToBeCreated = (resourceREF.resourceBackup and resourceREF.resourceBackup[(responsePointer[2])] and true) or false
             if responsePointer[3] then
+                if isBackupToBeCreated then file:write(responsePointer[2]..".backup", file:read(responsePointer[2])) end
                 file:write(responsePointer[2], responsePointer[3])
                 resourceThread:resume()
             else
                 imports.fetchRemote(responsePointer[1], function(response, status)
-                    if not response or not status or (status ~= 0) then syncer.private:updateLibrary(_, _, _, _, false); return resourceThread:destroy() end
+                    if not response or not status or (status ~= 0) then syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, _, _, false); return resourceThread:destroy() end
+                    if isBackupToBeCreated then file:write(responsePointer[2]..".backup", file:read(responsePointer[2])) end
                     file:write(responsePointer[2], response)
                     resourceThread:resume()
                 end)
