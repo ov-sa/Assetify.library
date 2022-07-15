@@ -207,6 +207,7 @@ else
         else
             local isBackupToBeCreated = (resourceREF.resourceBackup and resourceREF.resourceBackup[(responsePointer[2])] and true) or false
             responsePointer[2] = resourceREF.resourcePointer..responsePointer[2]
+            if isBackupToBeCreated then imports.outputDebugString("[Assetify]: Backed up <"..responsePointer[2].."> due to compatability breaking changes; Kindly update it accordingly!", 3) end
             if responsePointer[3] then
                 if isBackupToBeCreated then file:write(responsePointer[2]..".backup", file:read(responsePointer[2])) end
                 file:write(responsePointer[2], responsePointer[3])
