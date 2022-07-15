@@ -10,7 +10,7 @@
 
 **"Tired of replacing objects?"** Assetify helps you to ditch native inefficient method by using asset-pack method to load your assets without even touching the default ones! 
 
-**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Modules`, `Animations`, `Sounds`, `Scenes`, `Characters`, `Vehicles`, `Weapons`, `Objects` asset-packs & Custom Graphics!)
+**"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, `Inventory`, `Loot` Asset-Packs & Custom Graphics!)
 
 ##### [**V:M ━ Assetify-Library**](https://github.com/ov-vm/Assetify-Library)
 
@@ -28,6 +28,7 @@
 * Built-In File System
 * Built-In Timer & Threader
 * Built-In Networker & Scheduler
+* Built-In Library Updater (If enabled, Latest version will be pulled automatically and be replaced)
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
@@ -41,19 +42,12 @@
 * Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
 * Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
 * Built-In Custom Lights (Integrated w/ Assetify's Streamer)
-* Built-In Assetify Mapper (`assetify_mapper`)
+* Built-In Advaned Mapper  (`Assetify Mapper`)
 * Built-In Model Clearer & Restorer
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
-* Supports Module Asset-Pack
-* Supports Animation Asset-Pack
-* Supports Sound Asset-Pack
-* Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene IDE, Dimension, Interior & Offsets (Useful for mass movement!)
-* Supports Character Asset-Pack
-* Supports Vehicle Asset-Pack
-* Supports Weapon Asset-Pack
-* Supports Object Asset-Pack
+* Supports Scene Instancing, IDE, Dimension, Interior & Offsets (Useful for mass movement!)
+* Supports `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, `Inventory`, `Loot` Asset-Packs
 * Necessary Integration APIs
 
 ## ━ Contents
