@@ -194,18 +194,19 @@ else
                         for j in string.gmatch(response, "<".. syncer.private.libraryResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                             if #string.gsub(j, "%s", "") > 0 then
                                 if not isBackwardsCompatible or not resourceREF.resourceBackup or not resourceREF.resourceBackup[j] then
-                                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {syncer.private.libraryVersionSource..(resourceREF.resourceName).."/"..j, resourceREF.resourcePointer..j})
+                                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {syncer.private.libraryVersionSource..(resourceREF.resourceName).."/"..j, j})
                                     self:pause()
                                 end
                             end
                         end
                     end
-                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {resourceMeta, resourceREF.resourcePointer.."meta.xml", response})
+                    syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, self, {resourceMeta, "meta.xml", response})
                     syncer.private:updateLibrary(resourceREF, isBackwardsCompatible, _, _, true)
                 end):resume()
             end)
         else
             local isBackupToBeCreated = (resourceREF.resourceBackup and resourceREF.resourceBackup[(responsePointer[2])] and true) or false
+            responsePointer[2] = resourceREF.resourcePointer..responsePointer[2]
             if responsePointer[3] then
                 if isBackupToBeCreated then file:write(responsePointer[2]..".backup", file:read(responsePointer[2])) end
                 file:write(responsePointer[2], responsePointer[3])
