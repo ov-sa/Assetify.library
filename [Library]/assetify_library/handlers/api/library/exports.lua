@@ -33,8 +33,9 @@ manager:exportAPI("Library", {
         {name = "clearBoneAttachment", API = "clearBoneAttachment"}
     },
     client = {
-        {name = "getAssetID", API = "getAssetID"},
+        {name = "getDownloadProgress", API = "getDownloadProgress"},
         {name = "isAssetLoaded", API = "isAssetLoaded"},
+        {name = "getAssetID", API = "getAssetID"},
         {name = "loadAsset", API = "loadAsset"},
         {name = "unloadAsset", API = "unloadAsset"},
         {name = "createShader", API = "createShader"},

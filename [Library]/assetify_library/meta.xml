@@ -6,15 +6,16 @@
         <right name="function.fetchRemote" access="true"/>
     </aclrequest>
 
-    <!-- Utilities: Exports & Settings -->
+    <!-- Settings -->
+    <script src="settings/shared.lua" type="shared"/>
+    <script src="settings/server.lua" type="server"/>
+
+    <!-- Utilities: RW -->
     <file src="utilities/rw/dict.rw"/>
     <file src="utilities/rw/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/dict.rw"/>
     <file src="utilities/rw/planar_1x1/buffer.rw"/>
     <file src="utilities/rw/planar_1x1/collision.rw"/>
-    <script src="exports/client.lua" type="client"/>
-    <script src="settings/shared.lua" type="shared"/>
-    <script src="settings/server.lua" type="server"/>
 
     <!-- Utilities: Sandbox -->
     <script src="utilities/sandbox/index.lua" type="shared"/>
@@ -93,8 +94,9 @@
     <export function="setBoneRefreshment" type="shared"/>
     <export function="clearBoneAttachment" type="shared"/>
     <export function="getLibraryProgress" type="client"/>
-    <export function="getAssetID" type="client"/>
+    <export function="getDownloadProgress" type="client"/>
     <export function="isAssetLoaded" type="client"/>
+    <export function="getAssetID" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
     <export function="createShader" type="client"/>

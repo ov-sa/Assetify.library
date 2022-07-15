@@ -89,7 +89,7 @@ function manager.public:setElementScoped(element)
     return true
 end
 
-function manager.public:clearElementBuffer(element, isResource)
+function manager.public.clearElementBuffer(element, isResource)
     if not element then return false end
     if isResource then
         local resourceScope = manager.private.buffer.scoped[element]
@@ -106,10 +106,6 @@ function manager.public:clearElementBuffer(element, isResource)
     manager.private.buffer.instance[element], manager.private.buffer.scoped[element] = nil, nil
     return true
 end
-
-imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(stoppedResource)
-    manager.public:clearElementBuffer(stoppedResource, true)
-end)
 
 if localPlayer then
     function manager.private:createDep(cAsset)
@@ -140,11 +136,27 @@ if localPlayer then
 
     function manager.private:freeAsset(cAsset)
         if not cAsset then return false end
-        shader:clearAssetBuffer(cAsset.unSynced.rwCache.map)
-        asset:clearAssetBuffer(cAsset.unSynced.rwCache.dep)
+        shader.clearAssetBuffer(cAsset.unSynced.rwCache.map)
+        asset.clearAssetBuffer(cAsset.unSynced.rwCache.dep)
         cAsset.unSynced = nil
         imports.collectgarbage()
         return true
+    end
+
+    function manager.public:getDownloadProgress(assetType, assetName)
+        local cDownloaded, cBandwidth, cETA = nil, nil, nil
+        if assetType and assetName then
+            if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].rwDatas[assetName] then return false end
+            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
+            cBandwidth = cPointer.bandwidthData.total
+            cDownloaded = (cPointer.bandwidthData.isDownloaded and cBandwidth) or (cPointer.bandwidthData.status and cPointer.bandwidthData.status.total) or 0
+            cETA = (not cPointer.bandwidthData.isDownloaded and cPointer.bandwidthData.status and (cPointer.bandwidthData.status.eta/math.max(1, cPointer.bandwidthData.status.eta_count))) or false
+        else
+            cBandwidth = syncer.libraryBandwidth.total
+            cDownloaded = (syncer.isLibraryLoaded and cBandwidth) or (syncer.libraryBandwidth.status and syncer.libraryBandwidth.status.total) or 0
+            cETA = (not syncer.isLibraryLoaded and syncer.libraryBandwidth.status and (syncer.libraryBandwidth.status.eta/math.max(1, syncer.libraryBandwidth.status.eta_count))) or false
+        end
+        return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
     end
 
     function manager.public:isAssetLoaded(assetType, assetName)
@@ -358,7 +370,10 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
+imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(stoppedResource)
+    manager.public.clearElementBuffer(stoppedResource, true)
+end)
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.isLibraryBooted or not source then return false end
-    manager.public:clearElementBuffer(source)
+    manager.public.clearElementBuffer(source)
 end)

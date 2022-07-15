@@ -90,7 +90,7 @@ function bone.public:destroy(...)
     return self:unload(...)
 end
 
-function bone.public:clearElementBuffer(element)
+function bone.public.clearElementBuffer(element)
     local cBone = bone.private:fetchInstance(element)
     if cBone then cBone:destroy() end
     if bone.public.buffer.parent[element] then
@@ -203,7 +203,7 @@ else
         bone.public.buffer.parent[parent] = bone.public.buffer.parent[parent] or {}
         bone.public.buffer.parent[parent][self] = true
         thread:create(function(__self)
-            for i, j in imports.pairs(syncer.public.loadedClients) do
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 self:load(_, _, _, i)
                 thread:pause()
             end
@@ -217,7 +217,7 @@ else
         if self.isUnloading then return false end
         self.isUnloading = true
         thread:create(function(__self)
-            for i, j in imports.pairs(syncer.public.loadedClients) do
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 self:unload(i)
                 thread:pause()
             end
@@ -239,7 +239,7 @@ else
         self.boneData = boneData
         if not skipSync then
             thread:create(function(__self)
-                for i, j in imports.pairs(syncer.public.loadedClients) do
+                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                     self:refresh(_, i)
                     thread:pause()
                 end
@@ -257,14 +257,14 @@ end
 function syncer.public.syncBoneAttachment(length, ...) return bone.public:create(table.unpack(table.pack(...), length or 3)) end
 function syncer.public.syncBoneDetachment(length, element) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:destroy() end
 function syncer.public.syncBoneRefreshment(length, element, ...) local cBone = bone.private:fetchInstance(element); if not cBone then return false end; return cBone:refresh(table.unpack(table.pack(...), length or 1)) end
-function syncer.public.syncClearBoneAttachment(length, ...) return bone.public:clearElementBuffer(...) end
+function syncer.public.syncClearBoneAttachment(length, ...) return bone.public.clearElementBuffer(...) end
 if localPlayer then
     network:create("Assetify:Bone:onAttachment"):on(function(...) syncer.public.syncBoneAttachment(4, ...) end)
     network:create("Assetify:Bone:onDetachment"):on(function(...) syncer.public.syncBoneDetachment(_, ...) end)
     network:create("Assetify:Bone:onRefreshment"):on(function(...) syncer.public.syncBoneRefreshment(2, ...) end)
     network:create("Assetify:Bone:onClearAttachment"):on(function(...) syncer.public.syncClearBoneAttachment(_, ...) end)
 else
-    network:fetch("Assetify:Downloader:onSyncPostPool"):on(function(self, source)
+    network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(bone.public.buffer.element) do
             if j and not j.isUnloading then network:emit("Assetify:Bone:onAttachment", true, false, source, self.element, self.parent, self.boneData, self.remoteSignature) end
@@ -274,5 +274,5 @@ else
 end
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.public.isLibraryBooted or not source then return false end
-    bone.public:clearElementBuffer(source)
+    bone.public.clearElementBuffer(source)
 end)

@@ -114,7 +114,7 @@ function thread.public:sleep(duration)
     self.isAwaiting = "sleep"
     self.sleepTimer = timer:create(function()
         self.isAwaiting = nil
-        self:resume()
+        thread.private.resume(self)
     end, duration, 1)
     self:pause()
     return true

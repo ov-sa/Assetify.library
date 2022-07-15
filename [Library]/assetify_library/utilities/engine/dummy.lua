@@ -66,7 +66,7 @@ function dummy.public:destroy(...)
     return self:unload(...)
 end
 
-function dummy.public:clearElementBuffer(element)
+function dummy.public.clearElementBuffer(element)
     local cDummy = dummy.public:fetchInstance(element)
     if not cDummy then return false end
     cDummy:destroy()
@@ -169,7 +169,7 @@ else
         imports.setElementDimension(self.cModelInstance, dummyData.dimension)
         imports.setElementInterior(self.cModelInstance, dummyData.interior)
         thread:create(function(__self)
-            for i, j in imports.pairs(syncer.public.loadedClients) do
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 self:load(_, _, _, _, _, i)
                 thread:pause()
             end
@@ -183,7 +183,7 @@ else
         if self.isUnloading then return false end
         self.isUnloading = true
         thread:create(function(__self)
-            for i, j in imports.pairs(syncer.public.loadedClients) do
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 self:unload(i)
                 thread:pause()
             end
@@ -206,7 +206,7 @@ if localPlayer then
     network:create("Assetify:Dummy:onSpawn"):on(function(...) syncer.public.syncDummySpawn(6, ...) end)
     network:create("Assetify:Dummy:onDespawn"):on(function(...) syncer.public.syncDummySpawn(_, ...) end)
 else
-    network:fetch("Assetify:Downloader:onSyncPostPool"):on(function(self, source)
+    network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(dummy.public.buffer) do
             if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, self.remoteSignature) end
@@ -216,5 +216,5 @@ else
 end
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.public.isLibraryBooted or not source then return false end
-    dummy.public:clearElementBuffer(source)
+    dummy.public.clearElementBuffer(source)
 end)

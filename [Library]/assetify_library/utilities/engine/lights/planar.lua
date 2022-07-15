@@ -73,7 +73,7 @@ function planar.public:destroy(...)
     return self:unload(...)
 end
 
-function planar.public:clearElementBuffer(element)
+function planar.public.clearElementBuffer(element)
     if not element or not planar.public.buffer[element] then return false end
     planar.public.buffer[element]:destroy()
     return true

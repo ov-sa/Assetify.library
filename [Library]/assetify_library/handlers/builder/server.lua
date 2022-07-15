@@ -42,7 +42,6 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
     end)
 
     thread:create(function(self)
-        syncer.public.libraryModules = {}
         if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
         for i, j in imports.pairs(settings.assetPacks) do
             asset:buildPack(i, j, function(state, assetType)
@@ -54,11 +53,6 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
             thread:pause()
         end
         network:emit("Assetify:onLoad", false)
-        for i, j in imports.pairs(syncer.private.scheduledClients) do
-            syncer.private:syncPack(i, _, true)
-            syncer.public.loadedClients[i] = true
-            syncer.private.scheduledClients[i] = nil
-        end
     end):resume()
 end)
 

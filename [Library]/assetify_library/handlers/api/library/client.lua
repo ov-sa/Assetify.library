@@ -12,12 +12,16 @@
 --[[ APIs: Library ]]--
 -----------------------
 
-function manager.API.Library.getAssetID(...)
-    return manager:getAssetID(...)
+function manager.API.Library.getDownloadProgress(...)
+    return manager:getDownloadProgress(...)
 end
 
 function manager.API.Library.isAssetLoaded(...)
     return manager:isAssetLoaded(...)
+end
+
+function manager.API.Library.getAssetID(...)
+    return manager:getAssetID(...)
 end
 
 function manager.API.Library.loadAsset(...)

@@ -109,7 +109,7 @@ if localPlayer then
         return self:unload(...)
     end
 
-    function shader.public:clearAssetBuffer(rwCache)
+    function shader.public.clearAssetBuffer(rwCache)
         if not rwCache then return false end
         if rwCache.shader then
             for i, j in imports.pairs(rwCache.shader) do
@@ -126,11 +126,11 @@ if localPlayer then
         return true
     end
 
-    function shader.public:clearElementBuffer(element, shaderCategory)
+    function shader.public.clearElementBuffer(element, shaderCategory)
         if not element or not shader.public.buffer.element[element] or (shaderCategory and not shader.public.buffer.element[element][shaderCategory]) then return false end
         if not shaderCategory then
             for i, j in imports.pairs(shader.public.buffer.element[element]) do
-                shader.public:clearElementBuffer(element, i)
+                shader.public.clearElementBuffer(element, i)
             end
             shader.public.buffer.element[element] = nil
         else

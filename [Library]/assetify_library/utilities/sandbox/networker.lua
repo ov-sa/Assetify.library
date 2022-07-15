@@ -51,68 +51,91 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
         local cNetwork = network.public:fetch(payload.networkName)
         if cNetwork and not cNetwork.isCallback then
             for i, j in imports.pairs(cNetwork.handlers) do
-                if i and (imports.type(i) == "function") then
-                    thread:create(function(self)
-                        if not j.config.isAsync then
-                            i(table.unpack(payload.processArgs))
-                        else
-                            i(self, table.unpack(payload.processArgs))
-                        end
-                        j.config.subscriptionCount = (j.config.subscriptionLimit and (j.config.subscriptionCount + 1)) or false
-                        if j.config.subscriptionLimit and (j.config.subscriptionCount >= j.config.subscriptionLimit) then
-                            cNetwork:off(i)
-                        end
-                    end):resume()
+                if not j.config.isAsync then
+                    network.private.execNetwork(cNetwork, i, _, serial, payload)
+                else
+                    thread:create(function(self) network.private.execNetwork(cNetwork, i, self, serial, payload) end):resume()
                 end
             end
         end
     elseif payload.processType == "emitCallback" then
         if not payload.isSignal then
             local cNetwork = network.public:fetch(payload.networkName)
-            if cNetwork and cNetwork.isCallback then
-                if not cNetwork or not cNetwork.isCallback or not cNetwork.handler then return false end
+            if cNetwork and cNetwork.isCallback and cNetwork.handler then
                 payload.isSignal = true
                 payload.isRestricted = true
-                thread:create(function(self)
-                    if not cNetwork.handler.config.isAsync then
-                        payload.processArgs = {cNetwork.handler.exec(table.unpack(payload.processArgs))}
-                    else
-                        payload.processArgs = {cNetwork.handler.exec(self, table.unpack(payload.processArgs))}
-                    end
-                    if not payload.isRemote then
-                        imports.triggerEvent("Assetify:Networker:API", resourceRoot, serial, payload)
-                    else
-                        if not payload.isReceiver or not network.public.isServerInstance then
-                            if not payload.isLatent then
-                                imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, serial, payload)
-                            else
-                                imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, serial, payload)
-                            end
-                        else
-                            if not payload.isLatent then
-                                imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Networker:API", resourceRoot, serial, payload)
-                            else
-                                imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, serial, payload)
-                            end
-                        end
-                    end
-                end):resume()
+                if not cNetwork.handler.config.isAsync then
+                    network.private.execNetwork(cNetwork, cNetwork.handler.exec, _, serial, payload)
+                else
+                    thread:create(function(self) network.private.execNetwork(cNetwork, cNetwork.handler.exec, self, serial, payload) end):resume()
+                end
             end
         else
             if network.private.cache.execSerials[(payload.execSerial)] then
                 network.private.cache.execSerials[(payload.execSerial)](table.unpack(payload.processArgs))
-                network.public:deserializeExec(payload.execSerial)
+                network.private.deserializeExec(payload.execSerial)
             end
         end
     end
 end)
 
-function network.private:fetchArg(index, pool)
+function network.private.fetchArg(index, pool)
     index = imports.tonumber(index) or 1
     if not pool or (imports.type(pool) ~= "table") then return false end
     local argValue = pool[index]
     table.remove(pool, index)
     return argValue
+end
+
+function network.private.execNetwork(cNetwork, exec, cThread, serial, payload)
+    if not cNetwork.isCallback then
+        if cThread then
+            exec(cThread, table.unpack(payload.processArgs))
+        else
+            exec(table.unpack(payload.processArgs))
+        end
+        local execData = cNetwork.handlers[exec]
+        execData.config.subscriptionCount = (execData.config.subscriptionLimit and (execData.config.subscriptionCount + 1)) or false
+        if execData.config.subscriptionLimit and (execData.config.subscriptionCount >= execData.config.subscriptionLimit) then
+            cNetwork:off(exec)
+        end
+    else
+        if cThread then
+            payload.processArgs = {exec(cThread, table.unpack(payload.processArgs))}
+        else
+            payload.processArgs = {exec(table.unpack(payload.processArgs))}
+        end
+        if not payload.isRemote then
+            imports.triggerEvent("Assetify:Networker:API", resourceRoot, serial, payload)
+        else
+            if not payload.isReceiver or not network.public.isServerInstance then
+                if not payload.isLatent then
+                    imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, serial, payload)
+                else
+                    imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, serial, payload)
+                end
+            else
+                if not payload.isLatent then
+                    imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Networker:API", resourceRoot, serial, payload)
+                else
+                    imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, serial, payload)
+                end
+            end
+        end
+    end
+    return true
+end
+
+function network.private.serializeExec(exec)
+    if not exec or (imports.type(exec) ~= "function") then return false end
+    local cSerial = imports.md5(network.public.identifier..":"..imports.tostring(exec))
+    network.private.cache.execSerials[cSerial] = exec
+    return cSerial
+end
+
+function network.private.deserializeExec(serial)
+    network.private.cache.execSerials[serial] = nil
+    return true
 end
 
 function network.public:create(...)
@@ -154,20 +177,6 @@ function network.public:fetch(name, isRemote)
         cNetwork = network.public:create(name)
     end
     return cNetwork
-end
-
-function network.public:serializeExec(exec)
-    if self ~= network.public then return false end
-    if not exec or (imports.type(exec) ~= "function") then return false end
-    local cSerial = imports.md5(network.public.identifier..":"..imports.tostring(exec))
-    network.private.cache.execSerials[cSerial] = exec
-    return cSerial
-end
-
-function network.public:deserializeExec(serial)
-    if self ~= network.public then return false end
-    network.private.cache.execSerials[serial] = nil
-    return true
 end
 
 function network.public:on(exec, config)
@@ -219,11 +228,11 @@ function network.public:emit(...)
         networkName = false
     }
     if self == network.public then
-        payload.networkName, payload.isRemote = network.private:fetchArg(_, cArgs), network.private:fetchArg(_, cArgs)
+        payload.networkName, payload.isRemote = network.private.fetchArg(_, cArgs), network.private.fetchArg(_, cArgs)
         if payload.isRemote then
-            payload.isLatent = network.private:fetchArg(_, cArgs)
+            payload.isLatent = network.private.fetchArg(_, cArgs)
             if network.public.isServerInstance then
-                payload.isReceiver = network.private:fetchArg(_, cArgs)
+                payload.isReceiver = network.private.fetchArg(_, cArgs)
                 payload.isReceiver = (payload.isReceiver and imports.isElement(payload.isReceiver) and (imports.getElementType(payload.isReceiver) == "player") and payload.isReceiver) or false
             end
         end
@@ -261,16 +270,16 @@ function network.public:emitCallback(cThread, ...)
         isRestricted = false,
         processType = "emitCallback",
         networkName = false,
-        execSerial = network.public:serializeExec(cExec)
+        execSerial = network.private.serializeExec(cExec)
     }
     if self == network.public then
-        payload.networkName, payload.isRemote = network.private:fetchArg(_, cArgs), network.private:fetchArg(_, cArgs)
+        payload.networkName, payload.isRemote = network.private.fetchArg(_, cArgs), network.private.fetchArg(_, cArgs)
         if payload.isRemote then
-            payload.isLatent = network.private:fetchArg(_, cArgs)
+            payload.isLatent = network.private.fetchArg(_, cArgs)
             if not network.public.isServerInstance then
                 payload.isReceiver = localPlayer
             else
-                payload.isReceiver = network.private:fetchArg(_, cArgs)
+                payload.isReceiver = network.private.fetchArg(_, cArgs)
                 payload.isReceiver = (payload.isReceiver and imports.isElement(payload.isReceiver) and (imports.getElementType(payload.isReceiver) == "player") and payload.isReceiver) or false
             end
         end
