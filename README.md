@@ -28,7 +28,7 @@
 * Built-In File System
 * Built-In Timer & Threader
 * Built-In Networker & Scheduler
-* Built-In Library Updater (If enabled, Latest version will be pulled automatically and replaced)
+* Built-In Library Updater (If enabled, Latest version will be pulled automatically and be replaced)
 * Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
@@ -46,15 +46,8 @@
 * Built-In Model Clearer & Restorer
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
-* Supports Module Asset-Pack
-* Supports Animation Asset-Pack
-* Supports Sound Asset-Pack
-* Supports Scene Asset-Pack (Supports multiple instances!)
-* Supports Scene IDE, Dimension, Interior & Offsets (Useful for mass movement!)
-* Supports Character Asset-Pack
-* Supports Vehicle Asset-Pack
-* Supports Weapon Asset-Pack
-* Supports Object Asset-Pack
+* Supports Scene Instancing, IDE, Dimension, Interior & Offsets (Useful for mass movement!)
+* Supports `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, `Inventory`, `Loot` Asset-Packs
 * Necessary Integration APIs
 
 ## ━ Contents
