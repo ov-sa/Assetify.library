@@ -171,12 +171,14 @@ else
         if packName then
             local cPack = (settings.assetPacks[packName] and settings.assetPacks[packName].assetPack) or false
             if not cPack then return false end
+            local isPackVoid = true
             local isModule = packName == "module"
             for i, j in imports.pairs(cPack) do
                 if i ~= "rwDatas" then
                     if isModule or syncModules then syncer.private:syncData(player, packName, i, false, j) end
                 else
                     for k, v in imports.pairs(j) do
+                        isPackVoid = false
                         if isModule or syncModules then syncer.private:syncData(player, packName, i, {k, "bandwidthData"}, v.synced.bandwidthData) end
                         if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.unSynced.fileHash) end
                         thread:pause()
@@ -184,7 +186,7 @@ else
                 end
                 thread:pause()
             end
-            return true
+            return not isPackVoid
         end
         if not assetDatas then
             thread:create(function(self)
