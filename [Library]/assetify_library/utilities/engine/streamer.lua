@@ -45,6 +45,7 @@ streamer.private.allocator = {
         ["light"] = {desyncOccclusionsOnPause = true}
     }
 }
+streamer.private.ref = {}
 streamer.private.buffer = {}
 streamer.private.cache = {
     clientCamera = getCamera()
@@ -92,9 +93,12 @@ function streamer.public:resume()
         imports.setElementDimension(self.streamer, self.dimension)
         imports.setElementInterior(self.streamer, self.interior)
     end
-    if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
-        for i = 1, #self.occlusions do
-            imports.setElementDimension(self.occlusions[i], self.dimension)
+    for i = 1, #self.occlusions do
+        local j = self.occlusions[i]
+        streamer.private.ref[j] = streamer.private.ref[j] or {}
+        streamer.private.ref[j][self] = true
+        if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
+            imports.setElementDimension(j, self.dimension)
         end
     end
     self.isResumed = true
@@ -102,7 +106,7 @@ function streamer.public:resume()
     streamer.private.buffer[(self.dimension)] = streamer.private.buffer[(self.dimension)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)] = streamer.private.buffer[(self.dimension)][(self.interior)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] or {}
-    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = {}
+    streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = true
     self:allocate()
     return true
 end
@@ -118,9 +122,11 @@ function streamer.public:pause()
         end
         imports.setElementDimension(self.streamer, settings.streamer.unsyncDimension)
     end
-    if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
-        for i = 1, #self.occlusions do
-            imports.setElementDimension(self.occlusions[i], settings.streamer.unsyncDimension)
+    for i = 1, #self.occlusions do
+        local j = self.occlusions[i]
+        streamer.private.ref[j][self] = nil
+        if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
+            imports.setElementDimension(j, settings.streamer.unsyncDimension)
         end
     end
     return true
@@ -137,7 +143,7 @@ function streamer.public:update(clientDimension, clientInterior)
     if streamer.private.buffer[clientDimension] and streamer.private.buffer[clientDimension][clientInterior] then
         for i, j in imports.pairs(streamer.private.buffer[clientDimension][clientInterior]) do
             if j then
-                j.isStreamed = nil
+                i.isStreamed = nil
                 imports.setElementDimension(i.streamer, settings.streamer.unsyncDimension)
             end
         end
@@ -147,8 +153,6 @@ function streamer.public:update(clientDimension, clientInterior)
     streamer.private.cache.clientWorld.dimension, streamer.private.cache.clientWorld.interior = currentDimension, currentInterior
     return true
 end
-imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer.public:update(dimension) end)
-imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)
 
 function streamer.public:allocate()
     if not streamer.public:isInstance(self) or not self.isResumed or self.isAllocated then return false end
@@ -213,7 +217,7 @@ streamer.private.onEntityStream = function(streamBuffer)
                     break
                 end
             end
-            local isStreamAltered = isStreamed ~= j.isStreamed
+            local isStreamAltered = isStreamed ~= i.isStreamed
             if isStreamAltered then imports.setElementDimension(i.streamer, (isStreamed and streamer.private.cache.clientWorld.dimension) or settings.streamer.unsyncDimension) end
             if streamer.private.allocator.validStreams[(i.streamType)] and streamer.private.allocator.validStreams[(i.streamType)].dynamicStreamAllocation then
                 if not isStreamed then
@@ -230,7 +234,7 @@ streamer.private.onEntityStream = function(streamBuffer)
                     end
                 end
             end
-            j.isStreamed = isStreamed
+            i.isStreamed = isStreamed
         end
         if settings.streamer.syncCoolDownRate then streamer.private.cache.clientThread:sleep(settings.streamer.syncCoolDownRate) end
     end
@@ -241,7 +245,7 @@ streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
     bone.cache.streamTick = imports.getTickCount()
     for i, j in imports.pairs(streamBuffer) do
-        if j and j.isStreamed then
+        if j and i.isStreamed then
             bone.update(bone.buffer.element[(i.streamer)])
         end
     end
@@ -267,6 +271,7 @@ network:fetch("Assetify:onLoad"):on(function()
         end
         return true
     end, function() end, settings.streamer.cameraRate)
+
     streamer.private.cache.clientThread = thread:createHeartbeat(function()
         if streamer.private.cache.isCameraTranslated then
             streamer.private.cache.cameraLocation = streamer.private.cache.cameraLocation or {}
@@ -287,3 +292,11 @@ network:fetch("Assetify:onLoad"):on(function()
         return true
     end, function() end, settings.streamer.syncRate)
 end)
+
+
+---------------------
+--[[ API Syncers ]]--
+---------------------
+
+imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer.public:update(dimension) end)
+imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)
