@@ -424,6 +424,14 @@ bundler.rw["syncer"] = {
 bundler.rw["attacher"] = {
     rw = [[
         assetify.attacher = {
+            setAttachment = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setAttachment", ...)
+            end,
+
+            clearAttachment = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearAttachment", ...)
+            end,
+
             setBoneAttach = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setBoneAttachment", ...)
             end,

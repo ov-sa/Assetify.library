@@ -14,12 +14,11 @@
 
 local imports = {
     pairs = pairs,
+    tonumber = tonumber,
     getCamera = getCamera,
     isElement = isElement,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
-    attachElements = attachElements,
-    detachElements = detachElements,
     getTickCount = getTickCount,
     isElementOnScreen = isElementOnScreen,
     getElementCollisionsEnabled = getElementCollisionsEnabled,
@@ -88,7 +87,7 @@ function streamer.public:resume()
     if not streamer.public:isInstance(self) or self.isResumed then return false end
     if self.streamer ~= self.occlusions[1] then
         if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
-            imports.attachElements(self.streamer, self.occlusions[1])
+            attacher:attachElements(self.streamer, self.occlusions[1])
         end
         imports.setElementDimension(self.streamer, self.dimension)
         imports.setElementInterior(self.streamer, self.interior)
@@ -118,7 +117,7 @@ function streamer.public:pause()
     streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)][self] = nil
     if self.streamer ~= self.occlusions[1] then
         if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
-            imports.detachElements(self.streamer)
+            attacher:detachElements(self.streamer)
         end
         imports.setElementDimension(self.streamer, settings.streamer.unsyncDimension)
     end
@@ -243,10 +242,10 @@ end
 
 streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
-    bone.cache.streamTick = imports.getTickCount()
+    attacher.bone.cache.streamTick = imports.getTickCount()
     for i, j in imports.pairs(streamBuffer) do
         if j and i.isStreamed then
-            bone.update(bone.buffer.element[(i.streamer)])
+            attacher.bone.update(attacher.bone.buffer.element[(i.streamer)])
         end
     end
     return true
@@ -299,4 +298,5 @@ end)
 ---------------------
 
 imports.addEventHandler("onClientElementDimensionChange", localPlayer, function(dimension) streamer.public:update(dimension) end)
+imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)
 imports.addEventHandler("onClientElementInteriorChange", localPlayer, function(interior) streamer.public:update(_, interior) end)

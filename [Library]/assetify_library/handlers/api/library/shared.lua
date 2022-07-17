@@ -44,7 +44,7 @@ end
 
 function manager.API.Library.getElementAssetInfo(element)
     if not syncer.syncedElements[element] then return false end
-    return syncer.syncedElements[element].type, syncer.syncedElements[element].name, syncer.syncedElements[element].clump, syncer.syncedElements[element].clumpMaps
+    return syncer.syncedElements[element].assetType, syncer.syncedElements[element].assetName, syncer.syncedElements[element].assetClump, syncer.syncedElements[element].clumpMaps
 end
 
 function manager.API.Library.setGlobalData(...)
@@ -61,6 +61,18 @@ end
 
 function manager.API.Library.getEntityData(element, data)
     return syncer.syncedEntityDatas[element] and syncer.syncedEntityDatas[element][data]
+end
+
+function manager.API.Library.setAttachment(...)
+    return attacher:attachElements(...)
+end
+
+function manager.API.Library.setDetachment(...)
+    return attacher:detachElements(...)
+end
+
+function manager.API.Library.clearAttachment(...)
+    return attacher:clearAttachment(...)
 end
 
 function manager.API.Library.createAssetDummy(...)

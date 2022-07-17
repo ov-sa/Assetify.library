@@ -18,10 +18,10 @@ local imports = {
     tonumber = tonumber,
     tostring = tostring,
     loadstring = loadstring,
+    collectgarbage = collectgarbage,
     isElement = isElement,
     destroyElement = destroyElement,
-    addEventHandler = addEventHandler,
-    collectgarbage = collectgarbage
+    addEventHandler = addEventHandler
 }
 
 
@@ -251,9 +251,9 @@ if localPlayer then
                                 cAsset.unSynced.assetCache[i] = {}
                                 asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
                                     txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath.."txd/"..(sceneIDEDatas[(j[2])][1])..".txd") or assetPath..(asset.references.asset)..".txd",
-                                    dff = assetPath.."dff/"..j[2]..".dff",
-                                    lod = assetPath.."dff/lod/"..j[2]..".dff",
-                                    col = assetPath.."col/"..j[2]..".col"
+                                    dff = assetPath..(asset.references.dff).."/"..j[2]..".dff",
+                                    lod = assetPath..(asset.references.dff).."/"..(asset.references.lod).."/"..j[2]..".dff",
+                                    col = assetPath..(asset.references.col).."/"..j[2]..".col"
                                 })
                                 cAsset.unSynced.assetRef[(j[2])] = cAsset.unSynced.assetCache[i].cAsset
                             end
@@ -274,7 +274,7 @@ if localPlayer then
             thread:create(function(self)
                 for i, j in imports.pairs(cAsset.manifestData.assetClumps) do
                     cAsset.unSynced.assetCache[i] = {}
-                    local clumpTXD, clumpDFF, clumpCOL = assetPath.."clump/"..j.."/"..(asset.references.asset)..".txd", assetPath.."clump/"..j.."/"..(asset.references.asset)..".dff", assetPath.."clump/"..j.."/"..(asset.references.asset)..".col"
+                    local clumpTXD, clumpDFF, clumpCOL = assetPath..(asset.references.clump).."/"..j.."/"..(asset.references.asset)..".txd", assetPath..(asset.references.clump).."/"..j.."/"..(asset.references.asset)..".dff", assetPath..(asset.references.clump).."/"..j.."/"..(asset.references.asset)..".col"
                     clumpTXD = (file:exists(clumpTXD) and clumpTXD) or assetPath..(asset.references.asset)..".txd"
                     clumpCOL = (file:exists(clumpCOL) and clumpCOL) or assetPath..(asset.references.asset)..".col"
                     asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {

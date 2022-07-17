@@ -13,7 +13,6 @@
 -----------------
 
 local imports = {
-    attachElements = attachElements,
     destroyElement = destroyElement,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
@@ -92,14 +91,14 @@ if localPlayer then
             if sceneManifest.enableLODs then
                 self.cModelInstance = imports.createObject(cAsset.synced.collisionID, posX, posY, posZ, rotX, rotY, rotZ, true) or false
                 self.cLODInstance = (cAsset.synced.lodID and imports.createObject(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true)) or false
-                imports.attachElements(self.cModelInstance, self.cCollisionInstance)
+                attacher:attachElements(self.cModelInstance, self.cCollisionInstance)
                 imports.setElementAlpha(self.cModelInstance, 0)
                 imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
                 imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
                 if self.cLODInstance then
                     imports.setElementDoubleSided(self.cLODInstance, true)
                     imports.setLowLODElement(self.cStreamerInstance, self.cLODInstance)
-                    imports.attachElements(self.cLODInstance, self.cCollisionInstance)
+                    attacher:attachElements(self.cLODInstance, self.cCollisionInstance)
                     imports.setElementDimension(self.cLODInstance, sceneManifest.sceneDimension)
                     imports.setElementInterior(self.cLODInstance, sceneManifest.sceneInterior)
                 end

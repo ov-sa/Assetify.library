@@ -101,9 +101,9 @@ function network.private.execNetwork(cNetwork, exec, cThread, serial, payload)
         end
     else
         if cThread then
-            payload.processArgs = {exec(cThread, table.unpack(payload.processArgs))}
+            payload.processArgs = table.pack(exec(cThread, table.unpack(payload.processArgs)))
         else
-            payload.processArgs = {exec(table.unpack(payload.processArgs))}
+            payload.processArgs = table.pack(exec(table.unpack(payload.processArgs)))
         end
         if not payload.isRemote then
             imports.triggerEvent("Assetify:Networker:API", resourceRoot, serial, payload)

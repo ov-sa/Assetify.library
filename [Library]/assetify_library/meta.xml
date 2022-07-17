@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="6.0.0"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="6.1.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -46,16 +46,17 @@
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
-    <script src="utilities/engine/dummy.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>
+    <script src="utilities/engine/streamer.lua" type="client"/>
     <script src="utilities/engine/shader.lua" type="shared"/>
     <script src="utilities/engine/manager.lua" type="shared"/>
-    <script src="utilities/engine/scene.lua" type="shared"/>
-    <script src="utilities/engine/bone.lua" type="shared"/>
-    <script src="utilities/engine/streamer.lua" type="client"/>
     <script src="utilities/engine/downloader.lua" type="shared"/>
-    <script src="utilities/engine/light.lua" type="client"/>
-    <script src="utilities/engine/lights/planar.lua" type="client"/>
+    <script src="utilities/engine/scene.lua" type="shared"/>
+    <script src="utilities/engine/dummy.lua" type="shared"/>
+    <script src="utilities/engine/attacher/index.lua" type="shared"/>
+    <script src="utilities/engine/attacher/bone.lua" type="shared"/>
+    <script src="utilities/engine/light/index.lua" type="client"/>
+    <script src="utilities/engine/light/planar.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/builder/server.lua" type="server"/>
@@ -88,6 +89,9 @@
     <export function="getGlobalData" type="shared"/>
     <export function="setEntityData" type="shared"/>
     <export function="getEntityData" type="shared"/>
+    <export function="setAttachment" type="shared"/>
+    <export function="setDetachment" type="shared"/>
+    <export function="clearAttachment" type="shared"/>
     <export function="createAssetDummy" type="shared"/>
     <export function="setBoneAttachment" type="shared"/>
     <export function="setBoneDetachment" type="shared"/>

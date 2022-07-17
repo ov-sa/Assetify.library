@@ -42,7 +42,12 @@ local asset = class:create("asset", {
         root = ((settings.downloader.isAccessSafe and "@") or "").."files/assets/",
         manifest = "manifest",
         asset = "asset",
-        scene = "scene"
+        scene = "scene",
+        clump = "clump",
+        lod = "lod",
+        dff = "dff",
+        col = "col",
+        map = "map"
     },
     ranges = {
         dimension = {-1, 65535},
@@ -58,6 +63,41 @@ function asset.public:readFile(filePath, encryptKey, ...)
     return (rw and string.decode(rw, "tea", {key = encryptKey}, ...)) or false
 end
 
+function asset.private:validateMap(filePointer, filePath, mapPointer)
+    local mapPath = ((filePointer and filePath) and filePointer..filePath) or false
+    if mapPointer and mapPath then mapPointer[mapPath] = true end
+    return mapPath
+end
+
+function asset.private:fetchMap(assetPath, shaderMaps)
+    local cPointer, cMaps = (assetPath and assetPath..asset.public.references.map.."/") or "", {}
+    for i, j in imports.pairs(shader.validTypes) do
+        local mapData = shaderMaps[i] 
+        if j and mapData then
+            for k, v in imports.pairs(mapData) do
+                for m = 1, #v, 1 do
+                    local n = v[m]
+                    if i == asset.public.references.clump then
+                        n.clump = asset.private:validateMap(cPointer, n.clump, cMaps)
+                        n.bump = asset.private:validateMap(cPointer, n.bump, cMaps)
+                    elseif i == "control" then
+                        n.control = asset.private:validateMap(cPointer, n.control, cMaps)
+                        n.bump = asset.private:validateMap(cPointer, n.bump, cMaps)
+                        for x = 1, #shader.validChannels, 1 do
+                            local y = shader.validChannels[x].index
+                            if n[y] then
+                                n[y].map = asset.private:validateMap(cPointer, n[y].map, cMaps)
+                                n[y].bump = asset.private:validateMap(cPointer, n[y].bump, cMaps)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return cMaps
+end
+
 if localPlayer then
     asset.public.rwAssets = {
         txd = imports.engineLoadTXD("utilities/rw/dict.rw"),
@@ -71,6 +111,10 @@ if localPlayer then
             return false
         end
         return cAsset
+    end
+
+    function asset.public:buildShader(shaderMaps)
+        return asset.private:fetchMap(_, shaderMaps)
     end
 
     function asset.public:createDep(assetDeps, rwCache, encryptKey)
@@ -241,48 +285,9 @@ else
     end
 
     function asset.public:buildShader(assetPath, shaderMaps, filePointer, encryptKey)
-        for i, j in imports.pairs(shaderMaps) do
-            if j and (imports.type(j) == "table") then
-                if i == "clump" then
-                    for k, v in imports.pairs(j) do
-                        for m = 1, #v, 1 do
-                            local n = v[m]
-                            if n.clump then
-                                n.clump = assetPath.."map/"..n.clump
-                                asset.public:buildFile(n.clump, filePointer, encryptKey, _, _, true)
-                            end
-                            if n.bump then
-                                n.bump = assetPath.."map/"..n.bump
-                                asset.public:buildFile(n.bump, filePointer, encryptKey, _, _, true)
-                            end
-                        end
-                    end
-                elseif i == "control" then
-                    for k, v in imports.pairs(j) do
-                        for m = 1, #v, 1 do
-                            local n = v[m]
-                            if n.control then
-                                n.control = assetPath.."map/"..n.control
-                                asset.public:buildFile(n.control, filePointer, encryptKey, _, _, true)
-                            end
-                            if n.bump then
-                                n.bump = assetPath.."map/"..n.bump
-                                asset.public:buildFile(n.bump, filePointer, encryptKey, _, _, true)
-                            end
-                            for x = 1, #shader.validChannels, 1 do
-                                local y = shader.validChannels[x].index
-                                if n[y] then
-                                    n[y].map = assetPath.."map/"..n[y].map
-                                    asset.public:buildFile(n[y].map, filePointer, encryptKey, _, _, true)
-                                    if n[y].bump then
-                                        n[y].bump = assetPath.."map/"..n[y].bump
-                                        asset.public:buildFile(n[y].bump, filePointer, encryptKey, _, _, true)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
+        for i, j in imports.pairs(asset.private:fetchMap(assetPath, shaderMaps)) do
+            if j then
+                asset.public:buildFile(i, filePointer, encryptKey, _, _, true)
             end
             thread:pause()
         end
@@ -419,9 +424,9 @@ else
                                         cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
                                         for k = 1, #sceneIPLDatas, 1 do
                                             local v = sceneIPLDatas[k]
-                                            asset.public:buildFile(assetPath.."dff/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
-                                            asset.public:buildFile(assetPath.."dff/lod/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                            asset.public:buildFile(assetPath.."col/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            asset.public:buildFile(assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             if sceneIDEDatas and sceneIDEDatas[(v[2])] then
                                                 asset.public:buildFile(assetPath.."txd/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                             end
@@ -433,10 +438,10 @@ else
                                 local debugTXDExistence = not file:exists(assetPath..(asset.public.references.asset)..".txd")
                                 if assetManifestData.assetClumps then
                                     for i, j in imports.pairs(assetManifestData.assetClumps) do
-                                        debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath.."clump/"..j.."/"..(asset.public.references.asset)..".txd") and true) or debugTXDExistence
-                                        asset.public:buildFile(assetPath.."clump/"..j.."/"..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        asset.public:buildFile(assetPath.."clump/"..j.."/"..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
-                                        asset.public:buildFile(assetPath.."clump/"..j.."/"..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd") and true) or debugTXDExistence
+                                        asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                        asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         thread:pause()
                                     end
                                 else

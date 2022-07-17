@@ -98,12 +98,12 @@ if localPlayer then
             return not imports.isElement(element)
         end, function()
             if clumpMaps then
-                shader.clearElementBuffer(element, "clump")
+                shader.clearElementBuffer(element, asset.references.clump)
                 local cAsset = manager:getAssetData(assetType, assetName, syncer.public.librarySerial)
-                if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.clump then
+                if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps[(asset.references.clump)] then
                     for i, j in imports.pairs(clumpMaps) do
-                        if cAsset.manifestData.shaderMaps.clump[i] and cAsset.manifestData.shaderMaps.clump[i][j] then
-                            shader:create(element, "clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps.clump[i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps.clump[i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps.clump[i][j], cAsset.manifestData.encryptKey)
+                        if cAsset.manifestData.shaderMaps[(asset.references.clump)][i] and cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j] then
+                            shader:create(element, asset.references.clump, "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey)
                         end
                     end
                 end
@@ -285,16 +285,6 @@ end
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
-    network:fetch("Assetify:onElementDestroy"):on(function(source)
-        if not syncer.public.isLibraryBooted or not source then return false end
-        shader.clearElementBuffer(source)
-        syncer.public.syncedEntityDatas[source] = nil
-        for i, j in imports.pairs(light) do
-            if j and (imports.type(j) == "table") and j.clearElementBuffer then
-                j.clearElementBuffer(source)
-            end
-        end
-    end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)

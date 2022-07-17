@@ -43,7 +43,7 @@ shaderRW[identifier] = {
     },
 
     exec = function(shaderMaps)
-        if not shaderMaps or not shaderMaps.clump then return false end
+        if not shaderMaps or not shaderMaps[(asset.references.clump)] then return false end
         local controlVars, handlerBody, handlerFooter = [[
             texture clumpTex;
             sampler clumpSampler = sampler_state {
