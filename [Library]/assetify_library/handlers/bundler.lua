@@ -428,6 +428,10 @@ bundler.rw["attacher"] = {
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setAttachment", ...)
             end,
 
+            setDetachment = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "setDetachment", ...)
+            end,
+
             clearAttachment = function(...)
                 return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "clearAttachment", ...)
             end,
