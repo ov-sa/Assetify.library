@@ -6,6 +6,6 @@
 
 ## ━ Sneak Peaks
 
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/wood_barrel_01/.github/1.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/wood_barrel_01/.github/2.png)
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/wood_barrel_01/.github/3.png)
+![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/%5BObject-Pack%5D/Wood%20Barrel/.github/1.png)
+![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/%5BObject-Pack%5D/Wood%20Barrel/.github/2.png)
+![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Example/%5BObject-Pack%5D/Wood%20Barrel/.github/3.png)
