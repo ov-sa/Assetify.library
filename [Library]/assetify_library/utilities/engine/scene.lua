@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    loadstring = loadstring,
     destroyElement = destroyElement,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
@@ -31,8 +32,8 @@ local imports = {
 local scene = class:create("scene")
 scene.private.separators = {IPL = ", ", IDE = ", "}
 scene.private.native = {
-    buffer = loadstring(file:read("utilities/rw/native/buffer.rw"))(),
-    buffer_lod = loadstring(file:read("utilities/rw/native/buffer_lod.rw"))()
+    buffer = imports.loadstring(file:read("utilities/rw/native/buffer.rw"))(),
+    buffer_lod = imports.loadstring(file:read("utilities/rw/native/buffer_lod.rw"))()
 }
 
 function scene.private:fetchNativeID(modelName)
