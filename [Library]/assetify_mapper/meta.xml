@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Mapper" type="Library" version="6.2.0"/>
+    <info author="vStudio" name="Assetify Mapper" type="Library" version="6.3.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
 
     <!-- Imports -->
