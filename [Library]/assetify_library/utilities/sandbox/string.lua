@@ -15,6 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
+    md5 = md5,
     tostring = tostring,
     tonumber = tonumber,
     loadstring = loadstring,
@@ -32,6 +33,7 @@ local string = class:create("string", utf8)
 for i, j in imports.pairs(imports.string) do
     string.public[i] = (not string.public[i] and j) or string.public[i]
 end
+string.private.minifier = imports.md5("vStudio")
 
 local __string_gsub = string.public.gsub
 function string.public.gsub(baseString, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
@@ -75,4 +77,17 @@ end
 function string.public.kern(baseString, kerner)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     return string.public.sub(string.public.gsub(baseString, ".", (kerner or " ").."%0"), 2)
+end
+
+function string.public.minify(baseString)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    local result = ""
+    for i = 1, #baseString, 1 do
+        result = result..(string.private.minifier)..string.public.byte(baseString, i)
+    end
+    return [[
+    local b, __b = string.split("]]..result..[[", "]]..(string.private.minifier)..[["), ""
+    for i = 1, #b, 1 do __b = __b..(string.char(b[i]) or "") end
+    loadstring(__b)()
+    ]]
 end

@@ -12,6 +12,7 @@
 --[[ Settings ]]--
 ------------------
 
+settings.libraryUID = false
 settings.assetPacks = {
     ["module"] = {
         autoLoad = true

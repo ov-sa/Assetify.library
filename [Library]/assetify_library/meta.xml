@@ -64,6 +64,7 @@
     <script src="handlers/builder/server.lua" type="server"/>
     <script src="handlers/builder/client.lua" type="client"/>
     <script src="handlers/bundler.lua" type="shared"/>
+    <script src="handlers/cli.lua" type="server"/>
     <script src="handlers/api/library/exports.lua" type="shared"/>
     <script src="handlers/api/library/shared.lua" type="shared"/>
     <script src="handlers/api/library/client.lua" type="client"/>
