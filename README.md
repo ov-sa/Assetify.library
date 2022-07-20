@@ -1,6 +1,6 @@
 # ━ S Y N O P S I S
 
-![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/Documentation/assets/assetify_banner.png)
+![](https://raw.githubusercontent.com/ov-sa/Assetify-Library/docs/assets/assetify_banner.png)
 
 **━ Maintainer(s):** [**Aviril**](https://github.com/Aviril), [**Mario**](https://github.com/OvileAmriam), [**Tron**](https://github.com/OvileAmriam), [**Anisa**](https://github.com/Anisa-Nur)
 
