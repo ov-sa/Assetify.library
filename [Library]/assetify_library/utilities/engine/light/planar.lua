@@ -30,9 +30,9 @@ local imports = {
 }
 
 
------------------------
---[[ Class: Shader ]]--
------------------------
+-----------------------------
+--[[ Class: Planar-Light ]]--
+-----------------------------
 
 local syncer = syncer:import()
 local planar = class:create("planar", {

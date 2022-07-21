@@ -14,6 +14,7 @@
 
 settings.libraryUID = false
 settings.assetPacks = {
+    --[[
     ["module"] = {
         autoLoad = true
     },
@@ -74,4 +75,5 @@ settings.assetPacks = {
         assetBase = 1337,
         assetTransparency = false
     }
+    ]]
 }

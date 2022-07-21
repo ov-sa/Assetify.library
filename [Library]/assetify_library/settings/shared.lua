@@ -19,7 +19,7 @@ settings = {
     },
 
     library = {
-        autoUpdate = true
+        autoUpdate = false
     },
 
     downloader = {

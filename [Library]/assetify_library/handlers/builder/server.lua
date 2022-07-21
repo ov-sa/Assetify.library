@@ -23,7 +23,7 @@ local imports = {
 --------------------------
 
 imports.addEventHandler("onResourceStart", resourceRoot, function()
-    cli:update(_, true)
+    cli:update()
     thread:create(function(self)
         if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
         for i, j in imports.pairs(settings.assetPacks) do
