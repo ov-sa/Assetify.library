@@ -35,8 +35,8 @@ updateResources = {
             syncer.libraryVersion = updateResources.updateCache.libraryVersion
             for i = 1, #updateResources, 1 do
                 local j = updateResources[i]
-                local cResource = getResourceFromName(j.resourceName)
-                if cResource then restartResource(cResource) end
+                local cResource = imports.getResourceFromName(j.resourceName)
+                if cResource then imports.restartResource(cResource) end
             end
         end
         updateResources.updateCache = nil
