@@ -19,7 +19,7 @@ local imports = {
     fetchRemote = fetchRemote,
     restartResource = restartResource,
     getResourceFromName = getResourceFromName,
-    outputDebugString = outputDebugString
+    outputServerLog = outputServerLog
 }
 
 
@@ -35,13 +35,13 @@ updateResources = {
         if isCompleted then
             syncer.libraryVersion = updateResources.updateCache.libraryVersion
             for i, j in imports.pairs(updateResources.updateCache.backup) do
-                imports.outputDebugString("[Assetify] | Backed up <"..i.."> due to compatibility breaking changes; Kindly acknowledge it accordingly!", 3)
+                imports.outputServerLog("[Assetify] | Backed up <"..i.."> due to compatibility breaking changes; Kindly acknowledge it accordingly!")
                 file:write(i, j)
             end
             for i, j in imports.pairs(updateResources.updateCache.output) do
                 file:write(i, j)
             end
-            imports.outputDebugString("[Assetify] | Update successfully completed; Rebooting!", 3)
+            imports.outputServerLog("[Assetify] | Update successfully completed; Rebooting!")
             for i = 1, #updateResources, 1 do
                 local j = updateResources[i]
                 if not j.isSilentResource and j.resourceREF then
@@ -50,7 +50,7 @@ updateResources = {
                 end
             end
         end
-        if isNotification and not isCompleted then imports.outputDebugString("[Assetify] | Update failed due to connectivity issues; Try again later...", 3) end
+        if isNotification and not isCompleted then imports.outputServerLog("[Assetify] | Update failed due to connectivity issues; Try again later...") end
         if updateResources.updateThread then updateResources.updateThread:destroy() end
         updateResources.updateCache = nil
         updateResources.updateThread = nil
@@ -137,19 +137,19 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
 end
 
 function cli.public:update(isAction)
-    if cli.public.isLibraryBeingUpdated then return imports.outputDebugString("[Assetify] | An update request is already being processed; Kindly have patience...", 3) end
+    if cli.public.isLibraryBeingUpdated then return imports.outputServerLog("[Assetify] | An update request is already being processed; Kindly have patience...") end
     cli.public.isLibraryBeingUpdated = true
-    if isAction then imports.outputDebugString("[Assetify] | Fetching latest version; Hold up...", 3) end
+    if isAction then imports.outputServerLog("[Assetify] | Fetching latest version; Hold up...") end
     imports.fetchRemote(syncer.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
         response = table.decode(response)
         if not response or not response.tag_name then return updateResources.onUpdateCallback(false, true) end
         if syncer.libraryVersion == response.tag_name then
-            if isAction then imports.outputDebugString("[Assetify] | Already upto date - "..response.tag_name, 3) end
+            if isAction then imports.outputServerLog("[Assetify] | Already upto date - "..response.tag_name) end
             return updateResources.onUpdateCallback()
         end
         local isToBeUpdated, isAutoUpdate = (isAction and true) or settings.library.autoUpdate, (not isAction and settings.library.autoUpdate) or false
-        imports.outputDebugString("[Assetify] | "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name, 3)
+        imports.outputServerLog("[Assetify] | "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name)
         if not isToBeUpdated then return updateResources.onUpdateCallback() end
         updateResources.updateCache = {
             output = {}, backup = {},

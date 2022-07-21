@@ -14,7 +14,8 @@
 
 local imports = {
     getElementType = getElementType,
-    addCommandHandler = addCommandHandler
+    addCommandHandler = addCommandHandler,
+    outputServerLog = outputServerLog
 }
 
 
@@ -25,6 +26,7 @@ local imports = {
 local cli = class:create("cli")
 function cli.public:import() return cli end
 cli.private.validActions = {
+    ["uid"] = true,
     ["update"] = true
 }
 
@@ -32,6 +34,16 @@ cli.private.validActions = {
 ----------------------
 --[[ CLI Handlers ]]--
 ----------------------
+
+function cli.public:uid(isAction)
+    imports.outputServerLog("[Assetify] | Your UID: "..syncer.librarySerial)
+    return true
+end
+
+
+---------------------
+--[[ CLI Syncers ]]--
+---------------------
 
 imports.addCommandHandler("assetify", function(isConsole, _, isAction, ...)
     if not isConsole or (imports.getElementType(isConsole) ~= "console") then return false end
