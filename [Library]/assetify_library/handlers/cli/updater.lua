@@ -44,8 +44,10 @@ updateResources = {
             imports.outputDebugString("[Assetify] | Update successfully completed; Rebooting!", 3)
             for i = 1, #updateResources, 1 do
                 local j = updateResources[i]
-                local cResource = imports.getResourceFromName(j.resourceName)
-                if cResource then imports.restartResource(cResource) end
+                if not j.isSilentResource and j.resourceREF then
+                    local cResource = imports.getResourceFromName(j.resourceREF)
+                    if cResource then imports.restartResource(cResource) end
+                end
             end
         end
         if isNotification and not isCompleted then imports.outputDebugString("[Assetify] | Update failed due to connectivity issues; Try again later...", 3) end
@@ -57,17 +59,27 @@ updateResources = {
         return true
     end,
     {
-        resourceName = syncer.libraryName,
+        isSilentResource = false,
+        resourceREF = syncer.libraryName,
+        resourceName = "assetify_library",
         resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/%s/[Library]/",
         resourceBackup = {
             ["settings/shared.lua"] = true,
             ["settings/server.lua"] = true
         }
+    },
+    --[[
+    {
+        isSilentResource = true,
+        resourceName = "assetify_mapper",
+        resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/mapper/[Library]/"
     }
+    ]]
 }
 for i = 1, #updateResources, 1 do
     local j = updateResources[i]
-    j.resourcePointer = ":"..j.resourceName.."/"
+    if j.isSilentResource then j.buffer = {} end
+    if j.resourceREF then j.resourcePointer = ":"..j.resourceREF.."/" end
 end
 
 
@@ -105,16 +117,18 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
         end)
         updateResources.updateThread:resume()
     else
-        local isBackupToBeCreated = (resourcePointer.resourceBackup and resourcePointer.resourceBackup[(responsePointer[2])] and true) or false
+        if resourcePointer.isSilentResource then resourcePointer.isFetched = false end
+        local outputPointer = (not resourcePointer.isSilentResource and updateResources.updateCache.output) or resourcePointer.buffer
+        local isBackupToBeCreated = (not resourcePointer.isSilentResource and resourcePointer.resourceBackup and resourcePointer.resourceBackup[(responsePointer[2])] and true) or false
         responsePointer[2] = resourcePointer.resourcePointer..responsePointer[2]
         if isBackupToBeCreated then updateResources.updateCache.backup[(responsePointer[2]..".backup")] = file:read(responsePointer[2]) end
         if responsePointer[3] then
-            updateResources.updateCache.output[(responsePointer[2])] = responsePointer[3]
+            outputPointer[(responsePointer[2])] = responsePointer[3]
             updateResources.updateThread:resume()
         else
             imports.fetchRemote(responsePointer[1], function(response, status)
                 if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
-                updateResources.updateCache.output[(responsePointer[2])] = response
+                outputPointer[(responsePointer[2])] = response
                 updateResources.updateThread:resume()
             end)
         end
