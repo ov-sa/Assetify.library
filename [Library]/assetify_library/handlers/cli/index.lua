@@ -27,6 +27,7 @@ local cli = class:create("cli")
 function cli.public:import() return cli end
 cli.private.validActions = {
     ["uid"] = true,
+    ["version"] = true,
     ["update"] = true
 }
 
@@ -36,7 +37,12 @@ cli.private.validActions = {
 ----------------------
 
 function cli.public:uid(isAction)
-    imports.outputServerLog("[Assetify] | Your UID: "..syncer.librarySerial)
+    imports.outputServerLog("[Assetify] | Assetify UID: "..syncer.librarySerial)
+    return true
+end
+
+function cli.public:version(isAction)
+    imports.outputServerLog("[Assetify] | Assetify Version: "..(syncer.libraryVersion or "N/A"))
     return true
 end
 
