@@ -19,9 +19,9 @@ local imports = {
 }
 
 
--------------
---[[ CLI ]]--
--------------
+--------------------
+--[[ Class: CLI ]]--
+--------------------
 
 local cli = class:create("cli")
 function cli.public:import() return cli end
