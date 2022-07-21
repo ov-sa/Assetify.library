@@ -55,5 +55,5 @@
 
 * [**Official Releases**](https://github.com/ov-sa/Assetify-Library/releases)
 * [**Installation Guide**](https://github.com/ov-sa/Assetify-Library/wiki)
-* [**Example Assets**](https://github.com/ov-sa/Assetify-Library/tree/marketplace)
+* [**Market Place**](https://github.com/ov-sa/Assetify-Library/tree/marketplace)
 * [**Discord Community**](http://discord.gg/sVCnxPW)
