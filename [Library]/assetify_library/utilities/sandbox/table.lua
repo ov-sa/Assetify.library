@@ -167,6 +167,6 @@ function table.public.forEach(baseTable, exec)
     return true
 end
 
-unpack = function(...) table.public.unpack(...) end
-inspect = function(...) table.public.inspect(...) end
-iprint = function(...) imports.print(table.public.inspect(...)) end
+unpack = function(...) return table.public.unpack(...) end
+inspect = function(...) return table.public.inspect(...) end
+iprint = function(...) return imports.print(table.public.inspect(...)) end
