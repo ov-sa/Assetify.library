@@ -156,7 +156,7 @@ function cli.public:update(isAction)
             isAutoUpdate = isAutoUpdate,
             libraryVersion = response.tag_name,
             libraryVersionSource = updateResources.fetchSource(updateResources[1].resourceSource, response.tag_name),
-            isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") ~= string.match(response.tag_name, "(%d+)%.")
+            isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") == string.match(response.tag_name, "(%d+)%.")
         }
         cli.private:update()
     end)

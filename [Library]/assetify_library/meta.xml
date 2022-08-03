@@ -1,9 +1,10 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="6.3.3"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="6.3.5"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
+        <right name="function.restartResource" access="true"/>
     </aclrequest>
 
     <!-- Settings -->
