@@ -46,7 +46,7 @@ function manager.API.World.restoreWorld()
     imports.destroyElement(streamer.waterBuffer)
     streamer.waterBuffer = nil
     imports.restoreAllWorldModels()
-    manager.API.World.toggleOcclusions(true)
+    manager.API.World.toggleOcclusions((not settings.GTA.disableOcclusions and true) or false)
     imports.setWorldSpecialPropertyEnabled("randomfoliage", true)
     return true
 end
