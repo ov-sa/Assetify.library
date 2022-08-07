@@ -71,6 +71,7 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.createShader", exportName = "createShader"},
             {exportIndex = "assetify.__core.clearWorld", exportName = "clearWorld"},
             {exportIndex = "assetify.__core.restoreWorld", exportName = "restoreWorld"},
+            {exportIndex = "assetify.__core.toggleOcclusions", exportName = "toggleOcclusions"},
             {exportIndex = "assetify.__core.clearModel", exportName = "clearModel"},
             {exportIndex = "assetify.__core.restoreModel", exportName = "restoreModel"},
             {exportIndex = "assetify.__core.playSound", exportName = "playSoundAsset"},
