@@ -76,7 +76,7 @@ shaderRW[identifier] = {
         float2x4 SampleHandler(float2 TexCoord) {
             float4 baseTexel = tex2D(vSource0Sampler, TexCoord);
             float4 depthTexel = tex2D(depthSampler, TexCoord);
-            float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? baseTexel*float4(vWeatherColor, 0.75) : float4(0, 0, 0, 0);
+            float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? baseTexel*float4(MTAGetWeatherColor(), 0.75) : float4(0, 0, 0, 0);
             float2x4 result = {baseTexel, weatherTexel};
             return result;
         }

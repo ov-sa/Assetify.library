@@ -46,7 +46,6 @@ bool vEmissiveSource = false;
 bool vRenderingEnabled = false;
 bool vSource1Enabled = false;
 bool vSource2Enabled = false;
-float3 vWeatherColor = false;
 float vWeatherBlend = false;
 texture vSource0;
 texture vSource1 <string renderTarget = "yes";>;
@@ -250,4 +249,8 @@ float MTAGetWeatherValue() {
     float weatherClamp = 0.0025;
     float weatherValue = cDuration/12;
     return (cDuration >= 12) ? max(weatherClamp, 2 - weatherValue) : max(weatherClamp, weatherValue);
+}
+
+float MTAGetWeatherColor() {
+    return float3(1, 1, 1);
 }
