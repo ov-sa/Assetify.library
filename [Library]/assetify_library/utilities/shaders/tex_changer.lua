@@ -91,10 +91,8 @@ shaderRW[identifier] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identifier..[[
-        {
-            pass P0
-            {
+        technique ]]..identifier..[[ {
+            pass P0 {
                 PixelShader = compile ps_2_0 PSHandler();
             }
         }

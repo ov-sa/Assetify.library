@@ -57,10 +57,8 @@ shaderRW[identifier] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identifier..[[
-        {
-            pass P0
-            {
+        technique ]]..identifier..[[ {
+            pass P0 {
                 AlphaBlendEnable = true;
                 Texture[0] = baseTexture;
             }
