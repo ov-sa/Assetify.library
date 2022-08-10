@@ -33,6 +33,7 @@ local imports = {
 
 local renderer = class:create("renderer", {
     isVirtualRendering = false,
+    weatherColor = {1, 1, 1},
     isTimeSynced = false,
     serverTick = 60*60*12,
     minuteDuration = 60
@@ -89,6 +90,7 @@ if localPlayer then
             if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
             local vSource0, vSource1, vSource2 = (renderer.public.isVirtualRendering and renderer.public.virtualSource) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.diffuse) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.emissive) or false
             syncShader:setValue("vResolution", (renderer.public.isVirtualRendering and renderer.public.resolution) or false)
+            syncShader:setValue("vWeatherColor", table.unpack(renderer.public.weatherColor))
             syncShader:setValue("vRenderingEnabled", (renderer.public.isVirtualRendering and true) or false)
             syncShader:setValue("vSource0", vSource0)
             syncShader:setValue("vSource1", vSource1)
