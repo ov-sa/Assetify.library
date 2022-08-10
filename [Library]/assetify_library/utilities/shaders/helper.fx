@@ -50,6 +50,7 @@ float vWeatherBlend = false;
 texture vSource0;
 texture vSource1 <string renderTarget = "yes";>;
 texture vSource2 <string renderTarget = "yes";>;
+texture gDepthBuffer : DEPTHBUFFER;
 texture gTexture0           <string textureState="0,Texture";>;
 texture gTexture1           <string textureState="1,Texture";>;
 texture gTexture2           <string textureState="2,Texture";>;
