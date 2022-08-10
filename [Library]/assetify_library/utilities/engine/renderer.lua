@@ -23,7 +23,8 @@ local imports = {
     removeEventHandler = removeEventHandler,
     dxCreateScreenSource = dxCreateScreenSource,
     dxCreateRenderTarget = dxCreateRenderTarget,
-    dxUpdateScreenSource = dxUpdateScreenSource
+    dxUpdateScreenSource = dxUpdateScreenSource,
+    dxDrawImage = dxDrawImage
 }
 
 
@@ -44,7 +45,7 @@ if localPlayer then
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
-        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"])
+        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
         return true
     end
 
