@@ -146,4 +146,14 @@ if localPlayer then
         end
         return true
     end
+
+    function renderer.public:setAntiAliasing(intensity)
+        renderer.public.antialiasing = imports.tonumber(intensity) or 0
+        syncShader:setValue("sampleIntensity", renderer.public.antialiasing)
+        return true
+    end
+
+    function renderer.public:getAntiAliasing()
+        return renderer.public.antialiasing or 0
+    end
 end
