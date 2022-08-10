@@ -219,6 +219,7 @@ if localPlayer then
     end
 
     shader.public.preLoaded["Assetify_TextureClearer"] = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureClearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.public.preLoadedTex.invisibleMap}}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+    shader.public.preLoaded["Assetify_TextureSampler"] = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
 end
 
 
