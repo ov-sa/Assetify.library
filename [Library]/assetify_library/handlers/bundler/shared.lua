@@ -116,7 +116,9 @@ bundler.private:createBuffer("renderer", _, [[
             {exportIndex = "assetify.renderer.getVirtualRTs", exportName = "getRendererVirtualRTs"},
             {exportIndex = "assetify.renderer.setTimeSync", exportName = "setRendererTimeSync"},
             {exportIndex = "assetify.renderer.setServerTick", exportName = "setRendererServerTick"},
-            {exportIndex = "assetify.renderer.setMinuteDuration", exportName = "setRendererMinuteDuration"}
+            {exportIndex = "assetify.renderer.setMinuteDuration", exportName = "setRendererMinuteDuration"},
+            {exportIndex = "assetify.renderer.setAntiAliasing", exportName = "setRendererAntiAliasing"},
+            {exportIndex = "assetify.renderer.getAntiAliasing", exportName = "getRendererAntiAliasing"}
         }
     })..[[
 ]])
