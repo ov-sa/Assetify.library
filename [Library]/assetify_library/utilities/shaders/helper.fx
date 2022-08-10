@@ -269,6 +269,6 @@ float MTAGetWeatherValue() {
     return (cDuration >= 12) ? max(weatherClamp, 2 - weatherValue) : max(weatherClamp, weatherValue);
 }
 
-float MTAGetWeatherColor() {
+float3 MTAGetWeatherColor() {
     return float3(1, 1, 1);
 }
