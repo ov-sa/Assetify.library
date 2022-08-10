@@ -70,10 +70,10 @@ shaderRW[identifier] = {
             Texture = baseTexture;
         };
         sampler vSource0Sampler = sampler_state {
-            Texture = (vSource0);
+            Texture = vSource0;
         };
         sampler vSource1Sampler = sampler_state {
-            Texture = (vSource1);
+            Texture = vSource1;
         };
 
         

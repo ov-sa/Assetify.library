@@ -60,7 +60,7 @@ shaderRW[identifier] = {
             float4 Emissive : COLOR2;
         };
         sampler baseSampler = sampler_state {
-            Texture = (gTexture0);
+            Texture = gTexture0;
         };
 
 
