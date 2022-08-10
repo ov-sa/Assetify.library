@@ -34,7 +34,7 @@ end
 
 function manager.API.Library.createShader(...)
     local cShader = shader:create(...)
-    return cShader.cShader
+    return (cShader and cShader.cShader) or false
 end
 
 function manager.API.Library.isRendererVirtualRendering()
