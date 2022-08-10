@@ -74,6 +74,14 @@ shaderRW[identifier] = {
         -->> Handlers <<--
         ------------------*/
 
+        float2x4 SampleHandler(float2 TexCoord) {
+            float4 baseTexel = tex2D(vSource0Sampler, TexCoord);
+            float4 depthTexel = tex2D(depthSampler, TexCoord);
+            float4 skyTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? baseTexel*float4(skyColor, 0.75) : float4(0, 0, 0, 0);
+            float2x4 result = {baseTexel, skyTexel};
+            return result;
+        }
+    
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
             PS.Position = mul(float4(VS.Position, 1), gWorldViewProjection);
