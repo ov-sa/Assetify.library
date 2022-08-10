@@ -44,6 +44,7 @@ if localPlayer then
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
+        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"])
         return true
     end
 
@@ -149,7 +150,7 @@ if localPlayer then
 
     function renderer.public:setAntiAliasing(intensity)
         renderer.public.antialiasing = imports.tonumber(intensity) or 0
-        syncShader:setValue("sampleIntensity", renderer.public.antialiasing)
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.antialiasing)
         return true
     end
 
