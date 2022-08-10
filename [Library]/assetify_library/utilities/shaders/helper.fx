@@ -251,7 +251,7 @@ float4x4 MTACreateMatrix(float3 position, float3 rotation) {
     return cMatrix;
 }
 
-float4x4 MTACreateTranslationMatrix(float3 position) {
+float4x4 MTACreatePositionMatrix(float3 position) {
     float4x4 cMatrix = (
         float4(1, 0, 0, 0),
         float4(0, 1, 0, 0),
