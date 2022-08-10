@@ -49,6 +49,8 @@ manager:exportAPI("Library", {
         {name = "setRendererTimeSync", API = "setRendererTimeSync"},
         {name = "setRendererServerTick", API = "setRendererServerTick"},
         {name = "setRendererMinuteDuration", API = "setRendererMinuteDuration"},
+        {name = "setRendererAntiAliasing", API = "setRendererAntiAliasing"},
+        {name = "getRendererAntiAliasing", API = "getRendererAntiAliasing"},
         {name = "createPlanarLight", API = "createPlanarLight"},
         {name = "setPlanarLightResolution", API = "setPlanarLightResolution"},
         {name = "setPlanarLightTexture", API = "setPlanarLightTexture"},
