@@ -427,7 +427,7 @@ else
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset.public:buildFile(assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(assetPath.."txd/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         end
                                     end
                                     thread:pause()
