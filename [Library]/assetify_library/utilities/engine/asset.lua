@@ -44,11 +44,8 @@ local asset = class:create("asset", {
         asset = "asset",
         scene = "scene",
         clump = "clump",
-        lod = "lod",
-        dff = "dff",
-        col = "col",
-        map = "map",
-        dep = "dep"
+        txd = "txd", dff = "dff", lod = "lod", col = "col",
+        map = "map", dep = "dep"
     },
     ranges = {
         dimension = {-1, 65535},
@@ -425,6 +422,7 @@ else
                                 for k = 1, #sceneIPLDatas, 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
+                                        asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..v[2]..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset.public:buildFile(assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
