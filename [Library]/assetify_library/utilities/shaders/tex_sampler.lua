@@ -8,36 +8,23 @@
 ----------------------------------------------------------------
 
 
------------------
---[[ Imports ]]--
------------------
-
-local imports = {
-    pairs = pairs
-}
-
-
 -------------------
 --[[ Variables ]]--
 -------------------
 
-local identifier = "Assetify_TextureSampler"
-local depDatas, dependencies = "", {
-    helper = "utilities/shaders/helper.fx"
+local identity = {
+    name = "Assetify_TextureSampler",
+    deps = shader:createDeps({
+        "utilities/shaders/helper.fx"
+    })
 }
-for i, j in imports.pairs(dependencies) do
-    local depData = file:read(j)
-    if depData then
-        depDatas = depDatas.."\n"..depData
-    end
-end
 
 
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW[identifier] = {
+shaderRW[(identity.name)] = {
     properties = {
         disabled = {
             ["vSource1"] = true,
@@ -46,7 +33,7 @@ shaderRW[identifier] = {
     },
 
     exec = function()
-        return depDatas..[[
+        return identity.deps..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -108,7 +95,7 @@ shaderRW[identifier] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identifier..[[ {
+        technique ]]..identity.name..[[ {
             pass P0 {
                 AlphaBlendEnable = true;
                 VertexShader = compile vs_3_0 VSHandler();
