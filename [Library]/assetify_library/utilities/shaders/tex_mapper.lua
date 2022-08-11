@@ -8,37 +8,24 @@
 ----------------------------------------------------------------
 
 
------------------
---[[ Imports ]]--
------------------
-
-local imports = {
-    pairs = pairs
-}
-
-
 -------------------
 --[[ Variables ]]--
 -------------------
 
-local identifier = "Assetify_TextureMapper"
-local samplingIteration = 3
-local depDatas, dependencies = "", {
-    helper = "utilities/shaders/helper.fx"
+local identity = {
+    name = "Assetify_TextureMapper",
+    iteration = 3,
+    deps = shader:createDeps({
+        "utilities/shaders/helper.fx"
+    })
 }
-for i, j in imports.pairs(dependencies) do
-    local depData = file:read(j)
-    if depData then
-        depDatas = depDatas.."\n"..depData
-    end
-end
 
 
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW[identifier] = {
+shaderRW[(identity.name)] = {
     properties = {
         disabled = {}
     },
@@ -118,7 +105,7 @@ shaderRW[identifier] = {
                             float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2D(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
                         ]]
                     end
-                    for m = 1, samplingIteration, 1 do
+                    for m = 1, identity.iteration, 1 do
                         handlerBody = handlerBody..[[
                             sampledTexel_]]..i..[[ = lerp(sampledTexel_]]..i..[[, controlTexel_]]..i..[[_]]..v..[[, controlTexel_]]..i..[[.]]..channel..[[);
                         ]]
@@ -131,7 +118,7 @@ shaderRW[identifier] = {
                 end
             end
             handlerBody = handlerBody..[[
-                sampledTexel_]]..i..[[.rgb *= ]]..(1/samplingIteration)..[[;
+                sampledTexel_]]..i..[[.rgb *= ]]..(1/identity.iteration)..[[;
             ]]
             if j.bump then
                 handlerBody = handlerBody..[[
@@ -148,7 +135,7 @@ shaderRW[identifier] = {
             ]])
             isSamplingStage = true
         end
-        return depDatas..[[
+        return identity.deps..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -196,7 +183,7 @@ shaderRW[identifier] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identifier..[[ {
+        technique ]]..identity.name..[[ {
             pass P0 {
                 SRGBWriteEnable = false;
                 PixelShader = compile ps_2_0 PSHandler();
