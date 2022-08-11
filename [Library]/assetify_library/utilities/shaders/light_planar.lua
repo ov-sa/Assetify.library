@@ -14,7 +14,7 @@
 
 local identity = {
     name = "Assetify_LightPlanar",
-    deps = shader:createDeps({
+    deps = shaderRW.createDeps({
         "utilities/shaders/helper.fx"
     })
 }
@@ -24,7 +24,7 @@ local identity = {
 --[[ Shader ]]--
 ----------------
 
-shaderRW[(identity.name)] = {
+shaderRW.buffer[(identity.name)] = {
     properties = {
         disabled = {}
     },

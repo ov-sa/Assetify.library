@@ -14,7 +14,7 @@
 
 local identity = {
     name = "Assetify_TextureChanger",
-    deps = shader:createDeps({})
+    deps = shaderRW.createDeps({})
 }
 
 
@@ -22,7 +22,7 @@ local identity = {
 --[[ Shader ]]--
 ----------------
 
-shaderRW[(identity.name)] = {
+shaderRW.buffer[(identity.name)] = {
     properties = {
         disabled = {
             ["vSource0"] = true,

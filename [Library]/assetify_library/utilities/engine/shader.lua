@@ -63,7 +63,7 @@ if localPlayer then
         element = {},
         shader = {}
     }
-    shader.public.rwCache = shaderRW
+    shader.public.rwCache = shaderRW.buffer
     shaderRW = nil
 
     function shader.public:create(...)
@@ -84,18 +84,6 @@ if localPlayer then
             end
         end
         return true
-    end
-
-    function shader.public:createDeps(deps)
-        if not deps then return false ends
-        local cDeps = ""
-        for i = 1, #deps, 1 do
-            local j = file:read(deps[i])
-            if j then
-                j = j.."\n"..j
-            end
-        end
-        return cDeps
     end
 
     function shader.public:destroy(...)

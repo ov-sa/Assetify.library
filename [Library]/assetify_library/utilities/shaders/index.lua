@@ -12,4 +12,18 @@
 --[[ Variables ]]--
 -------------------
 
-shaderRW = {}
+shaderRW = {
+    buffer = {}
+}
+
+function shaderRW.createDeps(deps)
+    if not deps then return false ends
+    local cDeps = ""
+    for i = 1, #deps, 1 do
+        local j = file:read(deps[i])
+        if j then
+            j = j.."\n"..j
+        end
+    end
+    return cDeps
+end

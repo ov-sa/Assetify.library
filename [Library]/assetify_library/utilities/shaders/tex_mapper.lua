@@ -15,7 +15,7 @@
 local identity = {
     name = "Assetify_TextureMapper",
     iteration = 3,
-    deps = shader:createDeps({
+    deps = shaderRW.createDeps({
         "utilities/shaders/helper.fx"
     })
 }
@@ -25,7 +25,7 @@ local identity = {
 --[[ Shader ]]--
 ----------------
 
-shaderRW[(identity.name)] = {
+shaderRW.buffer[(identity.name)] = {
     properties = {
         disabled = {}
     },
