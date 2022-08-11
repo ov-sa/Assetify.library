@@ -86,6 +86,18 @@ if localPlayer then
         return true
     end
 
+    function shader.public:createDeps(deps)
+        if not deps then return false ends
+        local cDeps = ""
+        for i = 1, #deps, 1 do
+            local j = file:read(deps[i])
+            if j then
+                j = j.."\n"..j
+            end
+        end
+        return cDeps
+    end
+
     function shader.public:destroy(...)
         if not shader.public:isInstance(self) then return false end
         return self:unload(...)

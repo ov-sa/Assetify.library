@@ -8,40 +8,27 @@
 ----------------------------------------------------------------
 
 
------------------
---[[ Imports ]]--
------------------
-
-local imports = {
-    pairs = pairs
-}
-
-
 -------------------
 --[[ Variables ]]--
 -------------------
 
-local identifier = "Assetify_TextureChanger"
-local depDatas, dependencies = "", {}
-for i, j in imports.pairs(dependencies) do
-    local depData = file:read(j)
-    if depData then
-        depDatas = depDatas.."\n"..depData
-    end
-end
+local identity = {
+    name = "Assetify_TextureChanger",
+    deps = shader:createDeps({})
+}
 
 
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW[identifier] = {
+shaderRW[(identity.name)] = {
     properties = {
         disabled = {}
     },
 
     exec = function()
-        return depDatas..[[
+        return identity.deps..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -91,7 +78,7 @@ shaderRW[identifier] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identifier..[[ {
+        technique ]]..identity.name..[[ {
             pass P0 {
                 PixelShader = compile ps_2_0 PSHandler();
             }
