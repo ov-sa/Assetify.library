@@ -21,9 +21,7 @@ function shaderRW.createDeps(deps)
     local cDeps = ""
     for i = 1, #deps, 1 do
         local j = file:read(deps[i])
-        if j then
-            j = j.."\n"..j
-        end
+        cDeps = (j and cDeps.."\n"..j) or ""
     end
     return cDeps
 end
