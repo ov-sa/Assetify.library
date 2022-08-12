@@ -414,28 +414,31 @@ else
                         if sceneIPLDatas then
                             asset.public:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                             if not assetManifestData.sceneMapped then
+                                local debugTXDExistence = false
                                 local sceneIDEPath = assetPath..(asset.public.references.scene)..".ide"
                                 local sceneIDEDatas = scene:parseIDE(file:read(sceneIDEPath))
                                 asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                asset.public:buildFile(assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                 cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
                                 for k = 1, #sceneIPLDatas, 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
-                                        asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..v[2]..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        if sceneIDEDatas and sceneIDEDatas[(v[2])] then
+                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                        else
+                                            debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath..(asset.public.references.txd).."/"..v[2]..".txd") and true) or debugTXDExistence
+                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..v[2]..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        end
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         asset.public:buildFile(assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        end
                                     end
                                     thread:pause()
                                 end
+                                asset.public:buildFile(assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, debugTXDExistence)
                             end
                         end
                     else
-                        local debugTXDExistence = not file:exists(assetPath..(asset.public.references.asset)..".txd")
+                        local debugTXDExistence = false
                         if assetManifestData.assetClumps then
                             for i, j in imports.pairs(assetManifestData.assetClumps) do
                                 debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd") and true) or debugTXDExistence
