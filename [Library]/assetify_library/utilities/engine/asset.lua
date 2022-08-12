@@ -425,8 +425,9 @@ else
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
                                             asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                         else
-                                            debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath..(asset.public.references.txd).."/"..v[2]..".txd") and true) or debugTXDExistence
-                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..v[2]..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            local childTXDPath = assetPath..(asset.public.references.txd).."/"..v[2]..".txd"
+                                            debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
+                                            asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                         end
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                         asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
@@ -441,8 +442,9 @@ else
                         local debugTXDExistence = false
                         if assetManifestData.assetClumps then
                             for i, j in imports.pairs(assetManifestData.assetClumps) do
-                                debugTXDExistence = (not debugTXDExistence and not file:exists(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd") and true) or debugTXDExistence
-                                asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                local childTXDPath = assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd"
+                                debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
+                                asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                 asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
                                 asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                 thread:pause()

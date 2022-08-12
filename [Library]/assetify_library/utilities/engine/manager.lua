@@ -249,8 +249,9 @@ if localPlayer then
                         if not cAsset.manifestData.sceneMapped then
                             if not j.nativeID and not cAsset.unSynced.assetRef[(j[2])] then
                                 cAsset.unSynced.assetCache[i] = {}
+                                local childTXDPath = assetPath..(asset.references.txd).."/"..j[2]..".txd"
                                 asset:create(assetType, assetName, cAssetPack, cAsset.unSynced.rwCache, cAsset.manifestData, cAsset.unSynced.assetCache[i], {
-                                    txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath..(asset.references.txd).."/"..(sceneIDEDatas[(j[2])][1])..".txd") or assetPath..(asset.references.asset)..".txd",
+                                    txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath..(asset.references.txd).."/"..(sceneIDEDatas[(j[2])][1])..".txd") or (file:exists(childTXDPath) and childTXDPath) or assetPath..(asset.references.asset)..".txd",
                                     dff = assetPath..(asset.references.dff).."/"..j[2]..".dff",
                                     lod = assetPath..(asset.references.dff).."/"..(asset.references.lod).."/"..j[2]..".dff",
                                     col = assetPath..(asset.references.col).."/"..j[2]..".col"
