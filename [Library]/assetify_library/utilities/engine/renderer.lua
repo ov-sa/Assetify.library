@@ -55,6 +55,7 @@ if localPlayer then
         renderer.public:setTimeSync(_, syncShader, syncer.librarySerial)
         renderer.public:setServerTick(_, syncShader, syncer.librarySerial)
         renderer.public:setMinuteDuration(_, syncShader, syncer.librarySerial)
+        renderer.public:setDynamicSky(_, syncShader, syncer.librarySerial)
         return true
     end
 
@@ -115,7 +116,7 @@ if localPlayer then
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
             if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
-            syncShader:setValue("gTimeSync", renderer.public.isTimeSynced)
+            syncShader:setValue("vTimeSync", renderer.public.isTimeSynced)
         end
         return true
     end
@@ -130,7 +131,7 @@ if localPlayer then
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
             if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
-            syncShader:setValue("gServerTick", renderer.public.serverTick)
+            syncShader:setValue("vServerTick", renderer.public.serverTick)
         end
         return true
     end
@@ -144,18 +145,38 @@ if localPlayer then
         else
             local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
             if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
-            syncShader:setValue("gMinuteDuration", renderer.public.minuteDuration)
+            syncShader:setValue("vMinuteDuration", renderer.public.minuteDuration)
         end
         return true
     end
 
     function renderer.public:setAntiAliasing(intensity)
-        renderer.public.antialiasing = imports.tonumber(intensity) or 0
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.antialiasing)
+        renderer.public.isAntiAliased = imports.tonumber(intensity) or 0
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.isAntiAliased)
         return true
     end
 
     function renderer.public:getAntiAliasing()
-        return renderer.public.antialiasing or 0
+        return renderer.public.isAntiAliased or 0
+    end
+
+    function renderer.public:isDynamicSky()
+        return renderer.public.isDynamicSkyEnabled or false
+    end
+
+    function renderer.public:setDynamicSky(state, syncShader, isInternal)
+        if not syncShader then
+            state = (state and true) or false
+            if (renderer.public.isDynamicSkyEnabled == state) then return false end
+            renderer.public.isDynamicSkyEnabled = state
+            for i, j in imports.pairs(shader.buffer.shader) do
+                renderer.public:setDynamicSky(_, i, syncer.librarySerial)
+            end
+        else
+            local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
+            if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then return false end
+            syncShader:setValue("vDynamicSkyEnabled", renderer.public.isDynamicSkyEnabled or false)
+        end
+        return true
     end
 end

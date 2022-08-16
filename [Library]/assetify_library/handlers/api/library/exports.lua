@@ -51,6 +51,8 @@ manager:exportAPI("Library", {
         {name = "setRendererMinuteDuration", API = "setRendererMinuteDuration"},
         {name = "setRendererAntiAliasing", API = "setRendererAntiAliasing"},
         {name = "getRendererAntiAliasing", API = "getRendererAntiAliasing"},
+        {name = "isRendererDynamicSky", API = "isRendererDynamicSky"},
+        {name = "setRendererDynamicSky", API = "setRendererDynamicSky"},
         {name = "createPlanarLight", API = "createPlanarLight"},
         {name = "setPlanarLightResolution", API = "setPlanarLightResolution"},
         {name = "setPlanarLightTexture", API = "setPlanarLightTexture"},

@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="6.4.1"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="6.5.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -131,6 +131,8 @@
     <export function="setRendererMinuteDuration" type="client"/>
     <export function="setRendererAntiAliasing" type="client"/>
     <export function="getRendererAntiAliasing" type="client"/>
+    <export function="isRendererDynamicSky" type="client"/>
+    <export function="setRendererDynamicSky" type="client"/>
     <export function="createPlanarLight" type="client"/>
     <export function="setPlanarLightResolution" type="client"/>
     <export function="setPlanarLightTexture" type="client"/>

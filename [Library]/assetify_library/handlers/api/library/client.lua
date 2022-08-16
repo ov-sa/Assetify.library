@@ -73,6 +73,14 @@ function manager.API.Library.getRendererAntiAliasing(...)
     return renderer:getAntiAliasing(...)
 end
 
+function manager.API.Library.isRendererDynamicSky(...)
+    return renderer:isDynamicSky(...)
+end
+
+function manager.API.Library.setRendererDynamicSky(...)
+    return renderer:setDynamicSky(...)
+end
+
 function manager.API.Library.createPlanarLight(...)
     local cLight = light.planar:create(...)
     return (cLight and cLight.cLight) or false
