@@ -51,6 +51,12 @@ function string.public.parse(baseString)
     else return imports.tonumber(baseString) or baseString end
 end
 
+function string.public.parseHex(baseString)
+    if not baseString then return false end
+    baseString = string.public.gsub(baseString, "#", "")
+    return imports.tonumber("0x"..string.public.sub(baseString, 1, 2)) or 0, imports.tonumber("0x"..string.public.sub(baseString, 3, 4)) or 0, imports.tonumber("0x"..string.public.sub(baseString, 5, 6)) or 0
+end
+
 function string.public.encode(baseString, type, options)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     return imports.encodeString(type, baseString, options)

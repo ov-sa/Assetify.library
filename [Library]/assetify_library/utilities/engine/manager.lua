@@ -43,6 +43,11 @@ manager.private.buffer = {
     scoped = {}
 }
 
+function manager.public:isInternal(serial)
+    local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
+    return (not isExternal and true) or (serial and (serial == syncer.librarySerial)) or false
+end
+
 function manager.public:exportAPI(moduleName, moduleAPIs)
     if not moduleName or (imports.type(moduleName) ~= "string") or not moduleAPIs or (imports.type(moduleAPIs) ~= "table") then return false end
     for i, j in imports.pairs(moduleAPIs) do
@@ -180,9 +185,8 @@ if localPlayer then
         if not settings.assetPacks[assetType] then return false end
         local cAsset = settings.assetPacks[assetType].rwDatas[assetName]
         if not cAsset then return false end
-        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
         local unSynced = cAsset.unSynced
-        if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
+        if not manager.public:isInternal(isInternal) then
             cAsset = table.clone(cAsset, true)
             cAsset.manifestData.encryptKey = nil
             cAsset.unSynced = nil
@@ -347,8 +351,7 @@ else
         if not settings.assetPacks[assetType] then return false end
         local cAsset = settings.assetPacks[assetType].assetPack.rwDatas[assetName]
         if not cAsset then return false end
-        local isExternalResource = sourceResource and (sourceResource ~= syncer.libraryResource)
-        if (not isInternal or (isInternal ~= syncer.librarySerial)) and isExternalResource then
+        if not manager.public:isInternal(isInternal) then
             cAsset = cAsset.synced
             if cAsset.manifestData.encryptKey then
                 cAsset = table.clone(cAsset, true)

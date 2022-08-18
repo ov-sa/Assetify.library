@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="6.5.0"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="6.5.1"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -14,6 +14,7 @@
     <!-- Utilities: RW -->
     <file src="utilities/rw/dict.rw"/>
     <file src="utilities/rw/buffer.rw"/>
+    <file src="utilities/rw/timecyc.rw"/>
     <file src="utilities/rw/native/buffer.rw"/>
     <file src="utilities/rw/native/buffer_lod.rw"/>
     <file src="utilities/rw/planar_1x1/dict.rw"/>
@@ -50,10 +51,10 @@
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
+    <script src="utilities/engine/manager.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>
     <script src="utilities/engine/streamer.lua" type="client"/>
     <script src="utilities/engine/shader.lua" type="shared"/>
-    <script src="utilities/engine/manager.lua" type="shared"/>
     <script src="utilities/engine/downloader.lua" type="shared"/>
     <script src="utilities/engine/scene.lua" type="shared"/>
     <script src="utilities/engine/dummy.lua" type="shared"/>
@@ -133,6 +134,8 @@
     <export function="getRendererAntiAliasing" type="client"/>
     <export function="isRendererDynamicSky" type="client"/>
     <export function="setRendererDynamicSky" type="client"/>
+    <export function="getRendererTimeCycle" type="client"/>
+    <export function="setRendererTimeCycle" type="client"/>
     <export function="createPlanarLight" type="client"/>
     <export function="setPlanarLightResolution" type="client"/>
     <export function="setPlanarLightTexture" type="client"/>

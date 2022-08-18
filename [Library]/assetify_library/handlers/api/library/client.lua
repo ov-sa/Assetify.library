@@ -81,6 +81,14 @@ function manager.API.Library.setRendererDynamicSky(...)
     return renderer:setDynamicSky(...)
 end
 
+function manager.API.Library.getRendererTimeCycle(...)
+    return renderer:getTimeCycle(...)
+end
+
+function manager.API.Library.setRendererTimeCycle(...)
+    return renderer:setTimeCycle(...)
+end
+
 function manager.API.Library.createPlanarLight(...)
     local cLight = light.planar:create(...)
     return (cLight and cLight.cLight) or false

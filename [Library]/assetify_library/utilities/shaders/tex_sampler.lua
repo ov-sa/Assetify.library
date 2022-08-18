@@ -33,21 +33,39 @@ shaderRW.buffer[(identity.name)] = {
     },
 
     exec = function()
+        local controlVars, controlHandlers = "", [[
+            float3x4 FetchTimeCycle(float hour) {
+                float3x4 cycles[24] = {
+        ]]
+        for i = 1, 24, 1 do
+            controlVars = controlVars..[[
+                float3x4 timecycle_]]..i..[[ = false;
+            ]]
+            controlHandlers = controlHandlers..[[
+                timecycle_]]..i..[[,
+            ]]
+        end
+        controlHandlers = controlHandlers..[[
+                };
+                return cycles[hour];
+            }
+        ]]
         return identity.deps..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
 
         float sampleOffset = 0.001;
-        float sampleIntensity = 2;
+        float sampleIntensity = 0;
         float2x3 skyGradient = {
             float3(0.7, 0.75, 0.85),
             float3(0.2, 0.5, 0.85)
         };
-        float cloudDensity = 10;
-        float cloudScale = 15;
-        float3 cloudColor = 0.85 * float3(1, 1, 1);
+        float cloudDensity = 18;
+        float cloudScale = 13;
+        float3 cloudColor = 0.75 * float3(1, 1, 1);
         float3 sunColor = float3(1, 0.7, 0.4);
+        ]]..controlVars..[[
         struct VSInput {
             float3 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
@@ -68,8 +86,9 @@ shaderRW.buffer[(identity.name)] = {
         -->> Handlers <<--
         ------------------*/
 
-        float4x4 GetViewMatrix(float4x4 matrixInput) {
-            #define minor(a, b, c) determinant(float3x3(matrixInput.a, matrixInput.b, matrixInput.c))
+        ]]..controlHandlers..[[
+        float4x4 GetViewMatrix(float4x4 viewMatrix) {
+            #define minor(a, b, c) determinant(float3x3(viewMatrix.a, viewMatrix.b, viewMatrix.c))
             float4x4 cofactors = float4x4(
                minor(_22_23_24, _32_33_34, _42_43_44), 
                -minor(_21_23_24, _31_33_34, _41_43_44),
@@ -89,11 +108,11 @@ shaderRW.buffer[(identity.name)] = {
                minor(_11_12_13, _21_22_23, _31_32_33)
             );
             #undef minor
-            return transpose(cofactors)/determinant(matrixInput);
+            return transpose(cofactors)/determinant(viewMatrix);
         }
        
-        float3 GetViewClipPosition(float2 coords, float4 view) {
-            return float3((coords.x*view.x) + view.z, (1 - coords.y)*view.y + view.w, 1)*(gProjectionMainScene[3][2]/(1 - gProjectionMainScene[2][2]));
+        float3 GetViewClipPosition(float2 uv, float4 view) {
+            return float3((uv.x*view.x) + view.z, (1 - uv.y)*view.y + view.w, 1)*(gProjectionMainScene[3][2]/(1 - gProjectionMainScene[2][2]));
         }
        
         float2 GetViewCoord(float3 dir, float2 div) {
@@ -104,9 +123,9 @@ shaderRW.buffer[(identity.name)] = {
             return frac(sin((uv.x*83.876) + (uv.y*76.123))*3853.875);
         }
       
-        float CreatePerlinNoise(float2 uv, float iterations) {
+        float CreatePerlinNoise(float2 uv, float iteration) {
             float c = 1;
-            for (float i = 0; i < iterations; i++) {
+            for (float i = 0; i < iteration; i++) {
                 float power = pow(2, i + 1);
                 float2 luv = uv * float2(power, power) + (gTime*0.2);
                 float2 gv = smoothstep(0, 1, frac(luv));
@@ -126,6 +145,17 @@ shaderRW.buffer[(identity.name)] = {
             return result;
         }
     
+        float3 SampleCycle(float2 uv, float3x4 cycle) {
+              float4 result = cycle[0];
+              float alpha = 1.57079633;
+              float step = (uv.x*cos(-alpha)) - (uv.y*sin(-alpha)), length = -sin(-alpha);
+              for (int i = 0; i < 2; i++) {
+                  if (cycle[i].a >= 0) result = lerp(result, cycle[(i + 1)], smoothstep(cycle[i].a*length, (cycle[(i + 1)].a >= 0 ? cycle[(i + 1)].a : 1)*length, step));
+                  else break;
+              }
+              return result.rgb;
+          }
+          
         float4 SampleSky(float2 uv) {
             float2 viewAdd = - 1/float2(gProjectionMainScene[0][0], gProjectionMainScene[1][1]);	
             float2 viewMul = -2*viewAdd.xy;
@@ -135,11 +165,9 @@ shaderRW.buffer[(identity.name)] = {
             float2 viewCoord = GetViewCoord(-viewDirection.xzy, float2(1, 1));
             float2 screenCoord = float2(uv.x*(vResolution.x/vResolution.y), uv.y);
             // Sample Base
-            float3 result = skyGradient[0]*1.1 - (viewCoord.y*viewCoord.y*0.5);
-            result = lerp(result, 0.85*skyGradient[1], pow(1 - max(viewCoord.y, 0), 4));
-            // Sample Clouds
-            float cloudID = sin(2)*0.1 + 0.7;
-            result = lerp(result, cloudColor, smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
+            float cycle = MTAGetWeatherCycle();
+            float hour = floor(cycle);
+            float3 result = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
             // Sample Sun
             float2 sunCoord = vSunViewOffset/vResolution;
             sunCoord.x *= vResolution.x/vResolution.y;
@@ -149,6 +177,9 @@ shaderRW.buffer[(identity.name)] = {
             result += sunColor*sunPoint*pow(dot(screenCoord.y, screenCoord.y), 1/5);
             result += lerp(sunColor, sunColor - 0.25, 0.25)*sunGlow*pow(dot(screenCoord.y, screenCoord.y), 1/64);
             result += lerp(sunColor, sunColor - 0.4, 0.4)*sunGlow*pow(dot(screenCoord.y, screenCoord.y), 1/512);
+            // Sample Clouds
+            float cloudID = sin(2)*0.1 + 0.7;
+            result = lerp(result, cloudColor, smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
             return float4(result, 1);
         }
 
