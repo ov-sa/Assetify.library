@@ -70,13 +70,13 @@ shaderRW.buffer[(identity.name)] = {
             float4 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
         };
-        sampler depthSampler = sampler_state {
-            Texture = gDepthBuffer;
-        };
         sampler vSource0Sampler = sampler_state {
             Texture = vSource0;
         };
-
+        sampler vDepth0Sampler = sampler_state {
+            Texture = vDepth0;
+        };
+    
 
         /*----------------
         -->> Handlers <<--
@@ -135,7 +135,7 @@ shaderRW.buffer[(identity.name)] = {
     
         float2x4 SampleSource(float2 uv) {
             float4 baseTexel = tex2D(vSource0Sampler, uv);
-            float4 depthTexel = tex2D(depthSampler, uv);
+            float4 depthTexel = tex2D(vDepth0Sampler, uv);
             float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? baseTexel*float4(MTAGetWeatherColor(), 0.75) : float4(0, 0, 0, 0);
             float2x4 result = {baseTexel, weatherTexel};
             return result;

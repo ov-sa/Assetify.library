@@ -53,7 +53,7 @@ float2 vSunViewOffset = 1;
 texture vSource0;
 texture vSource1 <string renderTarget = "yes";>;
 texture vSource2 <string renderTarget = "yes";>;
-texture gDepthBuffer : DEPTHBUFFER;
+texture vDepth0 : DEPTHBUFFER;
 int gMaxAnisotropy <string deviceCaps="MaxAnisotropy";>;
 int gDeclNormal <string vertexDeclState="Normal";>;
 texture gTexture0 <string textureState="0,Texture";>;
