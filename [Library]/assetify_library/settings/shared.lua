@@ -14,7 +14,7 @@
 
 settings = {
     GTA = {
-        clearWorld = true,
+        clearWorld = false,
         disableOcclusions = false,
         waterLevel = 0.01
     },

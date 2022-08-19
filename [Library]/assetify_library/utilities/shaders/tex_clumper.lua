@@ -110,10 +110,8 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[
-        {
-            pass P0
-            {
+        technique ]]..identity.name..[[ {
+            pass P0 {
                 SRGBWriteEnable = false;
                 PixelShader = compile ps_2_0 PSHandler();
             }
