@@ -163,7 +163,8 @@ shaderRW.buffer[(identity.name)] = {
             // Sample Base
             float cycle = MTAGetWeatherCycle();
             float hour = floor(cycle);
-            float3 result = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
+            float3 skyCycle = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
+            float3 result = skyCycle;
             // Sample Sun
             float2 sunCoord = vSunViewOffset/vResolution;
             sunCoord.x *= vResolution.x/vResolution.y;
@@ -175,7 +176,7 @@ shaderRW.buffer[(identity.name)] = {
             result += lerp(sunColor, sunColor - 0.4, 0.4)*sunGlow*pow(dot(screenCoord.y, screenCoord.y), 1/512);
             // Sample Clouds
             float cloudID = sin(2)*0.1 + 0.7;
-            result = lerp(result, cloudColor, smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
+            result = lerp(result, cloudColor, length(skyCycle)*smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
             return float4(result, 1);
         }
 
