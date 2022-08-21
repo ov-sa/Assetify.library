@@ -57,9 +57,10 @@ shaderRW.buffer[(identity.name)] = {
 
         float sampleOffset = 0.001;
         float sampleIntensity = 0;
+        bool isStarsEnabled = true;
         float cloudDensity = 18;
         float cloudScale = 13;
-        float3 cloudColor = 0.75 * float3(1, 1, 1);
+        float3 cloudColor = 0.75*float3(1, 1, 1);
         float3 sunColor = float3(1, 0.7, 0.4);
         ]]..controlVars..[[
         struct VSInput {
@@ -142,16 +143,30 @@ shaderRW.buffer[(identity.name)] = {
         }
     
         float3 SampleCycle(float2 uv, float3x4 cycle) {
-              float4 result = cycle[0];
-              float alpha = 1.57079633;
-              float step = (uv.x*cos(-alpha)) - (uv.y*sin(-alpha)), length = -sin(-alpha);
-              for (int i = 0; i < 2; i++) {
-                  if (cycle[i].a >= 0) result = lerp(result, cycle[(i + 1)], smoothstep(cycle[i].a*length, (cycle[(i + 1)].a >= 0 ? cycle[(i + 1)].a : 1)*length, step));
-                  else break;
-              }
-              return result.rgb;
-          }
-          
+            float4 result = cycle[0];
+            float alpha = 1.57079633;
+            float step = (uv.x*cos(-alpha)) - (uv.y*sin(-alpha)), length = -sin(-alpha);
+            for (int i = 0; i < 2; i++) {
+                if (cycle[i].a >= 0) result = lerp(result, cycle[(i + 1)], smoothstep(cycle[i].a*length, (cycle[(i + 1)].a >= 0 ? cycle[(i + 1)].a : 1)*length, step));
+                else break;
+            }
+            return result.rgb;
+        }
+
+        float SampleStars(float2 uv, float cycle) {
+            cycle = cycle < 18 ? cycle + 24 : cycle;
+            float alpha = 0;
+            if ((cycle > 18) && (cycle < 28)) alpha = clamp(1 - (18 - cycle), 0, 1)*clamp(28- cycle, 0, 1);
+            if (alpha <= 0) return 0;
+            uv *= 10000;
+            float t = gTime/7;
+            float a = sin((uv.x - t + cos(uv.y*20 + t))*10);
+            a *= cos((uv.y*0.234 - t*3.24 + sin(uv.x*12.3 + t*0.243))*7.34);
+            float3 p = frac(float3(uv.x*0.1031, uv.y*0.11369, uv.x*0.13787));
+            p += dot(p, p.yzx + 19.19);
+            return pow(frac((p.x + p.y)*p.z), 1000)*(a*0.5 + 0.15)*alpha;
+        }
+
         float4 SampleSky(float2 uv) {
             float2 viewAdd = - 1/float2(gProjectionMainScene[0][0], gProjectionMainScene[1][1]);	
             float2 viewMul = -2*viewAdd.xy;
@@ -163,8 +178,10 @@ shaderRW.buffer[(identity.name)] = {
             // Sample Base
             float cycle = MTAGetWeatherCycle();
             float hour = floor(cycle);
-            float3 skyCycle = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
-            float3 result = skyCycle;
+            float3 skyBase = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
+            float3 result = skyBase;
+            // Sample Stars
+            if (isStarsEnabled) result += SampleStars(viewCoord, cycle);
             // Sample Sun
             float2 sunCoord = vSunViewOffset/vResolution;
             sunCoord.x *= vResolution.x/vResolution.y;
@@ -176,7 +193,7 @@ shaderRW.buffer[(identity.name)] = {
             result += lerp(sunColor, sunColor - 0.4, 0.4)*sunGlow*pow(dot(screenCoord.y, screenCoord.y), 1/512);
             // Sample Clouds
             float cloudID = sin(2)*0.1 + 0.7;
-            result = lerp(result, cloudColor, length(skyCycle)*smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
+            result = lerp(result, cloudColor, length(skyBase)*smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
             return float4(result, 1);
         }
 

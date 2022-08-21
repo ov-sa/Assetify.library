@@ -53,6 +53,10 @@ function manager.API.Library.getRendererVirtualRTs()
     return (renderer.isVirtualRendering and renderer.virtualRTs) or false
 end
 
+function manager.API.Library.isRendererTimeSynced(...)
+    return renderer.isTimeSynced
+end
+
 function manager.API.Library.setRendererTimeSync(...)
     return renderer:setTimeSync(...)
 end
@@ -65,24 +69,64 @@ function manager.API.Library.setRendererMinuteDuration(...)
     return renderer:setMinuteDuration(...)
 end
 
+function manager.API.Library.getRendererAntiAliasing()
+    return renderer.isAntiAliased or 0
+end
+
 function manager.API.Library.setRendererAntiAliasing(...)
     return renderer:setAntiAliasing(...)
 end
 
-function manager.API.Library.getRendererAntiAliasing(...)
-    return renderer:getAntiAliasing(...)
-end
-
-function manager.API.Library.isRendererDynamicSky(...)
-    return renderer:isDynamicSky(...)
+function manager.API.Library.isRendererDynamicSky()
+    return renderer.isDynamicSkyEnabled
 end
 
 function manager.API.Library.setRendererDynamicSky(...)
     return renderer:setDynamicSky(...)
 end
 
-function manager.API.Library.getRendererTimeCycle(...)
-    return renderer:getTimeCycle(...)
+function manager.API.Library.getRendererDynamicSunColor()
+    return table.unpack(renderer.isDynamicSunColor)
+end
+
+function manager.API.Library.setRendererDynamicSunColor(...)
+    return renderer:setDynamicSunColor(...)
+end
+
+function manager.API.Library.isRendererDynamicStars()
+    return renderer.isDynamicStarsEnabled
+end
+
+function manager.API.Library.setRendererDynamicStars(...)
+    return renderer:setDynamicStars(...)
+end
+
+function manager.API.Library.getRendererDynamicCloudDensity()
+    return renderer.isDynamicCloudDensity
+end
+
+function manager.API.Library.setRendererDynamicCloudDensity(...)
+    return renderer:setDynamicCloudDensity(...)
+end
+
+function manager.API.Library.getRendererDynamicCloudScale()
+    return renderer.isDynamicCloudScale
+end
+
+function manager.API.Library.setRendererDynamicCloudScale(...)
+    return renderer:setDynamicCloudScale(...)
+end
+
+function manager.API.Library.getRendererDynamicCloudColor()
+    return table.unpack(renderer.isDynamicCloudColor)
+end
+
+function manager.API.Library.setRendererDynamicCloudColor(...)
+    return renderer:setDynamicCloudColor(...)
+end
+
+function manager.API.Library.getRendererTimeCycle()
+    return renderer.timecycle
 end
 
 function manager.API.Library.setRendererTimeCycle(...)
