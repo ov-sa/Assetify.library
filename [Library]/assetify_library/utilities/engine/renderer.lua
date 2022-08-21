@@ -40,9 +40,7 @@ local imports = {
 local renderer = class:create("renderer", {
     isVirtualRendering = false,
     isTimeSynced = false,
-    timecycle = table.decode(file:read("utilities/rw/timecyc.rw")),
-    isDynamicSkyEnabled = false,
-    isDynamicStarsEnabled = true
+    isDynamicSkyEnabled = false
 })
 renderer.private.serverTick = 60*60*12
 renderer.private.minuteDuration = 60
@@ -189,10 +187,11 @@ if localPlayer then
     end
 
     function renderer.public:setDynamicSunColor(r, g, b)
-        r, g, b = imports.tonumber(r) or 0, imports.tonumber(g) or 0, imports.tonumber(b) or 0
+        r, g, b = (imports.tonumber(r) or 0)/255, (imports.tonumber(g) or 0)/255, (imports.tonumber(b) or 0)/255
+        renderer.public.isDynamicSunColor = renderer.public.isDynamicSunColor or {}
         if ((renderer.public.isDynamicSunColor[1] == r) and (renderer.public.isDynamicSunColor[2] == g) and (renderer.public.isDynamicSunColor[3] == b)) then return false end
         renderer.public.isDynamicSunColor[1], renderer.public.isDynamicSunColor[2], renderer.public.isDynamicSunColor[3] = r, g, b
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("sunColor", table.unpack(renderer.public.isDynamicSunColor))
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("sunColor", renderer.public.isDynamicSunColor)
         return true
     end
 
@@ -216,15 +215,17 @@ if localPlayer then
         density = imports.tonumber(scale) or 0
         if renderer.public.isDynamicCloudScale == scale then return false end
         renderer.public.isDynamicCloudScale = scale
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudScale", renderer.public.isDynamicCloudDensity)
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudScale", renderer.public.isDynamicCloudScale)
         return true
     end
 
     function renderer.public:setDynamicCloudColor(r, g, b)
-        r, g, b = imports.tonumber(r) or 0, imports.tonumber(g) or 0, imports.tonumber(b) or 0
+        r, g, b = (imports.tonumber(r) or 0)/255, (imports.tonumber(g) or 0)/255, (imports.tonumber(b) or 0)/255
+        renderer.public.isDynamicCloudColor = renderer.public.isDynamicCloudColor or {}
         if ((renderer.public.isDynamicCloudColor[1] == r) and (renderer.public.isDynamicCloudColor[2] == g) and (renderer.public.isDynamicCloudColor[3] == b)) then return false end
         renderer.public.isDynamicCloudColor[1], renderer.public.isDynamicCloudColor[2], renderer.public.isDynamicCloudColor[3] = r, g, b
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudColor", table.unpack(renderer.public.isDynamicCloudColor))
+        iprint(renderer.public.isDynamicCloudColor)
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudColor", renderer.public.isDynamicCloudColor)
         return true
     end
 
@@ -272,7 +273,7 @@ if localPlayer then
             end
             shader.preLoaded["Assetify_TextureSampler"]:setValue("timecycle_"..i, bCycle)
         end
-        renderer.public.timecycle = cycle
+        renderer.public.isDynamicTimeCycle = cycle
         return true
     end
 end

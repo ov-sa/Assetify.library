@@ -86,7 +86,7 @@ function manager.API.Library.setRendererDynamicSky(...)
 end
 
 function manager.API.Library.getRendererDynamicSunColor()
-    return table.unpack(renderer.isDynamicSunColor)
+    return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255
 end
 
 function manager.API.Library.setRendererDynamicSunColor(...)
@@ -118,7 +118,7 @@ function manager.API.Library.setRendererDynamicCloudScale(...)
 end
 
 function manager.API.Library.getRendererDynamicCloudColor()
-    return table.unpack(renderer.isDynamicCloudColor)
+    return renderer.isDynamicCloudColor[1]*255, renderer.isDynamicCloudColor[2]*255, renderer.isDynamicCloudColor[3]*255
 end
 
 function manager.API.Library.setRendererDynamicCloudColor(...)
@@ -126,7 +126,7 @@ function manager.API.Library.setRendererDynamicCloudColor(...)
 end
 
 function manager.API.Library.getRendererTimeCycle()
-    return renderer.timecycle
+    return renderer.isDynamicTimeCycle
 end
 
 function manager.API.Library.setRendererTimeCycle(...)

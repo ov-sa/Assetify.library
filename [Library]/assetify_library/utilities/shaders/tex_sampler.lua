@@ -57,11 +57,11 @@ shaderRW.buffer[(identity.name)] = {
 
         float sampleOffset = 0.001;
         float sampleIntensity = 0;
+        float3 sunColor = false;
         bool isStarsEnabled = true;
-        float cloudDensity = 18;
-        float cloudScale = 13;
-        float3 cloudColor = 0.75*float3(1, 1, 1);
-        float3 sunColor = float3(1, 0.7, 0.4);
+        float cloudDensity = false;
+        float cloudScale = false;
+        float3 cloudColor = false;
         ]]..controlVars..[[
         struct VSInput {
             float3 Position : POSITION0;

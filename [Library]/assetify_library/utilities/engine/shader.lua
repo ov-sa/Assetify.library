@@ -226,6 +226,12 @@ if localPlayer then
     shader.public.preLoaded["Assetify_TextureClearer"] = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureClearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.public.preLoadedTex.invisibleMap}}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
     shader.public.preLoaded["Assetify_TextureSampler"] = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
     shader.public.preLoaded["Assetify_OverlayGoogle"] = shader.public:create(_, "Assetify-PreLoaded", "Assetify_OverlayGoogle", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+    renderer:setDynamicSunColor(1*255, 0.7*255, 0.4*255)
+    renderer:setDynamicStars(true)
+    renderer:setDynamicCloudDensity(18)
+    renderer:setDynamicCloudScale(13)
+    renderer:setDynamicCloudColor(0.75*255, 0.75*255, 0.75*255)
+    renderer:setTimeCycle(table.decode(file:read("utilities/rw/timecyc.rw")))
 end
 
 
