@@ -15,11 +15,11 @@
 manager:exportAPI("World", {
     shared = {},
     client = {
-        {name = "clearWorld", API = "clearWorld"},
-        {name = "restoreWorld", API = "restoreWorld"},
-        {name = "toggleOcclusions", API = "toggleOcclusions"},
-        {name = "clearModel", API = "clearModel"},
-        {name = "restoreModel", API = "restoreModel"}
+        {name = "clearWorld"},
+        {name = "restoreWorld"},
+        {name = "toggleOcclusions"},
+        {name = "clearModel"},
+        {name = "restoreModel"}
     },
     server = {}
 })

@@ -15,8 +15,8 @@
 manager:exportAPI("Anim", {
     shared = {},
     client = {
-        {name = "loadAnim", API = "loadAnim"},
-        {name = "unloadAnim", API = "unloadAnim"}
+        {name = "loadAnim"},
+        {name = "unloadAnim"}
     },
     server = {}
 })

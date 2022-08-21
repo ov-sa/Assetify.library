@@ -57,7 +57,7 @@ function manager.public:exportAPI(moduleName, moduleAPIs)
                 imports.loadstring([[
                     local ref = false
                     function ]]..v.name..[[(...)
-                        ref = ref or manager.API.]]..moduleName..[[.]]..v.API..[[
+                        ref = ref or manager.API.]]..moduleName..[[.]]..(v.API or v.name)..[[
                         return ref(...)
                     end
                 ]])()
