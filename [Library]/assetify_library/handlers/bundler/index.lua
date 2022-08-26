@@ -28,6 +28,7 @@ bundler.private.buffer = {}
 bundler.private.platform = (localPlayer and "client") or "server"
 bundler.private.utils = {
     "utilities/sandbox/index.lua",
+    "utilities/sandbox/vcl.lua",
     "utilities/sandbox/table.lua",
     "utilities/sandbox/math/index.lua",
     "utilities/sandbox/math/quat.lua",

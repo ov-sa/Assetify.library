@@ -19,12 +19,14 @@ local imports = {
     tonumber = tonumber,
     toJSON = toJSON,
     fromJSON = fromJSON,
+    vcl = vcl,
     select = select,
     unpack = unpack,
     print = print,
     getmetatable = getmetatable,
     loadstring = loadstring
 }
+vcl = nil
 
 
 ----------------------
@@ -52,12 +54,16 @@ function table.public.unpack(baseTable)
     return imports.unpack(baseTable, 1, (baseTable.__T and baseTable.__T.length) or #baseTable)
 end
 
-function table.public.encode(baseTable)
-    return (baseTable and (imports.type(baseTable) == "table") and imports.toJSON(baseTable)) or false
+function table.public.encode(baseTable, encoding)
+    if not baseTable or (imports.type(baseTable) ~= "table") then return false end
+    if encoding == "json" then return imports.toJSON(baseTable)
+    else return imports.vcl.encode(baseTable) end
 end
 
-function table.public.decode(baseString)
-    return (baseString and (imports.type(baseString) == "string") and imports.fromJSON(baseString)) or false
+function table.public.decode(baseString, encoding)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    if encoding == "json" then return imports.fromJSON(baseString)
+    else return imports.vcl.decode(baseString) end
 end
 
 function table.public.clone(baseTable, isRecursive)

@@ -35,6 +35,12 @@ for i, j in imports.pairs(imports.string) do
 end
 string.private.minifier = imports.md5("vStudio")
 
+function string.public.isVoid(baseString)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    baseString = string.public.gsub(baseString, "[\n\r\t%s]", "")
+    return (not string.public.match(baseString, "[%W%w]") and true) or false
+end
+
 local __string_gsub = string.public.gsub
 function string.public.gsub(baseString, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
     if not baseString or (imports.type(baseString) ~= "string") or not matchWord or (imports.type(matchWord) ~= "string") or not replaceWord or (imports.type(replaceWord) ~= "string") then return false end
@@ -73,9 +79,7 @@ function string.public.split(baseString, separator)
     baseString = baseString..separator
     local result = {}
     for matchValue in string.public.gmatch(baseString, "(.-)"..separator) do
-        if #string.public.gsub(matchValue, "%s", "") > 0 then
-            table.insert(result, matchValue)
-        end
+        table.insert(result, matchValue)
     end
     return result
 end
@@ -83,6 +87,11 @@ end
 function string.public.kern(baseString, kerner)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     return string.public.sub(string.public.gsub(baseString, ".", (kerner or " ").."%0"), 2)
+end
+
+function string.public.detab(baseString)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    return string.public.gsub(baseString, "\t", "    ")
 end
 
 function string.public.minify(baseString)

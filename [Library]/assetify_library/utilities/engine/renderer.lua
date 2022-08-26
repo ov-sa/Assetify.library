@@ -224,7 +224,6 @@ if localPlayer then
         renderer.public.isDynamicCloudColor = renderer.public.isDynamicCloudColor or {}
         if ((renderer.public.isDynamicCloudColor[1] == r) and (renderer.public.isDynamicCloudColor[2] == g) and (renderer.public.isDynamicCloudColor[3] == b)) then return false end
         renderer.public.isDynamicCloudColor[1], renderer.public.isDynamicCloudColor[2], renderer.public.isDynamicCloudColor[3] = r, g, b
-        iprint(renderer.public.isDynamicCloudColor)
         shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudColor", renderer.public.isDynamicCloudColor)
         return true
     end

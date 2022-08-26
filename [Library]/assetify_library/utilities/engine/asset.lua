@@ -262,12 +262,13 @@ else
     function asset.public:buildManifest(rootPath, localPath, manifestPath)
         if not manifestPath then return false end
         localPath = localPath or rootPath
-        local manifestData = file:read(localPath..manifestPath)
-        manifestData = (manifestData and table.decode(manifestData)) or false
+        manifestPath = localPath..manifestPath
+        local manifestData = file:read(manifestPath)
+        manifestData = (manifestData and table.decode(manifestData, file:parseURL(manifestPath).extension)) or false
         if manifestData then
             for i, j in imports.pairs(manifestData) do
                 local cURL = file:parseURL(j)
-                if cURL and cURL.url and cURL.extension and cURL.pointer and (cURL.extension == "json") then
+                if cURL and cURL.url and cURL.extension and cURL.pointer and ((cURL.extension == "vcl") or (cURL.extension == "json")) then
                     local pointerPath = ((cURL.pointer == "rootDir") and rootPath) or ((cURL.pointer == "localDir") and localPath) or false
                     if pointerPath then
                         local __cURL = file:parseURL(file:resolveURL(pointerPath..(cURL.directory or "")..cURL.file, file.validPointers["localDir"]..rootPath))
@@ -341,15 +342,17 @@ else
     function asset.public:buildPack(assetType, assetPack, callback)
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
         local cAssetPack = table.clone(assetPack, true)
-        cAssetPack.manifestData = file:read((asset.public.references.root)..string.lower(assetType).."/"..(asset.public.references.manifest)..".json")
-        cAssetPack.manifestData = (cAssetPack.manifestData and table.decode(cAssetPack.manifestData)) or false
+        local manifestPath = (asset.public.references.root)..string.lower(assetType).."/"..(asset.public.references.manifest)
+        manifestPath = manifestPath..((file:exists(manifestPath..".json") and ".json") or ".vcl")
+        cAssetPack.manifestData = file:read(manifestPath)
+        cAssetPack.manifestData = (cAssetPack.manifestData and table.decode(cAssetPack.manifestData, file:parseURL(manifestPath).extension)) or false
         if not cAssetPack.manifestData then execFunction(callback, false, assetType); return false end
         thread:create(function(self)
             cAssetPack.rwDatas = {}
             for i = 1, #cAssetPack.manifestData, 1 do
                 local assetName = cAssetPack.manifestData[i]
                 local assetPath = (asset.public.references.root)..string.lower(assetType).."/"..assetName.."/"
-                local assetManifestData = asset.public:buildManifest(assetPath, _, (asset.public.references.asset)..".json")
+                local assetManifestData = asset.public:buildManifest(assetPath, _, asset.public.references.asset..((file:exists(assetPath..(asset.public.references.asset)..".json") and ".json") or ".vcl"))
                 if assetManifestData then
                     local assetProperties = asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"]
                     for k = 1, #asset.private.properties.reserved, 1 do

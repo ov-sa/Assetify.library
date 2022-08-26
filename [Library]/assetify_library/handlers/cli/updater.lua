@@ -91,14 +91,14 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
     if not responsePointer then
         updateResources.updateThread = thread:create(function()
             for i = 1, #updateResources, 1 do
-                local resourcePointer, resoureResponse = updateResources[i], false
+                local resourcePointer, resourceResponse = updateResources[i], false
                 local resourceMeta = updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/meta.xml"
-                imports.fetchRemote(resourceMeta, function(...) resoureResponse = table.pack(...); updateResources.updateThread:resume() end)
+                imports.fetchRemote(resourceMeta, function(...) resourceResponse = table.pack(...); updateResources.updateThread:resume() end)
                 updateResources.updateThread:pause()
-                if not resoureResponse[1] or not resoureResponse[2] or (resoureResponse[2] ~= 0) then return updateResources.onUpdateCallback(false, true) end
+                if not resourceResponse[1] or not resourceResponse[2] or (resourceResponse[2] ~= 0) then return updateResources.onUpdateCallback(false, true) end
                 local isLastIndex = false
                 for i = 1, #updateResources.updateTags, 1 do
-                    for j in string.gmatch(resoureResponse[1], "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
+                    for j in string.gmatch(resourceResponse[1], "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                         if (#string.gsub(j, "%s", "") > 0) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
                             cli.private:update(resourcePointer, {updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/"..j, j})
                             timer:create(function()
@@ -111,7 +111,7 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                     end
                 end
                 isLastIndex = true
-                cli.private:update(resourcePointer, {resourceMeta, "meta.xml", resoureResponse[1]})
+                cli.private:update(resourcePointer, {resourceMeta, "meta.xml", resourceResponse[1]})
             end
             updateResources.onUpdateCallback(true, true)
         end)
@@ -142,7 +142,7 @@ function cli.public:update(isAction)
     if isAction then imports.outputServerLog("[Assetify] | Fetching latest version; Hold up...") end
     imports.fetchRemote(syncer.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
-        response = table.decode(response)
+        response = table.decode(response, "json")
         if not response or not response.tag_name then return updateResources.onUpdateCallback(false, true) end
         if syncer.libraryVersion == response.tag_name then
             if isAction then imports.outputServerLog("[Assetify] | Already upto date - "..response.tag_name) end
