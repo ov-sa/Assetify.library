@@ -60,8 +60,7 @@ function vcl.private.fetchLine(rw, index)
 end
 
 function vcl.private.parseComment(parser, buffer, rw)
-    local isComment = (not parser.isType or vcl.private.isVoid(parser.index)) and (rw == vcl.private.types.comment)
-    if isComment then
+    if not parser.isType and (rw == vcl.private.types.comment) then
         local line, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
         local rwLines = string.split(string.sub(buffer, 0, #buffer), vcl.private.types.newline)
         parser.ref =  parser.ref - #indexLine + #rwLines[line] + 2
@@ -115,8 +114,8 @@ function vcl.private.parseNumber(parser, buffer, rw)
             if rw == vcl.private.types.decimal then
                 if not parser.isTypeFloat then parser.isTypeFloat = true
                 else return false end
-            elseif not parser.isTypeFloat and parser.isTypeNegative and (rw == vcl.private.types.init) then
-                parser.ref, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative, "object", false, false
+            elseif not parser.isTypeFloat and parser.isTypeNegative and ((vcl.private.isVoid(parser.index) or (rw == " ")) or (rw == vcl.private.types.init)) then
+                parser.ref, parser.index, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative - 1, "", "object", false, false
             elseif rw == vcl.private.types.newline then parser.isParsed = true
             elseif not isNumber then return false end
         end

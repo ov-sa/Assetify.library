@@ -43,7 +43,7 @@ local renderer = class:create("renderer", {
     isDynamicSkyEnabled = false
 })
 renderer.private.serverTick = 60*60*12
-renderer.private.minuteDuration = 60
+renderer.private.minuteDuration = 60*1000
 
 if localPlayer then
     renderer.public.resolution = {imports.guiGetScreenSize()}
