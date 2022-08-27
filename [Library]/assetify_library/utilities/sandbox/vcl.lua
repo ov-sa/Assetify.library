@@ -88,22 +88,6 @@ function vcl.private.parseBoolean(parser, buffer, rw)
     return true
 end
 
-function vcl.private.parseString(parser, buffer, rw)
-    if not parser.isType or (parser.isType == "string") then
-        if (not parser.isTypeChar and vcl.private.types.string[rw]) or parser.isTypeChar then
-            if not parser.isType then parser.isSkipAppend, parser.isType, parser.isTypeChar = true, "string", rw
-            elseif rw == parser.isTypeChar then
-                if not parser.isTypeParsed then parser.isSkipAppend, parser.isTypeParsed = true, true
-                else return false end
-            elseif parser.isTypeParsed then
-                if rw == vcl.private.types.newline then parser.isParsed = true
-                else return false end
-            end
-        end
-    end
-    return true
-end
-
 function vcl.private.parseNumber(parser, buffer, rw)
     if not parser.isType or (parser.isType == "number") then
         local isNumber = imports.tonumber(rw)
@@ -118,6 +102,22 @@ function vcl.private.parseNumber(parser, buffer, rw)
                 parser.ref, parser.index, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative - 1, "", "object", false, false
             elseif rw == vcl.private.types.newline then parser.isParsed = true
             elseif not isNumber then return false end
+        end
+    end
+    return true
+end
+
+function vcl.private.parseString(parser, buffer, rw)
+    if not parser.isType or (parser.isType == "string") then
+        if (not parser.isTypeChar and vcl.private.types.string[rw]) or parser.isTypeChar then
+            if not parser.isType then parser.isSkipAppend, parser.isType, parser.isTypeChar = true, "string", rw
+            elseif rw == parser.isTypeChar then
+                if not parser.isTypeParsed then parser.isSkipAppend, parser.isTypeParsed = true, true
+                else return false end
+            elseif parser.isTypeParsed then
+                if rw == vcl.private.types.newline then parser.isParsed = true
+                else return false end
+            end
         end
     end
     return true
