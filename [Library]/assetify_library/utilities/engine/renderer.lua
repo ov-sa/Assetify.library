@@ -233,12 +233,11 @@ if localPlayer then
         if not cycle then return false end
         local isValid = false
         for i = 1, 24, 1 do
-            local j = imports.tostring(i)
-            cycle[j] = (cycle[j] and (imports.type(cycle[j]) == "table") and cycle[j]) or false
-            if cycle[j] then
+            cycle[i] = (cycle[i] and (imports.type(cycle[i]) == "table") and cycle[i]) or false
+            if cycle[i] then
                 for k = 1, 3, 1 do
-                    cycle[j][k] = (cycle[j][k] and (imports.type(cycle[j][k]) == "table") and (imports.type(cycle[j][k].color) == "string") and (imports.type(cycle[j][k].position) == "number") and cycle[j][k]) or false
-                    isValid = (cycle[j][k] and true) or isValid
+                    cycle[i][k] = (cycle[i][k] and (imports.type(cycle[i][k]) == "table") and (imports.type(cycle[i][k].color) == "string") and (imports.type(cycle[i][k].position) == "number") and cycle[i][k]) or false
+                    isValid = (cycle[i][k] and true) or isValid
                 end
             end
         end
@@ -249,12 +248,11 @@ if localPlayer then
         state = (state and true) or false
         if not renderer.private.isTimeCycleValid(cycle) then return false end
         for i = 1, 24, 1 do
-            local j = imports.tostring(i)
-            local vCycle, bCycle = cycle[j], {}
+            local vCycle, bCycle = cycle[i], {}
             if not vCycle then
                 for k = i - 1, i - 23, -1 do
                     local v = ((k > 0) and k) or (24 + k)
-                    local __vCycle = cycle[(imports.tostring(v))]
+                    local __vCycle = cycle[v]
                     if __vCycle then
                         vCycle = __vCycle
                         break
