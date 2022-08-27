@@ -30,6 +30,7 @@ vcl.private.types = {
     init = ":",
     comment = "#",
     tab = "\t",
+    space = " ",
     newline = "\n",
     carriageline = "\r",
     list = "-",
@@ -98,7 +99,7 @@ function vcl.private.parseNumber(parser, buffer, rw)
             if rw == vcl.private.types.decimal then
                 if not parser.isTypeFloat then parser.isTypeFloat = true
                 else return false end
-            elseif not parser.isTypeFloat and parser.isTypeNegative and ((vcl.private.isVoid(parser.index) and (rw == " ")) or (rw == vcl.private.types.init)) then
+            elseif not parser.isTypeFloat and parser.isTypeNegative and ((vcl.private.isVoid(parser.index) and (rw == vcl.private.types.space)) or (rw == vcl.private.types.init)) then
                 parser.ref, parser.index, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative - 1, "", "object", false, false
             elseif rw == vcl.private.types.newline then parser.isParsed = true
             elseif not isNumber then return false end
@@ -131,27 +132,25 @@ function vcl.private.parseObject(parser, buffer, rw, isChild)
             if parser.isTypeID and vcl.private.isVoid(parser.index) and (rw == vcl.private.types.init) then parser.index = imports.tostring(#parser.pointer + 1) end
             if not vcl.private.isVoid(parser.index) then
                 if parser.isTypeID and (rw == vcl.private.types.newline) then parser.pointer[(#parser.pointer + 1)] = parser.index
-                else
-                    if rw == vcl.private.types.init then
-                        local _, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
-                        local indexTypePadding = (parser.isTypeID and (parser.ref - parser.isTypeID - 1)) or 0
-                        local indexPadding = #indexLine - #parser.index - indexTypePadding - 1
-                        if isChild then
-                            parser.padding = parser.padding or indexPadding - 1
-                            if indexPadding <= parser.padding then
-                                parser.ref = parser.ref - #parser.index - indexTypePadding
-                                return false
-                            end
+                elseif rw == vcl.private.types.init then
+                    local _, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
+                    local indexTypePadding = (parser.isTypeID and (parser.ref - parser.isTypeID - 1)) or 0
+                    local indexPadding = #indexLine - #parser.index - indexTypePadding - 1
+                    if isChild then
+                        parser.padding = parser.padding or indexPadding - 1
+                        if indexPadding <= parser.padding then
+                            parser.ref = parser.ref - #parser.index - indexTypePadding
+                            return false
                         end
-                        if parser.isTypeID then parser.isTypeID, parser.index = false, imports.tonumber(parser.index) end
-                        if not vcl.private.isVoid(parser.index) then
-                            local value, __index, error = vcl.private.decode(buffer, parser.ref + 1, indexPadding, true)
-                            if not error then
-                                parser.pointer[(parser.index)], parser.ref, parser.index = value, __index - 1, ""
-                            else parser.isChildErrored = 1 end
-                        else parser.isChildErrored = 0 end
+                    end
+                    if parser.isTypeID then parser.isTypeID, parser.index = false, imports.tonumber(parser.index) end
+                    if not vcl.private.isVoid(parser.index) then
+                        local value, __index, error = vcl.private.decode(buffer, parser.ref + 1, indexPadding, true)
+                        if not error then
+                            parser.pointer[(parser.index)], parser.ref, parser.index = value, __index - 1, ""
+                        else parser.isChildErrored = 1 end
                     else parser.isChildErrored = 0 end
-                end
+                else parser.isChildErrored = 0 end
             end
             if parser.isChildErrored then return false end
         end
@@ -182,13 +181,13 @@ function vcl.private.encode(buffer, padding)
         else
             i = ((imports.type(i) == "number") and "- "..imports.tostring(i)) or i
             if imports.type(j) == "string" then j = "\""..j.."\"" end
-            result = result..vcl.private.types.newline..padding..i..vcl.private.types.init.." "..imports.tostring(j)
+            result = result..vcl.private.types.newline..padding..i..vcl.private.types.init..vcl.private.types.space..imports.tostring(j)
         end
     end
     table.sort(indexes.numeric, function(a, b) return a < b end)
     for i = 1, #indexes.numeric, 1 do
         local j = indexes.numeric[i]
-        result = result..vcl.private.types.newline..padding..vcl.private.types.list.." "..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+        result = result..vcl.private.types.newline..padding..vcl.private.types.list..vcl.private.types.space..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
     end
     for i = 1, #indexes.index, 1 do
         local j = indexes.index[i]
