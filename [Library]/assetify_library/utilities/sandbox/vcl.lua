@@ -114,7 +114,7 @@ function vcl.private.parseNumber(parser, buffer, rw)
             if rw == vcl.private.types.decimal then
                 if not parser.isTypeFloat then parser.isTypeFloat = true
                 else return false end
-            elseif not parser.isTypeFloat and parser.isTypeNegative and ((vcl.private.isVoid(parser.index) or (rw == " ")) or (rw == vcl.private.types.init)) then
+            elseif not parser.isTypeFloat and parser.isTypeNegative and ((vcl.private.isVoid(parser.index) and (rw == " ")) or (rw == vcl.private.types.init)) then
                 parser.ref, parser.index, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative - 1, "", "object", false, false
             elseif rw == vcl.private.types.newline then parser.isParsed = true
             elseif not isNumber then return false end
