@@ -54,10 +54,15 @@ shaderRW.buffer[identity] = {
 
         float anisotropy = 1;
         ]]..controlVars..[[
+        struct VSInput {
+            float3 Position : POSITION0;
+            float2 TexCoord : TEXCOORD0;
+            float4 Diffuse : COLOR0;
+        };
         struct PSInput {
             float4 Position : POSITION0;
-            float4 Diffuse : COLOR0;
             float2 TexCoord : TEXCOORD0;
+            float4 Diffuse : COLOR0;
         };
         struct Export {
             float4 World : COLOR0;
@@ -69,6 +74,14 @@ shaderRW.buffer[identity] = {
         /*----------------
         -->> Handlers <<--
         ------------------*/
+
+        PSInput VSHandler(VSInput VS) {
+            PSInput PS = (PSInput)0;
+            PS.Position = MTACalcScreenPosition(VS.Position);
+            PS.TexCoord = VS.TexCoord;
+            PS.Diffuse = MTACalcGTABuildingDiffuse(VS.Diffuse);
+            return PS;
+        }
 
         Export PSHandler(PSInput PS) : COLOR0 {
             Export output;
@@ -87,6 +100,7 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
+            ]]..shaderRW.prelight(shaderMaps)..[[
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
             return output;
@@ -100,6 +114,7 @@ shaderRW.buffer[identity] = {
         technique ]]..identity..[[ {
             pass P0 {
                 SRGBWriteEnable = false;
+                VertexShader = compile vs_2_0 VSHandler();
                 PixelShader = compile ps_2_0 PSHandler();
             }
         }

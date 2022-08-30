@@ -8,6 +8,15 @@
 ----------------------------------------------------------------
 
 
+-----------------
+--[[ Imports ]]--
+-----------------
+
+local imports = {
+    tonumber = tonumber
+}
+
+
 -------------------
 --[[ Variables ]]--
 -------------------
@@ -295,4 +304,11 @@ function shaderRW.create(rtModes)
             return float3(1, 1, 1);
         }
     ]]
+end
+
+function shaderRW.prelight(shaderMaps)
+    return ((shaderMaps.prelight and shaderMaps.prelight.vertexshading and [[sampledTexel.rgb *= PS.Diffuse.rgb;]]) or [[]])..[[
+    ]]..((shaderMaps.prelight and shaderMaps.prelight.brightness and [[sampledTexel.rgb += ]]..shaderMaps.prelight.brightness..[[;]]) or [[]])..[[
+    ]]..((shaderMaps.prelight and shaderMaps.prelight.contrast and [[sampledTexel.rgb *= ]]..shaderMaps.prelight.contrast..[[;]]) or [[]])..[[
+    ]]..((shaderMaps.prelight and shaderMaps.prelight.filter and [[sampledTexel.rgb *= float3(]]..((imports.tonumber(shaderMaps.prelight.filter.red) or 255)/255)..[[, ]]..((imports.tonumber(shaderMaps.prelight.filter.green) or 255)/255)..[[, ]]..((imports.tonumber(shaderMaps.prelight.filter.blue) or 255)/255)..[[);]]) or [[]])
 end

@@ -173,7 +173,7 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
-            sampledTexel.rgb *= PS.Diffuse.rgb;
+            ]]..shaderRW.prelight(shaderMaps)..[[
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
             return output;
