@@ -8,33 +8,14 @@
 ----------------------------------------------------------------
 
 
--------------------
---[[ Variables ]]--
--------------------
-
-local identity = {
-    name = "Assetify_TextureGrayscaler",
-    deps = shaderRW.createDeps({
-        "utilities/shaders/helper.fx"
-    })
-}
-
-
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW.buffer[(identity.name)] = {
-    properties = {
-        disabled = {
-            ["vSource0"] = true,
-            ["vSource1"] = true,
-            ["vSource2"] = true
-        }
-    },
-
+local identity = "Assetify_TextureGrayscaler"
+shaderRW.buffer[identity] = {
     exec = function()
-        return identity.deps..[[
+        return shaderRW.create()..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -69,7 +50,7 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[ {
+        technique ]]..identity..[[ {
             pass P0 {
                 AlphaRef = 1;
                 AlphaBlendEnable = true;

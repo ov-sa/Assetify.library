@@ -8,27 +8,12 @@
 ----------------------------------------------------------------
 
 
--------------------
---[[ Variables ]]--
--------------------
-
-local identity = {
-    name = "Assetify_TextureChanger",
-    deps = shaderRW.createDeps({
-        "utilities/shaders/helper.fx"
-    })
-}
-
-
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW.buffer[(identity.name)] = {
-    properties = {
-        disabled = {}
-    },
-
+local identity = "Assetify_TextureClumper"
+shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
         if not shaderMaps or not shaderMaps[(asset.references.clump)] then return false end
         local controlVars, handlerBody, handlerFooter = [[
@@ -62,7 +47,7 @@ shaderRW.buffer[(identity.name)] = {
                 sampledTexel.rgb *= clumpTexel_bump.rgb;
             ]]
         end
-        return identity.deps..[[
+        return shaderRW.create({diffuse = true, emissive = true})..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -92,11 +77,13 @@ shaderRW.buffer[(identity.name)] = {
                 if (vEmissiveSource) {
                     output.Diffuse = 0;
                     output.Emissive = sampledTexel;
-                } else {
+                }
+                else {
                     output.Diffuse = sampledTexel;
                     output.Emissive = 0;
                 }
-            } else {
+            }
+            else {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
@@ -110,7 +97,7 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[ {
+        technique ]]..identity..[[ {
             pass P0 {
                 SRGBWriteEnable = false;
                 PixelShader = compile ps_2_0 PSHandler();

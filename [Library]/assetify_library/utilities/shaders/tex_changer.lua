@@ -8,27 +8,14 @@
 ----------------------------------------------------------------
 
 
--------------------
---[[ Variables ]]--
--------------------
-
-local identity = {
-    name = "Assetify_TextureChanger",
-    deps = shaderRW.createDeps({})
-}
-
-
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW.buffer[(identity.name)] = {
-    properties = {
-        disabled = {}
-    },
-
+local identity = "Assetify_TextureChanger"
+shaderRW.buffer[identity] = {
     exec = function()
-        return identity.deps..[[
+        return shaderRW.create({diffuse = true, emissive = true})..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -60,11 +47,13 @@ shaderRW.buffer[(identity.name)] = {
                 if (vEmissiveSource) {
                     output.Diffuse = 0;
                     output.Emissive = sampledTexel;
-                } else {
+                }
+                else {
                     output.Diffuse = sampledTexel;
                     output.Emissive = 0;
                 }
-            } else {
+            }
+            else {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
@@ -78,7 +67,7 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[ {
+        technique ]]..identity..[[ {
             pass P0 {
                 PixelShader = compile ps_2_0 PSHandler();
             }

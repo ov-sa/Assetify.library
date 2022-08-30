@@ -69,8 +69,6 @@ if localPlayer then
         element = {},
         shader = {}
     }
-    shader.public.rwCache = shaderRW.buffer
-    shaderRW = nil
 
     function shader.public:create(...)
         local cShader = self:createInstance()
@@ -151,14 +149,14 @@ if localPlayer then
 
     function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance, isStandalone)
         if not shader.public:isInstance(self) then return false end
-        if not shaderCategory or not shaderName or (not manager:isInternal() and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shader.public.rwCache[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
+        if not shaderCategory or not shaderName or (not manager:isInternal() and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
         element = ((element and imports.isElement(element)) and element) or false
         textureName = textureName or false
         shaderPriority = imports.tonumber(shaderPriority) or shader.public.shaderPriority
         shaderDistance = imports.tonumber(shaderDistance) or shader.public.shaderDistance
         isStandalone = (isStandalone and true) or false
         self.isPreLoaded = (shader.public.preLoaded[shaderName] and true) or false
-        self.cShader = (self.isPreLoaded and shader.public.preLoaded[shaderName]) or imports.dxCreateShader(shader.public.rwCache[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, false, "all")
+        self.cShader = (self.isPreLoaded and shader.public.preLoaded[shaderName]) or imports.dxCreateShader(shaderRW.buffer[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, false, "all")
         shader.public.buffer.shader[self] = true
         self.shaderData = {
             element = element,
@@ -219,7 +217,7 @@ if localPlayer then
     end
 
     function shader.public:setValue(i, j)
-        if not shader.public:isInstance(self) or not i or (shader.public.rwCache[(self.shaderData.shaderName)].properties.disabled[i]) then return false end
+        if not shader.public:isInstance(self) or not i then return false end
         return imports.dxSetShaderValue(self.cShader, i, j)
     end
 

@@ -29,6 +29,8 @@ local imports = {
     dxCreateScreenSource = dxCreateScreenSource,
     dxCreateRenderTarget = dxCreateRenderTarget,
     dxUpdateScreenSource = dxUpdateScreenSource,
+    dxGetTexturePixels = dxGetTexturePixels,
+    dxGetPixelColor = dxGetPixelColor,
     dxDrawImage = dxDrawImage
 }
 
@@ -56,6 +58,20 @@ if localPlayer then
         local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
         local sunX, sunY = getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
         if sunX and sunY then shader.preLoaded["Assetify_TextureSampler"]:setValue("vSunViewOffset", {sunX, sunY}) end
+        --TODO: JUST TESTING..
+        --imports.dxDrawImage(0, 0, renderer.public.resolution[1]*0.45, renderer.public.resolution[2]*0.45, renderer.private.skyRT)
+        if renderer.public.isTimeSynced then
+            --TODO: OPTIMIZE LATER
+            --local cycle = ((renderer.private.serverTick + renderer.private.currentTick)/(60*renderer.private.minuteDuration))%24
+            --outputChatBox(cycle)
+            local currentTick = imports.getTickCount()
+            if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
+                renderer.private.serverTimeCycleTick = currentTick
+                local r, g, b = imports.dxGetPixelColor(imports.dxGetTexturePixels(renderer.private.skyRT, renderer.public.resolution[1]*0.5, renderer.public.resolution[2]*0.5, 1, 1), 0, 0)
+                r, g, b = r*0.5, g*0.5, b*0.5
+                imports.setSkyGradient(r, g, b, r, g, b)
+            end
+        end
         return true
     end
 
@@ -117,7 +133,7 @@ if localPlayer then
             if renderer.public.isTimeSynced == state then return false end
             renderer.public.isTimeSynced = state
             if not renderer.public.isTimeSynced then
-                renderer.public:setServerTick(((renderer.private.serverTick or 0)*1000) + (imports.getTickCount() - (renderer.public.__serverTick or 0)))
+                renderer.public:setServerTick((renderer.private.serverTick or 0) + (imports.getTickCount() - (renderer.private.serverTickFrame or 0)))
             end
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setTimeSync(_, i, syncer.librarySerial)
@@ -131,14 +147,14 @@ if localPlayer then
 
     function renderer.public:setServerTick(serverTick, syncShader, isInternal)
         if not syncShader then
-            renderer.private.serverTick = (imports.tonumber(serverTick) or 0)*0.001
-            renderer.public.__serverTick = imports.getTickCount()
+            renderer.private.serverTick = imports.tonumber(serverTick) or 0
+            renderer.private.serverTickFrame = imports.getTickCount()
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setServerTick(_, i, syncer.librarySerial)
             end
         else
             if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vServerTick", renderer.private.serverTick)
+            syncShader:setValue("vServerTick", renderer.private.serverTick*0.001)
         end
         return true
     end
@@ -173,8 +189,12 @@ if localPlayer then
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.prevNativeClouds = imports.getCloudsEnabled()
+                renderer.private.skyRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
+                shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
+            else
+                destroyElement(renderer.private.skyRT)
+                imports.setSkyGradient(table.upack(renderer.private.prevNativeSkyGradient))
             end
-            imports.setSkyGradient(table.unpack((not state and renderer.private.prevNativeSkyGradient) or {50, 50, 50, 50, 50, 50}))
             imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setDynamicSky(_, i, syncer.librarySerial)
@@ -247,6 +267,7 @@ if localPlayer then
     function renderer.public:setTimeCycle(cycle)
         state = (state and true) or false
         if not renderer.private.isTimeCycleValid(cycle) then return false end
+        renderer.public.isDynamicTimeCycle, renderer.private.serverTimeCycleColor = cycle, {}
         for i = 1, 24, 1 do
             local vCycle, bCycle = cycle[i], {}
             if not vCycle then
@@ -263,14 +284,17 @@ if localPlayer then
                 local v = vCycle[k]
                 local color = (v and {string.parseHex(v.color)}) or false
                 local position = (v and v.position) or false
+                if k == 1 then
+                    renderer.private.serverTimeCycleColor[i] = (color) or renderer.private.serverTimeCycleColor[i]
+                end
                 table.insert(bCycle, (color and color[1]/255) or -1)
                 table.insert(bCycle, (color and color[2]/255) or -1)
                 table.insert(bCycle, (color and color[3]/255) or -1)
                 table.insert(bCycle, (position and position/100) or -1)
             end
+            renderer.private.serverTimeCycleColor[i] = renderer.private.serverTimeCycleColor[i] or {255, 255, 255}
             shader.preLoaded["Assetify_TextureSampler"]:setValue("timecycle_"..i, bCycle)
         end
-        renderer.public.isDynamicTimeCycle = cycle
         return true
     end
 end

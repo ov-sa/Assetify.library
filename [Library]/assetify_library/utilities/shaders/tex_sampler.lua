@@ -8,30 +8,12 @@
 ----------------------------------------------------------------
 
 
--------------------
---[[ Variables ]]--
--------------------
-
-local identity = {
-    name = "Assetify_TextureSampler",
-    deps = shaderRW.createDeps({
-        "utilities/shaders/helper.fx"
-    })
-}
-
-
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW.buffer[(identity.name)] = {
-    properties = {
-        disabled = {
-            ["vSource1"] = true,
-            ["vSource2"] = true
-        }
-    },
-
+local identity = "Assetify_TextureSampler"
+shaderRW.buffer[identity] = {
     exec = function()
         local controlVars, controlHandlers = "", [[
             float3x4 FetchTimeCycle(float hour) {
@@ -50,7 +32,7 @@ shaderRW.buffer[(identity.name)] = {
                 return cycles[hour];
             }
         ]]
-        return identity.deps..[[
+        return shaderRW.create()..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
@@ -58,10 +40,11 @@ shaderRW.buffer[(identity.name)] = {
         float sampleOffset = 0.001;
         float sampleIntensity = 0;
         float3 sunColor = false;
-        bool isStarsEnabled = true;
+        bool isStarsEnabled = false;
         float cloudDensity = false;
         float cloudScale = false;
         float3 cloudColor = false;
+        texture vSky0 <string renderTarget = "yes";>;
         ]]..controlVars..[[
         struct VSInput {
             float3 Position : POSITION0;
@@ -71,8 +54,15 @@ shaderRW.buffer[(identity.name)] = {
             float4 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
         };
+        struct Export {
+            float4 World : COLOR0;
+            float4 Sky : COLOR1;
+        };
         sampler vSource0Sampler = sampler_state {
             Texture = vSource0;
+        };
+        sampler vSource2Sampler = sampler_state {
+            Texture = vSource2;
         };
         sampler vDepth0Sampler = sampler_state {
             Texture = vDepth0;
@@ -135,9 +125,19 @@ shaderRW.buffer[(identity.name)] = {
         }
     
         float2x4 SampleSource(float2 uv) {
-            float4 baseTexel = tex2D(vSource0Sampler, uv);
-            float4 depthTexel = tex2D(vDepth0Sampler, uv);
-            float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? baseTexel*float4(MTAGetWeatherColor(), 0.75) : float4(0, 0, 0, 0);
+            float4 baseTexel = tex2Dlod(vSource0Sampler, float4(uv, 0, 0));
+            float4 depthTexel = tex2Dlod(vDepth0Sampler, float4(uv, 0, 0));
+            float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? 1 : 0;
+            if ((sampleOffset > 0) && (weatherTexel.a <= 0)) {
+                float4 sampledTexel = tex2Dlod(vSource0Sampler, float4(uv + float2(sampleOffset, sampleOffset), 0, 0));
+                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(-sampleOffset, -sampleOffset), 0, 0));
+                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(-sampleOffset, sampleOffset), 0, 0));
+                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(sampleOffset, -sampleOffset), 0, 0));
+                sampledTexel *= 0.25;
+                float edgeIntensity = length(sampledTexel.rgb);
+                edgeIntensity = pow(length(float2(ddx(edgeIntensity), ddy(edgeIntensity))), 0.5)*sampleIntensity;
+                baseTexel = lerp(baseTexel, sampledTexel, edgeIntensity);
+            }
             float2x4 result = {baseTexel, weatherTexel};
             return result;
         }
@@ -197,6 +197,20 @@ shaderRW.buffer[(identity.name)] = {
             return float4(result, 1);
         }
 
+        float4 SampleEmissive(float2 uv) {
+            float viewPI = PI*2;
+            float2 viewRadius = 20/vResolution;
+            float viewIterations = 26, viewQuality = 4, viewBrightness = 1.5;
+            float4 result = tex2Dlod(vSource2Sampler, float4(uv, 0, 0))*viewBrightness;
+            for(float i = 0; i < viewPI; i += viewPI/viewIterations) {
+                for(float j = 1/viewQuality; j <= 1; j += 1/viewQuality) {
+                    result += tex2Dlod(vSource2Sampler, float4(uv + (float2(cos(i), sin(i))*viewRadius*j), 0, 0))*viewBrightness;
+                }
+            }
+            result /= (viewQuality*viewIterations) - 15;
+            return result;
+        }
+    
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
             PS.Position = MTACalcScreenPosition(VS.Position);
@@ -204,19 +218,27 @@ shaderRW.buffer[(identity.name)] = {
             return PS;
         }
     
-        float4 PSHandler(PSInput PS) : COLOR0 {
-            float2x4 rawTexel = SampleSource(PS.TexCoord + float2(sampleOffset, sampleOffset));
-            rawTexel += SampleSource(PS.TexCoord + float2(-sampleOffset, -sampleOffset));
-            rawTexel += SampleSource(PS.TexCoord + float2(-sampleOffset, sampleOffset));
-            rawTexel += SampleSource(PS.TexCoord + float2(sampleOffset, -sampleOffset));
-            rawTexel *= 0.25;
+        Export BufferHandler(PSInput PS) : COLOR0 {
+            Export output;
+            output.Sky = 1;
+            output.World = 1;
+            return output;
+        }
+
+        Export PSHandler(PSInput PS) : COLOR0 {
+            Export output;
+            float2x4 rawTexel = SampleSource(PS.TexCoord);
             float4 sampledTexel = rawTexel[0];
-            if (rawTexel[1].a > 0) sampledTexel = vDynamicSkyEnabled ? SampleSky(PS.TexCoord) : rawTexel[1];
-            else {
-                float edgeIntensity = length(sampledTexel.rgb);
-                sampledTexel.a = pow(length(float2(ddx(edgeIntensity), ddy(edgeIntensity))), 0.5)*sampleIntensity;
+            if (rawTexel[1].a > 0) {
+                sampledTexel = vDynamicSkyEnabled ? SampleSky(PS.TexCoord) : rawTexel[1];
+                if (PS.TexCoord.x >= 0.5 && PS.TexCoord.y >= 0.5) {
+                    output.Sky = sampledTexel;
+                }
+                else output.Sky = 1;
             }
-            return saturate(sampledTexel);
+            if (vSource2Enabled) sampledTexel += SampleEmissive(PS.TexCoord);
+            output.World = saturate(sampledTexel);
+            return output;
         }
 
 
@@ -224,8 +246,13 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[ {
+        technique ]]..identity..[[ {
             pass P0 {
+                AlphaBlendEnable = true;
+                VertexShader = compile vs_3_0 VSHandler();
+                PixelShader  = compile ps_3_0 BufferHandler();
+            }
+            pass P1 {
                 AlphaBlendEnable = true;
                 VertexShader = compile vs_3_0 VSHandler();
                 PixelShader  = compile ps_3_0 PSHandler();

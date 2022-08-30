@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="6.6.3"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="6.6.4"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -38,7 +38,6 @@
     <script src="utilities/sandbox/datasystem.lua" type="shared"/>
 
     <!-- Utilities: Shaders -->
-    <file src="utilities/shaders/helper.fx"/>
     <script src="utilities/shaders/index.lua" type="client"/>
     <script src="utilities/shaders/tex_clearer.lua" type="client"/>
     <script src="utilities/shaders/tex_changer.lua" type="client"/>

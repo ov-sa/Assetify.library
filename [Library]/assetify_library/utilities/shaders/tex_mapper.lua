@@ -8,28 +8,13 @@
 ----------------------------------------------------------------
 
 
--------------------
---[[ Variables ]]--
--------------------
-
-local identity = {
-    name = "Assetify_TextureMapper",
-    iteration = 3,
-    deps = shaderRW.createDeps({
-        "utilities/shaders/helper.fx"
-    })
-}
-
-
 ----------------
 --[[ Shader ]]--
 ----------------
 
-shaderRW.buffer[(identity.name)] = {
-    properties = {
-        disabled = {}
-    },
-
+local identity = "Assetify_TextureMapper"
+local iteration = 3
+shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
         if not shaderMaps or (#shaderMaps <= 0) then return false end
         local isSamplingStage = false
@@ -105,7 +90,7 @@ shaderRW.buffer[(identity.name)] = {
                             float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2D(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
                         ]]
                     end
-                    for m = 1, identity.iteration, 1 do
+                    for m = 1, iteration, 1 do
                         handlerBody = handlerBody..[[
                             sampledTexel_]]..i..[[ = lerp(sampledTexel_]]..i..[[, controlTexel_]]..i..[[_]]..v..[[, controlTexel_]]..i..[[.]]..channel..[[);
                         ]]
@@ -118,7 +103,7 @@ shaderRW.buffer[(identity.name)] = {
                 end
             end
             handlerBody = handlerBody..[[
-                sampledTexel_]]..i..[[.rgb *= ]]..(1/identity.iteration)..[[;
+                sampledTexel_]]..i..[[.rgb *= ]]..(1/iteration)..[[;
             ]]
             if j.bump then
                 handlerBody = handlerBody..[[
@@ -135,13 +120,17 @@ shaderRW.buffer[(identity.name)] = {
             ]])
             isSamplingStage = true
         end
-        return identity.deps..[[
+        return shaderRW.create({diffuse = true, emissive = true})..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
 
         float anisotropy = 1;
         ]]..controlVars..[[
+        struct VSInput {
+            float3 Position : POSITION0;
+            float2 TexCoord : TEXCOORD0;
+        };
         struct PSInput {
             float4 Position : POSITION0;
             float4 Diffuse : COLOR0;
@@ -158,6 +147,14 @@ shaderRW.buffer[(identity.name)] = {
         -->> Handlers <<--
         ------------------*/
 
+        PSInput VSHandler(VSInput VS) {
+            PSInput PS = (PSInput)0;
+            PS.Position = MTACalcScreenPosition(VS.Position);
+            PS.Diffuse = MTACalcGTABuildingDiffuse(VS.Diffuse);
+            PS.TexCoord = VS.TexCoord;
+            return PS;
+        }
+    
         Export PSHandler(PSInput PS) : COLOR0 {
             Export output;
             ]]..handlerBody..handlerFooter..[[
@@ -165,14 +162,17 @@ shaderRW.buffer[(identity.name)] = {
                 if (vEmissiveSource) {
                     output.Diffuse = 0;
                     output.Emissive = sampledTexel;
-                } else {
+                }
+                else {
                     output.Diffuse = sampledTexel;
                     output.Emissive = 0;
                 }
-            } else {
+            }
+            else {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
+            sampledTexel.rgb *= PS.Diffuse.rgb;
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
             return output;
@@ -183,9 +183,10 @@ shaderRW.buffer[(identity.name)] = {
         -->> Techniques <<--
         --------------------*/
 
-        technique ]]..identity.name..[[ {
+        technique ]]..identity..[[ {
             pass P0 {
                 SRGBWriteEnable = false;
+                VertexShader = compile vs_2_0 VSHandler();
                 PixelShader = compile ps_2_0 PSHandler();
             }
         }
