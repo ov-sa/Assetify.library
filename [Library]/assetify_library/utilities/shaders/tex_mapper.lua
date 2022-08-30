@@ -130,11 +130,12 @@ shaderRW.buffer[identity] = {
         struct VSInput {
             float3 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
+            float4 Diffuse : COLOR0;
         };
         struct PSInput {
             float4 Position : POSITION0;
-            float4 Diffuse : COLOR0;
             float2 TexCoord : TEXCOORD0;
+            float4 Diffuse : COLOR0;
         };
         struct Export {
             float4 World : COLOR0;
@@ -150,8 +151,8 @@ shaderRW.buffer[identity] = {
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
             PS.Position = MTACalcScreenPosition(VS.Position);
-            PS.Diffuse = MTACalcGTABuildingDiffuse(VS.Diffuse);
             PS.TexCoord = VS.TexCoord;
+            PS.Diffuse = MTACalcGTABuildingDiffuse(VS.Diffuse);
             return PS;
         }
     
