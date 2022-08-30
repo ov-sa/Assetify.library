@@ -44,7 +44,7 @@ local renderer = class:create("renderer", {
     isTimeSynced = false,
     isDynamicSkyEnabled = false
 })
-renderer.private.serverTick = 60*60*12
+renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
 
 if localPlayer then
