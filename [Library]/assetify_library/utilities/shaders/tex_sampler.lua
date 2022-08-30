@@ -237,6 +237,8 @@ shaderRW.buffer[identity] = {
                 else output.Sky = 1;
             }
             if (vSource2Enabled) sampledTexel += SampleEmissive(PS.TexCoord);
+            sampledTexel.rgb *= lerp(1, float3(0.8, 0.9, 1.3), sin(gTime + 3)*0.5 + 0.5);
+            sampledTexel.rgb *= (1 - dot(PS.TexCoord -= 0.5, PS.TexCoord))*pow(smoothstep(0, 10, gTime), 2);
             output.World = saturate(sampledTexel);
             return output;
         }
