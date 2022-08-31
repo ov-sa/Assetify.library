@@ -265,23 +265,21 @@ function shaderRW.create(rtModes)
         float4x4 MTACreateMatrix(float3 position, float3 rotation) {
             float sYaw = sin(rotation.x), sPitch = sin(rotation.y), sRoll = sin(rotation.z);
             float cYaw = cos(rotation.x), cPitch = cos(rotation.y), cRoll = cos(rotation.z);
-            float4x4 cMatrix = {
+            return float4x4(
                 float4((cRoll*cPitch) - (sRoll*sYaw*sPitch), (cPitch*sRoll) + (cRoll*sYaw*sPitch), -cYaw*sPitch, 0),
                 float4(-cYaw*sRoll, cRoll*cYaw, sYaw, 0),
                 float4((cRoll*sPitch) + (cPitch*sRoll*sYaw), (sRoll*sPitch) - (cRoll*cPitch*sYaw), cYaw*cPitch, 0),
                 float4(position.x, position.y, position.z, 1)
-            };
-            return cMatrix;
+            );
         }
 
         float4x4 MTACreatePositionMatrix(float3 position) {
-            float4x4 cMatrix = {
+            return float4x4(
                 float4(1, 0, 0, 0),
                 float4(0, 1, 0, 0),
                 float4(0, 0, 1, 0),
                 float4(position.x, position.y, position.z, 1)
-            };
-            return cMatrix;
+            );
         }
 
         float MTAGetWeatherTick() {
