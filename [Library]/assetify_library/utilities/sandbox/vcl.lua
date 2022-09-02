@@ -63,7 +63,7 @@ end
 function vcl.private.parseComment(parser, buffer, rw)
     if not parser.isType and (rw == vcl.private.types.comment) then
         local line, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
-        local rwLines = string.split(string.sub(buffer, 0, #buffer), vcl.private.types.newline)
+        local rwLines = string.split(buffer, vcl.private.types.newline)
         parser.ref =  parser.ref - #indexLine + #rwLines[line] + 2
     end
     return true
