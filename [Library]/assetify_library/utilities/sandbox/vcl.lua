@@ -48,7 +48,7 @@ vcl.private.types = {
 }
 
 function vcl.private.isVoid(rw)
-    return (not rw or not string.match(rw, "%w") and true) or false
+    return (not string.match(rw, "%w") and true) or false
 end
 
 function vcl.private.fetch(rw, index)
@@ -57,7 +57,8 @@ end
 
 function vcl.private.fetchLine(rw, index)
     local rwLines = string.split(string.sub(rw, 0, index), vcl.private.types.newline)
-    return math.max(1, #rwLines), rwLines[(#rwLines)] or ""
+    local rwLength = #rwLines
+    return math.max(1, rwLength), rwLines[rwLength] or ""
 end
 
 function vcl.private.parseComment(parser, buffer, rw)
