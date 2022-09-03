@@ -113,7 +113,10 @@ else
     syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or false
     syncer.public.libraryModules = {}
     syncer.public.libraryClients = {loaded = {}, loading = {}, scheduled = {}}
-    network:create("Assetify:onLoadClient"):on(function(player) syncer.public.libraryClients.loaded[player] = true end)
+    network:create("Assetify:onLoadClient"):on(function(player)
+        syncer.public.libraryClients.loaded[player] = true
+        network:emit("Assetify:Syncer:onSyncPostPool", false, player)
+    end)
     syncer.private.execOnLoad(function()
         for i, j in imports.pairs(syncer.public.libraryClients.scheduled) do
             syncer.private:loadClient(i)
