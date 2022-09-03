@@ -148,7 +148,7 @@ else
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
             if j then
-                syncer.public.syncElementModel(_, i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, source)
+                syncer.private.syncElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source)
             end
             thread:pause()
         end
@@ -196,7 +196,7 @@ else
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         remoteSignature = imports.getElementType(element)
-        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps}
+        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, remoteSignature = remoteSignature}
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, i)
