@@ -148,7 +148,7 @@ else
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
             if j then
-                syncer.public.syncElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, source)
+                syncer.public.syncElementModel(_, i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, source)
             end
             thread:pause()
         end
