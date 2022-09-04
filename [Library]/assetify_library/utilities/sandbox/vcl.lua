@@ -62,9 +62,9 @@ end
 
 function vcl.private.parseComment(parser, buffer, rw)
     if not parser.isType and (rw == vcl.private.types.comment) then
-        local line, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
+        local line, lineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
         local rwLines = string.split(buffer, vcl.private.types.newline)
-        parser.ref = parser.ref - #indexLine + #rwLines[line] + 2
+        parser.ref = parser.ref - #lineText + #rwLines[line] + 2
     end
     return true
 end
@@ -133,9 +133,9 @@ function vcl.private.parseObject(parser, buffer, rw, isChild)
             if not vcl.private.isVoid(parser.index) then
                 if parser.isTypeID and (rw == vcl.private.types.newline) then parser.pointer[(#parser.pointer + 1)] = parser.index
                 elseif rw == vcl.private.types.init then
-                    local _, indexLine = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
+                    local _, lineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
                     local indexTypePadding = (parser.isTypeID and (parser.ref - parser.isTypeID - 1)) or 0
-                    local indexPadding = #indexLine - #parser.index - indexTypePadding - 1
+                    local indexPadding = #lineText - #parser.index - indexTypePadding - 1
                     if isChild then
                         parser.padding = parser.padding or indexPadding - 1
                         if indexPadding <= parser.padding then
