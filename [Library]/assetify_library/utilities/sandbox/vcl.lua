@@ -57,8 +57,7 @@ end
 
 function vcl.private.fetchLine(rw, index)
     local rwLines = string.split(string.sub(rw, 0, index), vcl.private.types.newline)
-    local rwLength = #rwLines
-    return math.max(1, rwLength), rwLines[rwLength] or ""
+    return math.max(1, #rwLines), rwLines[(#rwLines)] or ""
 end
 
 function vcl.private.parseComment(parser, buffer, rw)
