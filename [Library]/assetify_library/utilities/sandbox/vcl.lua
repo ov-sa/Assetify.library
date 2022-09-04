@@ -218,7 +218,7 @@ function vcl.private.decode(buffer, ref, padding, isChild)
             if not vcl.private.parseString(parser, buffer, vcl.private.fetch(buffer, parser.ref)) then break end
             if parser.isType and not parser.isSkipAppend and not parser.isParsed then parser.value = parser.value..vcl.private.fetch(buffer, parser.ref) end
         end
-        parser.isType = (not parser.isType and (not isChild or isChild) and ((vcl.private.fetch(buffer, parser.ref) == vcl.private.types.list) or not vcl.private.isVoid(vcl.private.fetch(buffer, parser.ref))) and "object") or parser.isType
+        parser.isType = (not parser.isType and ((vcl.private.fetch(buffer, parser.ref) == vcl.private.types.list) or not vcl.private.isVoid(vcl.private.fetch(buffer, parser.ref))) and "object") or parser.isType
         if not vcl.private.parseObject(parser, buffer, vcl.private.fetch(buffer, parser.ref), isChild) then break end
         if isChild and not parser.isChildErrored and parser.isParsed then break end
         parser.ref = parser.ref + 1
