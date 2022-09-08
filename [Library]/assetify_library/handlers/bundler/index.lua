@@ -44,7 +44,7 @@ bundler.private.modules = {
     ["network"] = {module = "networker", namespace = "assetify.network", path = "utilities/sandbox/networker.lua", endpoints = {"network"}}
 }
 
-function bundler.public:createUtils()
+function bundler.private:createUtils()
     if imports.type(bundler.private.utils) == "table" then
         local rw = ""
         for i = 1, #bundler.private.utils, 1 do
@@ -64,12 +64,14 @@ function bundler.public:createUtils()
 end
 
 function bundler.private:createBuffer(index, name, rw)
-    if bundler.private.buffer[index] then return false end
-    bundler.private.buffer[index] = {module = name, rw = rw}
-    return true
+    if not bundler.private.buffer[index] and name and rw then
+        bundler.private.buffer[index] = {module = name, rw = rw}
+        return true
+    end
+    return (bundler.private.buffer[index] and bundler.private.buffer[index].rw) or false
 end
 
-function bundler.public:createModule(name)
+function bundler.private:createModule(name)
     if not name then return false end
     local module = bundler.private.modules[name]
     if not module then return false end
@@ -104,7 +106,7 @@ function bundler.public:createModule(name)
 end
 for i, j in imports.pairs(bundler.private.modules) do
     if j.module and j.endpoints then
-        bundler.public:createModule(i)
+        bundler.private:createModule(i)
     end
 end
 

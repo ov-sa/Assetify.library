@@ -26,8 +26,8 @@ local imports = {
 bundler.private:createBuffer("imports", _, [[
     if not assetify then
         assetify = {}
-        ]]..bundler.public:createModule("namespace")..[[
-        ]]..bundler.public:createUtils()..[[
+        ]]..bundler.private:createModule("namespace")..[[
+        ]]..bundler.private:createUtils()..[[
         assetify.imports = {
             resourceName = "]]..syncer.libraryName..[[",
             type = type,
@@ -101,7 +101,8 @@ bundler.private:createBuffer("core", "__core", [[
 ]])
 
 bundler.private:createBuffer("scheduler", _, [[
-    ]]..bundler.public:createModule("network")..[[
+    ]]..bundler.private:createBuffer("core")..[[
+    ]]..bundler.private:createModule("network")..[[
     assetify.scheduler = {}
     ]]..bundler.private:createScheduler()..[[
 ]])
