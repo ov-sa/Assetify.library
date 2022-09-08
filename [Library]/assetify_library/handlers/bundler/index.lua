@@ -64,7 +64,7 @@ function bundler.private:createUtils()
 end
 
 function bundler.private:createBuffer(index, name, rw)
-    if not bundler.private.buffer[index] and name and rw then
+    if not bundler.private.buffer[index] and rw then
         bundler.private.buffer[index] = {module = name, rw = rw}
         return true
     end
