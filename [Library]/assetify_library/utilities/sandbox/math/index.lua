@@ -15,8 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    tonumber = tonumber,
-    loadstring = loadstring
+    tonumber = tonumber
 }
 
 
