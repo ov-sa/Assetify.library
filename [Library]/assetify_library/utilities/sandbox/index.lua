@@ -15,6 +15,7 @@
 local imports = {
     type = type,
     tonumber = tonumber,
+    getTickCount = getTickCount,
     getLocalPlayer = getLocalPlayer,
     isElement = isElement,
     destroyElement = destroyElement,
@@ -42,4 +43,9 @@ function getElementPosition(element, offX, offY, offZ)
         local cMatrix = imports.getElementMatrix(element)
         return (offX*cMatrix[1][1]) + (offY*cMatrix[2][1]) + (offZ*cMatrix[3][1]) + cMatrix[4][1], (offX*cMatrix[1][2]) + (offY*cMatrix[2][2]) + (offZ*cMatrix[3][2]) + cMatrix[4][2], (offX*cMatrix[1][3]) + (offY*cMatrix[2][3]) + (offZ*cMatrix[3][3]) + cMatrix[4][3]
     end
+end
+
+function getInterpolationProgress(tick, interval)
+    if not tick or not interval then return false end
+    return ((CLIENT_CURRENT_TICK or imports.getTickCount()) - tick)/interval
 end

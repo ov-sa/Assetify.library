@@ -20,10 +20,13 @@ local imports = {
     getTickCount = getTickCount,
     destroyElement = destroyElement,
     guiGetScreenSize = guiGetScreenSize,
+    setTime = setTime,
     setSkyGradient = setSkyGradient,
     getSkyGradient = getSkyGradient,
     setCloudsEnabled = setCloudsEnabled,
     getCloudsEnabled = getCloudsEnabled,
+    getCameraMatrix = getCameraMatrix,
+    getScreenFromWorldPosition = getScreenFromWorldPosition,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     dxCreateScreenSource = dxCreateScreenSource,
@@ -31,7 +34,9 @@ local imports = {
     dxUpdateScreenSource = dxUpdateScreenSource,
     dxGetTexturePixels = dxGetTexturePixels,
     dxGetPixelColor = dxGetPixelColor,
-    dxDrawImage = dxDrawImage
+    dxDrawImage = dxDrawImage,
+    interpolateBetween = interpolateBetween,
+    math = math
 }
 
 
@@ -55,19 +60,28 @@ if localPlayer then
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
         imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
         if renderer.public.isDynamicSkyEnabled then
-            --TODO: IT SHOULD BE DYNAMIC LATER
-            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
-            local sunX, sunY = getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
-            if sunX and sunY then shader.preLoaded["Assetify_TextureSampler"]:setValue("vSunViewOffset", {sunX, sunY}) end
             if renderer.public.isTimeSynced then
                 local currentTick = imports.getTickCount()
                 if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
                     renderer.private.serverTimeCycleTick = currentTick
+                    renderer.private.serverNativeSkyColor, renderer.private.serverNativeTimePercent = renderer.private.serverNativeSkyColor or {}, renderer.private.serverNativeTimePercent or {}
                     local r, g, b = imports.dxGetPixelColor(imports.dxGetTexturePixels(renderer.private.skyRT, renderer.public.resolution[1]*0.5, renderer.public.resolution[2]*0.5, 1, 1), 0, 0)
+                    renderer.private.serverNativeTimePercent[1] = ((renderer.private.serverNativeSkyColor[1] or r) + (renderer.private.serverNativeSkyColor[2] or g) + (renderer.private.serverNativeSkyColor[3] or b))/(3*255)
+                    renderer.private.serverNativeSkyColor[1], renderer.private.serverNativeSkyColor[2], renderer.private.serverNativeSkyColor[3] = r, g, b
+                    renderer.private.serverNativeTimePercent[2] = (renderer.private.serverNativeSkyColor[1] + renderer.private.serverNativeSkyColor[2] + renderer.private.serverNativeSkyColor[3])/(3*255)
                     r, g, b = r*0.5, g*0.5, b*0.5
                     imports.setSkyGradient(r, g, b, r, g, b)
                 end
+                local currentTime = 12*imports.interpolateBetween(renderer.private.serverNativeTimePercent[1], 0, 0, renderer.private.serverNativeTimePercent[2], 0, 0, 0.25, "OutQuad")
+                local currentHour = imports.math.floor(currentTime)
+                local currentMinute = (currentTime - currentHour)*30
+                imports.setTime(currentHour, currentMinute)
             end
+            local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
+            local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
+            local isSunInView = (sunX and sunY and true) or false
+            if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_TextureSampler"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
+            renderer.private.isSunInView = isSunInView
         end
         return true
     end
