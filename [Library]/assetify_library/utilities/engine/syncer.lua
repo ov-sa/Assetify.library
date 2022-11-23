@@ -53,6 +53,8 @@ network:create("Assetify:onLoad")
 network:create("Assetify:onUnload")
 network:create("Assetify:onModuleLoad")
 network:create("Assetify:onElementDestroy")
+network:create("Assetify:onResourceUnload")
+network:create("Assetify:onResourceFlush")
 syncer.private.execOnBoot = function(execFunc)
     if not execFunc or (imports.type(execFunc) ~= "function") then return false end
     if syncer.public.isLibraryBooted then execFunc()
@@ -212,6 +214,10 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
+imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(stoppedResource)
+    network:emit("Assetify:onResourceUnload", false, stoppedResource)
+    network:emit("Assetify:onResourceFlush", false, stoppedResource)
+end)
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
