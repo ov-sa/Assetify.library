@@ -180,6 +180,7 @@ else
     function syncer.private:syncResource(player, resource, hashes, syncFiles)
         if not syncFiles then
             local resourceName = imports.getResourceName(resource)
+            if not resourceName then return false end
             syncer.private.syncedResources[resource] = syncer.private.syncedResources[resource] or {
                 synced = {
                     bandwidthData = {total = 0, file = {}},
