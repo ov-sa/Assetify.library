@@ -246,7 +246,7 @@ else
             }
         }
         for i = 1, #resourceFiles, 1 do
-            local j = "@"..resourceFiles[i]
+            local j = ":"..resourceName.."/"..resourceFiles[i]
             local builtFileData, builtFileSize = file:read(j)
             if builtFileData then
                 syncer.private.syncedResources[source].synced.bandwidthData.file[j] = builtFileSize
@@ -254,7 +254,7 @@ else
                 syncer.private.syncedResources[source].unSynced.fileData[j] = builtFileData
                 syncer.private.syncedResources[source].unSynced.fileHash[j] = imports.md5(builtFileData)
             else
-                imports.outputDebugString("[Assetify] | Invalid File: "..string.gsub(j, "@", "@"..resourceName.."/", 1))
+                imports.outputDebugString("[Assetify] | Invalid File: "..j)
             end
         end
     end)
