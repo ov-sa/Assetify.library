@@ -156,6 +156,7 @@ else
             if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
             thread:pause()
         end
+        syncer.private:syncResource(source)
     end, {isAsync = true})
 
     function syncer.private:loadClient(player)
@@ -187,7 +188,6 @@ else
                 return false
             end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
             syncer.private:syncPack(player, _, true)
-            syncer.private:syncResource(player)
         end
         return true
     end
