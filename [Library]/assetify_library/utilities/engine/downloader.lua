@@ -18,6 +18,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
+    getResourceName = getResourceName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -69,25 +70,31 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes)
-        syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
-        syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
+    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes, isResource)
+        if not isResource then
+            syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
+            syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
+        end
         thread:create(function(self)
-            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
+            if not isResource then
+                local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
+                cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
+            end
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local fileData = file:read(i)
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                    syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                    if not isResource then
+                        cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                    end
                 end
                 fileData = nil
                 thread:pause()
             end
-            network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles)
+            network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, isResource)
             imports.collectgarbage()
         end):resume({executions = settings.downloader.buildRate, frames = 1})
     end)
@@ -164,8 +171,44 @@ else
     function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, true, player, ...) end
     function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onSyncContent", true, true, player, ...) end
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
-    network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
+    network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, isResource)
+        if not isResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
+        else syncer.private:syncResource(source, hashes, isResource) end
+    end)
     network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
+
+    function syncer.private:syncResource(player, hashes, syncResource)
+        if not syncResource then
+            local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
+            if not isExternal then return false end
+            local resourceName = imports.getResourceName(sourceResource)
+            syncer.private.syncedResources[resourceName] = syncer.private.syncedResources[resourceName] or {
+                synced = {
+                    bandwidthData = {total = 0, file = {}},
+                },
+                unSynced = {
+                    fileData = {},
+                    fileHash = {}
+                }
+            }
+            for i = 1, #hashes, 1 do
+                local j = "@"..hashes[i]
+                local builtFileData, builtFileSize = file:read(j)
+                if builtFileData then
+                    syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j] = builtFileSize
+                    syncer.private.syncedResources[resourceName].synced.bandwidthData.total = syncer.private.syncedResources[resourceName].synced.bandwidthData.total + syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j]
+                    syncer.private.syncedResources[resourceName].unSynced.fileData[j] = builtFileData
+                    syncer.private.syncedResources[resourceName].unSynced.fileHash[j] = imports.md5(builtFileData)
+                else
+                    imports.outputDebugString("[Assetify] | Invalid File: "..string.gsub(j, "@", "@"..resourceName.."/", 1))
+                end
+            end
+            syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resourceName].unSynced.fileHash, resourceName)
+        else
+            --TODO: SYNC FILES NOW
+        end
+        return true
+    end
 
     function syncer.private:syncPack(player, assetDatas, syncModules, packName)
         if packName then
