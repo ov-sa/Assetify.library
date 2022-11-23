@@ -254,6 +254,14 @@ else
                 imports.outputDebugString("[Assetify] | Invalid File: "..j)
             end
         end
+        local __source = source
+        thread:create(function(self)
+            local source = __source
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
+                syncer.private:syncResource(i, source)
+                thread:pause()
+            end
+        end):resume({executions = settings.downloader.syncRate, frames = 1})
     end)
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
         if imports.getResourceRootElement(resourceElement) ~= resourceRoot then return false end
