@@ -71,5 +71,7 @@ manager:exportAPI("Library", {
         {name = "setPlanarLightTexture"},
         {name = "setPlanarLightColor"}
     },
-    server = {}
+    server = {
+        {name = "loadResource"}
+    }
 })

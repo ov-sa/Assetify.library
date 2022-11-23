@@ -346,11 +346,6 @@ if localPlayer then
         return true
     end
 else
-    function manager.public:loadResource(resourceFiles)
-        if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
-        network:emit("Assetify:onResourceLoad", false, sourceResource, resourceFiles) 
-    end
-
     function manager.public:getAssetData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
         if not settings.assetPacks[assetType] then return false end
@@ -371,6 +366,11 @@ else
         if not cAsset then return false end
         if not depType or not depIndex or not cAsset.synced.manifestData.assetDeps or not cAsset.synced.manifestData.assetDeps[depType] or not cAsset.synced.manifestData.assetDeps[depType][depIndex] or ((imports.type(cAsset.synced.manifestData.assetDeps[depType][depIndex]) == "table") and (not depSubIndex or not cAsset.synced.manifestData.assetDeps[depType][depIndex][depSubIndex])) then return false end
         return (depSubIndex and cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex][depSubIndex])]) or cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex])] or false
+    end
+
+    function manager.public:loadResource(resourceFiles)
+        if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
+        network:emit("Assetify:onResourceLoad", false, sourceResource, resourceFiles) 
     end
 end
 

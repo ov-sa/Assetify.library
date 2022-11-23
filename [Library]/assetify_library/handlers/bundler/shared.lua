@@ -76,6 +76,9 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.restoreModel", exportName = "restoreModel"},
             {exportIndex = "assetify.__core.playSound", exportName = "playSoundAsset"},
             {exportIndex = "assetify.__core.playSound3D", exportName = "playSoundAsset3D"}
+        },
+        server = {
+            {exportIndex = "assetify.__core.loadResource", exportName = "loadResource"}
         }
     })..[[
     assetify.__core.loadModule = function(assetName, moduleTypes)
