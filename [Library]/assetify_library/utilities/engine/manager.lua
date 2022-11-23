@@ -102,10 +102,6 @@ function manager.public.clearElementBuffer(element, isResource)
         for i, j in imports.pairs(resourceScope) do
             imports.destroyElement(i)
         end
-        if syncer.syncedResources[element] then
-            syncer.syncedResources[element] = nil
-            imports.collectgarbage()
-        end
     else
         if not imports.isElement(element) then return false end
         local elementScope = manager.private.buffer.instance[element]

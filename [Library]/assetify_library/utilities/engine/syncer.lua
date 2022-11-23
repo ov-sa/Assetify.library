@@ -17,6 +17,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     tostring = tostring,
+    collectgarbage = collectgarbage,
     isElement = isElement,
     getElementType = getElementType,
     getRealTime = getRealTime,
@@ -217,6 +218,11 @@ function syncer.public.syncElementModel(length, ...) return syncer.private:setEl
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(source)
     network:emit("Assetify:onResourceUnload", false, source)
     network:emit("Assetify:onResourceFlush", false, source)
+end)
+network:fetch("Assetify:onResourceFlush"):on(function(source)
+    if not syncer.syncedResources[source] then return false end
+    syncer.syncedResources[source] = nil
+    imports.collectgarbage()
 end)
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
