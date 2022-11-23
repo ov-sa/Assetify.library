@@ -31,7 +31,7 @@
 * Built-In Networker, Scheduler, Renderer & Attacher
 * Built-In Library CLI
 * Built-In Library Updater (If enabled, Latest version will be pulled automatically and be replaced)
-* Built-In Asset-Pack Downloader & Broadcaster (No more `meta.xml` boredom!)
+* Built-In Asset-Pack & Resource Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (Server-Sided APIs)
 * Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
