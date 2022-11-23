@@ -18,6 +18,7 @@ local imports = {
     md5 = md5,
     tostring = tostring,
     collectgarbage = collectgarbage,
+    outputDebugString = outputDebugString,
     isElement = isElement,
     getElementType = getElementType,
     getRealTime = getRealTime,
@@ -54,6 +55,7 @@ network:create("Assetify:onLoad")
 network:create("Assetify:onUnload")
 network:create("Assetify:onModuleLoad")
 network:create("Assetify:onElementDestroy")
+network:create("Assetify:onResourceLoad")
 network:create("Assetify:onResourceUnload")
 network:create("Assetify:onResourceFlush")
 syncer.private.execOnBoot = function(execFunc)
@@ -185,6 +187,10 @@ else
                 return false
             end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
             syncer.private:syncPack(player, _, true)
+            syncer.private:syncResource(player, _, true)
+            for i, j in pairs(syncer.private.syncedResources) do
+                syncer.private:syncResource(player, i)
+            end
         end
         return true
     end
@@ -218,6 +224,30 @@ function syncer.public.syncElementModel(length, ...) return syncer.private:setEl
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(source)
     network:emit("Assetify:onResourceUnload", false, source)
     network:emit("Assetify:onResourceFlush", false, source)
+end)
+network:fetch("Assetify:onResourceLoad"):on(function(source)
+    local resourceName = imports.getResourceName(source)
+    syncer.private.syncedResources[source] = syncer.private.syncedResources[source] or {
+        synced = {
+            bandwidthData = {total = 0, file = {}},
+        },
+        unSynced = {
+            fileData = {},
+            fileHash = {}
+        }
+    }
+    for i = 1, #hashes, 1 do
+        local j = "@"..hashes[i]
+        local builtFileData, builtFileSize = file:read(j)
+        if builtFileData then
+            syncer.private.syncedResources[source].synced.bandwidthData.file[j] = builtFileSize
+            syncer.private.syncedResources[source].synced.bandwidthData.total = syncer.private.syncedResources[source].synced.bandwidthData.total + syncer.private.syncedResources[source].synced.bandwidthData.file[j]
+            syncer.private.syncedResources[source].unSynced.fileData[j] = builtFileData
+            syncer.private.syncedResources[source].unSynced.fileHash[j] = imports.md5(builtFileData)
+        else
+            imports.outputDebugString("[Assetify] | Invalid File: "..string.gsub(j, "@", "@"..resourceName.."/", 1))
+        end
+    end
 end)
 network:fetch("Assetify:onResourceFlush"):on(function(source)
     if not syncer.private.syncedResources[source] then return false end

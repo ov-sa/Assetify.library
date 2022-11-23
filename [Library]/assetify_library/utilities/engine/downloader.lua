@@ -18,7 +18,6 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
-    getResourceName = getResourceName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -173,35 +172,13 @@ else
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
     network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, remoteResource)
         if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
-        else syncer.private:syncResource(source, remoteResource, hashes, true) end
+        else syncer.private:syncResource(source, remoteResource, hashes) end
     end)
     network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
-    function syncer.private:syncResource(player, resource, hashes, syncFiles)
-        if not syncFiles then
-            local resourceName = imports.getResourceName(resource)
-            if not resourceName then return false end
-            syncer.private.syncedResources[resource] = syncer.private.syncedResources[resource] or {
-                synced = {
-                    bandwidthData = {total = 0, file = {}},
-                },
-                unSynced = {
-                    fileData = {},
-                    fileHash = {}
-                }
-            }
-            for i = 1, #hashes, 1 do
-                local j = "@"..hashes[i]
-                local builtFileData, builtFileSize = file:read(j)
-                if builtFileData then
-                    syncer.private.syncedResources[resource].synced.bandwidthData.file[j] = builtFileSize
-                    syncer.private.syncedResources[resource].synced.bandwidthData.total = syncer.private.syncedResources[resource].synced.bandwidthData.total + syncer.private.syncedResources[resource].synced.bandwidthData.file[j]
-                    syncer.private.syncedResources[resource].unSynced.fileData[j] = builtFileData
-                    syncer.private.syncedResources[resource].unSynced.fileHash[j] = imports.md5(builtFileData)
-                else
-                    imports.outputDebugString("[Assetify] | Invalid File: "..string.gsub(j, "@", "@"..resourceName.."/", 1))
-                end
-            end
+    function syncer.private:syncResource(player, resource, hashes)
+        if not syncer.private.syncedResources[resource] then return false end
+        if not hashes then
             syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resource].unSynced.fileHash, resource)
         else
             --TODO: SYNC FILES NOW

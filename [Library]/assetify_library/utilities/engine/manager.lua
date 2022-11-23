@@ -346,6 +346,11 @@ if localPlayer then
         return true
     end
 else
+    function manager.public:loadResource(resourceFiles)
+        if manager.public:isInternal() then return false end
+        network:emit("Assetify:onResourceLoad", false, sourceResource) 
+    end
+
     function manager.public:getAssetData(assetType, assetName, isInternal)
         if not assetType or not assetName then return false end
         if not settings.assetPacks[assetType] then return false end
