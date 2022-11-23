@@ -214,9 +214,9 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
-imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(stoppedResource)
-    network:emit("Assetify:onResourceUnload", false, stoppedResource)
-    network:emit("Assetify:onResourceFlush", false, stoppedResource)
+imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(source)
+    network:emit("Assetify:onResourceUnload", false, source)
+    network:emit("Assetify:onResourceFlush", false, source)
 end)
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
