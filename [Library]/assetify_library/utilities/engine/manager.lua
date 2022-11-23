@@ -347,8 +347,8 @@ if localPlayer then
     end
 else
     function manager.public:loadResource(resourceFiles)
-        if manager.public:isInternal() then return false end
-        network:emit("Assetify:onResourceLoad", false, sourceResource) 
+        if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
+        network:emit("Assetify:onResourceLoad", false, sourceResource, resourceFiles) 
     end
 
     function manager.public:getAssetData(assetType, assetName, isInternal)
