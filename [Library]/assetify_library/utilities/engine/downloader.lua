@@ -173,7 +173,7 @@ else
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
     network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, remoteResource)
         if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
-        else syncer.private:syncResource(source, hashes, remoteResource) end
+        else syncer.private:syncResource(source, remoteResource, hashes, true) end
     end)
     network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
