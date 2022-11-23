@@ -179,8 +179,7 @@ else
 
     function syncer.private:syncResource(player, hashes, remoteResource)
         if not remoteResource then
-            local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
-            if not isExternal then return false end
+            if manager:isInternal() then return false end
             local resourceName = imports.getResourceName(sourceResource)
             syncer.private.syncedResources[sourceResource] = syncer.private.syncedResources[sourceResource] or {
                 synced = {
