@@ -182,7 +182,7 @@ else
             local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
             if not isExternal then return false end
             local resourceName = imports.getResourceName(sourceResource)
-            syncer.public.syncedResources[sourceResource] = syncer.public.syncedResources[sourceResource] or {
+            syncer.private.syncedResources[sourceResource] = syncer.private.syncedResources[sourceResource] or {
                 synced = {
                     bandwidthData = {total = 0, file = {}},
                 },
@@ -195,15 +195,15 @@ else
                 local j = "@"..hashes[i]
                 local builtFileData, builtFileSize = file:read(j)
                 if builtFileData then
-                    syncer.public.syncedResources[sourceResource].synced.bandwidthData.file[j] = builtFileSize
-                    syncer.public.syncedResources[sourceResource].synced.bandwidthData.total = syncer.public.syncedResources[sourceResource].synced.bandwidthData.total + syncer.public.syncedResources[sourceResource].synced.bandwidthData.file[j]
-                    syncer.public.syncedResources[sourceResource].unSynced.fileData[j] = builtFileData
-                    syncer.public.syncedResources[sourceResource].unSynced.fileHash[j] = imports.md5(builtFileData)
+                    syncer.private.syncedResources[sourceResource].synced.bandwidthData.file[j] = builtFileSize
+                    syncer.private.syncedResources[sourceResource].synced.bandwidthData.total = syncer.private.syncedResources[sourceResource].synced.bandwidthData.total + syncer.private.syncedResources[sourceResource].synced.bandwidthData.file[j]
+                    syncer.private.syncedResources[sourceResource].unSynced.fileData[j] = builtFileData
+                    syncer.private.syncedResources[sourceResource].unSynced.fileHash[j] = imports.md5(builtFileData)
                 else
                     imports.outputDebugString("[Assetify] | Invalid File: "..string.gsub(j, "@", "@"..resourceName.."/", 1))
                 end
             end
-            syncer.private:syncHash(player, _, _, syncer.public.syncedResources[sourceResource].unSynced.fileHash, sourceResource)
+            syncer.private:syncHash(player, _, _, syncer.private.syncedResources[sourceResource].unSynced.fileHash, sourceResource)
         else
             --TODO: SYNC FILES NOW
         end

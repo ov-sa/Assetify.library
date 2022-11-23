@@ -220,8 +220,8 @@ imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceS
     network:emit("Assetify:onResourceFlush", false, source)
 end)
 network:fetch("Assetify:onResourceFlush"):on(function(source)
-    if not syncer.syncedResources[source] then return false end
-    syncer.syncedResources[source] = nil
+    if not syncer.private.syncedResources[source] then return false end
+    syncer.private.syncedResources[source] = nil
     imports.collectgarbage()
 end)
 if localPlayer then
