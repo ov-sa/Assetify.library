@@ -42,13 +42,13 @@ local syncer = class:create("syncer", {
     isLibraryLoaded = false,
     isModuleLoaded = false,
     libraryBandwidth = 0,
-    syncedResources = {},
     syncedElements = {}
 })
 function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
+syncer.private.syncedResources = {}
 
 network:create("Assetify:onBoot")
 network:create("Assetify:onLoad")
@@ -187,10 +187,7 @@ else
                 return false
             end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
             syncer.private:syncPack(player, _, true)
-            syncer.private:syncResource(player, _, true)
-            for i, j in pairs(syncer.private.syncedResources) do
-                syncer.private:syncResource(player, i)
-            end
+            syncer.private:syncResource(player)
         end
         return true
     end

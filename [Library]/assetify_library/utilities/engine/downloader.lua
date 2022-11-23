@@ -177,6 +177,15 @@ else
     network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
     function syncer.private:syncResource(player, resource, hashes)
+        if not resource then
+            thread:create(function(self)
+                for i, j in imports.pairs(syncer.private.syncedResources) do
+                    syncer.private:syncResource(player, i)
+                    thread:pause()
+                end
+            end):resume({executions = settings.downloader.syncRate, frames = 1})
+            return true
+        end
         if not syncer.private.syncedResources[resource] then return false end
         if not hashes then
             syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resource].unSynced.fileHash, resource)
