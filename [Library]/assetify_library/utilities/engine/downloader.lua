@@ -18,7 +18,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
-    getsourceResource = getsourceResource,
+    getResourceName = getResourceName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -181,7 +181,7 @@ else
         if not remoteResource then
             local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
             if not isExternal then return false end
-            local resourceName = imports.getsourceResource(sourceResource)
+            local resourceName = imports.getResourceName(sourceResource)
             syncer.private.syncedResources[sourceResource] = syncer.private.syncedResources[sourceResource] or {
                 synced = {
                     bandwidthData = {total = 0, file = {}},
