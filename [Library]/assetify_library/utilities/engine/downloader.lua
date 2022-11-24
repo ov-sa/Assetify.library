@@ -40,10 +40,10 @@ if localPlayer then
     end
     syncer.private.execOnLoad(function() network:emit("Assetify:Downloader:onPostSyncPool", true, false, localPlayer) end)
 
-    local function updateStatus(pointer, isResource)
+    local function updateStatus(pointer, rawStatus, isResource)
         if pointer.bandwidthData.isDownloaded then return false end
         local prevTotalETA, prevTotalSize = pointer.bandwidthData.status.eta or 0, pointer.bandwidthData.status.total or 0
-        for file, status in imports.pairs(j) do
+        for file, status in imports.pairs(rawStatus) do
             pointer.bandwidthData.status.file[file] = pointer.bandwidthData.status.file[file] or {}
             local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*pointer.bandwidthData.file[file]
             local prevETA, prevSize = pointer.bandwidthData.status.file[file].eta or 0, pointer.bandwidthData.status.file[file].size or 0
@@ -72,12 +72,12 @@ if localPlayer then
             end
             for assetType, i in imports.pairs(status) do
                 for assetName, j in imports.pairs(i) do
-                    updateStatus(settings.assetPacks[assetType].rwDatas[assetName])
+                    updateStatus(settings.assetPacks[assetType].rwDatas[assetName], j)
                 end
             end
         else
             for resourceName, i in imports.pairs(status) do
-                updateStatus(resource.private.buffer.name[resourceName], true)
+                updateStatus(resource.private.buffer.name[resourceName], i, true)
             end
         end
     end)
