@@ -370,9 +370,10 @@ else
     end
 
     function manager.public:loadResource(player, resourceFiles, ...)
-        if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
-        if player and not imports.isElement(player) and (imports.getElementType(player) ~= "player") then return false end
-        return syncer:syncResource(player, sourceResource, resourceFiles, ...)
+        if manager.public:isInternal() then return false end
+        if player and (not imports.isElement(player) or (imports.getElementType(player) ~= "player")) then return false end
+        if not player and (not resourceFiles or (imports.type(resourceFiles) ~= "table")) then return false end
+        return syncer:requestSyncResource(player, sourceResource, resourceFiles, ...)
     end
 end
 
