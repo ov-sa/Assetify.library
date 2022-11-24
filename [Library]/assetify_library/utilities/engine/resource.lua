@@ -117,28 +117,31 @@ else
     end
 
     function resource.private:loadClient(player)
-        resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
-            local self = resource.private.resourceClients.loading[player]
-            if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
-                self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
-                for i, j in imports.pairs(self.cQueue) do
-                    local queueStatus = imports.getLatentEventStatus(player, i)
-                    if queueStatus then
-                        self.cStatus[(j.resourceName)] = self.cStatus[(j.resourceName)] or {}
-                        self.cStatus[(j.resourceName)][(j.file)] = queueStatus
-                    else
-                        self.cQueue[i] = nil
-                        if self.cStatus[(j.resourceName)] then
-                            self.cStatus[(j.resourceName)][(j.file)] = (self.cStatus[(j.resourceName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
+        if not resource.private.resourceClients.loading[player] then
+            resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
+                local self = resource.private.resourceClients.loading[player]
+                if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
+                    self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
+                    for i, j in imports.pairs(self.cQueue) do
+                        local queueStatus = imports.getLatentEventStatus(player, i)
+                        if queueStatus then
+                            self.cStatus[(j.resourceName)] = self.cStatus[(j.resourceName)] or {}
+                            self.cStatus[(j.resourceName)][(j.file)] = queueStatus
+                        else
+                            self.cQueue[i] = nil
+                            if self.cStatus[(j.resourceName)] then
+                                self.cStatus[(j.resourceName)][(j.file)] = (self.cStatus[(j.resourceName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
+                            end
                         end
                     end
+                    network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus, true)
+                    return true
                 end
-                network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus, true)
-                return true
-            end
-            return false
-        end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
+                return false
+            end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
+        end
     end
+    return true
 end
 
 

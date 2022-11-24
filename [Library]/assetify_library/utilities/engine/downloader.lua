@@ -192,7 +192,8 @@ else
             syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resourceName)
         else
             thread:create(function(self)
-                for i, j in pairs(hashes) do
+                resource.private:loadClient(player)
+                for i, j in imports.pairs(hashes) do
                     syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
                     thread:pause()
                 end
