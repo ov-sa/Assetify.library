@@ -74,9 +74,8 @@ if localPlayer then
         self.name = resourceName
         self.bandwidthData = {
             total = bandwidth.total,
-            bandwidth = bandwidth.file,
-            status = {total = 0, eta = 0, eta_count = 0},
-            file = {}
+            file = bandwidth.file,
+            status = {total = 0, eta = 0, eta_count = 0, file = {}},
         }
         self.isLoaded = true
         resource.private.buffer.name[(self.name)] = self
