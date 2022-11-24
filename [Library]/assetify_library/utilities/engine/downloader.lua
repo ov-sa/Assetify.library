@@ -19,7 +19,6 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
-    getResourceName = getResourceName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -204,7 +203,10 @@ else
         return true
     end
     function syncer.public:syncResource(player, resourceSource, resourceFiles)
-        if player then return syncer:syncResource(player, imports.getResourceName(resourceSource)) end
+        if player then
+            if not resource.private.buffer.source[resourceSource] then return false end
+            return syncer:syncResource(player, resource.private.buffer.source[resourceSource].resourceName)
+        end
         return resource:create(resourceSource, resourceFiles)
     end
 
