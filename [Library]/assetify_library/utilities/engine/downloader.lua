@@ -205,7 +205,7 @@ else
     function syncer.public:syncResource(player, resourceSource, ...)
         if player then
             if not resource.private.buffer.source[resourceSource] then return false end
-            return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].resourceName)
+            return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].name)
         end
         return resource.public:create(resourceSource, ...)
     end
