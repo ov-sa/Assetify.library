@@ -34,6 +34,7 @@ resource.private.buffer = {
     name = {},
     source = {}
 }
+resource.private.resourceClients = {loaded = {}, loading = {}}
 function resource.public:import() return resource end
 
 network:create("Assetify:onResourceLoad")
@@ -79,7 +80,6 @@ else
         self.resource = resourceSource
         self.name = name
         self.isSilent = (isSilent and true) or false
-        self.clients = {loaded = {}, loading = {}}
         self.synced = {
             bandwidthData = {total = 0, file = {}}
         }
@@ -105,7 +105,7 @@ else
         resource.private.buffer.source[(self.resource)] = self
         if not self.isSilent then
             thread:create(function(self)
-                for i, j in imports.pairs(self.clients.loaded) do
+                for i, j in imports.pairs(resource.private.resourceClients.loaded) do
                     syncer.private:syncResource(i, name)
                     thread:pause()
                 end
@@ -116,9 +116,9 @@ else
     end
 
     function resource.private:loadClient(player)
-        self.clients.loading[player] = thread:createHeartbeat(function()
-            local self = self.clients.loading[player]
-            if self and not self.clients.loaded[player] and thread:isInstance(self) then
+        resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
+            local self = resource.private.resourceClients.loading[player]
+            if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
                 self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
                 for i, j in imports.pairs(self.cQueue) do
                     local queueStatus = imports.getLatentEventStatus(player, i)
@@ -136,7 +136,7 @@ else
                 return true
             end
             return false
-        end, function() self.clients.loading[player] = nil end, settings.downloader.trackRate)
+        end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
     end
 end
 
