@@ -176,7 +176,9 @@ if localPlayer then
                 end
             end
         else
-            --TODO: MARK THIS RESOURCE LOADED...
+            if not resource.private.buffer.name[remoteResource] then return false end
+            resource.private.buffer.name[remoteResource].isLoaded = true
+            network:emit("Assetify:onResourceLoad", false, remoteResource, resource.private.buffer.name[remoteResource].resource) 
         end
     end)
 else
@@ -212,6 +214,7 @@ else
                     resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {resourceName = resourceName, file = i}
                     thread:pause()
                 end
+                print("SYNCING STATE..")
                 syncer.private:syncState(player, _, _, resourceName)
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         end

@@ -77,10 +77,8 @@ if localPlayer then
             file = bandwidth.file,
             status = {total = 0, eta = 0, eta_count = 0, file = {}},
         }
-        self.isLoaded = true
         resource.private.buffer.name[(self.name)] = self
         resource.private.buffer.source[(self.resource)] = self
-        network:emit("Assetify:onResourceLoad", false, self.name, self.resource) 
         return true
     end
 else
