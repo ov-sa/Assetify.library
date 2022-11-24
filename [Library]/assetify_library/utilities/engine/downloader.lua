@@ -117,8 +117,8 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onSyncContent"):on(function(assetType, assetName, contentPath, ...)
-        file:write(contentPath, ...)
+    network:create("Assetify:Downloader:onSyncContent"):on(function(assetType, assetName, contentPath, content, remoteResource)
+        file:write(contentPath, content)
         imports.collectgarbage()
     end)
 
@@ -190,9 +190,14 @@ else
         if not hashes then
             syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resourceName].unSynced.fileHash, resourceName)
         else
-            print("REQUESTING RESOURCE FILES NOW")
-            iprint(hashes)
-            --TODO: SYNC FILES NOW
+            thread:create(function(self)
+                for i, j in pairs(hashes) do
+                    syncer.private:syncContent(player, _, _, i, syncer.private.syncedResources[resourceName].unSynced.fileData[i], resourceName)
+                    thread:pause()
+                end
+                --TODO: ...WIP STATE SYNCER
+                --syncer.private:syncState(player, assetDatas.type, assetDatas.name, resourceName)
+            end):resume({executions = settings.downloader.syncRate, frames = 1})
         end
         return true
     end
