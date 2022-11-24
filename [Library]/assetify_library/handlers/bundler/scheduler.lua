@@ -25,7 +25,7 @@ bundler.private.schedulers = {
         ["execOnModuleLoad"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onModuleLoad"},
     },
     resource = {
-        ["execOnResourceLoad"] = {exec = "assetify.isResourceLoaded", network = "Assetify:onResourceLoad"},
+        ["execOnResourceLoad"] = {network = "Assetify:onResourceLoad"},
         ["execOnResourceFlush"] = {network = "Assetify:onResourceFlush"},
         ["execOnResourceUnload"] = {network = "Assetify:onResourceUnload"}
     }
@@ -77,8 +77,8 @@ function bundler.private:createScheduler()
                     ]]
                 elseif i == "resource" then
                     footer = footer..[[
-                    assetify.network:fetch("]]..v.network..[[", true):on(function(_, resourceSource)
-                        if assetify.imports.resource == resourceSource then bootExec("]]..k..[[") end
+                    assetify.network:fetch("]]..v.network..[[", true):on(function(_, resource)
+                        if assetify.imports.resource == resource then bootExec("]]..k..[[") end
                     end, {subscriptionLimit = 1})
                     ]]
                 end
