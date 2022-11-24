@@ -19,9 +19,16 @@ local imports = {
 }
 
 bundler.private.schedulers = {
-    ["execOnBoot"] = {exec = "assetify.isBooted", network = "Assetify:onBoot"},
-    ["execOnLoad"] = {exec = "assetify.isLoaded", network = "Assetify:onLoad"},
-    ["execOnModuleLoad"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onModuleLoad"}
+    library = {
+        ["execOnBoot"] = {exec = "assetify.isBooted", network = "Assetify:onBoot"},
+        ["execOnLoad"] = {exec = "assetify.isLoaded", network = "Assetify:onLoad"},
+        ["execOnModuleLoad"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onModuleLoad"},
+    },
+    resource = {
+        ["execOnResourceLoad"] = {exec = "assetify.isResourceLoaded", network = "Assetify:onResourceLoad"},
+        ["execOnResourceFlush"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onResourceFlush"},
+        ["execOnResourceUnload"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onResourceUnload"}
+    }
 }
 
 
@@ -53,7 +60,7 @@ function bundler.private:createScheduler()
             assetify.scheduler[(assetify.imports.string.gsub(i, "exec", "execSchedule", 1))] = function(...) return scheduleExec(i, ...) end
         end
         ]]
-        for i, j in imports.pairs(bundler.private.schedulers) do
+        for i, j in imports.pairs(bundler.private.schedulers.library) do
             header = header..i..[[ = {}, ]]
             body = body..[[
             assetify.scheduler.]]..i..[[ = function(exec)

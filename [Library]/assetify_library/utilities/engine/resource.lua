@@ -63,12 +63,15 @@ function resource.public:unload()
 end
 
 if localPlayer then
-    function resource.public:load(resourceSource)
+    function resource.public:load(resourceSource, bandwidth)
         local name = (resourceSource and imports.getResourceName(resourceSource)) or false
         if not resource.public:isInstance(self) or not name or resource.private.buffer.name[name] then return false end
         self.resource = resourceSource
         self.name = name
-        self.bandwidthData = {total = 0, file = {}}
+        self.bandwidthData = {
+            total = bandwidth,
+            status = {total = 0, eta = 0, eta_count = 0}
+        }
         resource.private.buffer.name[(self.name)] = self
         resource.private.buffer.source[(self.resource)] = self
         network:emit("Assetify:onResourceLoad", false, self.name, self.resource) 

@@ -62,14 +62,14 @@ if localPlayer then
     end
 
     network:create("Assetify:Downloader:onSyncProgress"):on(function(status, bandwidth, isResource)
-        if bandwidth then
-            syncer.public.libraryBandwidth = {
-                total = bandwidth,
-                status = {total = 0, eta = 0, eta_count = 0}
-            }
-            return true
-        end
         if not isResource then
+            if bandwidth then
+                syncer.public.libraryBandwidth = {
+                    total = bandwidth,
+                    status = {total = 0, eta = 0, eta_count = 0}
+                }
+                return true
+            end
             for assetType, i in imports.pairs(status) do
                 for assetName, j in imports.pairs(i) do
                     updateStatus(settings.assetPacks[assetType].rwDatas[assetName])
