@@ -66,18 +66,18 @@ function bundler.private:createScheduler()
                 body = body..[[
                 assetify.scheduler.]]..k..[[ = function(exec)
                     if not exec or (assetify.imports.type(exec) ~= "function") then return false end
-                    if ]]..v.exec..[[() then exec()
+                    ]]..((v.exec and [[if ]]..v.exec..[[() then exec()]]) or [[if false then]])..[[
                     else assetify.imports.table.insert(assetify.scheduler.buffer.pending.]]..k..[[, exec) end
                     return true
                 end
                 ]]
                 if i == "library" then
                     footer = footer..[[
-                    assetify.network:fetch("]]..j.network..[[", true):on(function() bootExec("]]..k..[[") end, {subscriptionLimit = 1})
+                    assetify.network:fetch("]]..v.network..[[", true):on(function() bootExec("]]..k..[[") end, {subscriptionLimit = 1})
                     ]]
                 elseif i == "resource" then
                     footer = footer..[[
-                    assetify.network:fetch("]]..j.network..[[", true):on(function(_, resourceSource)
+                    assetify.network:fetch("]]..v.network..[[", true):on(function(_, resourceSource)
                         if assetify.imports.resource == resourceSource then bootExec("]]..k..[[") end
                     end, {subscriptionLimit = 1})
                     ]]
