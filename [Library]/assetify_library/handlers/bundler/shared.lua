@@ -29,6 +29,7 @@ bundler.private:createBuffer("imports", _, [[
         ]]..bundler.private:createModule("namespace")..[[
         ]]..bundler.private:createUtils()..[[
         assetify.imports = {
+            resource = getThisResource(),
             resourceName = "]]..syncer.libraryName..[[",
             type = type,
             pairs = pairs,

@@ -26,8 +26,8 @@ bundler.private.schedulers = {
     },
     resource = {
         ["execOnResourceLoad"] = {exec = "assetify.isResourceLoaded", network = "Assetify:onResourceLoad"},
-        ["execOnResourceFlush"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onResourceFlush"},
-        ["execOnResourceUnload"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onResourceUnload"}
+        ["execOnResourceFlush"] = {network = "Assetify:onResourceFlush"},
+        ["execOnResourceUnload"] = {network = "Assetify:onResourceUnload"}
     }
 }
 
@@ -60,19 +60,29 @@ function bundler.private:createScheduler()
             assetify.scheduler[(assetify.imports.string.gsub(i, "exec", "execSchedule", 1))] = function(...) return scheduleExec(i, ...) end
         end
         ]]
-        for i, j in imports.pairs(bundler.private.schedulers.library) do
-            header = header..i..[[ = {}, ]]
-            body = body..[[
-            assetify.scheduler.]]..i..[[ = function(exec)
-                if not exec or (assetify.imports.type(exec) ~= "function") then return false end
-                if ]]..j.exec..[[() then exec()
-                else assetify.imports.table.insert(assetify.scheduler.buffer.pending.]]..i..[[, exec) end
-                return true
+        for i, j in imports.pairs(bundler.private.schedulers) do
+            for k, v in imports.pairs(j) do
+                header = header..k..[[ = {}, ]]
+                body = body..[[
+                assetify.scheduler.]]..k..[[ = function(exec)
+                    if not exec or (assetify.imports.type(exec) ~= "function") then return false end
+                    if ]]..v.exec..[[() then exec()
+                    else assetify.imports.table.insert(assetify.scheduler.buffer.pending.]]..k..[[, exec) end
+                    return true
+                end
+                ]]
+                if i == "library" then
+                    footer = footer..[[
+                    assetify.network:fetch("]]..j.network..[[", true):on(function() bootExec("]]..k..[[") end, {subscriptionLimit = 1})
+                    ]]
+                elseif i == "resource" then
+                    footer = footer..[[
+                    assetify.network:fetch("]]..j.network..[[", true):on(function(_, resourceSource)
+                        if assetify.imports.resource == resourceSource then bootExec("]]..k..[[") end
+                    end, {subscriptionLimit = 1})
+                    ]]
+                end
             end
-            ]]
-            footer = footer..[[
-            assetify.network:fetch("]]..j.network..[[", true):on(function() bootExec("]]..i..[[") end, {subscriptionLimit = 1})
-            ]]
         end
         header = header..[[}}
         assetify.scheduler.buffer.schedule = assetify.imports.table.clone(assetify.scheduler.buffer.pending, true)
