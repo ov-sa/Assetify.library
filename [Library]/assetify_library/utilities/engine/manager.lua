@@ -89,7 +89,7 @@ function manager.public:fetchAssets(assetType)
 end
 
 function manager.public:setElementScoped(element)
-    if not sourceResource or (sourceResource == resource) then return false end
+    if manager:isInternal() then return false end
     manager.private.buffer.instance[element] = sourceResource
     manager.private.buffer.scoped[sourceResource] = manager.private.buffer.scoped[sourceResource] or {}
     manager.private.buffer.scoped[sourceResource][element] = true
