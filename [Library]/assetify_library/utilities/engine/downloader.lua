@@ -196,7 +196,7 @@ else
                 for i, j in imports.pairs(hashes) do
                     syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
                     local cQueue = imports.getLatentEventHandles(player)
-                    resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
+                    resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {resourceName = resourceName, file = i}
                     thread:pause()
                 end
                 --TODO: ...WIP STATE SYNCER
