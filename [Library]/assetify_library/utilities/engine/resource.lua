@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    type = type,
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,

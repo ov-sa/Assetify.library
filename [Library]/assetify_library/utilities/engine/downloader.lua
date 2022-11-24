@@ -207,7 +207,7 @@ else
             if not resource.private.buffer.source[resourceSource] then return false end
             return syncer:syncResource(player, resource.private.buffer.source[resourceSource].resourceName)
         end
-        return resource:create(resourceSource, resourceFiles)
+        return resource.public:create(resourceSource, resourceFiles)
     end
 
     function syncer.private:syncPack(player, assetDatas, syncModules, packName)
