@@ -20,6 +20,7 @@ local imports = {}
 -------------------------
 
 local resource = class:create("resource")
+resource.private.buffer = {}
 
 function resource.public:create(...)
     local cResource = self:createInstance()
@@ -37,13 +38,13 @@ end
 
 function resource.public:load()
     if not resource.public:isInstance(self) then return false end
-    resource.public.buffer.resource[self] = true
+    resource.private.buffer[(self.resource)] = self
     return true
 end
 
 function resource.public:unload()
     if not resource.public:isInstance(self) then return false end
-    resource.public.buffer.resource[self] = nil
+    resource.private.buffer[(self.resource)] = nil
     self:destroyInstance()
     return true
 end
