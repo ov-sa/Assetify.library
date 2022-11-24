@@ -34,7 +34,6 @@ resource.private.buffer = {
     name = {},
     source = {}
 }
-resource.private.resourceClients = {loaded = {}, loading = {}}
 function resource.public:import() return resource end
 
 network:create("Assetify:onResourceLoad")
@@ -73,6 +72,8 @@ if localPlayer then
         return true
     end
 else
+    resource.private.resourceClients = {loaded = {}, loading = {}}
+
     function resource.public:load(resourceSource, resourceFiles, isSilent)
         local name = (resourceSource and imports.getResourceName(resourceSource)) or false
         resourceFiles = (resourceFiles and (imports.type(resourceFiles) == "table") and resourceFiles) or false
