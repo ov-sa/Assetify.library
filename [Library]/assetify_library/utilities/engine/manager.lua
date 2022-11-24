@@ -22,6 +22,7 @@ local imports = {
     isElement = isElement,
     getElementType = getElementType,
     destroyElement = destroyElement,
+    getResourceName = getResourceName,
     addEventHandler = addEventHandler
 }
 
@@ -372,7 +373,7 @@ else
     function manager.public:loadResource(player, resourceFiles)
         if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
         if player and not imports.isElement(player) and (imports.getElementType(player) ~= "player") then return false end
-        return syncer:syncResource(player, sourceResource, resourceFiles)
+        return syncer:syncResource(player, imports.getResourceName(sourceResource), sourceResource, resourceFiles)
     end
 end
 
@@ -381,8 +382,8 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-network:fetch("Assetify:onResourceUnload"):on(function(source)
-    manager.public.clearElementBuffer(source, true)
+network:fetch("Assetify:onResourceUnload"):on(function(_, resource)
+    manager.public.clearElementBuffer(resource, true)
 end)
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.isLibraryBooted or not source then return false end

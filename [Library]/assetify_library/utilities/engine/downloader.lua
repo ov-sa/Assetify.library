@@ -176,8 +176,8 @@ else
     end)
     network:create("Assetify:Downloader:onSyncPack"):on(function(source) syncer.private:syncPack(source) end)
 
-    function syncer.private:syncResource(player, resource, hashes)
-        if not resource then
+    function syncer.private:syncResource(player, resourceName, hashes)
+        if not resourceName then
             thread:create(function(self)
                 for i, j in imports.pairs(syncer.private.syncedResources) do
                     syncer.private:syncResource(player, i)
@@ -186,12 +186,9 @@ else
             end):resume({executions = settings.downloader.syncRate, frames = 1})
             return true
         end
-        print("TRYING TO SYNC RESOURCE - "..tostring(resource))
-        if not syncer.private.syncedResources[resource] then return false end
+        if not syncer.private.syncedResources[resourceName] then return false end
         if not hashes then
-            print("INSTIATING RESOURCE SYNC - "..tostring(resource))
-            iprint(syncer.private.syncedResources[resource].unSynced.fileHash)
-            syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resource].unSynced.fileHash, resource)
+            syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resourceName].unSynced.fileHash, resourceName)
         else
             print("REQUESTING RESOURCE FILES NOW")
             iprint(hashes)
@@ -199,9 +196,9 @@ else
         end
         return true
     end
-    function syncer.public:syncResource(player, resource, resourceFiles)
-        if player then return syncer:syncResource(player, resource) end
-        network:emit("Assetify:onResourceLoad", false, resource, resourceFiles) 
+    function syncer.public:syncResource(player, resourceName, resource, resourceFiles)
+        if player then return syncer:syncResource(player, resourceName) end
+        network:emit("Assetify:onResourceLoad", false, resourceName, resource, resourceFiles) 
         return true
     end
 
