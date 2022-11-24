@@ -186,12 +186,22 @@ else
             end):resume({executions = settings.downloader.syncRate, frames = 1})
             return true
         end
+        print("TRYING TO SYNC RESOURCE - "..tostring(resource))
         if not syncer.private.syncedResources[resource] then return false end
         if not hashes then
+            print("INSTIATING RESOURCE SYNC - "..tostring(resource))
+            iprint(syncer.private.syncedResources[resource].unSynced.fileHash)
             syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resource].unSynced.fileHash, resource)
         else
+            print("REQUESTING RESOURCE FILES NOW")
+            iprint(hashes)
             --TODO: SYNC FILES NOW
         end
+        return true
+    end
+    function syncer.public:syncResource(player, resource, resourceFiles)
+        if player then return syncer:syncResource(player, resource) end
+        network:emit("Assetify:onResourceLoad", false, resource, resourceFiles) 
         return true
     end
 
