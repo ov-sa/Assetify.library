@@ -201,9 +201,9 @@ else
         end
         return true
     end
-    function syncer.public:syncResource(player, resourceName, resource, resourceFiles)
+    function syncer.public:syncResource(player, resourceName, resourceSource, resourceFiles)
         if player then return syncer:syncResource(player, resourceName) end
-        network:emit("Assetify:onResourceLoad", false, resourceName, resource, resourceFiles) 
+        network:emit("Assetify:onResourceLoad", false, resourceName, resourceSource, resourceFiles) 
         return true
     end
 

@@ -218,10 +218,10 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
-imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resource)
-    local resourceName = imports.getResourceName(resource)
-    network:emit("Assetify:onResourceUnload", false, resourceName, resource)
-    network:emit("Assetify:onResourceFlush", false, resourceName, resource)
+imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
+    local resourceName = imports.getResourceName(resourceSource)
+    network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
+    network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
 end)
 network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
     if not syncer.private.syncedResources[resourceName] then return false end
@@ -232,7 +232,7 @@ if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
-    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resource, resourceFiles, isSilent)
+    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resourceSource, resourceFiles, isSilent)
         if syncer.private.syncedResources[resourceName] then return false end
         syncer.private.syncedResources[resourceName] = {
             isSilent = (isSilent and true) or false,
