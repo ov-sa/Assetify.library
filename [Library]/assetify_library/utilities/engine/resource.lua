@@ -68,10 +68,10 @@ end
 
 if localPlayer then
     function resource.public:load(resourceSource, bandwidth)
-        local name = (resourceSource and imports.getResourceName(resourceSource)) or false
-        if not resource.public:isInstance(self) or not name or resource.private.buffer.name[name] then return false end
+        local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
+        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] then return false end
         self.resource = resourceSource
-        self.name = name
+        self.name = resourceName
         self.bandwidthData = {
             total = bandwidth,
             status = {total = 0, eta = 0, eta_count = 0},
@@ -87,11 +87,11 @@ else
     resource.private.resourceClients = {loaded = {}, loading = {}}
 
     function resource.public:load(resourceSource, resourceFiles, isSilent)
-        local name = (resourceSource and imports.getResourceName(resourceSource)) or false
+        local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
         resourceFiles = (resourceFiles and (imports.type(resourceFiles) == "table") and resourceFiles) or false
-        if not resource.public:isInstance(self) or not name or resource.private.buffer.name[name] then return false end
+        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] then return false end
         self.resource = resourceSource
-        self.name = name
+        self.name = resourceName
         self.isSilent = (isSilent and true) or false
         self.synced = {
             bandwidthData = {total = 0, file = {}}
@@ -120,7 +120,7 @@ else
         if not self.isSilent then
             thread:create(function(self)
                 for i, j in imports.pairs(resource.private.resourceClients.loaded) do
-                    syncer.private:syncResource(i, name)
+                    syncer.private:syncResource(i, self.name)
                     thread:pause()
                 end
             end):resume({executions = settings.downloader.syncRate, frames = 1})
@@ -163,17 +163,17 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-network:fetch("Assetify:onResourceFlush"):on(function(name)
-    if not resource.private.buffer.name[name] then return false end
-    resource.private.buffer.name[name]:destroy()
+network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
+    if not resource.private.buffer.name[resourceName] then return false end
+    resource.private.buffer.name[resourceName]:destroy()
 end)
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
-    local name = imports.getResourceName(resourceSource)
-    resource.private.buffer.name[name].isFlushed = true
-    resource.private.buffer.name[name].isUnloaded = true
-    network:emit("Assetify:onResourceFlush", false, name, resourceSource)
-    network:emit("Assetify:onResourceUnload", false, name, resourceSource)
+    local resourceName = imports.getResourceName(resourceSource)
+    resource.private.buffer.name[resourceName].isFlushed = true
+    resource.private.buffer.name[resourceName].isUnloaded = true
+    network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
+    network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)
 imports.addEventHandler("onPlayerQuit", root, function()
     if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
