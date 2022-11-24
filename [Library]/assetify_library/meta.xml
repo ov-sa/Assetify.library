@@ -51,6 +51,7 @@
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
+    <script src="utilities/engine/resource.lua" type="shared"/>
     <script src="utilities/engine/manager.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>
     <script src="utilities/engine/streamer.lua" type="client"/>
