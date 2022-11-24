@@ -48,13 +48,29 @@ function resource.public:destroy(...)
     return self:unload(...)
 end
 
-if localPlayer then
+function resource.public:unload()
+    if not resource.public:isInstance(self) then return false end
+    resource.private.buffer.name[(self.resourceName)] = nil
+    resource.private.buffer.source[(self.resource)] = nil
+    self:destroyInstance()
+    imports.collectgarbage()
+    return true
+end
 
+if localPlayer then
+    function resource.public:load(resourceSource)
+        local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
+        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] then return false end
+        self.resource = resourceSource
+        self.resourceName = resourceName
+        network:emit("Assetify:onResourceLoad", false, self.resourceName, self.resource) 
+        return true
+    end
 else
     function resource.public:load(resourceSource, resourceFiles)
         local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
         resourceFiles = (resourceFiles and (imports.type(resourceFiles) == "table") and resourceFiles) or false
-        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] or not resourceFiles then return false end
+        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] then return false end
         self.resource = resourceSource
         self.resourceName = resourceName
         self.isSilent = (isSilent and true) or false
@@ -90,15 +106,6 @@ else
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         end
         network:emit("Assetify:onResourceLoad", false, self.resourceName, self.resource) 
-        return true
-    end
-
-    function resource.public:unload()
-        if not resource.public:isInstance(self) then return false end
-        resource.private.buffer.name[(self.resourceName)] = nil
-        resource.private.buffer.source[(self.resource)] = nil
-        self:destroyInstance()
-        imports.collectgarbage()
         return true
     end
 end
