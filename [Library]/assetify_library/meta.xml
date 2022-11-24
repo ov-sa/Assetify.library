@@ -92,6 +92,9 @@
     <export function="isLibraryBooted" type="shared"/>
     <export function="isLibraryLoaded" type="shared"/>
     <export function="isModuleLoaded" type="shared"/>
+    <export function="isResourceLoaded" type="shared"/>
+    <export function="isResourceFlushed" type="shared"/>
+    <export function="isResourceUnloaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
 
 

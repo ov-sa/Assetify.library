@@ -26,6 +26,18 @@ function manager.API.Library.isModuleLoaded()
     return syncer.isModuleLoaded
 end
 
+function manager.API.Library.isResourceLoaded()
+    return resource.isResourceLoaded()
+end
+
+function manager.API.Library.isResourceFlushed()
+    return resource.isResourceFlushed()
+end
+
+function manager.API.Library.isResourceUnloaded()
+    return resource.isResourceUnloaded()
+end
+
 function manager.API.Library.fetchAssets(...)
     return manager:fetchAssets(...)
 end
