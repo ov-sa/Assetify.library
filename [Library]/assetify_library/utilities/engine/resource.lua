@@ -13,6 +13,7 @@
 -----------------
 
 local imports = {
+    collectgarbage = collectgarbage,
     getResourceName = getResourceName,
     addEventHandler = addEventHandler
 }
@@ -61,6 +62,7 @@ else
         resource.private.buffer.name[(self.resourceName)] = nil
         resource.private.buffer.source[(self.resource)] = nil
         self:destroyInstance()
+        imports.collectgarbage()
         return true
     end
 end
@@ -71,14 +73,14 @@ end
 ---------------------
 
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
+    if resourceSource == syncer.public.libraryResource then return false end
     local resourceName = imports.getResourceName(resourceSource)
     network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
     network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
 end)
 network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
-    if not syncer.private.syncedResources[resourceName] then return false end
-    syncer.private.syncedResources[resourceName] = nil
-    imports.collectgarbage()
+    if not resource.private.buffer.name[resourceName] then return false end
+    resource.private.buffer.name[resourceName]:destroy()
 end)
 if not localPlayer then
     network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resourceSource, resourceFiles, isSilent)
