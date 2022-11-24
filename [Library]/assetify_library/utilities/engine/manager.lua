@@ -373,7 +373,7 @@ else
         if manager.public:isInternal() then return false end
         if player and (not imports.isElement(player) or (imports.getElementType(player) ~= "player")) then return false end
         if not player and (not resourceFiles or (imports.type(resourceFiles) ~= "table")) then return false end
-        return syncer:requestSyncResource(player, sourceResource, resourceFiles, ...)
+        return syncer:syncResource(player, sourceResource, resourceFiles, ...)
     end
 end
 
