@@ -214,7 +214,6 @@ else
                     resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {resourceName = resourceName, file = i}
                     thread:pause()
                 end
-                print("SYNCING STATE..")
                 syncer.private:syncState(player, _, _, resourceName)
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         end
