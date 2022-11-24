@@ -146,13 +146,18 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
+network:fetch("Assetify:onResourceFlush"):on(function(name)
+    if not resource.private.buffer.name[name] then return false end
+    resource.private.buffer.name[name]:destroy()
+end)
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
     local name = imports.getResourceName(resourceSource)
     network:emit("Assetify:onResourceFlush", false, name, resourceSource)
     network:emit("Assetify:onResourceUnload", false, name, resourceSource)
 end)
-network:fetch("Assetify:onResourceFlush"):on(function(name)
-    if not resource.private.buffer.name[name] then return false end
-    resource.private.buffer.name[name]:destroy()
+imports.addEventHandler("onPlayerQuit", root, function()
+    if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
+    resource.private.resourceClients.loaded[source] = nil
+    resource.private.resourceClients.loading[source] = nil
 end)
