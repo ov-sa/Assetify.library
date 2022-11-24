@@ -48,7 +48,6 @@ function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
-syncer.private.syncedResources = {}
 
 network:create("Assetify:onBoot")
 network:create("Assetify:onLoad")
@@ -218,53 +217,10 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
-imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
-    local resourceName = imports.getResourceName(resourceSource)
-    network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
-    network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
-end)
-network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
-    if not syncer.private.syncedResources[resourceName] then return false end
-    syncer.private.syncedResources[resourceName] = nil
-    imports.collectgarbage()
-end)
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
-    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resourceSource, resourceFiles, isSilent)
-        if syncer.private.syncedResources[resourceName] then return false end
-        syncer.private.syncedResources[resourceName] = {
-            isSilent = (isSilent and true) or false,
-            synced = {
-                bandwidthData = {total = 0, file = {}},
-            },
-            unSynced = {
-                fileData = {},
-                fileHash = {}
-            }
-        }
-        for i = 1, #resourceFiles, 1 do
-            local j = ":"..resourceName.."/"..resourceFiles[i]
-            local builtFileData, builtFileSize = file:read(j)
-            if builtFileData then
-                syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j] = builtFileSize
-                syncer.private.syncedResources[resourceName].synced.bandwidthData.total = syncer.private.syncedResources[resourceName].synced.bandwidthData.total + syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j]
-                syncer.private.syncedResources[resourceName].unSynced.fileData[j] = builtFileData
-                syncer.private.syncedResources[resourceName].unSynced.fileHash[j] = imports.md5(builtFileData)
-            else
-                imports.outputDebugString("[Assetify] | Invalid File: "..j)
-            end
-        end
-        if not syncer.private.syncedResources[resourceName].isSilent then
-            thread:create(function(self)
-                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                    syncer.private:syncResource(i, resourceName)
-                    thread:pause()
-                end
-            end):resume({executions = settings.downloader.syncRate, frames = 1})
-        end
-    end)
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
         if imports.getResourceRootElement(resourceElement) ~= resourceRoot then return false end
         syncer.private:loadClient(source)

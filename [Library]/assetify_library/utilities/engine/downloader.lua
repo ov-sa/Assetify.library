@@ -13,6 +13,7 @@
 -----------------
 
 local syncer = syncer:import()
+local resource = resource:import()
 local imports = {
     type = type,
     pairs = pairs,
@@ -179,7 +180,7 @@ else
     function syncer.private:syncResource(player, resourceName, hashes)
         if not resourceName then
             thread:create(function(self)
-                for i, j in imports.pairs(syncer.private.syncedResources) do
+                for i, j in imports.pairs(resource.private.buffer.name) do
                     if not j.isSilent then syncer.private:syncResource(player, i) end
                     thread:pause()
                 end
@@ -188,11 +189,11 @@ else
         end
         if not syncer.private.syncedResources[resourceName] then return false end
         if not hashes then
-            syncer.private:syncHash(player, _, _, syncer.private.syncedResources[resourceName].unSynced.fileHash, resourceName)
+            syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resourceName)
         else
             thread:create(function(self)
                 for i, j in pairs(hashes) do
-                    syncer.private:syncContent(player, _, _, i, syncer.private.syncedResources[resourceName].unSynced.fileData[i], resourceName)
+                    syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
                     thread:pause()
                 end
                 --TODO: ...WIP STATE SYNCER
