@@ -19,6 +19,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
+    getResourceName = getResourceName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -187,7 +188,7 @@ else
             end):resume({executions = settings.downloader.syncRate, frames = 1})
             return true
         end
-        if not syncer.private.syncedResources[resourceName] then return false end
+        if not resource.private.buffer.name[resourceName] then return false end
         if not hashes then
             syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resourceName)
         else
@@ -202,10 +203,9 @@ else
         end
         return true
     end
-    function syncer.public:syncResource(player, resourceName, resourceSource, resourceFiles)
-        if player then return syncer:syncResource(player, resourceName) end
-        network:emit("Assetify:onResourceLoad", false, resourceName, resourceSource, resourceFiles) 
-        return true
+    function syncer.public:syncResource(player, resourceSource, resourceFiles)
+        if player then return syncer:syncResource(player, imports.getResourceName(resourceSource)) end
+        return resource:create(resourceSource, resourceFiles)
     end
 
     function syncer.private:syncPack(player, assetDatas, syncModules, packName)

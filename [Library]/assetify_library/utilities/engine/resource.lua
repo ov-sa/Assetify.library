@@ -13,7 +13,10 @@
 -----------------
 
 local imports = {
+    pairs = pairs,
+    md5 = md5,
     collectgarbage = collectgarbage,
+    outputDebugString = outputDebugString,
     getResourceName = getResourceName,
     addEventHandler = addEventHandler
 }
@@ -23,6 +26,7 @@ local imports = {
 --[[ Class: Resource ]]--
 -------------------------
 
+local syncer = syncer:import()
 local resource = class:create("resource")
 resource.private.buffer = {
     name = {},
@@ -47,13 +51,45 @@ end
 if localPlayer then
 
 else
-    function resource.public:load(resourceSource)
+    function resource.public:load(resourceSource, resourceFiles)
         local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
-        if not resource.public:isInstance(self) or not resourceName then return false end
+        resourceFiles = (resourceFiles and (imports.type(resourceFiles) == "table") and resourceFiles) or false
+        if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] or not resourceFiles then return false end
         self.resource = resourceSource
         self.resourceName = resourceName
+        self.isSilent = (isSilent and true) or false
+        self.synced = {
+            bandwidthData = {total = 0, file = {}},
+        }
+        self.unSynced = {
+            fileData = {},
+            fileHash = {}
+        }
+        if resourceFiles then
+            for i = 1, #resourceFiles, 1 do
+                local j = ":"..resourceName.."/"..resourceFiles[i]
+                local builtFileData, builtFileSize = file:read(j)
+                if builtFileData then
+                    self.synced.bandwidthData.file[j] = builtFileSize
+                    self.synced.bandwidthData.total = self.synced.bandwidthData.total + self.synced.bandwidthData.file[j]
+                    self.unSynced.fileData[j] = builtFileData
+                    self.unSynced.fileHash[j] = imports.md5(builtFileData)
+                else
+                    imports.outputDebugString("[Assetify] | Invalid File: "..j)
+                end
+            end
+        end
         resource.private.buffer.name[(self.resourceName)] = self
         resource.private.buffer.source[(self.resource)] = self
+        if not self.isSilent then
+            thread:create(function(self)
+                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
+                    syncer.private:syncResource(i, resourceName)
+                    thread:pause()
+                end
+            end):resume({executions = settings.downloader.syncRate, frames = 1})
+        end
+        network:emit("Assetify:onResourceLoad", false, self.resourceName, self.resource) 
         return true
     end
 
@@ -82,38 +118,3 @@ network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
     if not resource.private.buffer.name[resourceName] then return false end
     resource.private.buffer.name[resourceName]:destroy()
 end)
-if not localPlayer then
-    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resourceSource, resourceFiles, isSilent)
-        if syncer.private.syncedResources[resourceName] then return false end
-        syncer.private.syncedResources[resourceName] = {
-            isSilent = (isSilent and true) or false,
-            synced = {
-                bandwidthData = {total = 0, file = {}},
-            },
-            unSynced = {
-                fileData = {},
-                fileHash = {}
-            }
-        }
-        for i = 1, #resourceFiles, 1 do
-            local j = ":"..resourceName.."/"..resourceFiles[i]
-            local builtFileData, builtFileSize = file:read(j)
-            if builtFileData then
-                syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j] = builtFileSize
-                syncer.private.syncedResources[resourceName].synced.bandwidthData.total = syncer.private.syncedResources[resourceName].synced.bandwidthData.total + syncer.private.syncedResources[resourceName].synced.bandwidthData.file[j]
-                syncer.private.syncedResources[resourceName].unSynced.fileData[j] = builtFileData
-                syncer.private.syncedResources[resourceName].unSynced.fileHash[j] = imports.md5(builtFileData)
-            else
-                imports.outputDebugString("[Assetify] | Invalid File: "..j)
-            end
-        end
-        if not syncer.private.syncedResources[resourceName].isSilent then
-            thread:create(function(self)
-                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                    syncer.private:syncResource(i, resourceName)
-                    thread:pause()
-                end
-            end):resume({executions = settings.downloader.syncRate, frames = 1})
-        end
-    end)
-end

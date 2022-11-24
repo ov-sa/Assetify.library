@@ -18,7 +18,6 @@ local imports = {
     md5 = md5,
     tostring = tostring,
     collectgarbage = collectgarbage,
-    outputDebugString = outputDebugString,
     isElement = isElement,
     getElementType = getElementType,
     getRealTime = getRealTime,
