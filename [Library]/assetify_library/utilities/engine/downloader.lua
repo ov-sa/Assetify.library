@@ -40,7 +40,7 @@ if localPlayer then
     end
     syncer.private.execOnLoad(function() network:emit("Assetify:Downloader:onPostSyncPool", true, false, localPlayer) end)
 
-    local function updateStatus(pointer)
+    local function updateStatus(pointer, isResource)
         if pointer.bandwidthData.isDownloaded then return false end
         local prevTotalETA, prevTotalSize = pointer.bandwidthData.status.eta or 0, pointer.bandwidthData.status.total or 0
         for file, status in imports.pairs(j) do
@@ -52,10 +52,12 @@ if localPlayer then
             pointer.bandwidthData.status.total = pointer.bandwidthData.status.total - prevSize + currentSize
             pointer.bandwidthData.status.file[file].eta, pointer.bandwidthData.status.file[file].size = currentETA, currentSize
         end
-        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
-        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
-        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
-        pointer.bandwidthData.status.isLibraryETACounted = true
+        if not isResource then
+            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
+            syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
+            syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
+            pointer.bandwidthData.status.isLibraryETACounted = true
+        end
         return true
     end
 
@@ -75,8 +77,7 @@ if localPlayer then
             end
         else
             for resourceName, i in imports.pairs(status) do
-                --TODO: INTEGRATE AND HOOK RESOURCE BANDWIDTH POINTER HERE...
-                updateStatus({})
+                updateStatus(resource.private.buffer.name[resourceName], true)
             end
         end
     end)
@@ -96,10 +97,9 @@ if localPlayer then
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    if not remoteResource then
-                        cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                    end
+                    --TODO: STORE ALL PREDOWNLOADED FILE SIZES... NOT SYNCED YET, SYNC SOMEHOW///
+                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + ((not remoteResource and settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]) or cPointer.bandwidthData.file[i])
+                    if not remoteResource then syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i] end
                 end
                 fileData = nil
                 thread:pause()
