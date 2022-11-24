@@ -232,8 +232,10 @@ if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
-    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resource, resourceFiles)
-        syncer.private.syncedResources[resourceName] = syncer.private.syncedResources[resourceName] or {
+    network:fetch("Assetify:onResourceLoad"):on(function(resourceName, resource, resourceFiles, isSilent)
+        if syncer.private.syncedResources[resourceName] then return false end
+        syncer.private.syncedResources[resourceName] = {
+            isSilent = (isSilent and true) or false,
             synced = {
                 bandwidthData = {total = 0, file = {}},
             },
@@ -254,12 +256,14 @@ else
                 imports.outputDebugString("[Assetify] | Invalid File: "..j)
             end
         end
-        thread:create(function(self)
-            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                syncer.private:syncResource(i, resourceName)
-                thread:pause()
-            end
-        end):resume({executions = settings.downloader.syncRate, frames = 1})
+        if not syncer.private.syncedResources[resourceName].isSilent then
+            thread:create(function(self)
+                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
+                    syncer.private:syncResource(i, resourceName)
+                    thread:pause()
+                end
+            end):resume({executions = settings.downloader.syncRate, frames = 1})
+        end
     end)
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
         if imports.getResourceRootElement(resourceElement) ~= resourceRoot then return false end

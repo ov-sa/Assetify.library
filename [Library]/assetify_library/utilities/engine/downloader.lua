@@ -180,7 +180,7 @@ else
         if not resourceName then
             thread:create(function(self)
                 for i, j in imports.pairs(syncer.private.syncedResources) do
-                    syncer.private:syncResource(player, i)
+                    if not j.isSilent then syncer.private:syncResource(player, i) end
                     thread:pause()
                 end
             end):resume({executions = settings.downloader.syncRate, frames = 1})
