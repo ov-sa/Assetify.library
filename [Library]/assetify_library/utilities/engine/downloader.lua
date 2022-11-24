@@ -39,7 +39,26 @@ if localPlayer then
     end
     syncer.private.execOnLoad(function() network:emit("Assetify:Downloader:onPostSyncPool", true, false, localPlayer) end)
 
-    network:create("Assetify:Downloader:onSyncProgress"):on(function(status, bandwidth)
+    local function updateStatus(pointer)
+        if pointer.bandwidthData.isDownloaded then return false end
+        local prevTotalETA, prevTotalSize = pointer.bandwidthData.status.eta or 0, pointer.bandwidthData.status.total or 0
+        for file, status in imports.pairs(j) do
+            pointer.bandwidthData.status.file[file] = pointer.bandwidthData.status.file[file] or {}
+            local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*pointer.bandwidthData.file[file]
+            local prevETA, prevSize = pointer.bandwidthData.status.file[file].eta or 0, pointer.bandwidthData.status.file[file].size or 0
+            pointer.bandwidthData.status.eta = pointer.bandwidthData.status.eta - prevETA + currentETA
+            pointer.bandwidthData.status.eta_count = pointer.bandwidthData.status.eta_count + ((not pointer.bandwidthData.status.file[file].eta and 1) or 0)
+            pointer.bandwidthData.status.total = pointer.bandwidthData.status.total - prevSize + currentSize
+            pointer.bandwidthData.status.file[file].eta, pointer.bandwidthData.status.file[file].size = currentETA, currentSize
+        end
+        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
+        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
+        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
+        pointer.bandwidthData.status.isLibraryETACounted = true
+        return true
+    end
+
+    network:create("Assetify:Downloader:onSyncProgress"):on(function(status, bandwidth, isResource)
         if bandwidth then
             syncer.public.libraryBandwidth = {
                 total = bandwidth,
@@ -47,25 +66,15 @@ if localPlayer then
             }
             return true
         end
-        for assetType, i in imports.pairs(status) do
-            for assetName, j in imports.pairs(i) do
-                local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-                if not cPointer.bandwidthData.isDownloaded then
-                    local prevTotalETA, prevTotalSize = cPointer.bandwidthData.status.eta or 0, cPointer.bandwidthData.status.total or 0
-                    for file, status in imports.pairs(j) do
-                        cPointer.bandwidthData.status.file[file] = cPointer.bandwidthData.status.file[file] or {}
-                        local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*cPointer.bandwidthData.file[file]
-                        local prevETA, prevSize = cPointer.bandwidthData.status.file[file].eta or 0, cPointer.bandwidthData.status.file[file].size or 0
-                        cPointer.bandwidthData.status.eta = cPointer.bandwidthData.status.eta - prevETA + currentETA
-                        cPointer.bandwidthData.status.eta_count = cPointer.bandwidthData.status.eta_count + ((not cPointer.bandwidthData.status.file[file].eta and 1) or 0)
-                        cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total - prevSize + currentSize
-                        cPointer.bandwidthData.status.file[file].eta, cPointer.bandwidthData.status.file[file].size = currentETA, currentSize
-                    end
-                    syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + cPointer.bandwidthData.status.eta
-                    syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not cPointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
-                    syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + cPointer.bandwidthData.status.total
-                    cPointer.bandwidthData.status.isLibraryETACounted = true
+        if not isResource then
+            for assetType, i in imports.pairs(status) do
+                for assetName, j in imports.pairs(i) do
+                    updateStatus(settings.assetPacks[assetType].rwDatas[assetName])
                 end
+            end
+        else
+            for resourceName, i in imports.pairs(status) do
+                updateStatus({})
             end
         end
     end)

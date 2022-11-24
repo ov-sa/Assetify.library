@@ -134,7 +134,7 @@ else
                             end
                         end
                     end
-                    network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus, true)
+                    network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus, _, true)
                     return true
                 end
                 return false
