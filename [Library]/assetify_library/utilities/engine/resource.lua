@@ -73,7 +73,8 @@ if localPlayer then
         self.resource = resourceSource
         self.name = resourceName
         self.bandwidthData = {
-            total = bandwidth,
+            total = bandwidth.total,
+            bandwidth = bandwidth.file,
             status = {total = 0, eta = 0, eta_count = 0},
             file = {}
         }
@@ -93,9 +94,7 @@ else
         self.resource = resourceSource
         self.name = resourceName
         self.isSilent = (isSilent and true) or false
-        self.synced = {
-            bandwidthData = {total = 0, file = {}}
-        }
+        self.bandwidthData = {total = 0, file = {}}
         self.unSynced = {
             fileData = {},
             fileHash = {}
@@ -105,8 +104,8 @@ else
                 local j = ":"..(self.name).."/"..resourceFiles[i]
                 local builtFileData, builtFileSize = file:read(j)
                 if builtFileData then
-                    self.synced.bandwidthData.file[j] = builtFileSize
-                    self.synced.bandwidthData.total = self.synced.bandwidthData.total + self.synced.bandwidthData.file[j]
+                    self.bandwidthData.file[j] = builtFileSize
+                    self.bandwidthData.total = self.bandwidthData.total + self.bandwidthData.file[j]
                     self.unSynced.fileData[j] = builtFileData
                     self.unSynced.fileHash[j] = imports.md5(builtFileData)
                 else
@@ -170,8 +169,10 @@ end)
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
     local resourceName = imports.getResourceName(resourceSource)
-    resource.private.buffer.name[resourceName].isFlushed = true
-    resource.private.buffer.name[resourceName].isUnloaded = true
+    if resource.private.buffer.name[resourceName] then
+        resource.private.buffer.name[resourceName].isFlushed = true
+        resource.private.buffer.name[resourceName].isUnloaded = true
+    end
     network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
     network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)

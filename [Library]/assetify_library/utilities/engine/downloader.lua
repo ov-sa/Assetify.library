@@ -82,12 +82,12 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes, remoteResource)
+    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes, bandwidth, remoteResource)
         if not remoteResource then
             syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
             syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
         else
-            resource.public:create(imports.getResourceFromName(remoteResource))
+            resource.public:create(imports.getResourceFromName(remoteResource), bandwidth)
         end
         thread:create(function(self)
             local cPointer = (not remoteResource and settings.assetPacks[assetType].rwDatas[assetName]) or resource.private.buffer.name[remoteResource]
@@ -97,9 +97,9 @@ if localPlayer then
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    --TODO: STORE ALL PREDOWNLOADED FILE SIZES... NOT SYNCED YET, SYNC SOMEHOW///
-                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + ((not remoteResource and settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]) or cPointer.bandwidthData.file[i])
+                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + ((not remoteResource and settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]) or cPointer.bandwidthData.bandwidth[i])
                     if not remoteResource then syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i] end
+                    print(cPointer.bandwidthData.status.total.." / "..cPointer.bandwidthData.total)
                 end
                 fileData = nil
                 thread:pause()
@@ -203,7 +203,7 @@ else
         end
         if not resource.private.buffer.name[resourceName] then return false end
         if not hashes then
-            syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resourceName)
+            syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, self.bandwidthData, resourceName)
         else
             resource.private:loadClient(player)
             thread:create(function(self)
