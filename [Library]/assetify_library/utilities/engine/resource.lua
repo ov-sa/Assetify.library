@@ -43,12 +43,6 @@ resource.public.isResourceLoaded = function() return (not manager:isInternal() a
 resource.public.isResourceFlushed = function() return (not manager:isInternal() and resource.private.buffer[sourceResource] and resource.private.buffer[sourceResource].isFlushed and true) or false end
 resource.public.isResourceUnLoaded = function() return (not manager:isInternal() and resource.private.buffer[sourceResource] and resource.private.buffer[sourceResource].isUnLoaded and true) or false end
 
-function manager.API.Library.isResourceLoaded()
-    if manager:isInternal() or not then return false end
-    return syncer.isModuleLoaded
-end
-
-
 function resource.public:create(...)
     local cResource = self:createInstance()
     if cResource and not cResource:load(...) then
