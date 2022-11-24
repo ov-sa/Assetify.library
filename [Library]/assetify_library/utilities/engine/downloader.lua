@@ -19,6 +19,7 @@ local imports = {
     pairs = pairs,
     md5 = md5,
     collectgarbage = collectgarbage,
+    getResourceFromName = getResourceFromName,
     getLatentEventHandles = getLatentEventHandles
 }
 
@@ -74,6 +75,7 @@ if localPlayer then
             end
         else
             for resourceName, i in imports.pairs(status) do
+                --TODO: INTEGRATE AND HOOK RESOURCE BANDWIDTH POINTER HERE...
                 updateStatus({})
             end
         end
@@ -83,12 +85,11 @@ if localPlayer then
         if not remoteResource then
             syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
             syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
+        else
+            resource.public:create(imports.getResourceFromName(remoteResource))
         end
         thread:create(function(self)
-            if not remoteResource then
-                local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-                cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
-            end
+            local cPointer = (not remoteResource and settings.assetPacks[assetType].rwDatas[assetName]) or resource.private.buffer.name[remoteResource]
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local fileData = file:read(i)
@@ -200,8 +201,8 @@ else
         if not hashes then
             syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resourceName)
         else
+            resource.private:loadClient(player)
             thread:create(function(self)
-                resource.private:loadClient(player)
                 for i, j in imports.pairs(hashes) do
                     syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
                     local cQueue = imports.getLatentEventHandles(player)

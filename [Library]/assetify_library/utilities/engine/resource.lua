@@ -121,6 +121,7 @@ else
             resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
                 local self = resource.private.resourceClients.loading[player]
                 if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
+                    print("HB RUNNING")
                     self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
                     for i, j in imports.pairs(self.cQueue) do
                         local queueStatus = imports.getLatentEventStatus(player, i)
