@@ -71,7 +71,7 @@ if localPlayer then
         return true
     end
 else
-    function resource.public:load(resourceSource, resourceFiles)
+    function resource.public:load(resourceSource, resourceFiles, isSilent)
         local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
         resourceFiles = (resourceFiles and (imports.type(resourceFiles) == "table") and resourceFiles) or false
         if not resource.public:isInstance(self) or not resourceName or resource.private.buffer.name[resourceName] then return false end

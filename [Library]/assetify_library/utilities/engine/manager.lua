@@ -369,10 +369,10 @@ else
         return (depSubIndex and cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex][depSubIndex])]) or cAsset.unSynced.rawData[(cAsset.synced.manifestData.assetDeps[depType][depIndex])] or false
     end
 
-    function manager.public:loadResource(player, resourceFiles)
+    function manager.public:loadResource(player, resourceFiles, ...)
         if manager.public:isInternal() or not resourceFiles or (imports.type(resourceFiles) ~= "table") then return false end
         if player and not imports.isElement(player) and (imports.getElementType(player) ~= "player") then return false end
-        return syncer:syncResource(player, sourceResource, resourceFiles)
+        return syncer:syncResource(player, sourceResource, resourceFiles, ...)
     end
 end
 

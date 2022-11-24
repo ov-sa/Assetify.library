@@ -202,12 +202,12 @@ else
         end
         return true
     end
-    function syncer.public:syncResource(player, resourceSource, resourceFiles)
+    function syncer.public:syncResource(player, resourceSource, ...)
         if player then
             if not resource.private.buffer.source[resourceSource] then return false end
-            return syncer.private:syncResource(player, resourceName)
+            return syncer.private:syncResource(player, resourceName, ...)
         end
-        return resource.public:create(resourceSource, resourceFiles)
+        return resource.public:create(resourceSource, ...)
     end
 
     function syncer.private:syncPack(player, assetDatas, syncModules, packName)
