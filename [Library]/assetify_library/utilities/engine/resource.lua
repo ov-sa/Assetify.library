@@ -32,8 +32,11 @@ resource.private.buffer = {
     name = {},
     source = {}
 }
-
 function resource.public:import() return resource end
+
+network:create("Assetify:onResourceLoad")
+network:create("Assetify:onResourceFlush")
+network:create("Assetify:onResourceUnload")
 function resource.public:create(...)
     local cResource = self:createInstance()
     if cResource and not cResource:load(...) then
@@ -118,8 +121,8 @@ end
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
     local resourceName = imports.getResourceName(resourceSource)
-    network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
     network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
+    network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)
 network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
     if not resource.private.buffer.name[resourceName] then return false end
