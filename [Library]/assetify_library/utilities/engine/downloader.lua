@@ -195,6 +195,8 @@ else
                 resource.private:loadClient(player)
                 for i, j in imports.pairs(hashes) do
                     syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
+                    local cQueue = imports.getLatentEventHandles(player)
+                    resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
                     thread:pause()
                 end
                 --TODO: ...WIP STATE SYNCER
@@ -261,7 +263,7 @@ else
                 for i, j in imports.pairs(assetDatas.hashes) do
                     syncer.private:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
                     local cQueue = imports.getLatentEventHandles(player)
-                    syncer.public.libraryClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
+                    resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
                     thread:pause()
                 end
                 syncer.private:syncState(player, assetDatas.type, assetDatas.name)
