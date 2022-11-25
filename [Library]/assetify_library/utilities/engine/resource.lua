@@ -102,9 +102,10 @@ if localPlayer then
 else
     resource.private.resourceClients = {loaded = {}, loading = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
+        iprint(resource.private.resourceClients.loading[source])
         local isVoid = true
-        syncer.public.libraryClients.loading[source].resources[resourceName] = nil
-        for i, j in imports.pairs(syncer.public.libraryClients.loading[source].resources) do
+        resource.private.resourceClients.loading[source].resources[resourceName] = nil
+        for i, j in imports.pairs(resource.private.resourceClients.loading[source].resources) do
             isVoid = false
             break
         end
@@ -158,7 +159,6 @@ else
             resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
                 local self = resource.private.resourceClients.loading[player]
                 if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
-                    print("HB RUNNING")
                     self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
                     for i, j in imports.pairs(self.cQueue) do
                         local queueStatus = imports.getLatentEventStatus(player, i)
@@ -180,7 +180,6 @@ else
         end
         resource.private.resourceClients.loading[player].resources = resource.private.resourceClients.loading[player].resources or {}
         resource.private.resourceClients.loading[player].resources[resourceName] = true
-        iprint(resource.private.resourceClients.loading[player].resources)
     end
 end
 
@@ -189,6 +188,11 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
+if localPlayer then
+    network:fetch("Assetify:onResourceLoad"):on(function(resourceName)
+        network:emit("Assetify:Resource:onLoadClient", true, false, localPlayer, resourceName)
+    end)
+end
 network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
     if not resource.private.buffer.name[resourceName] then return false end
     resource.private.buffer.name[resourceName]:destroy(true)

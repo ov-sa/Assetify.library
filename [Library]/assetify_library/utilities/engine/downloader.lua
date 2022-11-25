@@ -179,7 +179,7 @@ if localPlayer then
         else
             cPointer.bandwidthData.status = nil
             resource.private.buffer.name[remoteResource].isLoaded = true
-            network:emit("Assetify:onResourceLoad", false, remoteResource, resource.private.buffer.name[remoteResource].resource) 
+            network:emit("Assetify:onResourceLoad", false, remoteResource, resource.private.buffer.name[remoteResource].resource)
         end
     end)
 else
