@@ -81,7 +81,7 @@ if localPlayer then
     syncer.private.scheduledAssets = {}
     network:create("Assetify:onAssetLoad")
     network:create("Assetify:onAssetUnload")
-    syncer.private.execOnLoad(function() network:emit("Assetify:onLoadClient", true, false, localPlayer) end)
+    syncer.private.execOnLoad(function() network:emit("Assetify:Syncer:onLoadClient", true, false, localPlayer) end)
 
     function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) then return false end
@@ -114,9 +114,9 @@ else
     syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or false
     syncer.public.libraryModules = {}
     syncer.public.libraryClients = {loaded = {}, loading = {}, scheduled = {}}
-    network:create("Assetify:onLoadClient"):on(function(player)
-        syncer.public.libraryClients.loaded[player] = true
-        network:emit("Assetify:Syncer:onSyncPostPool", false, player)
+    network:create("Assetify:Syncer:onLoadClient"):on(function(source)
+        syncer.public.libraryClients.loaded[source] = true
+        network:emit("Assetify:Syncer:onSyncPostPool", false, source)
     end)
     syncer.private.execOnLoad(function()
         for i, j in imports.pairs(syncer.public.libraryClients.scheduled) do

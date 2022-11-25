@@ -101,6 +101,15 @@ if localPlayer then
     end
 else
     resource.private.resourceClients = {loaded = {}, loading = {}}
+    network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
+        local isVoid = true
+        syncer.public.libraryClients.loading[source].resources[resourceName] = nil
+        for i, j in imports.pairs(syncer.public.libraryClients.loading[source].resources) do
+            isVoid = false
+            break
+        end
+        if isVoid then resource.private.resourceClients.loaded[source] = true end
+    end)
 
     function resource.public:load(resourceSource, resourceFiles, isSilent)
         local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false

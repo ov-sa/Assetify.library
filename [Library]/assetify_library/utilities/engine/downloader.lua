@@ -164,7 +164,7 @@ if localPlayer then
                         syncer.private.scheduledAssets = nil
                         syncer.public.libraryBandwidth.isDownloaded = true
                         syncer.public.libraryBandwidth.status = nil
-                        network:emit("Assetify:onLoadClient", true, false, localPlayer)
+                        network:emit("Assetify:Syncer:onLoadClient", true, false, localPlayer)
                         thread:create(function(self)
                             for i, j in imports.pairs(settings.assetPacks) do
                                 if i ~= "module" then
