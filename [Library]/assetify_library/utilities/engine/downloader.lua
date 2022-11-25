@@ -133,10 +133,11 @@ if localPlayer then
     end)
 
     network:create("Assetify:Downloader:onSyncState"):on(function(assetType, assetName, remoteResource)
+        local cPointer = (not remoteResource and settings.assetPacks[assetType].rwDatas[assetName]) or resource.private.buffer.name[remoteResource]
+        if not cPointer then return false end
+        cPointer.bandwidthData.isDownloaded = true
         if not remoteResource then
             local isPackVoid = true
-            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cPointer.bandwidthData.isDownloaded = true
             if cPointer.bandwidthData.status and cPointer.bandwidthData.status.isLibraryETACounted then
                 syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidthData.status.eta
                 syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count - 1
@@ -176,7 +177,7 @@ if localPlayer then
                 end
             end
         else
-            if not resource.private.buffer.name[remoteResource] then return false end
+            cPointer.bandwidthData.status = nil
             resource.private.buffer.name[remoteResource].isLoaded = true
             network:emit("Assetify:onResourceLoad", false, remoteResource, resource.private.buffer.name[remoteResource].resource) 
         end
