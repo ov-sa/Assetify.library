@@ -190,7 +190,7 @@ network:fetch("Assetify:onResourceUnload"):on(function(resourceName)
 end)
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
-    local resourceName = imports.getResourceName(resourceSource)
+    local resourceName = (resource.private.buffer.source[resourceSource] and resource.private.buffer.source[resourceSource].name) or imports.getResourceName(resourceSource)
     network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
     network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)
