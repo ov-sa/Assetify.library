@@ -41,7 +41,7 @@ network:create("Assetify:onResourceFlush")
 network:create("Assetify:onResourceUnload")
 resource.public.isResourceLoaded = function() return (not manager:isInternal() and resource.private.buffer.source[sourceResource] and resource.private.buffer.source[sourceResource].isLoaded and true) or false end
 resource.public.isResourceFlushed = function() return (not manager:isInternal() and resource.private.buffer.source[sourceResource] and resource.private.buffer.source[sourceResource].isFlushed and true) or false end
-resource.public.isResourceUnLoaded = function() return (not manager:isInternal() and resource.private.buffer.source[sourceResource] and resource.private.buffer.source[sourceResource].isUnLoaded and true) or false end
+resource.public.isResourceUnloaded = function() return (not manager:isInternal() and resource.private.buffer.source[sourceResource] and resource.private.buffer.source[sourceResource].isUnLoaded and true) or false end
 
 function resource.public:create(...)
     local cResource = self:createInstance()
