@@ -88,7 +88,7 @@ function manager.public:fetchAssets(assetType)
 end
 
 function manager.public:setElementScoped(element)
-    if manager:isInternal() then return false end
+    if manager.public:isInternal() then return false end
     manager.private.buffer.instance[element] = sourceResource
     manager.private.buffer.scoped[sourceResource] = manager.private.buffer.scoped[sourceResource] or {}
     manager.private.buffer.scoped[sourceResource][element] = true
@@ -166,7 +166,7 @@ if localPlayer then
     end
 
     function manager.public:getResourceDownloadProgress()
-        if manager:isInternal() then return false end
+        if manager.public:isInternal() then return false end
         return resource:getDownloadProgress(sourceResource)
     end
 
