@@ -102,7 +102,6 @@ if localPlayer then
 else
     resource.private.resourceClients = {loaded = {}, loading = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
-        iprint(resource.private.resourceClients.loading[source])
         local isVoid = true
         resource.private.resourceClients.loading[source].resources[resourceName] = nil
         for i, j in imports.pairs(resource.private.resourceClients.loading[source].resources) do
