@@ -143,8 +143,9 @@ else
         return true
     end
 
-    function resource.private:loadClient(player)
+    function resource.private:loadClient(player, resourceName)
         if not resource.private.resourceClients.loading[player] then
+            resource.private.resourceClients.loaded[player] = nil
             resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
                 local self = resource.private.resourceClients.loading[player]
                 if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
@@ -168,6 +169,9 @@ else
                 return false
             end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
         end
+        resource.private.resourceClients.loading[player].resources = resource.private.resourceClients.loading[player].resources or {}
+        resource.private.resourceClients.loading[player].resources[resourceName] = true
+        iprint(resource.private.resourceClients.loading[player].resources)
     end
 end
 
