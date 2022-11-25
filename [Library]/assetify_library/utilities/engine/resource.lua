@@ -57,12 +57,21 @@ function resource.public:destroy(...)
     return self:unload(...)
 end
 
-function resource.public:unload()
+function resource.public:unload(isFlush)
     if not resource.public:isInstance(self) then return false end
-    resource.private.buffer.name[(self.name)] = nil
-    resource.private.buffer.source[(self.resource)] = nil
-    self:destroyInstance()
-    imports.collectgarbage()
+    if isFlush then
+        if self.isFlushed then return false end
+        self.isFlushed = true
+    else
+        if self.isUnloaded then return false end
+        self.isUnloaded = true
+        timer:create(function()
+            resource.private.buffer.name[(self.name)] = nil
+            resource.private.buffer.source[(self.resource)] = nil
+            self:destroyInstance()
+            imports.collectgarbage()
+        end, 1, 1)
+    end
     return true
 end
 
@@ -160,15 +169,15 @@ end
 
 network:fetch("Assetify:onResourceFlush"):on(function(resourceName)
     if not resource.private.buffer.name[resourceName] then return false end
+    resource.private.buffer.name[resourceName]:destroy(true)
+end)
+network:fetch("Assetify:onResourceUnload"):on(function(resourceName)
+    if not resource.private.buffer.name[resourceName] then return false end
     resource.private.buffer.name[resourceName]:destroy()
 end)
 imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(resourceSource)
     if resourceSource == syncer.public.libraryResource then return false end
     local resourceName = imports.getResourceName(resourceSource)
-    if resource.private.buffer.name[resourceName] then
-        resource.private.buffer.name[resourceName].isFlushed = true
-        resource.private.buffer.name[resourceName].isUnloaded = true
-    end
     network:emit("Assetify:onResourceFlush", false, resourceName, resourceSource)
     network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)
