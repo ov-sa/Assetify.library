@@ -133,7 +133,7 @@ else
         resource.private.buffer.source[(self.resource)] = self
         if not self.isSilent then
             thread:create(function(self)
-                for i, j in imports.pairs(resource.private.resourceClients.loaded) do
+                for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                     syncer.private:syncResource(i, self.name)
                     thread:pause()
                 end
