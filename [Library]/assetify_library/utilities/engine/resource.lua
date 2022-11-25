@@ -90,6 +90,15 @@ if localPlayer then
         resource.private.buffer.source[(self.resource)] = self
         return true
     end
+
+    function resource.public:getDownloadProgress(resourceSource)
+        local cPointer = resource.private.buffer.source[resourceSource]
+        if not cPointer then return false end
+        local cBandwidth = cPointer.bandwidthData.total
+        local cDownloaded = (cPointer.bandwidthData.isDownloaded and cBandwidth) or (cPointer.bandwidthData.status and cPointer.bandwidthData.status.total) or 0
+        local cETA = (not cPointer.bandwidthData.isDownloaded and cPointer.bandwidthData.status and (cPointer.bandwidthData.status.eta/math.max(1, cPointer.bandwidthData.status.eta_count))) or false
+        return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
+    end
 else
     resource.private.resourceClients = {loaded = {}, loading = {}}
 

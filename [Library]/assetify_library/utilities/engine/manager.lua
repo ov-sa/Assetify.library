@@ -165,6 +165,11 @@ if localPlayer then
         return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
     end
 
+    function manager.public:getResourceDownloadProgress()
+        if manager:isInternal() then return false end
+        return resource:getDownloadProgress(sourceResource)
+    end
+
     function manager.public:isAssetLoaded(assetType, assetName)
         local cAsset, isLoaded = manager.public:getAssetData(assetType, assetName)
         return (cAsset and isLoaded and true) or false
