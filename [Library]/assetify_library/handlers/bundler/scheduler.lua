@@ -65,7 +65,6 @@ function bundler.private:createScheduler()
                 header = header..k..[[ = {}, ]]
                 body = body..[[
                 assetify.scheduler.]]..k..[[ = function(exec)
-                    print(exec)
                     if not exec or (assetify.imports.type(exec) ~= "function") then return false end
                     ]]..((v.exec and [[if ]]..v.exec..[[() then exec()]]) or [[if false then]])..[[
                     else assetify.imports.table.insert(assetify.scheduler.buffer.pending.]]..k..[[, exec) end
