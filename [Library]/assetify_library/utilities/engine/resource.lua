@@ -151,7 +151,6 @@ else
             end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
         end
     end
-    return true
 end
 
 
