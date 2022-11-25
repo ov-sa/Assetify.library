@@ -66,6 +66,7 @@ bundler.private:createBuffer("core", "__core", [[
         },
         client = {
             {exportIndex = "assetify.__core.getDownloadProgress", exportName = "getDownloadProgress"},
+            {exportIndex = "assetify.__core.getResourceDownloadProgress", exportName = "getResourceDownloadProgress"},
             {exportIndex = "assetify.__core.isAssetLoaded", exportName = "isAssetLoaded"},
             {exportIndex = "assetify.__core.getAssetID", exportName = "getAssetID"},
             {exportIndex = "assetify.__core.loadAsset", exportName = "loadAsset"},

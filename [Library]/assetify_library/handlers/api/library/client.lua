@@ -16,6 +16,10 @@ function manager.API.Library.getDownloadProgress(...)
     return manager:getDownloadProgress(...)
 end
 
+function manager.API.Library.getResourceDownloadProgress(...)
+    return manager:getResourceDownloadProgress(...)
+end
+
 function manager.API.Library.isAssetLoaded(...)
     return manager:isAssetLoaded(...)
 end

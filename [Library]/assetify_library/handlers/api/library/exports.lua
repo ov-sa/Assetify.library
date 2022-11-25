@@ -40,6 +40,7 @@ manager:exportAPI("Library", {
     },
     client = {
         {name = "getDownloadProgress"},
+        {name = "getResourceDownloadProgress"},
         {name = "isAssetLoaded"},
         {name = "getAssetID"},
         {name = "loadAsset"},
