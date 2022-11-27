@@ -50,6 +50,14 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
     if payload.processType == "emit" then
         local cNetwork = network.public:fetch(payload.networkName)
         if cNetwork and not cNetwork.isCallback then
+            for i = 1, #cNetwork.priority.index, 1 do
+                local j = cNetwork.priority.index[i]
+                if not cNetwork.priority.handlers[j].config.isAsync then
+                    network.private.execNetwork(cNetwork, j, _, serial, payload)
+                else
+                    thread:create(function(self) network.private.execNetwork(cNetwork, j, self, serial, payload) end):resume()
+                end
+            end
             for i, j in imports.pairs(cNetwork.handlers) do
                 if not j.config.isAsync then
                     network.private.execNetwork(cNetwork, i, _, serial, payload)
@@ -95,7 +103,7 @@ function network.private.execNetwork(cNetwork, exec, cThread, serial, payload)
         else
             exec(table.unpack(payload.processArgs))
         end
-        local execData = cNetwork.handlers[exec]
+        local execData = cNetwork.priority.handlers[exec] or cNetwork.handlers[exec]
         execData.config.subscriptionCount = (execData.config.subscriptionLimit and (execData.config.subscriptionCount + 1)) or false
         if execData.config.subscriptionLimit and (execData.config.subscriptionCount >= execData.config.subscriptionLimit) then
             cNetwork:off(exec)
@@ -159,7 +167,7 @@ function network.public:load(name, isCallback)
     self.name = name
     self.owner = network.public.identifier
     self.isCallback = (isCallback and true) or false
-    if not self.isCallback then self.priority, self.handlers = {}, {} end
+    if not self.isCallback then self.priority, self.handlers = {index = {}, handlers = {}}, {} end
     network.private.buffer[name] = self
     return true
 end
@@ -217,7 +225,7 @@ function network.public:off(exec)
         end
     else
         if self.priority.handlers[exec] or self.handlers[exec] then
-            if not config.isPrioritized then self.handlers[exec] = nil
+            if self.handlers[exec] then self.handlers[exec] = nil
             else
                 for i = self.priority.handlers[exec].index + 1, #self.priority.index, 1 do
                     local j = self.priority.index[i]

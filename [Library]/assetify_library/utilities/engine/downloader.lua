@@ -271,7 +271,6 @@ else
                     end
                 end
                 if syncModules then
-                    print("TRYNNA SYNC MODULES")
                     network:emit("Assetify:Downloader:onSyncProgress", true, false, player, _, syncer.public.libraryBandwidth)
                     self:await(network:emitCallback(self, "Assetify:Syncer:onSyncPrePool", false, player))
                     if not syncer.private:syncPack(player, _, syncModules, "module") then

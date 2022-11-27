@@ -122,7 +122,6 @@ else
     end)
 
     network:create("Assetify:Syncer:onSyncPrePool", true):on(function(__self, source)
-        print("RECEIVED PRE SYNC POOL")
         local __source = source
         thread:create(function(self)
             local source = __source
@@ -152,13 +151,10 @@ else
     end, {isAsync = true})
 
     function syncer.private:loadClient(player)
-        print("TRYING TO LOAD CLIENT: "..tostring(player))
         if syncer.public.libraryClients.loaded[player] then return false end
         if not syncer.public.isLibraryLoaded then
-            print("TEST 0")
             syncer.public.libraryClients.scheduled[player] = true
         else
-            print("TEST 1")
             syncer.public.libraryClients.scheduled[player] = nil
             syncer.public.libraryClients.loading[player] = thread:createHeartbeat(function()
                 local self = syncer.public.libraryClients.loading[player]
@@ -182,7 +178,6 @@ else
                 end
                 return false
             end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
-            print("REQUEST MODULE SYNC")
             syncer.private:syncPack(player, _, true)
         end
         return true
