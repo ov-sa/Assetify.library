@@ -229,6 +229,11 @@ else
     function syncer.public:syncResource(player, resourceSource, ...)
         if player then
             if not resource.private.buffer.source[resourceSource] then return false end
+            if not syncer.public.libraryClients.loaded[player] then
+                resource.private.scheduledClients[player] = resource.private.scheduledClients[player] or {}
+                resource.private.scheduledClients[player][resourceSource] = true
+                return false
+            end
             return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].name)
         end
         if syncer.public.isLibraryLoaded then return resource.public:create(resourceSource, ...) end

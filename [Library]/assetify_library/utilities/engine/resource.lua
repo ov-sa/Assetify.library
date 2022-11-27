@@ -99,10 +99,10 @@ if localPlayer then
         return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
     end
 else
+    resource.private.scheduledClients = {}
     resource.private.scheduledResources = {}
     resource.private.resourceClients = {loaded = {}, loading = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
-        print("LOAD ALL RESOURCES NOW")
         local isVoid = true
         resource.private.resourceClients.loading[source].resources[resourceName] = nil
         for i, j in imports.pairs(resource.private.resourceClients.loading[source].resources) do
@@ -117,6 +117,18 @@ else
         end
         resource.private.scheduledResources = nil
     end)
+
+    network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
+        self:resume({executions = settings.downloader.syncRate, frames = 1})
+        syncer.private:syncResource(source)
+        if resource.private.scheduledClients[source] then
+            for i, j in imports.pairs(resource.private.scheduledClients[source]) do
+                if resource.private.buffer.source[i] then syncer.private:syncResource(source, resource.private.buffer.source[i].name) end
+                thread:pause()
+            end
+        end
+        resource.private.scheduledClients[source] = nil
+    end, {isAsync = true})
 
     function resource.public:load(resourceSource, resourceFiles, isSilent)
         local resourceName = (resourceSource and imports.getResourceName(resourceSource)) or false
@@ -215,6 +227,7 @@ imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceS
 end)
 imports.addEventHandler("onPlayerQuit", root, function()
     if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
+    resource.private.scheduledClients[source] = nil
     resource.private.resourceClients.loaded[source] = nil
     resource.private.resourceClients.loading[source] = nil
 end)

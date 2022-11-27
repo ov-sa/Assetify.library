@@ -151,7 +151,6 @@ else
             if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
             thread:pause()
         end
-        syncer.private:syncResource(source)
     end, {isAsync = true})
 
     function syncer.private:loadClient(player)
