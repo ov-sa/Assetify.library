@@ -90,15 +90,21 @@ if localPlayer then
             resource.public:create(imports.getResourceFromName(remoteResource), bandwidth)
         end
         thread:create(function(self)
-            local cPointer = (not remoteResource and settings.assetPacks[assetType].rwDatas[assetName]) or resource.private.buffer.name[remoteResource]
+            local cPointer = nil
+            if not remoteResource then cPointer = settings.assetPacks[assetType].rwDatas[assetName]
+            else cPointer = resource.private.buffer.name[remoteResource] end
+            cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local fileData = file:read(i)
                 if not fileData or (imports.md5(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
-                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + ((not remoteResource and settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]) or cPointer.bandwidthData.file[i])
-                    if not remoteResource then syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i] end
+                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total
+                    if not remoteResource then
+                        cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                    else cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + cPointer.bandwidthData.file[i] end
                 end
                 fileData = nil
                 thread:pause()
@@ -133,8 +139,9 @@ if localPlayer then
     end)
 
     network:create("Assetify:Downloader:onSyncState"):on(function(assetType, assetName, remoteResource)
-        local cPointer = (not remoteResource and settings.assetPacks[assetType].rwDatas[assetName]) or resource.private.buffer.name[remoteResource]
-        if not cPointer then return false end
+        local cPointer = nil
+        if not remoteResource then cPointer = settings.assetPacks[assetType].rwDatas[assetName]
+        else cPointer = resource.private.buffer.name[remoteResource] end
         cPointer.bandwidthData.isDownloaded = true
         if not remoteResource then
             local isPackVoid = true
@@ -223,9 +230,12 @@ else
     function syncer.public:syncResource(player, resourceSource, ...)
         if player then
             if not resource.private.buffer.source[resourceSource] then return false end
+            if not syncer.public.libraryClients.loaded[player] then return true end
             return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].name)
         end
-        return resource.public:create(resourceSource, ...)
+        if syncer.public.isLibraryLoaded then return resource.public:create(resourceSource, ...) end
+        resource.private.scheduledResources[resourceSource] = {...}
+        return true
     end
 
     function syncer.private:syncPack(player, assetDatas, syncModules, packName)
@@ -278,7 +288,7 @@ else
                 for i, j in imports.pairs(assetDatas.hashes) do
                     syncer.private:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
                     local cQueue = imports.getLatentEventHandles(player)
-                    resource.private.resourceClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
+                    syncer.public.libraryClients.loading[player].cQueue[(cQueue[#cQueue])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
                     thread:pause()
                 end
                 syncer.private:syncState(player, assetDatas.type, assetDatas.name)
