@@ -83,8 +83,7 @@ if localPlayer then
         self.name = resourceName
         self.bandwidthData = {
             total = bandwidth.total,
-            file = bandwidth.file,
-            status = {total = 0, eta = 0, eta_count = 0, file = {}},
+            file = bandwidth.file
         }
         resource.private.buffer.name[(self.name)] = self
         resource.private.buffer.source[(self.resource)] = self
@@ -100,8 +99,10 @@ if localPlayer then
         return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
     end
 else
+    resource.private.scheduledResources = {}
     resource.private.resourceClients = {loaded = {}, loading = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
+        print("LOAD ALL RESOURCES NOW")
         local isVoid = true
         resource.private.resourceClients.loading[source].resources[resourceName] = nil
         for i, j in imports.pairs(resource.private.resourceClients.loading[source].resources) do
@@ -109,6 +110,12 @@ else
             break
         end
         if isVoid then resource.private.resourceClients.loaded[source] = true end
+    end)
+    syncer.private.execOnLoad(function()
+        for i, j in imports.pairs(resource.private.scheduledResources) do
+            syncer.public:syncResource(_, i, table.unpack(j))
+        end
+        resource.private.scheduledResources = nil
     end)
 
     function resource.public:load(resourceSource, resourceFiles, isSilent)
