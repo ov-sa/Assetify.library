@@ -159,7 +159,7 @@ function network.public:load(name, isCallback)
     self.name = name
     self.owner = network.public.identifier
     self.isCallback = (isCallback and true) or false
-    if not self.isCallback then self.handlers = {} end
+    if not self.isCallback then self.priority, self.handlers = {}, {} end
     network.private.buffer[name] = self
     return true
 end
@@ -185,6 +185,7 @@ function network.public:on(exec, config)
     if not exec or (imports.type(exec) ~= "function") then return false end
     config = (config and (imports.type(config) == "table") and config) or {}
     config.isAsync = (config.isAsync and true) or false
+    config.isPrioritized = (not self.isCallback and config.isPrioritized and true) or false
     config.subscriptionLimit = (not self.isCallback and imports.tonumber(config.subscriptionLimit)) or false
     config.subscriptionLimit = (config.subscriptionLimit and math.max(1, config.subscriptionLimit)) or config.subscriptionLimit
     config.subscriptionCount = (config.subscriptionLimit and 0) or false
@@ -194,8 +195,12 @@ function network.public:on(exec, config)
             return true
         end
     else
-        if not self.handlers[exec] then
-            self.handlers[exec] = {config = config}
+        if not self.priority.handlers[exec] and not self.handlers[exec] then
+            if not config.isPrioritized then self.handlers[exec] = {config = config}
+            else
+                self.priority.handlers[exec] = {index = #self.priority.index + 1, config = config}
+                table.insert(self.priority.index, exec)
+            end
             return true
         end
     end
@@ -211,8 +216,16 @@ function network.public:off(exec)
             return true
         end
     else
-        if self.handlers[exec] then
-            self.handlers[exec] = nil
+        if self.priority.handlers[exec] or self.handlers[exec] then
+            if not config.isPrioritized then self.handlers[exec] = nil
+            else
+                for i = self.priority.handlers[exec].index + 1, #self.priority.index, 1 do
+                    local j = self.priority.index[i]
+                    self.priority.handlers[j].index = index - 1
+                end
+                table.remove(self.priority.index, self.priority.handlers[exec].index)
+                self.priority.handlers[exec] = nil
+            end
             return true
         end
     end

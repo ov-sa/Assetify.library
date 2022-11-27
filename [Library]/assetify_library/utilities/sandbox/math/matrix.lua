@@ -27,7 +27,7 @@ local matrix = class:create("matrix", _, "math")
 imports.setmetatable(matrix.public, matrix.public)
 
 matrix.public.__call = function(_, ...)
-    local rows, order = {...}, false
+    local rows, order = table.pack(...), false
     local isValid = (#rows > 0 and true) or false
     for i = 1, #rows, 1 do
         local j = rows[i]

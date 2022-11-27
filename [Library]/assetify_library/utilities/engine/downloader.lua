@@ -237,7 +237,7 @@ else
             return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].name)
         end
         if syncer.public.isLibraryLoaded then return resource.public:create(resourceSource, ...) end
-        resource.private.resourceSchedules.resource[resourceSource] = {...}
+        resource.private.resourceSchedules.resource[resourceSource] = table.pack(...)
         return true
     end
 
@@ -271,6 +271,7 @@ else
                     end
                 end
                 if syncModules then
+                    print("TRYNNA SYNC MODULES")
                     network:emit("Assetify:Downloader:onSyncProgress", true, false, player, _, syncer.public.libraryBandwidth)
                     self:await(network:emitCallback(self, "Assetify:Syncer:onSyncPrePool", false, player))
                     if not syncer.private:syncPack(player, _, syncModules, "module") then

@@ -48,10 +48,10 @@ syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResourc
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
 
-network:create("Assetify:onBoot")
-network:create("Assetify:onLoad")
-network:create("Assetify:onUnload")
-network:create("Assetify:onModuleLoad")
+network:create("Assetify:onBoot"):on(function() syncer.public.isLibraryBooted = true end, {isPrioritized = true})
+network:create("Assetify:onLoad"):on(function() syncer.public.isLibraryLoaded = true end, {isPrioritized = true})
+network:create("Assetify:onUnload"):on(function() syncer.public.isLibraryLoaded = false end, {isPrioritized = true})
+network:create("Assetify:onModuleLoad"):on(function() syncer.public.isModuleLoaded = false end, {isPrioritized = true})
 network:create("Assetify:onElementDestroy")
 syncer.private.execOnBoot = function(execFunc)
     if not execFunc or (imports.type(execFunc) ~= "function") then return false end
@@ -72,9 +72,6 @@ syncer.private.execOnModuleLoad = function(execFunc)
     return true
 end
 imports.addEventHandler((localPlayer and "onClientResourceStart") or "onResourceStart", resourceRoot, function() network:emit("Assetify:onBoot") end)
-syncer.private.execOnBoot(function() syncer.public.isLibraryBooted = true end)
-syncer.private.execOnLoad(function() syncer.public.isLibraryLoaded = true end)
-syncer.private.execOnModuleLoad(function() syncer.public.isModuleLoaded = true end)
 
 if localPlayer then
     settings.assetPacks = {}
@@ -125,6 +122,7 @@ else
     end)
 
     network:create("Assetify:Syncer:onSyncPrePool", true):on(function(__self, source)
+        print("RECEIVED PRE SYNC POOL")
         local __source = source
         thread:create(function(self)
             local source = __source
@@ -154,10 +152,13 @@ else
     end, {isAsync = true})
 
     function syncer.private:loadClient(player)
+        print("TRYING TO LOAD CLIENT: "..tostring(player))
         if syncer.public.libraryClients.loaded[player] then return false end
         if not syncer.public.isLibraryLoaded then
+            print("TEST 0")
             syncer.public.libraryClients.scheduled[player] = true
         else
+            print("TEST 1")
             syncer.public.libraryClients.scheduled[player] = nil
             syncer.public.libraryClients.loading[player] = thread:createHeartbeat(function()
                 local self = syncer.public.libraryClients.loading[player]
@@ -181,6 +182,7 @@ else
                 end
                 return false
             end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
+            print("REQUEST MODULE SYNC")
             syncer.private:syncPack(player, _, true)
         end
         return true
