@@ -204,11 +204,10 @@ function network.public:on(exec, config)
         end
     else
         if not self.priority.handlers[exec] and not self.handlers[exec] then
-            if not config.isPrioritized then self.handlers[exec] = {config = config}
-            else
+            if config.isPrioritized then
                 self.priority.handlers[exec] = {index = #self.priority.index + 1, config = config}
                 table.insert(self.priority.index, exec)
-            end
+            else self.handlers[exec] = {config = config} end
             return true
         end
     end
@@ -225,15 +224,14 @@ function network.public:off(exec)
         end
     else
         if self.priority.handlers[exec] or self.handlers[exec] then
-            if self.handlers[exec] then self.handlers[exec] = nil
-            else
+            if self.priority.handlers[exec] then
                 for i = self.priority.handlers[exec].index + 1, #self.priority.index, 1 do
                     local j = self.priority.index[i]
                     self.priority.handlers[j].index = index - 1
                 end
                 table.remove(self.priority.index, self.priority.handlers[exec].index)
                 self.priority.handlers[exec] = nil
-            end
+            else self.handlers[exec] = nil end
             return true
         end
     end
