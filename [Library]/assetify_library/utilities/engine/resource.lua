@@ -99,8 +99,7 @@ if localPlayer then
         return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100, cETA
     end
 else
-    resource.private.scheduledClients = {}
-    resource.private.scheduledResources = {}
+    resource.private.resourceSchedules = {resource = {}, client = {}}
     resource.private.resourceClients = {loaded = {}, loading = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
         local isVoid = true
@@ -112,22 +111,22 @@ else
         if isVoid then resource.private.resourceClients.loaded[source] = true end
     end)
     syncer.private.execOnLoad(function()
-        for i, j in imports.pairs(resource.private.scheduledResources) do
+        for i, j in imports.pairs(resource.private.resourceSchedules.resource) do
             syncer.public:syncResource(_, i, table.unpack(j))
         end
-        resource.private.scheduledResources = nil
+        resource.private.resourceSchedules.resource = nil
     end)
 
     network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         syncer.private:syncResource(source)
-        if resource.private.scheduledClients[source] then
-            for i, j in imports.pairs(resource.private.scheduledClients[source]) do
+        if resource.private.resourceSchedules.client[source] then
+            for i, j in imports.pairs(resource.private.resourceSchedules.client[source]) do
                 if resource.private.buffer.source[i] then syncer.private:syncResource(source, resource.private.buffer.source[i].name) end
                 thread:pause()
             end
         end
-        resource.private.scheduledClients[source] = nil
+        resource.private.resourceSchedules.client[source] = nil
     end, {isAsync = true})
 
     function resource.public:load(resourceSource, resourceFiles, isSilent)
@@ -227,7 +226,7 @@ imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceS
 end)
 imports.addEventHandler("onPlayerQuit", root, function()
     if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
-    resource.private.scheduledClients[source] = nil
+    resource.private.resourceSchedules.client[source] = nil
     resource.private.resourceClients.loaded[source] = nil
     resource.private.resourceClients.loading[source] = nil
 end)
