@@ -35,8 +35,7 @@ local imports = {
     dxGetTexturePixels = dxGetTexturePixels,
     dxGetPixelColor = dxGetPixelColor,
     dxDrawImage = dxDrawImage,
-    interpolateBetween = interpolateBetween,
-    math = math
+    interpolateBetween = interpolateBetween
 }
 
 
@@ -73,7 +72,7 @@ if localPlayer then
                     imports.setSkyGradient(r, g, b, r, g, b)
                 end
                 local currentTime = 12*imports.interpolateBetween(renderer.private.serverNativeTimePercent[1], 0, 0, renderer.private.serverNativeTimePercent[2], 0, 0, 0.25, "OutQuad")
-                local currentHour = imports.math.floor(currentTime)
+                local currentHour = math.floor(currentTime)
                 local currentMinute = (currentTime - currentHour)*30
                 imports.setTime(currentHour, currentMinute)
             end

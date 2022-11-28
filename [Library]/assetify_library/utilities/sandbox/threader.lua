@@ -15,8 +15,7 @@
 local imports = {
     type = type,
     tonumber = tonumber,
-    coroutine = coroutine,
-    math = math
+    coroutine = coroutine
 }
 
 
@@ -39,7 +38,7 @@ end
 function thread.public:createHeartbeat(conditionExec, exec, rate)
     if self ~= thread.public then return false end
     if not conditionExec or not exec or (imports.type(conditionExec) ~= "function") or (imports.type(exec) ~= "function") then return false end
-    rate = imports.math.max(imports.tonumber(rate) or 0, 1)
+    rate = math.max(imports.tonumber(rate) or 0, 1)
     local cThread = thread.public:create(function(self)
         while(conditionExec()) do
             self:pause()
@@ -108,7 +107,7 @@ function thread.public:resume(syncRate)
 end
 
 function thread.public:sleep(duration)
-    duration = imports.math.max(0, imports.tonumber(duration) or 0)
+    duration = math.max(0, imports.tonumber(duration) or 0)
     if not thread.public:isInstance(self) or self.isAwaiting then return false end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then return false end
     self.isAwaiting = "sleep"
