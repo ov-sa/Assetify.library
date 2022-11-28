@@ -186,6 +186,7 @@ shaderRW.buffer[identity] = {
 
         technique ]]..identity..[[ {
             pass P0 {
+                AlphaBlendEnable = true;
                 SRGBWriteEnable = false;
                 VertexShader = compile vs_2_0 VSHandler();
                 PixelShader = compile ps_2_0 PSHandler();

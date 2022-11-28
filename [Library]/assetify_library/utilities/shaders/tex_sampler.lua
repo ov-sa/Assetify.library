@@ -258,7 +258,6 @@ shaderRW.buffer[identity] = {
                 PixelShader  = compile ps_3_0 BufferHandler();
             }
             pass P1 {
-                AlphaBlendEnable = true;
                 VertexShader = compile vs_3_0 VSHandler();
                 PixelShader  = compile ps_3_0 PSHandler();
             }
