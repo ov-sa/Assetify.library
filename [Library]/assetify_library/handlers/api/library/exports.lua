@@ -58,6 +58,8 @@ manager:exportAPI("Library", {
         {name = "getRendererAntiAliasing"},
         {name = "isRendererDynamicSky"},
         {name = "setRendererDynamicSky"},
+        {name = "isRendererDynamicPrelights"},
+        {name = "setRendererDynamicPrelights"},
         {name = "getRendererDynamicSunColor"},
         {name = "setRendererDynamicSunColor"},
         {name = "isRendererDynamicStars"},

@@ -89,6 +89,14 @@ function manager.API.Library.setRendererDynamicSky(...)
     return renderer:setDynamicSky(...)
 end
 
+function manager.API.Library.isRendererDynamicPrelights()
+    return renderer.isDynamicPrelightsEnabled
+end
+
+function manager.API.Library.setRendererDynamicPrelights(...)
+    return renderer:setDynamicPrelights(...)
+end
+
 function manager.API.Library.getRendererDynamicSunColor()
     return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255
 end

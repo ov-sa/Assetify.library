@@ -131,6 +131,8 @@ bundler.private:createBuffer("renderer", _, [[
             {exportIndex = "assetify.renderer.setAntiAliasing", exportName = "setRendererAntiAliasing"},
             {exportIndex = "assetify.renderer.isDynamicSky", exportName = "isRendererDynamicSky"},
             {exportIndex = "assetify.renderer.setDynamicSky", exportName = "setRendererDynamicSky"},
+            {exportIndex = "assetify.renderer.isDynamicPrelights", exportName = "isRendererDynamicPrelights"},
+            {exportIndex = "assetify.renderer.setDynamicPrelights", exportName = "setRendererDynamicPrelights"},
             {exportIndex = "assetify.renderer.getDynamicSunColor", exportName = "getRendererDynamicSunColor"},
             {exportIndex = "assetify.renderer.setDynamicSunColor", exportName = "setRendererDynamicSunColor"},
             {exportIndex = "assetify.renderer.isDynamicStars", exportName = "isRendererDynamicStars"},
