@@ -230,14 +230,14 @@ shaderRW.buffer[identity] = {
             float2x4 rawTexel = SampleSource(PS.TexCoord);
             float4 sampledTexel = rawTexel[0];
             output.Sky = 1;
-            bool isViewCenter = (PS.TexCoord.x >= 0.5) && (PS.TexCoord.x <= (0.5 + 1/vResolution.x)) && (PS.TexCoord.y >= 0.5) && (PS.TexCoord.y <= (0.5 + 1/vResolution.y));
+            bool isViewCenter = (PS.TexCoord.x >= 0.5) && (PS.TexCoord.x <= (0.5 + (1/vResolution.x))) && (PS.TexCoord.y >= 0.5) && (PS.TexCoord.y <= (0.5 + (1/vResolution.y)));
             bool isSkyVisible = rawTexel[1].a > 0;
             if (!vDynamicSkyEnabled && isSkyVisible) sampledTexel = rawTexel[1];
             else if (vDynamicSkyEnabled && (isViewCenter || isSkyVisible)) {
                 float2x4 skyTexel = SampleSky(PS.TexCoord, !isSkyVisible);
                 sampledTexel = isSkyVisible ? skyTexel[0] : sampledTexel;
                 output.Sky = skyTexel[1];
-            } 
+            }
             if (vSource2Enabled) sampledTexel += SampleEmissive(PS.TexCoord);
             // Sample Gamma & Vignette
             sampledTexel.rgb *= lerp(1, float3(0.8, 0.9, 1.3), sin(gTime + 3)*0.5 + 0.5);
