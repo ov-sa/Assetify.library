@@ -71,10 +71,12 @@ if localPlayer then
                     r, g, b = r*0.5, g*0.5, b*0.5
                     imports.setSkyGradient(r, g, b, r, g, b)
                 end
-                local currentTime = 12*imports.interpolateBetween(renderer.private.serverNativeTimePercent[1], 0, 0, renderer.private.serverNativeTimePercent[2], 0, 0, 0.25, "OutQuad")
-                local currentHour = math.floor(currentTime)
-                local currentMinute = (currentTime - currentHour)*30
-                imports.setTime(currentHour, currentMinute)
+                if renderer.public.isDynamicPrelightsEnabled then
+                    local currentTime = 12*imports.interpolateBetween(renderer.private.serverNativeTimePercent[1], 0, 0, renderer.private.serverNativeTimePercent[2], 0, 0, 0.25, "OutQuad")
+                    local currentHour = math.floor(currentTime)
+                    local currentMinute = (currentTime - currentHour)*30
+                    imports.setTime(currentHour, currentMinute)
+                end
             end
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
             local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
@@ -216,6 +218,13 @@ if localPlayer then
         return true
     end
 
+    function renderer.public:setDynamicPrelights(state)
+        state = (state and true) or false
+        if renderer.public.isDynamicPrelightsEnabled == state then return false end
+        renderer.public.isDynamicPrelightsEnabled = state
+        return true
+    end
+
     function renderer.public:setDynamicSunColor(r, g, b)
         r, g, b = (imports.tonumber(r) or 0)/255, (imports.tonumber(g) or 0)/255, (imports.tonumber(b) or 0)/255
         renderer.public.isDynamicSunColor = renderer.public.isDynamicSunColor or {}
@@ -227,9 +236,9 @@ if localPlayer then
 
     function renderer.public:setDynamicStars(state)
         state = (state and true) or false
-        if renderer.public.isDynamicStarsEnabled == state then return false end
-        renderer.public.isDynamicStarsEnabled = state
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled)
+        if renderer.public.isDynamicPrelightsEnabled == state then return false end
+        renderer.public.isDynamicPrelightsEnabled = state
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("isStarsEnabled", renderer.public.isDynamicPrelightsEnabled)
         return true
     end
 
