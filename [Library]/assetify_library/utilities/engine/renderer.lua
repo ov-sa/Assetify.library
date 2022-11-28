@@ -236,9 +236,9 @@ if localPlayer then
 
     function renderer.public:setDynamicStars(state)
         state = (state and true) or false
-        if renderer.public.isDynamicPrelightsEnabled == state then return false end
-        renderer.public.isDynamicPrelightsEnabled = state
-        shader.preLoaded["Assetify_TextureSampler"]:setValue("isStarsEnabled", renderer.public.isDynamicPrelightsEnabled)
+        if renderer.public.isDynamicStarsEnabled == state then return false end
+        renderer.public.isDynamicStarsEnabled = state
+        shader.preLoaded["Assetify_TextureSampler"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled)
         return true
     end
 
