@@ -46,6 +46,7 @@ local imports = {
 local renderer = class:create("renderer", {
     isVirtualRendering = false,
     isTimeSynced = false,
+    isEmissiveModeEnabled = false,
     isDynamicSkyEnabled = false
 })
 renderer.private.serverTick = 60*60*12*1000
@@ -192,6 +193,27 @@ if localPlayer then
         return true
     end
 
+    function renderer.public:setEmissiveState(state)
+        state = (state and true) or false
+        if not renderer.public.isVirtualRendering or not renderer.public.virtualRTs.emissive then return false end
+        if renderer.public.isEmissiveModeEnabled == state then return false end
+        renderer.public.isEmissiveModeEnabled = state
+        if state then
+            local intermediateRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
+            local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
+            renderer.private.emissiveMode = {
+                intermediateRT = intermediateRT,
+                resultRT = resultRT,
+                shader = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureBloomer", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+            }
+        else
+            renderer.private.emissiveMode.shader:destroy()
+            imports.destroyElement(renderer.private.emissiveMode.intermediateRT)
+            imports.destroyElement(renderer.private.emissiveMode.resultRT)
+        end
+        return true
+    end
+
     function renderer.public:setDynamicSky(state, syncShader, isInternal)
         if not syncShader then
             state = (state and true) or false
@@ -204,7 +226,7 @@ if localPlayer then
                 renderer.private.skyRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
                 shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
             else
-                destroyElement(renderer.private.skyRT)
+                imports.destroyElement(renderer.private.skyRT)
                 imports.setSkyGradient(table.upack(renderer.private.prevNativeSkyGradient))
             end
             imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
