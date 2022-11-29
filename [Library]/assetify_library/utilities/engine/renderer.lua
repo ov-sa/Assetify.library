@@ -201,16 +201,16 @@ if localPlayer then
         if state then
             local intermediateRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
             local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
-            renderer.private.emissiveMode = {
+            renderer.private.emissiveBuffer = {
                 intermediateRT = intermediateRT,
                 resultRT = resultRT,
                 shader = shader.public:create(_, "Assetify-PreLoaded", "Assetify_TextureBloomer", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
             }
         else
-            renderer.private.emissiveMode.shader:destroy()
-            imports.destroyElement(renderer.private.emissiveMode.intermediateRT)
-            imports.destroyElement(renderer.private.emissiveMode.resultRT)
-            renderer.private.emissiveMode = nil
+            renderer.private.emissiveBuffer.shader:destroy()
+            imports.destroyElement(renderer.private.emissiveBuffer.intermediateRT)
+            imports.destroyElement(renderer.private.emissiveBuffer.resultRT)
+            renderer.private.emissiveBuffer = nil
         end
         return true
     end
