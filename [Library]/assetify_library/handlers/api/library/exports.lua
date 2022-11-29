@@ -56,6 +56,8 @@ manager:exportAPI("Library", {
         {name = "setRendererMinuteDuration"},
         {name = "setRendererAntiAliasing"},
         {name = "getRendererAntiAliasing"},
+        {name = "isRendererEmissiveMode"},
+        {name = "setRendererEmissiveMode"},
         {name = "isRendererDynamicSky"},
         {name = "setRendererDynamicSky"},
         {name = "isRendererDynamicPrelights"},
