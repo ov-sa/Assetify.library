@@ -120,7 +120,7 @@ if localPlayer then
                 end
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
-                renderer.public:setEmissiveState(false)
+                renderer.public:setEmissiveMode(false)
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 imports.destroyElement(renderer.public.virtualSource)
                 renderer.public.virtualSource = nil
@@ -199,7 +199,7 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:setEmissiveState(state)
+    function renderer.public:setEmissiveMode(state)
         state = (state and true) or false
         if not renderer.public.isVirtualRendering or not renderer.public.virtualRTs.emissive then return false end
         if renderer.public.isEmissiveModeEnabled == state then return false end

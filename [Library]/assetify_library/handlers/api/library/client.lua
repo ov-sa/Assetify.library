@@ -81,6 +81,14 @@ function manager.API.Library.setRendererAntiAliasing(...)
     return renderer:setAntiAliasing(...)
 end
 
+function manager.API.Library.isRendererEmissiveMode()
+    return renderer.isEmissiveModeEnabled
+end
+
+function manager.API.Library.setRendererEmissiveMode(...)
+    return renderer:setEmissiveMode(...)
+end
+
 function manager.API.Library.isRendererDynamicSky()
     return renderer.isDynamicSkyEnabled
 end

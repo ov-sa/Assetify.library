@@ -143,6 +143,8 @@
     <export function="setRendererMinuteDuration" type="client"/>
     <export function="getRendererAntiAliasing" type="client"/>
     <export function="setRendererAntiAliasing" type="client"/>
+    <export function="isRendererEmissiveMode" type="client"/>
+    <export function="setRendererEmissiveMode" type="client"/>
     <export function="isRendererDynamicSky" type="client"/>
     <export function="setRendererDynamicSky" type="client"/>
     <export function="isRendererDynamicPrelights" type="client"/>
