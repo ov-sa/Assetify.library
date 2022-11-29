@@ -20,6 +20,8 @@ shaderRW.buffer[identity] = {
         -->> Variables <<--
         -------------------*/
 
+        float blurIntensity = 1;
+        float bloomIntensity = 1;
         static const float2x2 kernelWeights[13] = {
             float2x2(-6, 0.002216),
             float2x2(-5, 0.008764),
@@ -44,8 +46,8 @@ shaderRW.buffer[identity] = {
         };
         struct Export {
             float4 World : COLOR0;
-            float4 EmissiveX : COLOR1;
-            float4 EmissiveY : COLOR2;
+            float4 Intermediate : COLOR1;
+            float4 Emissive : COLOR2;
         };
         sampler baseSampler = sampler_state {
             Texture = baseTexture;
@@ -67,18 +69,18 @@ shaderRW.buffer[identity] = {
             if (!isVertical) {
                 sampledTexel.x = PS.TexCoord.x;
                 for(int i = 0; i < 13; i++) {
-                    sampledTexel.x = PS.TexCoord.x + ((blurMultiplier/viewportSize.x)*kernelWeights[i].x);
-                    output.EmissiveX += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomMultiplier*kernelWeights[i].y;
+                    sampledTexel.x = PS.TexCoord.x + ((blurIntensity/viewportSize.x)*kernelWeights[i].x);
+                    output.Intermediate += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
                 }
-                output.EmissiveY = 0;
+                output.Emissive = 0;
             }
             else {
                 sampledTexel.y = PS.TexCoord.y;
                 for(int i = 0; i < 13; i++) {
-                    sampledTexel.y = PS.TexCoord.y + ((blurMultiplier/viewportSize.y)*kernelWeights[i].x);
-                    output.EmissiveY += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomMultiplier*kernelWeights[i].y;
+                    sampledTexel.y = PS.TexCoord.y + ((blurIntensity/viewportSize.y)*kernelWeights[i].x);
+                    output.Emissive += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
                 }
-                output.EmissiveX = 0;
+                output.Intermediate = 0;
             }
             output.World = 0;
             return output;
