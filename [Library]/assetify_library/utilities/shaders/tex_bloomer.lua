@@ -37,7 +37,6 @@ shaderRW.buffer[identity] = {
             float2x2(5, 0.008764),
             float2x2(6, 0.002216)
         };
-        texture baseTexture;
         texture vEmissive0 <string renderTarget = "yes";>;
         texture vEmissive1 <string renderTarget = "yes";>;
         struct PSInput {
@@ -50,7 +49,7 @@ shaderRW.buffer[identity] = {
             float4 Emissive : COLOR2;
         };
         sampler vEmissive0Sampler = sampler_state {
-            Texture = baseTexture;
+            Texture = vSource2;
             MinFilter = Linear;
             MagFilter = Linear;
             MipFilter = Linear;
