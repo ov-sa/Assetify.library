@@ -20,13 +20,40 @@ shaderRW.buffer[identity] = {
         -->> Variables <<--
         -------------------*/
 
+        static const float2x2 kernelWeights[13] = {
+            float2x2(-6, 0.002216),
+            float2x2(-5, 0.008764),
+            float2x2(-4, 0.026995),
+            float2x2(-3, 0.064759),
+            float2x2(-2, 0.120985),
+            float2x2(-1, 0.176033),
+            float2x2(0, 0.199471),
+            float2x2(1, 0.176033),
+            float2x2(2, 0.120985),
+            float2x2(3, 0.064759),
+            float2x2(4, 0.026995),
+            float2x2(5, 0.008764),
+            float2x2(6, 0.002216)
+        };
         texture baseTexture;
+        texture vEmissive0 <string renderTarget = "yes";>;
+        texture vEmissive1 <string renderTarget = "yes";>;
         struct PSInput {
             float4 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
         };
+        struct Export {
+            float4 World : COLOR0;
+            float4 EmissiveX : COLOR1;
+            float4 EmissiveY : COLOR2;
+        };
         sampler baseSampler = sampler_state {
             Texture = baseTexture;
+            MinFilter = Linear;
+            MagFilter = Linear;
+            MipFilter = Linear;
+            AddressU = Mirror;
+            AddressV = Mirror;
         };
 
 
@@ -34,12 +61,30 @@ shaderRW.buffer[identity] = {
         -->> Handlers <<--
         ------------------*/
 
-        float4 SampleEmissive(PSInput PS, bool isVertical) {
-            return float4(1, 0, 0, 1);
+        Export SampleEmissive(PSInput PS, bool isVertical) {
+            Export output;
+            float2 sampledTexel;
+            if (!isVertical) {
+                sampledTexel.x = PS.TexCoord.x;
+                for(int i = 0; i < 13; i++) {
+                    sampledTexel.x = PS.TexCoord.x + ((blurMultiplier/viewportSize.x)*kernelWeights[i].x);
+                    output.EmissiveX += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomMultiplier*kernelWeights[i].y;
+                }
+                output.EmissiveY = 0;
+            }
+            else {
+                sampledTexel.y = PS.TexCoord.y;
+                for(int i = 0; i < 13; i++) {
+                    sampledTexel.y = PS.TexCoord.y + ((blurMultiplier/viewportSize.y)*kernelWeights[i].x);
+                    output.EmissiveY += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomMultiplier*kernelWeights[i].y;
+                }
+                output.EmissiveX = 0;
+            }
+            output.World = 0;
+            return output;
         }
-    
-        float4 EmissiveXHandler(PSInput PS) : COLOR0 { return SampleEmissive(PS, false) }
-        float4 EmissiveYHandler(PSInput PS) : COLOR0 { return SampleEmissive(PS, true) }
+        Export EmissiveXHandler(PSInput PS) : COLOR0 { return SampleEmissive(PS, false); }
+        Export EmissiveYHandler(PSInput PS) : COLOR0 { return SampleEmissive(PS, true); }
 
 
         /*------------------
@@ -49,11 +94,11 @@ shaderRW.buffer[identity] = {
         technique ]]..identity..[[ {
             pass P0 {
                 AlphaBlendEnable = true;
-                PixelShader  = compile ps_2_0 EmissiveXHandler();
+                PixelShader = compile ps_2_0 EmissiveXHandler();
             }
             pass P1 {
                 AlphaBlendEnable = true;
-                PixelShader  = compile ps_2_0 EmissiveYHandler();
+                PixelShader = compile ps_2_0 EmissiveYHandler();
             }
         }
 
