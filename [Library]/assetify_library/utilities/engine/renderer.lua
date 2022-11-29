@@ -210,6 +210,7 @@ if localPlayer then
             renderer.private.emissiveMode.shader:destroy()
             imports.destroyElement(renderer.private.emissiveMode.intermediateRT)
             imports.destroyElement(renderer.private.emissiveMode.resultRT)
+            renderer.private.emissiveMode = nil
         end
         return true
     end
