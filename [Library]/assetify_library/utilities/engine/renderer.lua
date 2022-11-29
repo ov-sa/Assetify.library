@@ -59,6 +59,10 @@ if localPlayer then
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
         imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
+        if renderer.public.isEmissiveModeEnabled then
+            imports.dxDrawImage(0, 0, 0, 0, renderer.private.emissiveBuffer.shader) --TODO: IS THIS NEEDED?
+            imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.emissiveBuffer.rt)
+        end
         if renderer.public.isDynamicSkyEnabled then
             if renderer.public.isTimeSynced then
                 local currentTick = imports.getTickCount()
