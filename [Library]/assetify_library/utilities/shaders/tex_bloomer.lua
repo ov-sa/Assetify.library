@@ -49,7 +49,7 @@ shaderRW.buffer[identity] = {
             float4 Intermediate : COLOR1;
             float4 Emissive : COLOR2;
         };
-        sampler baseSampler = sampler_state {
+        sampler vEmissive0Sampler = sampler_state {
             Texture = baseTexture;
             MinFilter = Linear;
             MagFilter = Linear;
@@ -57,7 +57,14 @@ shaderRW.buffer[identity] = {
             AddressU = Mirror;
             AddressV = Mirror;
         };
-
+        sampler vEmissive1Sampler = sampler_state {
+            Texture = vEmissive0;
+            MinFilter = Linear;
+            MagFilter = Linear;
+            MipFilter = Linear;
+            AddressU = Mirror;
+            AddressV = Mirror;
+        };
 
         /*----------------
         -->> Handlers <<--
@@ -70,7 +77,7 @@ shaderRW.buffer[identity] = {
                 sampledTexel.x = PS.TexCoord.x;
                 for(int i = 0; i < 13; i++) {
                     sampledTexel.x = PS.TexCoord.x + ((blurIntensity/viewportSize.x)*kernelWeights[i].x);
-                    output.Intermediate += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
+                    output.Intermediate += tex2Dlod(vEmissive0Sampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
                 }
                 output.Emissive = 0;
             }
@@ -78,7 +85,7 @@ shaderRW.buffer[identity] = {
                 sampledTexel.y = PS.TexCoord.y;
                 for(int i = 0; i < 13; i++) {
                     sampledTexel.y = PS.TexCoord.y + ((blurIntensity/viewportSize.y)*kernelWeights[i].x);
-                    output.Emissive += tex2Dlod(baseSampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
+                    output.Emissive += tex2Dlod(vEmissive1Sampler, float4(sampledTexel.xy, 0, 0))*bloomIntensity*kernelWeights[i].y;
                 }
                 output.Intermediate = 0;
             }
