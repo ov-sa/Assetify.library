@@ -60,6 +60,7 @@ if localPlayer then
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
         imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
         if renderer.public.isEmissiveModeEnabled then
+            outputChatBox("RENDERING EMISSIVE SHADER...")
             imports.dxDrawImage(0, 0, 0, 0, renderer.private.emissiveBuffer.shader) --TODO: IS THIS NEEDED?
             imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.emissiveBuffer.rt)
         end
@@ -119,6 +120,7 @@ if localPlayer then
                 end
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
+                renderer.public:setEmissiveState(false)
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 imports.destroyElement(renderer.public.virtualSource)
                 renderer.public.virtualSource = nil
