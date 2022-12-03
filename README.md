@@ -13,8 +13,6 @@
 
 **"Don't need default map, Doing complete custom map?"** That's what the library is crafted for! (Unlimited `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, `Inventory`, `Loot` Asset-Packs & Custom Graphics!)
 
-##### [**V:M ━ Assetify-Library**](https://github.com/ov-vm/Assetify-Library)
-
 ## ━ Features
 
 💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovStudio) **US TO SUPPORT THE DEVELOPMENT.**
