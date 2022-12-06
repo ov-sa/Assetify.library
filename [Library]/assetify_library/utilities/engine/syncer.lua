@@ -51,7 +51,7 @@ syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..import
 network:create("Assetify:onBoot"):on(function() syncer.public.isLibraryBooted = true end, {isPrioritized = true})
 network:create("Assetify:onLoad"):on(function() syncer.public.isLibraryLoaded = true end, {isPrioritized = true})
 network:create("Assetify:onUnload"):on(function() syncer.public.isLibraryLoaded = false end, {isPrioritized = true})
-network:create("Assetify:onModuleLoad"):on(function() syncer.public.isModuleLoaded = false end, {isPrioritized = true})
+network:create("Assetify:onModuleLoad"):on(function() syncer.public.isModuleLoaded = true end, {isPrioritized = true})
 network:create("Assetify:onElementDestroy")
 syncer.private.execOnBoot = function(execFunc)
     if not execFunc or (imports.type(execFunc) ~= "function") then return false end
