@@ -14,7 +14,10 @@
 
 local imports = {
     type = type,
+    pairs = pairs,
+    error = error,
     tonumber = tonumber,
+    collectgarbage = collectgarbage,
     coroutine = coroutine
 }
 
@@ -48,6 +51,35 @@ function thread.public:createHeartbeat(conditionExec, exec, rate)
     end)
     cThread:resume({executions = 1, frames = rate})
     return cThread
+end
+
+function thread.public:createPromise(callback, isAsync)
+    if self ~= thread.public then return false end
+    if not callback or (imports.type(callback) ~= "function") then return false end
+    isAsync = (isAsync and true) or false
+    local cThread, cHandle = nil, nil
+    local cPromise = {
+        isHandled = false,
+        thread = cThread,
+        resolve = function(...) return cHandle(true, ...) end,
+        reject = function(...) return cHandle(_, ...) end,
+        awaitingThreads = {}
+    }
+    cHandle = function(isResolver, ...)
+        if cPromise.isHandled then return false end
+        isResolver = (isResolver and true) or false
+        if not isResolver then imports.error(...) end
+        for i, j in imports.pairs(cPromise.awaitingThreads) do
+            --i:resolve() --TODO
+        end
+        cPromise.isHandled = true
+        cPromise = nil
+        imports.collectgarbage()
+        return true
+    end
+    if not isAsync then callback(cPromise.resolve, cPromise.reject)
+    else callback(cPromise.thread, cPromise.resolve, cPromise.reject) end
+    return true
 end
 
 function thread.public:destroy()
