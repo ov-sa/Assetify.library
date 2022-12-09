@@ -172,17 +172,15 @@ function thread.public:await(cPromise)
     local resolvedValues = self.resolvedValues
     self.resolvedValues = nil
     if self.isErrored then
-        print("CHECK IF THE THREAD IS WITHIN A TRY SCOPE...")
-        local currentThread = thread.public:getThread()
-        if currentThread and thread.private.exceptions[currentThread] then
+        if thread.private.exceptions[self] then
             print("YES ITS A TRY SCOPE")
             timer:create(function()
-                local exception = thread.private.exceptions[currentThread]
-                currentThread:destroy()
+                local exception = thread.private.exceptions[self]
+                self:destroy()
                 exception.promise.resolve()
                 exception.handles.catch("something bla bla")
             end, 1, 1)
-            currentThread:pause()
+            self:pause()
         end
         return
     else return table.unpack(resolvedValues) end
