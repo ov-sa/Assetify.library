@@ -219,6 +219,7 @@ function thread.public:try(handles)
 end
 
 function async(...) return thread.public:create(...) end
+function heartbeat(...) return thread.public:createHeartbeat(...) end
 function promise(...) return thread.public:createPromise(...) end
 function sleep(...)
     local currentThread = thread.public:getThread()
