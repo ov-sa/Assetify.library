@@ -27,6 +27,7 @@ local imports = {
 -----------------------
 
 local thread = class:create("thread")
+thread.private.coroutines = {}
 thread.private.promises = {}
 
 function thread.public:create(exec)
@@ -35,6 +36,7 @@ function thread.public:create(exec)
     if cThread then
         cThread.syncRate = {}
         cThread.thread = imports.coroutine.create(exec)
+        thread.private.coroutines[(cThread.thread)] = cThread
     end
     return cThread
 end
@@ -87,6 +89,7 @@ function thread.public:destroy()
     if not thread.public:isInstance(self) then return false end
     if self.intervalTimer and timer:isInstance(self.intervalTimer) then self.intervalTimer:destroy() end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then self.sleepTimer:destroy() end
+    thread.private.coroutines[(self.thread)] = nil
     self:destroyInstance()
     return true
 end
