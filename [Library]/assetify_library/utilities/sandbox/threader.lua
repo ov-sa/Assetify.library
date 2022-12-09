@@ -67,17 +67,16 @@ function thread.public:createPromise(callback, isAsync)
     cHandle = function(isResolver, ...)
         if not thread.private.promises[cPromise] then return false end
         for i, j in imports.pairs(thread.private.promises[cPromise]) do
-            thread.private.resolve(isResolver, ...)
+            thread.private.resolve(i, isResolver, ...)
         end
         thread.private.promises[cPromise] = nil
-        cPromise = nil
         imports.collectgarbage()
         return true
     end
     thread.private.promises[cPromise] = {}
     if not isAsync then callback(cPromise.resolve, cPromise.reject)
     else callback(cPromise.thread, cPromise.resolve, cPromise.reject) end
-    return {}
+    return cPromise
 end
 
 function thread.public:destroy()
@@ -153,23 +152,22 @@ function thread.public:await(cPromise)
     if not thread.public:isInstance(self) or self.isAwaiting then return false end
     if not cPromise or not thread.private.promises[cPromise] then return false end
     self.isAwaiting = cPromise
-    print("AWAITING THE THREAD")
+    thread.private.promises[cPromise][self] = true
     thread.public:pause()
-    print("RESOLVED THE THREAD")
     local resolvedValues = self.resolvedValues
     self.resolvedValues = nil
     if self.isErrored then imports.error(table.unpack(resolvedValues))
-    else table.unpack(resolvedValues) end
-    return true
+    else return table.unpack(resolvedValues) end
 end
 
-function thread.public:resolve(...)
-    if not thread.public:isInstance(self) then return false end
-    if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
+function thread.private.resolve(cThread, isResolved, ...)
+    if not thread.public:isInstance(cThread) then return false end
+    if not cThread.isAwaiting or not thread.private.promises[(cThread.isAwaiting)] then return false end
     timer:create(function(...)
-        self.isAwaiting = nil
-        self.resolvedValues = table.pack(...)
-        thread.private.resume(self)
+        cThread.isAwaiting = nil
+        cThread.isErrored = not isResolved
+        cThread.resolvedValues = table.pack(...)
+        thread.private.resume(cThread)
     end, 1, 1, ...)
     return true
 end
