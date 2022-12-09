@@ -28,6 +28,7 @@ local imports = {
 local timer = class:create("timer")
 
 function timer.public:create(...)
+    if self ~= timer.public then return false end
     local cTimer = self:createInstance()
     if cTimer and not cTimer:load(...) then
         cTimer:destroyInstance()

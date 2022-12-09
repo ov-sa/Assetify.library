@@ -148,6 +148,7 @@ function network.private.deserializeExec(serial)
 end
 
 function network.public:create(...)
+    if self ~= network.public then return false end
     local cNetwork = self:createInstance()
     if cNetwork and not cNetwork:load(...) then
         cNetwork:destroyInstance()

@@ -30,7 +30,13 @@ local thread = class:create("thread")
 thread.private.coroutines = {}
 thread.private.promises = {}
 
+function thread.public:getThread()
+    local currentThread = imports.coroutine.running()
+    return (currentThread and thread.private.coroutines[currentThread]) or false
+end
+
 function thread.public:create(exec)
+    if self ~= thread.public then return false end
     if not exec or (imports.type(exec) ~= "function") then return false end
     local cThread = self:createInstance()
     if cThread then
