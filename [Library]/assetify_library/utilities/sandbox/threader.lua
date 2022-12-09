@@ -220,6 +220,10 @@ end
 
 function async(...) return thread.public:create(...) end
 function promise(...) return thread.public:createPromise(...) end
+function await(...)
+    local currentThread = thread.public:getThread()
+    return (currentThread and currentThread:await(...)) or false
+end
 function try(...)
     local currentThread = thread.public:getThread()
     return (currentThread and currentThread:try(...)) or false
