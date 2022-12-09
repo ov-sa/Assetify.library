@@ -282,9 +282,8 @@ function network.public:emit(...)
     return true
 end
 
-function network.public:emitCallback(cThread, ...)
-    if not self or not cThread or not thread:isInstance(cThread) then return false end
-    local cThread = cThread
+function network.public:emitCallback(...)
+    if not self or not thread:getThread() then return false end
     local cPromise = thread:createPromise()
     local cArgs, cExec = table.pack(...), cPromise.resolve
     local payload = {
