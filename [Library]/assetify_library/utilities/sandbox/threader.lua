@@ -62,12 +62,11 @@ function thread.public:createPromise(callback, isAsync)
         isHandled = false,
         thread = cThread,
         resolve = function(...) return cHandle(true, ...) end,
-        reject = function(...) return cHandle(_, ...) end,
+        reject = function(...) return cHandle(false, ...) end,
         awaitingThreads = {}
     }
     cHandle = function(isResolver, ...)
         if cPromise.isHandled then return false end
-        isResolver = (isResolver and true) or false
         if not isResolver then imports.error(...) end
         for i, j in imports.pairs(cPromise.awaitingThreads) do
             --i:resolve() --TODO
