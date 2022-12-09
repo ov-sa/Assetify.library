@@ -209,7 +209,7 @@ function thread.public:try(handles)
     if not handles.exec or not handles.catch then return false end
     local cPromise = promise()
     local cException = nil
-    cException = thread:create(function(self)
+    cException = thread.public:create(function(self)
         handles.exec(self)
         cPromise.resolve()
     end)
