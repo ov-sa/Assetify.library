@@ -203,19 +203,19 @@ function thread.public:try(handles)
     handles.exec = (handles.exec and (imports.type(handles.exec) == "function") and handles.exec) or false
     handles.catch = (handles.catch and (imports.type(handles.catch) == "function") and handles.catch) or false
     if not handles.exec or not handles.catch then return false end
-    local cException = nil
-    cException = thread.public:create(function(self)
-        handles.exec(self)
-        thread.private.exceptions[cException].promise.resolve()
-    end)
-    thread.private.exceptions[cException] = {
-        isErrored = false,
+    local cException, exceptionBuffer = nil, {
         promise = promise(),
         handles = handles
     }
+    local resolvedValues = nil
+    cException = thread.public:create(function(self)
+        resolvedValues = table.pack(handles.exec(self))
+        exceptionBuffer.promise.resolve()
+    end)
+    thread.private.exceptions[cException] = exceptionBuffer
     cException:resume()
-    self:await(thread.private.exceptions[cException].promise)
-    return true
+    self:await(exceptionBuffer.promise)
+    return table.unpack(resolvedValues)
 end
 
 function async(...) return thread.public:create(...) end
