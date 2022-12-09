@@ -15,7 +15,6 @@
 local imports = {
     type = type,
     pairs = pairs,
-    error = error,
     tonumber = tonumber,
     collectgarbage = collectgarbage,
     coroutine = coroutine
@@ -79,6 +78,7 @@ function thread.public:createPromise(callback, config)
         assetify.timer:create(function(...)
             for i, j in imports.pairs(thread.private.promises[cPromise]) do
                 thread.private.resolve(i, isResolver, ...)
+                local isThisInstance = thread.public:isInstance(i)
             end
             thread.private.promises[cPromise] = nil
             imports.collectgarbage()
@@ -91,7 +91,7 @@ function thread.public:createPromise(callback, config)
     return cPromise
 end
 
-function thread.public:destroy()
+function thread.public:destroy(isDebug)
     if not thread.public:isInstance(self) then return false end
     if self.intervalTimer and timer:isInstance(self.intervalTimer) then self.intervalTimer:destroy() end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then self.sleepTimer:destroy() end
@@ -170,7 +170,22 @@ function thread.public:await(cPromise)
     thread.public:pause()
     local resolvedValues = self.resolvedValues
     self.resolvedValues = nil
-    if self.isErrored then imports.error(resolvedValues)
+    if self.isErrored then
+        --TODO: 
+        print("CHECK IF THE THREAD IS WITHIN A TRY SCOPE...")
+        local currThread = thread.public:getThread()
+        if currThread and currThread.isExceptionCallStack then
+            print("YES ITS A TRY SCOPE")
+            local reject = currThread.isExceptionCallStack.reject
+            timer:create(function()
+                currThread:destroy()
+                currThread.isExceptionPromise.resolve()
+                currThread.isExceptionCallStack.catch("something bla bla")
+            end, 1, 1)
+            currThread:pause()
+        end
+        --return catchError(table.unpack(resolvedValues))
+        return
     else return table.unpack(resolvedValues) end
 end
 
@@ -186,4 +201,23 @@ function thread.private.resolve(cThread, isResolved, ...)
     return true
 end
 
+function thread.public:try(handles)
+    if not thread.public:isInstance(self) then return false end
+    handles = (handles and (imports.type(handles) == "table") and handles) or false
+    handles.exec = (handles.exec and (imports.type(handles.exec) == "function") and handles.exec) or false
+    handles.catch = (handles.catch and (imports.type(handles.catch) == "function") and handles.catch) or false
+    if not handles.exec or not handles.catch then return false end
+    local cPromise = promise()
+    thread:create(function(self)
+        self.isExceptionCallStack = handles
+        self.isExceptionPromise = cPromise
+        handles.exec(self)
+        self.isExceptionCallStack = false
+        cPromise.resolve()
+    end):resume()
+    self:await(cPromise)
+    return true
+end
+
 function async(...) return thread.public:create(...) end
+function promise(...) return thread.public:createPromise(...) end
