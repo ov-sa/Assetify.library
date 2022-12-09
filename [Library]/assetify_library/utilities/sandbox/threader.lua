@@ -176,7 +176,6 @@ function thread.public:await(cPromise)
         local currentThread = thread.public:getThread()
         if currentThread and thread.private.exceptions[currentThread] then
             print("YES ITS A TRY SCOPE")
-            local reject = currentThread.isExceptionCallStack.reject
             timer:create(function()
                 local exception = thread.private.exceptions[currentThread]
                 currentThread:destroy()
@@ -207,19 +206,18 @@ function thread.public:try(handles)
     handles.exec = (handles.exec and (imports.type(handles.exec) == "function") and handles.exec) or false
     handles.catch = (handles.catch and (imports.type(handles.catch) == "function") and handles.catch) or false
     if not handles.exec or not handles.catch then return false end
-    local cPromise = promise()
     local cException = nil
     cException = thread.public:create(function(self)
         handles.exec(self)
-        cPromise.resolve()
+        thread.private.exceptions[cException].promise.resolve()
     end)
     thread.private.exceptions[cException] = {
         isErrored = false,
-        promise = promise,
+        promise = promise(),
         handles = handles
     }
     cException:resume()
-    self:await(cPromise)
+    self:await(thread.private.exceptions[cException].promise)
     return true
 end
 
