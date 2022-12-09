@@ -27,6 +27,7 @@ local imports = {
 -----------------------
 
 local thread = class:create("thread")
+thread.private.promises = {}
 
 function thread.public:create(exec)
     if not exec or (imports.type(exec) ~= "function") then return false end
@@ -59,26 +60,24 @@ function thread.public:createPromise(callback, isAsync)
     isAsync = (isAsync and true) or false
     local cThread, cHandle = nil, nil
     local cPromise = {
-        isHandled = false,
         thread = cThread,
         resolve = function(...) return cHandle(true, ...) end,
-        reject = function(...) return cHandle(false, ...) end,
-        awaitingThreads = {}
+        reject = function(...) return cHandle(false, ...) end
     }
     cHandle = function(isResolver, ...)
-        if cPromise.isHandled then return false end
-        if not isResolver then imports.error(...) end
-        for i, j in imports.pairs(cPromise.awaitingThreads) do
-            --i:resolve() --TODO
+        if not thread.private.promises[cPromise] then return false end
+        for i, j in imports.pairs(thread.private.promises[cPromise]) do
+            thread.private.resolve(isResolver, ...)
         end
-        cPromise.isHandled = true
+        thread.private.promises[cPromise] = nil
         cPromise = nil
         imports.collectgarbage()
         return true
     end
+    thread.private.promises[cPromise] = {}
     if not isAsync then callback(cPromise.resolve, cPromise.reject)
     else callback(cPromise.thread, cPromise.resolve, cPromise.reject) end
-    return true
+    return {}
 end
 
 function thread.public:destroy()
@@ -150,15 +149,18 @@ function thread.public:sleep(duration)
     return true
 end
 
-function thread.public:await(exec)
-    if not thread.public:isInstance(self) then return false end
-    if not exec or (imports.type(exec) ~= "function") then return exec end
-    self.isAwaiting = "promise"
-    exec(self)
+function thread.public:await(cPromise)
+    if not thread.public:isInstance(self) or self.isAwaiting then return false end
+    if not cPromise or not thread.private.promises[cPromise] then return false end
+    self.isAwaiting = cPromise
+    print("AWAITING THE THREAD")
     thread.public:pause()
-    local resolvedValues = self.awaitingValues
-    self.awaitingValues = nil
-    return table.unpack(resolvedValues)
+    print("RESOLVED THE THREAD")
+    local resolvedValues = self.resolvedValues
+    self.resolvedValues = nil
+    if self.isErrored then imports.error(table.unpack(resolvedValues))
+    else table.unpack(resolvedValues) end
+    return true
 end
 
 function thread.public:resolve(...)
@@ -166,7 +168,7 @@ function thread.public:resolve(...)
     if not self.isAwaiting or (self.isAwaiting ~= "promise") then return false end
     timer:create(function(...)
         self.isAwaiting = nil
-        self.awaitingValues = table.pack(...)
+        self.resolvedValues = table.pack(...)
         thread.private.resume(self)
     end, 1, 1, ...)
     return true
