@@ -158,7 +158,8 @@ end
 function thread.public:await(cPromise)
     if not thread.public:isInstance(self) or self.isAwaiting then return false end
     if not cPromise or not thread.private.promises[cPromise] then return false end
-    self.isAwaiting = cPromise
+    self.isAwaiting = "promise"
+    self.awaitingPromise = cPromise
     thread.private.promises[cPromise][self] = true
     thread.public:pause()
     local resolvedValues = self.resolvedValues
@@ -169,9 +170,9 @@ end
 
 function thread.private.resolve(cThread, isResolved, ...)
     if not thread.public:isInstance(cThread) then return false end
-    if not cThread.isAwaiting or not thread.private.promises[(cThread.isAwaiting)] then return false end
+    if not cThread.isAwaiting or (cThread.isAwaiting ~= "promise") or not thread.private.promises[(cThread.awaitingPromise)] then return false end
     timer:create(function(...)
-        cThread.isAwaiting = nil
+        cThread.isAwaiting, cThread.awaitingPromise = nil, nil
         cThread.isErrored = not isResolved
         cThread.resolvedValues = table.pack(...)
         thread.private.resume(cThread)
