@@ -56,9 +56,10 @@ end
 
 function thread.public:createPromise(callback, config)
     if self ~= thread.public then return false end
-    if not callback or (imports.type(callback) ~= "function") then return false end
+    callback = (callback and (imports.type(callback) == "function") and callback) or false
     config = (config and (imports.type(config) == "table") and config) or {}
     config.isAsync = (config.isAsync and true) or false
+    if not callback and config.isAsync then return false end
     local cHandle, isHandled = nil, false
     local cPromise = {
         resolve = function(...) return cHandle(true, ...) end,
@@ -77,8 +78,8 @@ function thread.public:createPromise(callback, config)
         return true
     end
     thread.private.promises[cPromise] = {}
-    if not config.isAsync then callback(cPromise.resolve, cPromise.reject)
-    else thread.public:create(function(self) callback(self, cPromise.resolve, cPromise.reject) end):resume() end
+    if not config.isAsync then execFunction(callback, cPromise.resolve, cPromise.reject)
+    else thread.public:create(function(self) execFunction(callback, self, cPromise.resolve, cPromise.reject) end):resume() end
     return cPromise
 end
 
