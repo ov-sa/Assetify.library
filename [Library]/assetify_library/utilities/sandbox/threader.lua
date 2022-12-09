@@ -151,7 +151,7 @@ end
 
 function thread.public:sleep(duration)
     duration = math.max(0, imports.tonumber(duration) or 0)
-    if not thread.public:isInstance(self) or self.isAwaiting then return false end
+    if not thread.public:isInstance(self) or (self ~= thread.public:getThread()) or self.isAwaiting then return false end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then return false end
     self.isAwaiting = "sleep"
     self.sleepTimer = timer:create(function()
@@ -220,6 +220,10 @@ end
 
 function async(...) return thread.public:create(...) end
 function promise(...) return thread.public:createPromise(...) end
+function sleep(...)
+    local currentThread = thread.public:getThread()
+    return (currentThread and currentThread:sleep(...)) or false
+end
 function await(...)
     local currentThread = thread.public:getThread()
     return (currentThread and currentThread:await(...)) or false
