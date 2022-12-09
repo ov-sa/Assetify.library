@@ -28,6 +28,7 @@ local imports = {
 local thread = class:create("thread")
 thread.private.coroutines = {}
 thread.private.promises = {}
+thread.private.exceptions = {}
 
 function thread.public:getThread()
     local currentThread = imports.coroutine.running()
@@ -95,6 +96,7 @@ function thread.public:destroy()
     if self.intervalTimer and timer:isInstance(self.intervalTimer) then self.intervalTimer:destroy() end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then self.sleepTimer:destroy() end
     thread.private.coroutines[(self.thread)] = nil
+    thread.private.exceptions[self] = nil
     self:destroyInstance()
     return true
 end
@@ -170,20 +172,19 @@ function thread.public:await(cPromise)
     local resolvedValues = self.resolvedValues
     self.resolvedValues = nil
     if self.isErrored then
-        --TODO: 
         print("CHECK IF THE THREAD IS WITHIN A TRY SCOPE...")
-        local currThread = thread.public:getThread()
-        if currThread and currThread.isExceptionCallStack then
+        local currentThread = thread.public:getThread()
+        if currentThread and thread.private.exceptions[currentThread] then
             print("YES ITS A TRY SCOPE")
-            local reject = currThread.isExceptionCallStack.reject
+            local reject = currentThread.isExceptionCallStack.reject
             timer:create(function()
-                currThread:destroy()
-                currThread.isExceptionPromise.resolve()
-                currThread.isExceptionCallStack.catch("something bla bla")
+                local exception = thread.private.exceptions[currentThread]
+                currentThread:destroy()
+                exception.promise.resolve()
+                exception.handles.catch("something bla bla")
             end, 1, 1)
-            currThread:pause()
+            currentThread:pause()
         end
-        --return catchError(table.unpack(resolvedValues))
         return
     else return table.unpack(resolvedValues) end
 end
@@ -207,13 +208,17 @@ function thread.public:try(handles)
     handles.catch = (handles.catch and (imports.type(handles.catch) == "function") and handles.catch) or false
     if not handles.exec or not handles.catch then return false end
     local cPromise = promise()
-    thread:create(function(self)
-        self.isExceptionCallStack = handles
-        self.isExceptionPromise = cPromise
+    local cException = nil
+    cException = thread:create(function(self)
         handles.exec(self)
-        self.isExceptionCallStack = false
         cPromise.resolve()
-    end):resume()
+    end)
+    thread.private.exceptions[cException] = {
+        isErrored = false,
+        promise = promise,
+        handles = handles
+    }
+    cException:resume()
     self:await(cPromise)
     return true
 end
