@@ -284,7 +284,8 @@ end
 function network.public:emitCallback(cThread, ...)
     if not self or not cThread or not thread:isInstance(cThread) then return false end
     local cThread = cThread
-    local cArgs, cExec = table.pack(...), function(...) return cThread:resolve(...) end
+    local cPromise = thread:createPromise()
+    local cArgs, cExec = table.pack(...), cPromise.resolve end
     local payload = {
         isRemote = false,
         isRestricted = false,
@@ -309,12 +310,13 @@ function network.public:emitCallback(cThread, ...)
     end
     payload.processArgs = cArgs
     if not payload.isRemote then
-        return function() imports.triggerEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload) end
+        imports.triggerEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
     else
         if not payload.isLatent then
-            return function() imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload) end
+            imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
         else
-            return function() imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload) end
+            imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
         end
     end
+    return cPromise
 end
