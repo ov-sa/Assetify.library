@@ -59,18 +59,22 @@ function thread.public:createPromise(callback, isAsync)
     if not callback or (imports.type(callback) ~= "function") then return false end
     isAsync = (isAsync and true) or false
     local cThread, cHandle = nil, nil
+    local isHandled = false
     local cPromise = {
         thread = cThread,
         resolve = function(...) return cHandle(true, ...) end,
         reject = function(...) return cHandle(false, ...) end
     }
     cHandle = function(isResolver, ...)
-        if not thread.private.promises[cPromise] then return false end
-        for i, j in imports.pairs(thread.private.promises[cPromise]) do
-            thread.private.resolve(i, isResolver, ...)
-        end
-        thread.private.promises[cPromise] = nil
-        imports.collectgarbage()
+        if not thread.private.promises[cPromise] or isHandled then return false end
+        isHandled = true
+        assetify.timer:create(function(...)
+            for i, j in imports.pairs(thread.private.promises[cPromise]) do
+                thread.private.resolve(i, isResolver, ...)
+            end
+            thread.private.promises[cPromise] = nil
+            imports.collectgarbage()
+        end, 1, 1, ...)
         return true
     end
     thread.private.promises[cPromise] = {}
