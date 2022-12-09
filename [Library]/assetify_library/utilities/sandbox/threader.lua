@@ -53,7 +53,7 @@ function thread.public:createHeartbeat(conditionExec, exec, rate)
     rate = math.max(imports.tonumber(rate) or 0, 1)
     local cThread = thread.public:create(function(self)
         while(conditionExec()) do
-            self:pause()
+            thread.public:pause()
         end
         exec()
         conditionExec, exec = nil, nil
@@ -158,12 +158,12 @@ function thread.public:sleep(duration)
         self.isAwaiting = nil
         thread.private.resume(self)
     end, duration, 1)
-    self:pause()
+    thread.public:pause()
     return true
 end
 
 function thread.public:await(cPromise)
-    if not thread.public:isInstance(self) or self.isAwaiting then return false end
+    if not thread.public:isInstance(self) or (self ~= thread.public:getThread()) then return false end
     if not cPromise or not thread.private.promises[cPromise] then return false end
     self.isAwaiting = "promise"
     self.awaitingPromise = cPromise
@@ -179,7 +179,7 @@ function thread.public:await(cPromise)
                 exception.promise.resolve()
                 exception.handles.catch(table.unpack(resolvedValues))
             end, 1, 1)
-            self:pause()
+            thread.public:pause()
         end
         return
     else return table.unpack(resolvedValues) end
@@ -198,7 +198,7 @@ function thread.private.resolve(cThread, isResolved, ...)
 end
 
 function thread.public:try(handles)
-    if not thread.public:isInstance(self) then return false end
+    if not thread.public:isInstance(self) or (self ~= thread.public:getThread()) then return false end
     handles = (handles and (imports.type(handles) == "table") and handles) or false
     handles.exec = (handles.exec and (imports.type(handles.exec) == "function") and handles.exec) or false
     handles.catch = (handles.catch and (imports.type(handles.catch) == "function") and handles.catch) or false
@@ -220,3 +220,7 @@ end
 
 function async(...) return thread.public:create(...) end
 function promise(...) return thread.public:createPromise(...) end
+function try(...)
+    local currentThread = thread.public:getThread()
+    return (currentThread and currentThread:try(...)) or false
+end
