@@ -285,7 +285,7 @@ function network.public:emitCallback(cThread, ...)
     if not self or not cThread or not thread:isInstance(cThread) then return false end
     local cThread = cThread
     local cPromise = thread:createPromise()
-    local cArgs, cExec = table.pack(...), cPromise.resolve end
+    local cArgs, cExec = table.pack(...), cPromise.resolve
     local payload = {
         isRemote = false,
         isRestricted = false,
