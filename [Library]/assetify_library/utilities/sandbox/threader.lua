@@ -173,12 +173,11 @@ function thread.public:await(cPromise)
     self.resolvedValues = nil
     if self.isErrored then
         if thread.private.exceptions[self] then
-            print("YES ITS A TRY SCOPE")
             timer:create(function()
                 local exception = thread.private.exceptions[self]
                 self:destroy()
                 exception.promise.resolve()
-                exception.handles.catch("something bla bla")
+                exception.handles.catch(table.unpack(resolvedValues))
             end, 1, 1)
             self:pause()
         end
