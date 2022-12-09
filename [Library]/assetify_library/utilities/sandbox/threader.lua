@@ -91,7 +91,7 @@ function thread.public:createPromise(callback, config)
     return cPromise
 end
 
-function thread.public:destroy(isDebug)
+function thread.public:destroy()
     if not thread.public:isInstance(self) then return false end
     if self.intervalTimer and timer:isInstance(self.intervalTimer) then self.intervalTimer:destroy() end
     if self.sleepTimer and timer:isInstance(self.sleepTimer) then self.sleepTimer:destroy() end
