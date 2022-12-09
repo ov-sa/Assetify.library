@@ -223,13 +223,16 @@ function heartbeat(...) return thread.public:createHeartbeat(...) end
 function promise(...) return thread.public:createPromise(...) end
 function sleep(...)
     local currentThread = thread.public:getThread()
-    return (currentThread and currentThread:sleep(...)) or false
+    if not currentThread then return false end
+    return currentThread:sleep(...)
 end
 function await(...)
     local currentThread = thread.public:getThread()
-    return (currentThread and currentThread:await(...)) or false
+    if not currentThread then return false end
+    return currentThread:await(...)
 end
 function try(...)
     local currentThread = thread.public:getThread()
-    return (currentThread and currentThread:try(...)) or false
+    if not currentThread then return false end
+    return currentThread:try(...)
 end
