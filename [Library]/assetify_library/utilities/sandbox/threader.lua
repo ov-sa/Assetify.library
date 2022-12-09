@@ -78,7 +78,6 @@ function thread.public:createPromise(callback, config)
         assetify.timer:create(function(...)
             for i, j in imports.pairs(thread.private.promises[cPromise]) do
                 thread.private.resolve(i, isResolver, ...)
-                local isThisInstance = thread.public:isInstance(i)
             end
             thread.private.promises[cPromise] = nil
             imports.collectgarbage()
