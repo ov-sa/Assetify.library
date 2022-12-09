@@ -160,7 +160,7 @@ function thread.public:await(cPromise)
     thread.public:pause()
     local resolvedValues = self.resolvedValues
     self.resolvedValues = nil
-    if self.isErrored then imports.error(table.unpack(resolvedValues))
+    if self.isErrored then imports.error(resolvedValues)
     else return table.unpack(resolvedValues) end
 end
 
