@@ -76,7 +76,7 @@ function thread.public:createPromise(callback, config)
     cHandle = function(isResolver, ...)
         if not thread.private.promises[cPromise] or isHandled then return false end
         isHandled = true
-        assetify.timer:create(function(...)
+        timer:create(function(...)
             for i, j in imports.pairs(thread.private.promises[cPromise]) do
                 thread.private.resolve(i, isResolver, ...)
             end
