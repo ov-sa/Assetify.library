@@ -25,7 +25,7 @@
 * Built-In Namespacer (Inclusive of `Class` simulator)
 * Built-In Table, Math, String library
 * Built-In File System
-* Built-In Timer & Threader
+* Built-In Timer & Threader (Threads, Async/Await, Heartbeats, Promises & much more!)
 * Built-In Networker, Scheduler, Renderer & Attacher
 * Built-In Library CLI
 * Built-In Library Updater (If enabled, Latest version will be pulled automatically and be replaced)
