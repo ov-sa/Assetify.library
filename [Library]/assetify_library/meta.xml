@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="7.1.2"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="7.2.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -34,6 +34,7 @@
     <script src="utilities/sandbox/timer.lua" type="shared"/>
     <script src="utilities/sandbox/threader.lua" type="shared"/>
     <script src="utilities/sandbox/networker.lua" type="shared"/>
+    <script src="utilities/sandbox/rest.lua" type="shared"/>
     <script src="utilities/engine/syncer.lua" type="shared"/>
     <script src="utilities/sandbox/datasystem.lua" type="shared"/>
 
