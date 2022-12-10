@@ -41,7 +41,7 @@ function rest.public:fetch(method, route, data)
         method = string.upper(method),
         headers = {
             ["Content-Type"] = "application/json",
-            ["Accept"] = 'application/json'
+            ["Accept"] = "application/json"
         },
         formFields = (method == "post" and data) or nil
     }
