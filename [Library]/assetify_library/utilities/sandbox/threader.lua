@@ -176,7 +176,7 @@ function thread.public:await(cPromise)
             timer:create(function()
                 local exception = thread.private.exceptions[self]
                 self:destroy()
-                exception.promise.resolve()
+                exception.promise.reject(table.unpack(resolvedValues))
                 exception.handles.catch(table.unpack(resolvedValues))
             end, 1, 1)
             thread.public:pause()
