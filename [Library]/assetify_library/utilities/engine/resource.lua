@@ -142,7 +142,7 @@ else
             fileHash = {}
         }
         if resourceFiles then
-            for i = 1, #resourceFiles, 1 do
+            for i = 1, table.length(resourceFiles), 1 do
                 local j = ":"..(self.name).."/"..resourceFiles[i]
                 local builtFileData, builtFileSize = file:read(j)
                 if builtFileData then
