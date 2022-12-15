@@ -38,7 +38,7 @@ function import(...)
         else
             buildImports = cArgs
         end
-        for i = 1, #buildImports, 1 do
+        for i = 1, table.length(buildImports), 1 do
             local j = buildImports[i]
             if (j ~= "imports") and bundler.private.buffer[j] and not __cImports[j] then
                 __cImports[j] = true

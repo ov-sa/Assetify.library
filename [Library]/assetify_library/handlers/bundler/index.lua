@@ -48,7 +48,7 @@ bundler.private.modules = {
 function bundler.private:createUtils()
     if imports.type(bundler.private.utils) == "table" then
         local rw = ""
-        for i = 1, #bundler.private.utils, 1 do
+        for i = 1, table.length(bundler.private.utils), 1 do
             local j = file:read(bundler.private.utils[i])
             for k, v in imports.pairs(bundler.private.modules) do
                 j = string.gsub(j, k, v.namespace, _, true, "(", ".:)")
@@ -80,7 +80,7 @@ function bundler.private:createModule(name)
         local rw = file:read(module.path)
         for i, j in imports.pairs(bundler.private.modules) do
             local isBlacklisted = false
-            for k = 1, #module.endpoints, 1 do
+            for k = 1, table.length(module.endpoints), 1 do
                 local v = module.endpoints[k]
                 if i == v then
                     isBlacklisted = true
@@ -90,7 +90,7 @@ function bundler.private:createModule(name)
             if not isBlacklisted then rw = string.gsub(rw, i, j.namespace, _, true, "(", ".:)") end
         end
         rw = ((name == "namespace") and string.gsub(rw, "class = {}", "local class = {}")) or rw
-        for i = 1, #module.endpoints, 1 do
+        for i = 1, table.length(module.endpoints), 1 do
             local j = module.endpoints[i]
             rw = rw..[[
             assetify["]]..j..[["] = ]]..j..((bundler.private.modules[j] and bundler.private.modules[j].module and ".public") or "")..[[
@@ -116,7 +116,7 @@ function bundler.private:createAPIs(exports)
     local rw = ""
     for i, j in imports.pairs(exports) do
         if (i == bundler.private.platform) or (i == "shared") then
-            for k = 1, #j, 1 do
+            for k = 1, table.length(j), 1 do
                 local v = j[k]
                 rw = rw..[[
                 ]]..v.exportIndex..[[ = function(...)

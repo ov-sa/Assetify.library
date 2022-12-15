@@ -73,7 +73,7 @@ function asset.private:fetchMap(assetPath, shaderMaps)
         local mapData = shaderMaps[i] 
         if j and mapData then
             for k, v in imports.pairs(mapData) do
-                for m = 1, #v, 1 do
+                for m = 1, table.length(v), 1 do
                     local n = v[m]
                     if i == asset.public.references.clump then
                         n.clump = asset.private:validateMap(cPointer, n.clump, cMaps)
@@ -81,7 +81,7 @@ function asset.private:fetchMap(assetPath, shaderMaps)
                     elseif i == "control" then
                         n.control = asset.private:validateMap(cPointer, n.control, cMaps)
                         n.bump = asset.private:validateMap(cPointer, n.bump, cMaps)
-                        for x = 1, #shader.validChannels, 1 do
+                        for x = 1, table.length(shader.validChannels), 1 do
                             local y = shader.validChannels[x].index
                             if n[y] then
                                 n[y].map = asset.private:validateMap(cPointer, n[y].map, cMaps)
@@ -252,7 +252,7 @@ else
         }
     }
     for i, j in imports.pairs(asset.private.properties.whitelisted) do
-        for k = 1, #j, 1 do
+        for k = 1, table.length(j), 1 do
             local v = j[k]
             j[v] = true
             j[k] = nil
