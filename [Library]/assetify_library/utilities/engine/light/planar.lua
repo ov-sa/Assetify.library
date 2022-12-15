@@ -44,7 +44,7 @@ local planar = class:create("planar", {
     buffer = {}
 }, "light")
 syncer.private.execOnBoot(function()
-    for i = 1, #planar.private.cache.validTypes, 1 do
+    for i = 1, table.length(planar.private.cache.validTypes), 1 do
         local j = planar.private.cache.validTypes[i]
         local modelPath = "utilities/rw/"..j.index.."/"
         j.modelID, j.collisionID = imports.engineRequestModel("object"), imports.engineRequestModel("object")
