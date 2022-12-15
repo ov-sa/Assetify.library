@@ -129,9 +129,9 @@ function vcl.private.parseObject(parser, buffer, rw, isChild)
         if vcl.private.isVoid(parser.index) and (rw == vcl.private.types.list) then parser.isTypeID = parser.ref
         elseif not vcl.private.isVoid(rw) then parser.index = parser.index..rw
         else
-            if parser.isTypeID and vcl.private.isVoid(parser.index) and (rw == vcl.private.types.init) then parser.index = imports.tostring(#parser.pointer + 1) end
+            if parser.isTypeID and vcl.private.isVoid(parser.index) and (rw == vcl.private.types.init) then parser.index = imports.tostring(table.length(parser.pointer) + 1) end
             if not vcl.private.isVoid(parser.index) then
-                if parser.isTypeID and (rw == vcl.private.types.newline) then parser.pointer[(#parser.pointer + 1)] = parser.index
+                if parser.isTypeID and (rw == vcl.private.types.newline) then parser.pointer[(table.length(parser.pointer) + 1)] = parser.index
                 elseif rw == vcl.private.types.init then
                     local _, lineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
                     local indexTypePadding = (parser.isTypeID and (parser.ref - parser.isTypeID - 1)) or 0
