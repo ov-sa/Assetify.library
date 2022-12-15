@@ -42,8 +42,8 @@ function bundler.private:createScheduler()
         local footer = [[
         local bootExec = function(type)
             if not assetify.scheduler.buffer.pending[type] then return false end
-            if #assetify.scheduler.buffer.pending[type] > 0 then
-                for i = 1, #assetify.scheduler.buffer.pending[type], 1 do
+            if table.length(assetify.scheduler.buffer.pending[type]) > 0 then
+                for i = 1, table.length(assetify.scheduler.buffer.pending[type]), 1 do
                     assetify.scheduler.buffer.pending[type][i]()
                 end
                 assetify.scheduler.buffer.pending[type] = {}
@@ -88,8 +88,8 @@ function bundler.private:createScheduler()
         assetify.scheduler.buffer.schedule = assetify.imports.table.clone(assetify.scheduler.buffer.pending, true)
         assetify.scheduler.boot = function()
             for i, j in assetify.imports.pairs(assetify.scheduler.buffer.schedule) do
-                if #j > 0 then
-                    for k = 1, #j, 1 do
+                if table.length(j) > 0 then
+                    for k = 1, table.length(j), 1 do
                         assetify.scheduler[i](j[k])
                     end
                     assetify.scheduler.buffer.schedule[i] = {}
