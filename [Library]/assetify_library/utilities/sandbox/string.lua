@@ -102,7 +102,7 @@ function string.public.minify(baseString)
     end
     return [[
     local b, __b = string.split("]]..result..[[", "]]..(string.private.minifier)..[["), ""
-    for i = 1, #b, 1 do __b = __b..(string.char(b[i]) or "") end
+    for i = 1, table.length(b), 1 do __b = __b..(string.char(b[i]) or "") end
     loadstring(__b)()
     ]]
 end
