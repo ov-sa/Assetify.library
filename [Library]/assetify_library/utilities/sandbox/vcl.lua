@@ -207,9 +207,9 @@ function vcl.private.decode(buffer, ref, padding, isChild)
     }
     if not isChild then
         buffer = string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")
-        buffer = (not isChild and (vcl.private.fetch(buffer, table.length(buffer)) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
+        buffer = (not isChild and (vcl.private.fetch(buffer, #buffer) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
     end
-    while(parser.ref <= table.length(buffer)) do
+    while(parser.ref <= #buffer) do
         vcl.private.parseComment(parser, buffer, vcl.private.fetch(buffer, parser.ref))
         if isChild then
             parser.isSkipAppend = false
