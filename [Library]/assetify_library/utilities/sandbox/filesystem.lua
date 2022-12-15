@@ -111,7 +111,7 @@ function file.public:resolveURL(path, chroot)
             local j = cDirs[i]
             if j == "..." then
                 if not chroot or (chroot ~= cURL.url) then
-                    table.remove(vDirs, vDirs.__T.length)
+                    table.remove(vDirs, table.length(vDirs))
                 end
             else
                 table.insert(vDirs, j)
