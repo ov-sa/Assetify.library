@@ -57,14 +57,14 @@ end
 
 function vcl.private.fetchLine(rw, index)
     local rwLines = string.split(string.sub(rw, 0, index), vcl.private.types.newline)
-    return math.max(1, #rwLines), rwLines[(#rwLines)] or ""
+    return math.max(1, table.length(rwLines)), rwLines[table.length(rwLines)] or ""
 end
 
 function vcl.private.parseComment(parser, buffer, rw)
     if not parser.isType and (rw == vcl.private.types.comment) then
         local line, lineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
         local rwLines = string.split(buffer, vcl.private.types.newline)
-        parser.ref = parser.ref - #lineText + #rwLines[line] + 2
+        parser.ref = parser.ref - #lineText + table.length(rwLines[line]) + 2
     end
     return true
 end
