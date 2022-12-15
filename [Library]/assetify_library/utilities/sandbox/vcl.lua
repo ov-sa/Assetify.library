@@ -185,11 +185,11 @@ function vcl.private.encode(buffer, padding)
         end
     end
     table.sort(indexes.numeric, function(a, b) return a < b end)
-    for i = 1, #indexes.numeric, 1 do
+    for i = 1, table.length(indexes.numeric), 1 do
         local j = indexes.numeric[i]
         result = result..vcl.private.types.newline..padding..vcl.private.types.list..vcl.private.types.space..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
     end
-    for i = 1, #indexes.index, 1 do
+    for i = 1, table.length(indexes.index), 1 do
         local j = indexes.index[i]
         result = result..vcl.private.types.newline..padding..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
     end
@@ -207,9 +207,9 @@ function vcl.private.decode(buffer, ref, padding, isChild)
     }
     if not isChild then
         buffer = string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")
-        buffer = (not isChild and (vcl.private.fetch(buffer, #buffer) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
+        buffer = (not isChild and (vcl.private.fetch(buffer, table.length(buffer)) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
     end
-    while(parser.ref <= #buffer) do
+    while(parser.ref <= table.length(buffer)) do
         vcl.private.parseComment(parser, buffer, vcl.private.fetch(buffer, parser.ref))
         if isChild then
             parser.isSkipAppend = false
