@@ -206,7 +206,7 @@ function network.public:on(exec, config)
     else
         if not self.priority.handlers[exec] and not self.handlers[exec] then
             if config.isPrioritized then
-                self.priority.handlers[exec] = {index = #self.priority.index + 1, config = config}
+                self.priority.handlers[exec] = {index = table.length(self.priority.index) + 1, config = config}
                 table.insert(self.priority.index, exec)
             else self.handlers[exec] = {config = config} end
             return true
@@ -226,7 +226,7 @@ function network.public:off(exec)
     else
         if self.priority.handlers[exec] or self.handlers[exec] then
             if self.priority.handlers[exec] then
-                for i = self.priority.handlers[exec].index + 1, #self.priority.index, 1 do
+                for i = self.priority.handlers[exec].index + 1, table.length(self.priority.index), 1 do
                     local j = self.priority.index[i]
                     self.priority.handlers[j].index = index - 1
                 end
