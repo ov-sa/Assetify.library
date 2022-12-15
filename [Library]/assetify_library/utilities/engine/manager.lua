@@ -247,7 +247,7 @@ if localPlayer then
                 local sceneIPLDatas = scene:parseIPL(asset:readFile(assetPath..(asset.references.scene)..".ipl", cAsset.manifestData.encryptKey), cAsset.manifestData.sceneNativeObjects)
                 if sceneIPLDatas then
                     local sceneIDEDatas = scene:parseIDE(asset:readFile(assetPath..(asset.references.scene)..".ide", cAsset.manifestData.encryptKey))
-                    for i = 1, #sceneIPLDatas, 1 do
+                    for i = 1, table.length(sceneIPLDatas), 1 do
                         local j = sceneIPLDatas[i]
                         local sceneData = {
                             position = {x = imports.tonumber(j[4]), y = imports.tonumber(j[5]), z = imports.tonumber(j[6])},
