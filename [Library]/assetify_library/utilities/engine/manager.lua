@@ -53,7 +53,7 @@ function manager.public:exportAPI(moduleName, moduleAPIs)
     if not moduleName or (imports.type(moduleName) ~= "string") or not moduleAPIs or (imports.type(moduleAPIs) ~= "table") then return false end
     for i, j in imports.pairs(moduleAPIs) do
         if (i  == "shared") or (i == ((localPlayer and "client") or "server")) then
-            for k = 1, #j, 1 do
+            for k = 1, table.length(j), 1 do
                 local v = j[k]
                 imports.loadstring([[
                     local ref = false
@@ -121,11 +121,11 @@ if localPlayer then
         if cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.control then
             for i, j in imports.pairs(cAsset.manifestData.shaderMaps.control) do
                 local shaderTextures, shaderInputs = {}, {}
-                for k = 1, #j, 1 do
+                for k = 1, table.length(j), 1 do
                     local v = j[k]
                     if v.control then shaderTextures[("controlTex_"..k)] = v.control end
                     if v.bump then shaderTextures[("controlTex_"..k.."_bump")] = v.bump end
-                    for x = 1, #shader.validChannels, 1 do
+                    for x = 1, table.length(shader.validChannels), 1 do
                         local y = shader.validChannels[x]
                         if v[(y.index)] then
                             shaderTextures[("controlTex_"..k.."_"..(y.index))] = v[(y.index)].map

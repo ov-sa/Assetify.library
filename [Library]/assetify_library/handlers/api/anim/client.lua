@@ -29,7 +29,7 @@ function manager.API.Anim.loadAnim(element, assetName)
     local cAsset, isLoaded = manager:getAssetData("animation", assetName)
     if not cAsset or not isLoaded then return false end
     if cAsset.manifestData.assetAnimations then
-        for i = 1, #cAsset.manifestData.assetAnimations, 1 do
+        for i = 1, table.length(cAsset.manifestData.assetAnimations), 1 do
             local j = cAsset.manifestData.assetAnimations[i]
             imports.engineReplaceAnimation(element, j.defaultBlock, j.defaultAnim, "animation."..assetName, j.assetAnim)
         end
@@ -43,7 +43,7 @@ function manager.API.Anim.unloadAnim(element, assetName)
     local cAsset, isLoaded = manager:getAssetData("animation", assetName)
     if not cAsset or not isLoaded then return false end
     if cAsset.manifestData.assetAnimations then
-        for i = 1, #cAsset.manifestData.assetAnimations, 1 do
+        for i = 1, table.length(cAsset.manifestData.assetAnimations), 1 do
             local j = cAsset.manifestData.assetAnimations[i]
             imports.engineRestoreAnimation(element, j.defaultBlock, j.defaultAnim)
         end

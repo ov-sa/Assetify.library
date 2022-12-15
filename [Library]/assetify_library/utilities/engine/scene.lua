@@ -21,8 +21,7 @@ local imports = {
     setElementCollisionsEnabled = setElementCollisionsEnabled,
     setLowLODElement = setLowLODElement,
     setElementDimension = setElementDimension,
-    setElementInterior = setElementInterior,
-    table = table
+    setElementInterior = setElementInterior
 }
 
 
@@ -49,7 +48,7 @@ function scene.public:parseIDE(rw)
     rw = (rw and string.split(rw, "\n")) or rw
     if not rw then return false end
     local result = {}
-    for i = 1, imports.table.length(rw), 1 do
+    for i = 1, table.length(rw), 1 do
         local data = string.split(rw[i], scene.private.separators.IDE)
         data[2] = (data[2] and string.gsub(data[2], "%s", "")) or data[2]
         if data[2] then
@@ -65,7 +64,7 @@ function scene.public:parseIPL(rw, isNativeModelsEnabled)
     rw = (rw and string.split(rw, "\n")) or rw
     if not rw then return false end
     local result = {}
-    for i = 1, imports.table.length(rw), 1 do
+    for i = 1, table.length(rw), 1 do
         local data = string.split(rw[i], scene.private.separators.IPL)
         data[2] = (data[2] and string.gsub(data[2], "%s", "")) or data[2]
         if data[2] then

@@ -28,7 +28,7 @@ function import(...)
         table.remove(cArgs, 1)
         local buildImports, cImports, __cImports = {}, {}, {}
         local isCompleteFetch = false
-        if (#cArgs <= 0) then
+        if (table.length(cArgs) <= 0) then
             table.insert(buildImports, "core")
         elseif cArgs[1] == "*" then
             isCompleteFetch = true
@@ -52,7 +52,7 @@ function import(...)
         if #cImports <= 0 then return false end
         return cImports, isCompleteFetch
     else
-        cArgs = ((#cArgs > 0) and ", \""..table.concat(cArgs, "\", \"").."\"") or ""
+        cArgs = ((table.length(cArgs) > 0) and ", \""..table.concat(cArgs, "\", \"").."\"") or ""
         return [[
         local cImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..cArgs..[[)
         if not cImports then return false end
