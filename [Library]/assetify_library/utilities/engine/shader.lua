@@ -54,7 +54,7 @@ shader.private.__remoteWhitelist = {
     "Assetify_TextureGrayscaler",
     "Assetify_TextureShadower"
 }
-for i = 1, #shader.public.remoteWhitelist, 1 do
+for i = 1, table.length(shader.public.remoteWhitelist), 1 do
     local j = shader.public.remoteWhitelist[i]
     shader.private.__remoteWhitelist[j] = true
 end
