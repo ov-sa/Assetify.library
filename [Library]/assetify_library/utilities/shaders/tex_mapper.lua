@@ -16,7 +16,7 @@ local identity = "Assetify_TextureMapper"
 local iteration = 3
 shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
-        if not shaderMaps or (#shaderMaps <= 0) then return false end
+        if not shaderMaps or (table.length(shaderMaps) <= 0) then return false end
         local isSamplingStage = false
         local controlVars, handlerBody, handlerFooter = [[
             sampler baseSampler = sampler_state {
@@ -29,7 +29,7 @@ shaderRW.buffer[identity] = {
         handlerBody = handlerBody..[[
             float4 baseTexel = tex2D(baseSampler, PS.TexCoord);
         ]]
-        for i = #shaderMaps, 1, -1 do
+        for i = table.length(shaderMaps), 1, -1 do
             local j = shaderMaps[i]
             if j.control then
                 controlVars = controlVars..[[
@@ -60,7 +60,7 @@ shaderRW.buffer[identity] = {
                     float4 controlTexel_]]..i..[[_bump = tex2D(controlSampler_]]..i..[[_bump, PS.TexCoord);
                 ]]
             end
-            for k = 1, #shader.validChannels, 1 do
+            for k = 1, table.length(shader.validChannels), 1 do
                 local v, channel = shader.validChannels[k].index, shader.validChannels[k].channel
                 if j[v] then
                     controlVars = controlVars..[[

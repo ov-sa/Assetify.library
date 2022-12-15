@@ -50,7 +50,7 @@ imports.addEventHandler("Assetify:Networker:API", root, function(serial, payload
     if payload.processType == "emit" then
         local cNetwork = network.public:fetch(payload.networkName)
         if cNetwork and not cNetwork.isCallback then
-            for i = 1, #cNetwork.priority.index, 1 do
+            for i = 1, table.length(cNetwork.priority.index), 1 do
                 local j = cNetwork.priority.index[i]
                 if not cNetwork.priority.handlers[j].config.isAsync then
                     network.private.execNetwork(cNetwork, j, _, serial, payload)

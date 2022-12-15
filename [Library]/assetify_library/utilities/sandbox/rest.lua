@@ -25,7 +25,7 @@ local imports = {
 local rest = class:create("rest")
 rest.private.methods = {"post", "get"}
 rest.private.__methods, rest.private.methods = rest.private.methods, {}
-for i = 1, #rest.private.__methods, 1 do
+for i = 1, table.length(rest.private.__methods), 1 do
     local j = rest.private.__methods[i]
     rest.private.methods[j] = true
 end
