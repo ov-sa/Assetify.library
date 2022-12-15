@@ -57,7 +57,7 @@ function import(...)
         local cImports, isCompleteFetch = call(getResourceFromName("]]..syncer.libraryName..[["), "import", true]]..cArgs..[[)
         if not cImports then return false end
         local cReturns = (not isCompleteFetch and {}) or false
-        for i = 1, table.length(cImports), 1 do
+        for i = 1, #cImports, 1 do
             local j = cImports[i]
             assert(loadstring(j.rw))()
             if cReturns then cReturns[(#cReturns + 1)] = assetify[(j.index)] end
