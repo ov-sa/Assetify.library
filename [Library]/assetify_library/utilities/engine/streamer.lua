@@ -92,7 +92,7 @@ function streamer.public:resume()
         imports.setElementDimension(self.streamer, self.dimension)
         imports.setElementInterior(self.streamer, self.interior)
     end
-    for i = 1, #self.occlusions do
+    for i = 1, table.length(self.occlusions) do
         local j = self.occlusions[i]
         streamer.private.ref[j] = streamer.private.ref[j] or {}
         streamer.private.ref[j][self] = true
@@ -121,7 +121,7 @@ function streamer.public:pause()
         end
         imports.setElementDimension(self.streamer, settings.streamer.unsyncDimension)
     end
-    for i = 1, #self.occlusions do
+    for i = 1, table.length(self.occlusions) do
         local j = self.occlusions[i]
         streamer.private.ref[j][self] = nil
         if streamer.private.allocator.validStreams[(self.streamType)] and streamer.private.allocator.validStreams[(self.streamType)].desyncOccclusionsOnPause then
@@ -222,7 +222,7 @@ streamer.private.onEntityStream = function(streamBuffer, isStreamAltered)
     for i, j in imports.pairs(streamBuffer) do
         if j then
             local isStreamed = false
-            for k = 1, #i.occlusions, 1 do
+            for k = 1, table.length(i.occlusions), 1 do
                 local v = i.occlusions[k]
                 if imports.isElementOnScreen(v) then
                     isStreamed = true
