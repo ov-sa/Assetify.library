@@ -41,7 +41,7 @@ local bone = class:create("bone", {
 }, "attacher")
 for i, j in imports.pairs(bone.public.ids) do
     local indexes = {}
-    for k = 1, #j, 1 do indexes[(j[k])] = true end
+    for k = 1, table.length(j), 1 do indexes[(j[k])] = true end
     bone.public.ids[i] = indexes
     indexes = nil
 end
