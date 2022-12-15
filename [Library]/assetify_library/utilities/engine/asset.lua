@@ -349,13 +349,13 @@ else
         if not cAssetPack.manifestData then execFunction(callback, false, assetType); return false end
         thread:create(function(self)
             cAssetPack.rwDatas = {}
-            for i = 1, #cAssetPack.manifestData, 1 do
+            for i = 1, table.length(cAssetPack.manifestData), 1 do
                 local assetName = cAssetPack.manifestData[i]
                 local assetPath = (asset.public.references.root)..string.lower(assetType).."/"..assetName.."/"
                 local assetManifestData = asset.public:buildManifest(assetPath, _, asset.public.references.asset..((file:exists(assetPath..(asset.public.references.asset)..".json") and ".json") or ".vcl"))
                 if assetManifestData then
                     local assetProperties = asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"]
-                    for k = 1, #asset.private.properties.reserved, 1 do
+                    for k = 1, table.length(asset.private.properties.reserved), 1 do
                         local v = asset.private.properties.reserved[k]
                         assetManifestData[v] = (assetProperties[v] and assetManifestData[v]) or false
                     end
@@ -422,7 +422,7 @@ else
                                 local sceneIDEDatas = scene:parseIDE(file:read(sceneIDEPath))
                                 asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
                                 cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
-                                for k = 1, #sceneIPLDatas, 1 do
+                                for k = 1, table.length(sceneIPLDatas), 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
