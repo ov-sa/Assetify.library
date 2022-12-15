@@ -100,14 +100,14 @@ function file.public:resolveURL(path, chroot)
     if not cURL then return false end
     cURL.url = (cURL.pointer and string.gsub(cURL.url, file.public.validPointers[(cURL.pointer)], "")) or cURL.url
     local cDirs = string.split(cURL.url, "/")
-    if #cDirs > 0 then
+    if table.length(cDirs) > 0 then
         if chroot then
             chroot = file.public:parseURL(((string.sub(chroot, #chroot) ~= "/") and chroot.."/") or chroot)
             chroot = (chroot and chroot.pointer and string.gsub(chroot.url, file.public.validPointers[(chroot.pointer)], "")) or chroot
         end
         cURL.url = false
         local vDirs = {}
-        for i = 1, #cDirs, 1 do
+        for i = 1, table.length(cDirs), 1 do
             local j = cDirs[i]
             if j == "..." then
                 if not chroot or (chroot ~= cURL.url) then
