@@ -151,7 +151,7 @@ else
                     self.unSynced.fileData[j] = builtFileData
                     self.unSynced.fileHash[j] = imports.md5(builtFileData)
                 else
-                    imports.outputDebugString("[Assetify] | Invalid File: "..j)
+                    imports.outputDebugString("Assetify: Invalid File ━│  "..j)
                 end
             end
         end

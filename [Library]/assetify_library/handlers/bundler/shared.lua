@@ -97,7 +97,7 @@ bundler.private:createBuffer("core", "__core", [[
                     local rwData = assetify.getAssetDep("module", assetName, "script", j, k)
                     local status, error = assetify.imports.pcall(assetify.imports.loadstring(rwData))
                     if not status then
-                        assetify.imports.outputDebugString("[Module: "..assetName.."] | Importing Failed: "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
+                        assetify.imports.outputDebugString("Module - "..assetName..": Importing Failed ━│  "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
                         assetify.imports.assert(assetify.imports.loadstring(rwData))
                         assetify.imports.outputDebugString(error)
                     end

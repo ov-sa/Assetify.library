@@ -37,12 +37,12 @@ cli.private.validActions = {
 ----------------------
 
 function cli.public:uid(isAction)
-    imports.outputServerLog("[Assetify] | Assetify UID: "..syncer.librarySerial)
+    imports.outputServerLog("Assetify: UID ━│  "..syncer.librarySerial)
     return true
 end
 
 function cli.public:version(isAction)
-    imports.outputServerLog("[Assetify] | Assetify Version: "..(syncer.libraryVersion or "N/A"))
+    imports.outputServerLog("Assetify: Version ━│  "..(syncer.libraryVersion or "N/A"))
     return true
 end
 

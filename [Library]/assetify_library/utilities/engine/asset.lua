@@ -294,7 +294,7 @@ else
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
             else
-                if debugExistence then imports.outputDebugString("[Assetify] | Invalid File: "..filePath) end
+                if debugExistence then imports.outputDebugString("Assetify: Invalid File ━│  "..filePath) end
             end
         end
         return true
