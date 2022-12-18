@@ -35,13 +35,13 @@ updateResources = {
         if isCompleted then
             syncer.libraryVersion = updateResources.updateCache.libraryVersion
             for i, j in imports.pairs(updateResources.updateCache.backup) do
-                imports.outputServerLog("[Assetify] | Backed up <"..i.."> due to compatibility breaking changes; Kindly acknowledge it accordingly!")
+                imports.outputServerLog("Assetify: Updater ━│  Backed up <"..i.."> due to compatibility breaking changes; Kindly acknowledge it accordingly!")
                 file:write(i, j)
             end
             for i, j in imports.pairs(updateResources.updateCache.output) do
                 file:write(i, j)
             end
-            imports.outputServerLog("[Assetify] | Update successfully completed; Rebooting!")
+            imports.outputServerLog("Assetify: Updater ━│  Update successfully completed; Rebooting!")
             for i = 1, table.length(updateResources), 1 do
                 local j = updateResources[i]
                 if not j.isSilentResource and j.resourceREF then
@@ -50,7 +50,7 @@ updateResources = {
                 end
             end
         end
-        if isNotification and not isCompleted then imports.outputServerLog("[Assetify] | Update failed due to connectivity issues; Try again later...") end
+        if isNotification and not isCompleted then imports.outputServerLog("Assetify: Updater ━│  Update failed due to connectivity issues; Try again later...") end
         if updateResources.updateThread then updateResources.updateThread:destroy() end
         updateResources.updateCache = nil
         updateResources.updateThread = nil
@@ -97,7 +97,7 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                 updateResources.updateThread:pause()
                 if not resourceResponse[1] or not resourceResponse[2] or (resourceResponse[2] ~= 0) then return updateResources.onUpdateCallback(false, true) end
                 local isLastIndex = false
-                for i = 1, table.length(updateResources).updateTags, 1 do
+                for i = 1, table.length(updateResources.updateTags), 1 do
                     for j in string.gmatch(resourceResponse[1], "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                         if (#string.gsub(j, "%s", "") > 0) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
                             cli.private:update(resourcePointer, {updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/"..j, j})
@@ -137,19 +137,19 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
 end
 
 function cli.public:update(isAction)
-    if cli.public.isLibraryBeingUpdated then return imports.outputServerLog("[Assetify] | An update request is already being processed; Kindly have patience...") end
+    if cli.public.isLibraryBeingUpdated then return imports.outputServerLog("Assetify: Updater ━│  An update request is already being processed; Kindly have patience...") end
     cli.public.isLibraryBeingUpdated = true
-    if isAction then imports.outputServerLog("[Assetify] | Fetching latest version; Hold up...") end
+    if isAction then imports.outputServerLog("Assetify: Updater ━│  Fetching latest version; Hold up...") end
     imports.fetchRemote(syncer.librarySource, function(response, status)
         if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
         response = table.decode(response, "json")
         if not response or not response.tag_name then return updateResources.onUpdateCallback(false, true) end
         if syncer.libraryVersion == response.tag_name then
-            if isAction then imports.outputServerLog("[Assetify] | Already upto date - "..response.tag_name) end
+            if isAction then imports.outputServerLog("Assetify: Updater ━│  Already upto date - "..response.tag_name) end
             return updateResources.onUpdateCallback()
         end
         local isToBeUpdated, isAutoUpdate = (isAction and true) or settings.library.autoUpdate, (not isAction and settings.library.autoUpdate) or false
-        imports.outputServerLog("[Assetify] | "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name)
+        imports.outputServerLog("Assetify: Updater ━│  "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name)
         if not isToBeUpdated then return updateResources.onUpdateCallback() end
         updateResources.updateCache = {
             output = {}, backup = {},
