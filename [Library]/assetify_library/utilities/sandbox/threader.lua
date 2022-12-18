@@ -67,8 +67,10 @@ function thread.public:createPromise(callback, config)
     callback = (callback and (imports.type(callback) == "function") and callback) or false
     config = (config and (imports.type(config) == "table") and config) or {}
     config.isAsync = (config.isAsync and true) or false
+    config.timeout = imports.tonumber(config.timeout) or false
+    config.timeout = (config.timeout and (config.timeout > 0) and config.timeout) or false
     if not callback and config.isAsync then return false end
-    local cHandle, isHandled = nil, false
+    local cHandle, cTimer, isHandled = nil, nil, false
     local cPromise = {
         resolve = function(...) return cHandle(true, ...) end,
         reject = function(...) return cHandle(false, ...) end
@@ -76,6 +78,7 @@ function thread.public:createPromise(callback, config)
     cHandle = function(isResolver, ...)
         if not thread.private.promises[cPromise] or isHandled then return false end
         isHandled = true
+        if cTimer then cTimer:destroy() end
         timer:create(function(...)
             for i, j in imports.pairs(thread.private.promises[cPromise]) do
                 thread.private.resolve(i, isResolver, ...)
@@ -88,6 +91,9 @@ function thread.public:createPromise(callback, config)
     thread.private.promises[cPromise] = {}
     if not config.isAsync then execFunction(callback, cPromise.resolve, cPromise.reject)
     else thread.public:create(function(self) execFunction(callback, self, cPromise.resolve, cPromise.reject) end):resume() end
+    if config.timeout then
+        cTimer = timer:create(function() cPromise.reject("Promise - Timed Out") end, config.timeout, 1)
+    end
     return cPromise
 end
 
