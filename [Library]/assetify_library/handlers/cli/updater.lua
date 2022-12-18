@@ -97,7 +97,7 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                 updateResources.updateThread:pause()
                 if not resourceResponse[1] or not resourceResponse[2] or (resourceResponse[2] ~= 0) then return updateResources.onUpdateCallback(false, true) end
                 local isLastIndex = false
-                for i = 1, table.length(updateResources).updateTags, 1 do
+                for i = 1, table.length(updateResources.updateTags), 1 do
                     for j in string.gmatch(resourceResponse[1], "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                         if (#string.gsub(j, "%s", "") > 0) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
                             cli.private:update(resourcePointer, {updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/"..j, j})
