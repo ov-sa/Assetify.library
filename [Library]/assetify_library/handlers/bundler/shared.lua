@@ -157,8 +157,10 @@ bundler.private:createBuffer("syncer", _, [[
         shared = {
             {exportIndex = "assetify.syncer.setGlobalData", exportName = "setGlobalData"},
             {exportIndex = "assetify.syncer.getGlobalData", exportName = "getGlobalData"},
+            {exportIndex = "assetify.syncer.getAllGlobalDatas", exportName = "getAllGlobalDatas"},
             {exportIndex = "assetify.syncer.setEntityData", exportName = "setEntityData"},
-            {exportIndex = "assetify.syncer.getEntityData", exportName = "getEntityData"}
+            {exportIndex = "assetify.syncer.getEntityData", exportName = "getEntityData"},
+            {exportIndex = "assetify.syncer.getAllEntityDatas", exportName = "getAllEntityDatas"}
         }
     })..[[
 ]])

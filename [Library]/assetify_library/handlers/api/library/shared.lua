@@ -67,12 +67,20 @@ function manager.API.Library.getGlobalData(data)
     return syncer.syncedGlobalDatas[data]
 end
 
+function manager.API.Library.getAllGlobalDatas()
+    return syncer.syncedGlobalDatas
+end
+
 function manager.API.Library.setEntityData(...)
     return syncer.syncEntityData(table.unpack(table.pack(...), 3))
 end
 
 function manager.API.Library.getEntityData(element, data)
     return syncer.syncedEntityDatas[element] and syncer.syncedEntityDatas[element][data]
+end
+
+function manager.API.Library.getAllEntityDatas(element)
+    return syncer.syncedEntityDatas[element] or {}
 end
 
 function manager.API.Library.setAttachment(...)

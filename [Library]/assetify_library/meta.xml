@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify Library" type="Library" version="7.4.2"/>
+    <info author="vStudio" name="Assetify Library" type="Library" version="7.5.0"/>
     <min_mta_version server="1.5.9" client="1.5.9"/>
     <aclrequest>
         <right name="function.fetchRemote" access="true"/>
@@ -106,8 +106,10 @@
     <export function="getElementAssetInfo" type="shared"/>
     <export function="setGlobalData" type="shared"/>
     <export function="getGlobalData" type="shared"/>
+    <export function="getAllGlobalDatas" type="shared"/>
     <export function="setEntityData" type="shared"/>
     <export function="getEntityData" type="shared"/>
+    <export function="getAllEntityDatas" type="shared"/>
     <export function="setAttachment" type="shared"/>
     <export function="setDetachment" type="shared"/>
     <export function="clearAttachment" type="shared"/>
