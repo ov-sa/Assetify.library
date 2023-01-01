@@ -112,6 +112,15 @@ if localPlayer then
         return true
     end
 
+    function shader.public:fetchInstance(element, shaderCategory, textureName)
+        if element and shaderCategory and textureName then
+            if shader.public.buffer.element[element] and shader.public.buffer.element[element][shaderCategory] and shader.public.buffer.element[element][shaderCategory].textured[textureName] then
+                return shader.public.buffer.element[element][shaderCategory].textured[textureName]
+            end
+        end
+        return false
+    end
+
     function shader.public.clearElementBuffer(element, shaderCategory)
         if not element or not shader.public.buffer.element[element] or (shaderCategory and not shader.public.buffer.element[element][shaderCategory]) then return false end
         if not shaderCategory then
