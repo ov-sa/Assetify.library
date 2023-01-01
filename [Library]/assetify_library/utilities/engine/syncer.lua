@@ -213,10 +213,12 @@ else
         if not element or not imports.isElement(element) or not syncer.public.syncedElements[element].clumpTones then return false end
         local clumpTone = clumpTones
         if not clumpTone or (imports.type(clumpTone) ~= "table") or not clumpTone.textureName then return false end
+        local cAsset = manager:getAssetData(syncer.public.syncedElements[element].assetType, syncer.public.syncedElements[element].assetName)
+        if not cAsset or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[(asset.references.clump)] or not cAsset.manifestData.shaderMaps[(asset.references.clump)][(clumpTone.textureName)] then return false end
         clumpTone.isBumpTone = (clumpTone.isBumpTone and true) or false
         clumpTone[1] = math.max(0, math.min(100, imports.tonumber(clumpTone[1]) or 0))
         clumpTone[2] = math.max(0, math.min(100, imports.tonumber(clumpTone[2]) or 0))
-        local clumpTones, remoteSignature = syncer.public.syncedElements[element].clumpTones, syncer.public.syncedElements[element].remoteSignature
+        clumpTones, remoteSignature = syncer.public.syncedElements[element].clumpTones, syncer.public.syncedElements[element].remoteSignature
         clumpTones[(clumpTone.textureName)] = {clumpTone[1], clumpTone[2]}
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
