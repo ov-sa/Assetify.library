@@ -60,8 +60,7 @@ function manager.API.Library.getElementAsset(element)
 end
 
 function manager.API.Library.setElementClumpTone(...)
-    if not syncer.syncedElements[element] or not syncer.syncedElements[element].assetClump then return false end
-    --TODO: ..
+    return syncer.syncElementClumpTones(_, ...)
 end
 
 function manager.API.Library.getElementClumpTone(...)
