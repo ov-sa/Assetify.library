@@ -180,7 +180,7 @@ else
                 for k, v in imports.pairs(j) do
                     if k ~= "remoteSignature" then
                         for m, n in imports.pairs(v) do
-                            for x, y imports.pairs(n) do
+                            for x, y in imports.pairs(n) do
                                 if y.bump then syncer.private:setElementTone(i, k, m, x, y.bump, true, j.remoteSignature, source) end
                                 syncer.private:setElementTone(i, k, m, x, y, false, j.remoteSignature, source)
                             end
