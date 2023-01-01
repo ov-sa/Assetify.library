@@ -125,6 +125,12 @@ if localPlayer then
         local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
         ref = (isBumpTone and ref.bump) or ref
         ref[1], ref[2] = tone[1], tone[2]
+        print("RECEIVED TIME TO SET")
+        thread:createHeartbeat(function()
+            return not imports.isElement(element)
+        end, function()
+            --TODO: CREATE SHADER AND SET
+        end, settings.downloader.buildRate)
         return true
     end
 else
