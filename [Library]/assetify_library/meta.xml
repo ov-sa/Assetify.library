@@ -103,7 +103,7 @@
     <export function="getAssetData" type="shared"/>
     <export function="getAssetDep" type="shared"/>
     <export function="setElementAsset" type="shared"/>
-    <export function="getElementAssetInfo" type="shared"/>
+    <export function="getElementAsset" type="shared"/>
     <export function="setElementClumpTone" type="shared"/>
     <export function="getElementClumpTone" type="shared"/>
     <export function="setGlobalData" type="shared"/>

@@ -61,7 +61,7 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.getAsset", exportName = "getAssetData"},
             {exportIndex = "assetify.__core.getAssetDep", exportName = "getAssetDep"},
             {exportIndex = "assetify.__core.setElementAsset", exportName = "setElementAsset"},
-            {exportIndex = "assetify.__core.getElementAssetInfo", exportName = "getElementAssetInfo"},
+            {exportIndex = "assetify.__core.getElementAsset", exportName = "getElementAsset"},
             {exportIndex = "assetify.__core.setElementClumpTone", exportName = "setElementClumpTone"},
             {exportIndex = "assetify.__core.getElementClumpTone", exportName = "getElementClumpTone"},
             {exportIndex = "assetify.__core.createDummy", exportName = "createAssetDummy"}
