@@ -231,8 +231,10 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
+function syncer.public.syncElementClumpTone(length, ...) return syncer.private:setElementClumpTone(table.unpack(table.pack(...), length or 2)) end
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
+    network:create("Assetify:Syncer:onSyncElementClumpTone"):on(function(...) syncer.public.syncElementClumpTone(3, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
