@@ -47,7 +47,7 @@ shaderRW.buffer[identity] = {
         if shaderMaps.bump then
             handlerBody = handlerBody..[[
                 clumpTexel_bump.rgb = clumpTexel_bump.rgb*clumpTone_bump[0];
-                clumpTexel_bump.rgb = ((clumpTexel_bump.rgb - 0.5)*clumpTone_bump[1]) + 0.5;
+                clumpTexel_bump.rgb = ((clumpTexel_bump.rgb - 0.5)*(clumpTone_bump[1] + 1)) + 0.5;
                 sampledTexel.rgb *= clumpTexel_bump.rgb;
             ]]
         end
@@ -105,7 +105,7 @@ shaderRW.buffer[identity] = {
                 output.Emissive = 0;
             }
             sampledTexel.rgb = sampledTexel.rgb*clumpTone[0];
-            sampledTexel.rgb = ((sampledTexel.rgb - 0.5)*clumpTone[1]) + 0.5;
+            sampledTexel.rgb = ((sampledTexel.rgb - 0.5)*(clumpTone[1] + 1)) + 0.5;
             ]]..shaderRW.prelight(shaderMaps)..[[
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);

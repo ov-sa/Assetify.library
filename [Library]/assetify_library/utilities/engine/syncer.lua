@@ -135,7 +135,7 @@ if localPlayer then
             return not imports.isElement(element)
         end, function()
             local cShader = shader:fetchInstance(element, asset.references.clump, textureName)
-            if cShader then cShader:setValue((isBumpTone and "clumpTone_bump") or "clumpTone", {(15 + (85*tone[1]*0.01))*0.01, 1 + (25 + (25*tone[2]*0.01))*0.01}) end
+            if cShader then cShader:setValue((isBumpTone and "clumpTone_bump") or "clumpTone", {(15 + (85*tone[1]*0.01))*0.01, (25 + (25*tone[2]*0.01))*0.01}) end
         end, settings.downloader.buildRate)
         return true
     end
