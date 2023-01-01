@@ -169,7 +169,18 @@ else
             thread:pause()
         end
         for i, j in imports.pairs(syncer.public.syncedElementTones) do
-            if j then syncer.private:setElementTone(i, j.assetTones, j.remoteSignature, source) end
+            if j then
+                for k, v in imports.pairs(j) do
+                    if k ~= "remoteSignature" then
+                        for m, n in imports.pairs(v) do
+                            for x, y imports.pairs(n) do
+                                syncer.private:setElementTone(i, k, m, x, y.bump, true, j.remoteSignature, source)
+                                syncer.private:setElementTone(i, k, m, x, y, false, j.remoteSignature, source)
+                            end
+                        end
+                    end
+                end
+            end
             thread:pause()
         end
     end, {isAsync = true})
