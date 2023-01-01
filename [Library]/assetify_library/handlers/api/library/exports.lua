@@ -25,6 +25,8 @@ manager:exportAPI("Library", {
         {name = "getAssetDep"},
         {name = "setElementAsset"},
         {name = "getElementAssetInfo"},
+        {name = "setElementClumpTone"},
+        {name = "getElementClumpTone"},
         {name = "setGlobalData"},
         {name = "getGlobalData"},
         {name = "getAllGlobalDatas"},

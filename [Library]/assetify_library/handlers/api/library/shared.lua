@@ -59,6 +59,16 @@ function manager.API.Library.getElementAssetInfo(element)
     return syncer.syncedElements[element].assetType, syncer.syncedElements[element].assetName, syncer.syncedElements[element].assetClump, syncer.syncedElements[element].clumpMaps
 end
 
+function manager.API.Library.setElementClumpTone(...)
+    --TODO: ..
+    --return syncer.syncElementModel(_, ...)
+end
+
+function manager.API.Library.getElementClumpTone(...)
+    --TODO: ..
+    --return syncer.syncElementModel(_, ...)
+end
+
 function manager.API.Library.setGlobalData(...)
     return syncer.syncGlobalData(...)
 end
