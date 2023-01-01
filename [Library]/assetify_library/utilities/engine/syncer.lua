@@ -109,7 +109,7 @@ if localPlayer then
         return true
     end
 
-    function syncer.private.setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature)
+    function syncer.private:setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) then return false end
         if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
         local cAsset = manager:getAssetData(assetType, assetName)
@@ -125,11 +125,11 @@ if localPlayer then
         local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
         ref = (isBumpTone and ref.bump) or ref
         ref[1], ref[2] = tone[1], tone[2]
-        print("RECEIVED TIME TO SET")
         thread:createHeartbeat(function()
             return not imports.isElement(element)
         end, function()
-            --TODO: CREATE SHADER AND SET
+            local cShader = shader:fetchInstance(element, asset.references.clump, textureName)
+            if cShader then cShader:setValue((isBumpTone and "clumpTone_bump") or "clumpTone", {tone[1]*0.01, tone[2]*0.01}) end
         end, settings.downloader.buildRate)
         return true
     end
@@ -244,7 +244,7 @@ else
         return true
     end
 
-    function syncer.private.setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature, targetPlayer)
+    function syncer.private:setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature, targetPlayer)
         if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementTone", true, false, targetPlayer, element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature) end
         if not element or not imports.isElement(element) then return false end
         if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
