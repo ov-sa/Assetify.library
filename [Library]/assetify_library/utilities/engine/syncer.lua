@@ -102,6 +102,12 @@ if localPlayer then
                             shader:create(element, asset.references.clump, "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
                         end
                     end
+                    if syncer.public.syncedElementTones[element] and syncer.public.syncedElementTones[element][assetType] and syncer.public.syncedElementTones[element][assetType][assetName] then
+                        for i, j in imports.pairs(syncer.public.syncedElementTones[element][assetType][assetName]) do
+                            if j.bump then syncer.private:setElementTone(element, assetType, assetName, i, j.bump, true) end
+                            syncer.private:setElementTone(element, assetType, assetName, i, j, false)
+                        end
+                    end
                 end
             end
             imports.setElementModel(element, modelID)
