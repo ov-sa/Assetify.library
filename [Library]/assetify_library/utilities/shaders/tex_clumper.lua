@@ -104,8 +104,8 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
-            sampledTexel.rgb *= clumpTone[0];
-            sampledTexel.rgb += clumpTone[1];
+            sampledTexel.rgb = sampledTexel.rgb + clumpTone[0];
+            sampledTexel.rgb = ((sampledTexel.rgb - 0.5) * max(clumpTone[1] + 1.0, 0)) + 0.5;
             ]]..shaderRW.prelight(shaderMaps)..[[
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
