@@ -146,7 +146,10 @@ else
     network:create("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
-            if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
+            if j then
+                syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source)
+                syncer.private:setElementClumpTone(i, j.clumpTones, j.remoteSignature, source)
+            end
             thread:pause()
         end
     end, {isAsync = true})
