@@ -120,7 +120,8 @@ if localPlayer then
         syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {}
         syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
         syncer.public.syncedElementTones[element][assetType][assetName] = syncer.public.syncedElementTones[element][assetType][assetName] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {bump = {}}
+        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {}
+        if isBumpTone then syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump = syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump or {} end
         local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
         ref = (isBumpTone and ref.bump) or ref
         ref[1], ref[2] = tone[1], tone[2]
@@ -174,7 +175,7 @@ else
                     if k ~= "remoteSignature" then
                         for m, n in imports.pairs(v) do
                             for x, y imports.pairs(n) do
-                                syncer.private:setElementTone(i, k, m, x, y.bump, true, j.remoteSignature, source)
+                                if y.bump then syncer.private:setElementTone(i, k, m, x, y.bump, true, j.remoteSignature, source) end
                                 syncer.private:setElementTone(i, k, m, x, y, false, j.remoteSignature, source)
                             end
                         end
@@ -250,7 +251,8 @@ else
         syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {remoteSignature = remoteSignature}
         syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
         syncer.public.syncedElementTones[element][assetType][assetName] = syncer.public.syncedElementTones[element][assetType][assetName] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {bump = {}}
+        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {}
+        if isBumpTone then syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump = syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump or {} end
         local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
         ref = (isBumpTone and ref.bump) or ref
         ref[1], ref[2] = tone[1], tone[2]
