@@ -17,6 +17,7 @@ shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
         if not shaderMaps or not shaderMaps[(asset.references.clump)] then return false end
         local controlVars, handlerBody, handlerFooter = [[
+            float1x2 clumpTone = {1, 1};
             texture clumpTex;
             sampler clumpSampler = sampler_state {
                 Texture = clumpTex;
@@ -27,6 +28,7 @@ shaderRW.buffer[identity] = {
         ]], "", ""
         if shaderMaps.bump then
             controlVars = controlVars..[[
+                float1x2 clumpTone_bump = {1, 1};
                 texture clumpTex_bump;
                 sampler clumpSampler_bump = sampler_state { 
                     Texture = clumpTex_bump;
@@ -44,6 +46,8 @@ shaderRW.buffer[identity] = {
         ]]
         if shaderMaps.bump then
             handlerBody = handlerBody..[[
+                clumpTexel_bump.rgb *= clumpTone_bump[0];
+                clumpTexel_bump.rgb += clumpTone_bump[1];
                 sampledTexel.rgb *= clumpTexel_bump.rgb;
             ]]
         end
@@ -100,6 +104,8 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
+            sampledTexel.rgb *= clumpTone[0];
+            sampledTexel.rgb += clumpTone[1];
             ]]..shaderRW.prelight(shaderMaps)..[[
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
