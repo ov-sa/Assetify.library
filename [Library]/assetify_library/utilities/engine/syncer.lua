@@ -115,8 +115,8 @@ if localPlayer then
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[(asset.references.clump)] or not cAsset.manifestData.shaderMaps[(asset.references.clump)][textureName] then return false end
         isBumpTone = (isBumpTone and true) or false
-        tone[1] = math.max(-100, math.min(100, imports.tonumber(tone[1]) or 0))
-        tone[2] = math.max(-100, math.min(100, imports.tonumber(tone[2]) or 0))
+        tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
+        tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
         syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {}
         syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
         syncer.public.syncedElementTones[element][assetType][assetName] = syncer.public.syncedElementTones[element][assetType][assetName] or {}
@@ -251,8 +251,8 @@ else
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[(asset.references.clump)] or not cAsset.manifestData.shaderMaps[(asset.references.clump)][textureName] then return false end
         isBumpTone = (isBumpTone and true) or false
-        tone[1] = math.max(-100, math.min(100, imports.tonumber(tone[1]) or 0))
-        tone[2] = math.max(-100, math.min(100, imports.tonumber(tone[2]) or 0))
+        tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
+        tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
         remoteSignature = imports.getElementType(element)
         syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {remoteSignature = remoteSignature}
         syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
