@@ -208,7 +208,7 @@ else
 
     function syncer.private.setElementClumpTone(element, clumpTones, remoteSignature, targetPlayer)
         if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementClumpTone", true, false, targetPlayer, element, clumpTones, remoteSignature) end
-        if not element or not imports.isElement(element) or not syncer.public.syncedElements[element].assetClump then return false end
+        if not element or not imports.isElement(element) or not syncer.public.syncedElements[element] or not syncer.public.syncedElements[element].assetClump then return false end
         local clumpTone = clumpTones
         if not clumpTone or (imports.type(clumpTone) ~= "table") or not clumpTone.textureName then return false end
         local cAsset = manager:getAssetData(syncer.public.syncedElements[element].assetType, syncer.public.syncedElements[element].assetName)
