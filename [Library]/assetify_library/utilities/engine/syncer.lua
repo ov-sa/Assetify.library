@@ -148,7 +148,7 @@ else
         for i, j in imports.pairs(syncer.public.syncedElements) do
             if j then
                 syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source)
-                syncer.private:setElementClumpTone(i, j.clumpTones, j.remoteSignature, source)
+                syncer.private:setElementClumpTones(i, j.clumpTones, j.remoteSignature, source)
             end
             thread:pause()
         end
@@ -206,8 +206,8 @@ else
         return true
     end
 
-    function syncer.private.setElementClumpTone(element, clumpTones, remoteSignature, targetPlayer)
-        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementClumpTone", true, false, targetPlayer, element, clumpTones, remoteSignature) end
+    function syncer.private.setElementClumpTones(element, clumpTones, remoteSignature, targetPlayer)
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementClumpTones", true, false, targetPlayer, element, clumpTones, remoteSignature) end
         if not element or not imports.isElement(element) or not syncer.public.syncedElements[element] or not syncer.public.syncedElements[element].assetClump then return false end
         local clumpTone = clumpTones
         if not clumpTone or (imports.type(clumpTone) ~= "table") or not clumpTone.textureName then return false end
@@ -222,7 +222,7 @@ else
         ref[1], ref[2] = clumpTone[1], clumpTone[2]
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                syncer.private:setElementClumpTone(element, clumpTones, remoteSignature, i)
+                syncer.private:setElementClumpTones(element, clumpTones, remoteSignature, i)
                 thread:pause()
             end
         end):resume({executions = settings.downloader.syncRate, frames = 1})
@@ -236,10 +236,10 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
-function syncer.public.syncElementClumpTone(length, ...) return syncer.private:setElementClumpTone(table.unpack(table.pack(...), length or 2)) end
+function syncer.public.syncElementClumpTones(length, ...) return syncer.private:setElementClumpTones(table.unpack(table.pack(...), length or 2)) end
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
-    network:create("Assetify:Syncer:onSyncElementClumpTone"):on(function(...) syncer.public.syncElementClumpTone(3, ...) end)
+    network:create("Assetify:Syncer:onSyncElementClumpTones"):on(function(...) syncer.public.syncElementClumpTones(3, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
