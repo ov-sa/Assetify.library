@@ -217,7 +217,9 @@ else
         clumpTone[1] = math.max(0, math.min(100, imports.tonumber(clumpTone[1]) or 0))
         clumpTone[2] = math.max(0, math.min(100, imports.tonumber(clumpTone[2]) or 0))
         clumpTones, remoteSignature = syncer.public.syncedElements[element].clumpTones, syncer.public.syncedElements[element].remoteSignature
-        clumpTones[(clumpTone.textureName)] = {clumpTone[1], clumpTone[2]}
+        clumpTones[(clumpTone.textureName)] = clumpTones[(clumpTone.textureName)] or {bump = {}}
+        local ref = (clumpTone.isBumpTone and clumpTones[(clumpTone.textureName)].bump) or clumpTones[(clumpTone.textureName)]
+        ref[1], ref[2] = clumpTone[1], clumpTone[2]
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 syncer.private:setElementClumpTone(element, clumpTones, remoteSignature, i)
