@@ -16,6 +16,7 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
+    tonumber = tonumber,
     tostring = tostring,
     collectgarbage = collectgarbage,
     isElement = isElement,
@@ -80,14 +81,14 @@ if localPlayer then
     network:create("Assetify:onAssetUnload")
     syncer.private.execOnLoad(function() network:emit("Assetify:Syncer:onLoadClient", true, false, localPlayer) end)
 
-    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature)
+    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, clumpTones, remoteSignature)
         if not element or (not remoteSignature and not imports.isElement(element)) then return false end
         local elementType = imports.getElementType(element)
         elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
         if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
         local modelID = manager:getAssetID(assetType, assetName, assetClump)
         if not modelID then return false end
-        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps}
+        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, clumpTones = clumpTones}
         thread:createHeartbeat(function()
             return not imports.isElement(element)
         end, function()
@@ -98,6 +99,11 @@ if localPlayer then
                     for i, j in imports.pairs(clumpMaps) do
                         if cAsset.manifestData.shaderMaps[(asset.references.clump)][i] and cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j] then
                             shader:create(element, asset.references.clump, "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
+                            if syncer.public.syncedElements[element].clumpTones[i] then
+                                --TODO: SET SHADER TONE VALUES BACK HERE...
+                                --local ins2 = shader:fetchInstance(element, asset.references.clump, i)
+                                cShader:setValue()
+                            end
                         end
                     end
                 end
@@ -145,7 +151,7 @@ else
     network:create("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
-            if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
+            if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.clumpTones, j.remoteSignature, source) end
             thread:pause()
         end
     end, {isAsync = true})
@@ -192,10 +198,28 @@ else
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         remoteSignature = imports.getElementType(element)
-        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, remoteSignature = remoteSignature}
+        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, clumpTones = (assetClump and {}) or nil, remoteSignature = remoteSignature}
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, i)
+                thread:pause()
+            end
+        end):resume({executions = settings.downloader.syncRate, frames = 1})
+        return true
+    end
+
+    function syncer.private.setElementClumpTone(element, clumpTones, remoteSignature, targetPlayer)
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementClumpTone", true, false, targetPlayer, element, clumpTones, remoteSignature) end
+        if not element or not imports.isElement(element) or not syncer.public.syncedElements[element].clumpTones then return false end
+        local clumpTone = clumpTones
+        if not clumpTone or (imports.type(clumpTone) ~= "table") or not clumpTone.textureName then return false end
+        clumpTone[1] = math.max(0, math.min(100, imports.tonumber(clumpTone[1]) or 0))
+        clumpTone[2] = math.max(0, math.min(100, imports.tonumber(clumpTone[2]) or 0))
+        local clumpTones, remoteSignature = syncer.public.syncedElements[element].clumpTones, syncer.public.syncedElements[element].remoteSignature
+        clumpTones[(clumpTone.textureName)] = {clumpTone[1], clumpTone[2]}
+        thread:create(function(self)
+            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
+                syncer.private:setElementClumpTone(element, clumpTones, remoteSignature, i)
                 thread:pause()
             end
         end):resume({executions = settings.downloader.syncRate, frames = 1})
