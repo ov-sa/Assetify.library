@@ -98,8 +98,6 @@
     <export function="isResourceFlushed" type="shared"/>
     <export function="isResourceUnloaded" type="shared"/>
     <export function="getLibraryAssets" type="shared"/>
-
-
     <export function="getAssetData" type="shared"/>
     <export function="getAssetDep" type="shared"/>
     <export function="setElementAsset" type="shared"/>
