@@ -265,17 +265,17 @@ function network.public:emit(...)
     if not payload.isRemote then
         imports.triggerEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
     else
-        if payload.isReceiver then
-            if not payload.isLatent then
-                imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
-            else
-                imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
-            end
-        else
+        if not payload.isReceiver then
             if not payload.isLatent then
                 imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
             else
                 imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
+            end
+        else
+            if not payload.isLatent then
+                imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
+            else
+                imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
             end
         end
     end
