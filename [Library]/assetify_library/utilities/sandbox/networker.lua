@@ -302,6 +302,7 @@ function network.public:emitCallback(...)
             else
                 payload.isReceiver = network.private.fetchArg(_, cArgs)
                 payload.isReceiver = (payload.isReceiver and imports.isElement(payload.isReceiver) and (imports.getElementType(payload.isReceiver) == "player") and payload.isReceiver) or false
+                if not payload.isReceiver then return false end
             end
         end
     else
@@ -312,7 +313,7 @@ function network.public:emitCallback(...)
     if not payload.isRemote then
         imports.triggerEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
     else
-        if not payload.isReceiver then
+        if not network.public.isServerInstance then
             if not payload.isLatent then
                 imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
             else
