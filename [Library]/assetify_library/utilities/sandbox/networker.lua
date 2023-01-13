@@ -312,10 +312,18 @@ function network.public:emitCallback(...)
     if not payload.isRemote then
         imports.triggerEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
     else
-        if not payload.isLatent then
-            imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
+        if not payload.isReceiver then
+            if not payload.isLatent then
+                imports.triggerRemoteEvent("Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
+            else
+                imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
+            end
         else
-            imports.triggerRemoteLatentEvent("Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
+            if not payload.isLatent then
+                imports.triggerRemoteEvent(payload.isReceiver, "Assetify:Networker:API", resourceRoot, network.public.identifier, payload)
+            else
+                imports.triggerRemoteLatentEvent(payload.isReceiver, "Assetify:Networker:API", network.public.bandwidth, false, resourceRoot, network.public.identifier, payload)
+            end
         end
     end
     return cPromise
