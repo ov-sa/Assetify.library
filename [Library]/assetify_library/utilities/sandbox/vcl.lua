@@ -104,7 +104,7 @@ function vcl.private.parseString(parser, buffer, rw)
             elseif not parser.isTypeParsed and (rw == parser.isTypeChar) then
                 parser.isValueSkipAppend, parser.isTypeParsed = true, true
                 if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-                    parser.ref, parser.isType, parser.isTypeParsed, parser.isTypeChar = parser.ref - #parser.value - 1, "object", nil, nil
+                    parser.ref, parser.isType, parser.value, parser.isTypeParsed, parser.isTypeChar = parser.ref - #parser.value - 1, "object", "", nil, nil
                 end
             end
         end
@@ -151,7 +151,7 @@ function vcl.private.parseObject(parser, buffer, rw)
     return true
 end
 
-function vcl.private.parseReturn(parser)
+function vcl.private.parseReturn(parser, buffer)
     if parser.isParsed then
         if (parser.isType == "object") then parser.value = parser.pointer
         elseif (parser.isType == "bool") then parser.value = ((parser.value == "true") and true) or false
@@ -227,6 +227,6 @@ function vcl.private.decode(buffer, root, ref, padding)
         parser.ref = parser.ref + 1
     end
     parser.isParsed = (not parser.isErrored and (((parser.isType == "object") and not parser.isTypeID and string.isVoid(parser.index)) or parser.isParsed) and true) or false
-    return vcl.private.parseReturn(parser)
+    return vcl.private.parseReturn(parser, buffer)
 end
 function vcl.public.decode(buffer) return vcl.private.decode(buffer) end
