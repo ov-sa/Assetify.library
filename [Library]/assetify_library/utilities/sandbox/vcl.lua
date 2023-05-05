@@ -27,7 +27,6 @@ local imports = {
 
 local vcl = class:create("vcl")
 vcl.private.types = {
-    init = ":",
     comment = "#",
     tab = "\t",
     space = " ",
@@ -36,6 +35,8 @@ vcl.private.types = {
     list = "-",
     negative = "-",
     decimal = ".",
+    index = ".",
+    init = ":",
     bool = {["true"] = true, ["false"] = true},
     string = {["`"] = "template", ["'"] = true, ["\""] = true}
 }
@@ -101,24 +102,26 @@ function vcl.private.parseString(parser, buffer, rw)
                 else
                     parser.isTypeParsed, parser.isValueSkipAppend = true, true
                     if vcl.private.types.string[rw] == "template" then
-                        print("Template it!")
-                        local parsedString = ""
+                        local queryValue = ""
                         local startIndex, endIndex = string.find(parser.value, "${", startIndex)
+                        queryValue = string.sub(parser.value, 0, (startIndex and (startIndex - 1)) or #parser.value)
                         while(startIndex) do
                             endIndex = string.find(parser.value, "}", startIndex)
-                            local templateIndex = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "[.]")
-                            local templateValue = nil
-                            for i, j in ipairs(templateIndex) do
-                                if not parser.root[j] or ((type(parser.root[j]) ~= "table") and (#templateIndex > 1))  then
-                                    templateValue = tostring(parser.root[j])
+                            if not endIndex then return false end
+                            local queryIndex = endIndex + 1
+                            local templateIndex, templateValue = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "["..vcl.private.types.index.."]"), parser.root
+                            for i = 1, #templateIndex, 1 do
+                                local j = templateIndex[i]
+                                if (imports.type(templateValue) == "table") and (templateValue[j] ~= nil) then templateValue = templateValue[j]
+                                else
+                                    templateValue = nil
                                     break
                                 end
                             end
-                            parsedString = parsedString..""..tostring(templateValue)
-                            print(tostring(startIndex).." : "..tostring(endIndex))
                             startIndex, endIndex = string.find(parser.value, "${", endIndex)
+                            queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, queryIndex, (startIndex and (startIndex - 1)) or #parser.value)
                         end
-                        print("PARSED STRING: "..parsedString)
+                        parser.value = queryValue
                     end
                 end
             end
@@ -189,7 +192,8 @@ function vcl.private.encode(buffer, padding)
         if imports.type(j) == "table" then
             table.insert(((imports.type(i) == "number") and indexes.numeric) or indexes.index, i)
         else
-            i = ((imports.type(i) == "number") and "- "..imports.tostring(i)) or i
+            if imports.type(i) == "number" then i = "-"..imports.tostring(i)
+            elseif not string.isVoid(string.gsub(i, "%w", "")) then i = "\""..i.."\"" end
             if imports.type(j) == "string" then j = "\""..j.."\"" end
             result = result..vcl.private.types.newline..padding..i..vcl.private.types.init..vcl.private.types.space..imports.tostring(j)
         end
@@ -197,7 +201,7 @@ function vcl.private.encode(buffer, padding)
     table.sort(indexes.numeric, function(a, b) return a < b end)
     for i = 1, table.length(indexes.numeric), 1 do
         local j = indexes.numeric[i]
-        result = result..vcl.private.types.newline..padding..vcl.private.types.list..vcl.private.types.space..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+        result = result..vcl.private.types.newline..padding..vcl.private.types.list..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
     end
     for i = 1, table.length(indexes.index), 1 do
         local j = indexes.index[i]
@@ -244,3 +248,23 @@ function vcl.private.decode(buffer, root, ref, padding)
     return vcl.private.parseReturn(parser, buffer)
 end
 function vcl.public.decode(buffer) return vcl.private.decode(buffer) end
+
+addEventHandler("onResourceStart", root, function()
+local testCode = [[
+"indexA": #DADADA
+    "indexA": true #DADADA
+    "indexC'@@@": 3131 #DADADA
+    indexB: "WEW" #DADADA
+    "indexAdada": true #DADADA
+    wewA: #DADADA
+        lol: "xD" #DADADA
+        -: "Hello" #DADADA
+            -: #DADADA
+                -: "World" #DADADA
+                -5: "xDD" #DADADA
+]]
+
+testCode = vcl.public.encode(vcl.public.decode(testCode))
+print("\n==============================")
+print(testCode)
+end)

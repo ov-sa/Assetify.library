@@ -76,7 +76,7 @@ end
 
 function string.public.split(baseString, separator)
     if not baseString or (imports.type(baseString) ~= "string") or not separator or (imports.type(separator) ~= "string") then return false end
-    baseString = baseString..separator
+    baseString = baseString..string.public.match(separator, separator)
     local result = {}
     for matchValue in string.public.gmatch(baseString, "(.-)"..separator) do
         table.insert(result, matchValue)
