@@ -82,7 +82,7 @@ function shaderRW.create(rtModes)
         texture vSource0;
         texture vSource1 ]]..((rtModes and rtModes.diffuse and [[<string renderTarget = "yes";>]]) or [[]])..[[;
         texture vSource2 ]]..((rtModes and rtModes.emissive and [[<string renderTarget = "yes";>]]) or [[]])..[[;
-        texture vDepth0 : DEPTHBUFFER;
+        //texture vDepth0 : DEPTHBUFFER;
         int gMaxAnisotropy <string deviceCaps="MaxAnisotropy";>;
         int gDeclNormal <string vertexDeclState="Normal";>;
         texture gTexture0 <string textureState="0,Texture";>;

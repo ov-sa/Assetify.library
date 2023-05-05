@@ -47,7 +47,6 @@ vcl.private.types = {
     }
 }
 
-function vcl.private.isVoid(rw) return (not string.find(rw, "%w") and true) or false end
 function vcl.private.fetchRW(rw, index) return string.sub(rw, index, index) end
 function vcl.private.fetchLine(rw, index)
     local rwLines = string.split(string.sub(rw, 0, index), vcl.private.types.newline)
@@ -68,7 +67,8 @@ function vcl.private.parseBoolean(parser, buffer, rw)
     if not parser.isType or (parser.isType == "bool") then
         for i, j in imports.pairs(vcl.private.types.bool) do
             if string.sub(buffer, parser.ref, parser.ref + #i - 1) == i then
-                parser.ref, parser.isType, parser.value, parser.isValueSkipAppend, parser.isTypeParsed = parser.ref + #i - 1, "bool", i, true, true
+                parser.ref, parser.value, parser.isType, parser.isTypeParsed, parser.isValueSkipAppend = parser.ref + #i - 1, i, "bool", true, true
+                if (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false end
                 break
             end
         end
@@ -87,7 +87,7 @@ function vcl.private.parseNumber(parser, buffer, rw)
                 if not parser.isTypeFloat then parser.isTypeFloat = true
                 else return false end
             elseif not parser.isTypeFloat and parser.isTypeNegative and (rw == vcl.private.types.init) then
-                parser.ref, parser.index, parser.isType, parser.isTypeFloat, parser.isTypeNegative = parser.isTypeNegative - 1, "", "object", nil, nil
+                parser.ref, parser.index, parser.value, parser.isType, parser.isTypeFloat, parser.isTypeNegative, parser.isValueSkipAppend = parser.isTypeNegative - 1, "", "", "object", nil, nil, true
             elseif not parser.isTypeParsed then
                 if not isNumber then return false
                 elseif not string.isVoid(parser.value) and ((vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.space) or (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.newline)) then parser.isTypeParsed = true end
@@ -102,10 +102,10 @@ function vcl.private.parseString(parser, buffer, rw)
         if (not parser.isTypeChar and vcl.private.types.string[rw]) or parser.isTypeChar then
             if not parser.isType then parser.isValueSkipAppend, parser.isType, parser.isTypeChar = true, "string", rw
             elseif not parser.isTypeParsed and (rw == parser.isTypeChar) then
-                parser.isValueSkipAppend, parser.isTypeParsed = true, true
                 if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-                    parser.ref, parser.isType, parser.value, parser.isTypeParsed, parser.isTypeChar = parser.ref - #parser.value - 1, "object", "", nil, nil
-                end
+                    parser.ref, parser.value, parser.isType, parser.isTypeChar, parser.isValueSkipAppend = parser.ref - #parser.value - 1, "", "object", nil, nil, true
+                elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
+                else parser.isTypeParsed, parser.isValueSkipAppend = true, true end
             end
         end
     end
@@ -135,13 +135,12 @@ function vcl.private.parseObject(parser, buffer, rw)
             if parser.isChild and (rwIndexPadding <= parser.padding) then
                 parser.ref, parser.isParsed = parser.ref - #parser.index - rwTypePadding, true
             else
-                if parser.isTypeID then parser.isTypeID, parser.index = false, imports.tonumber(parser.index) end
+                if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
                     local value, ref, isErrored = vcl.private.decode(buffer, parser.root, parser.ref + 1, rwIndexPadding)
                     if not isErrored then
                         if not parser.isChild then parser.root[(parser.index)] = value end
                         parser.pointer[(parser.index)], parser.ref, parser.index = value, ref - 1, ""
-                        parser.isParsed = false
                     else parser.isErrored = 0 end
                 else parser.isErrored = 1 end
                 if parser.isErrored then return false end
@@ -211,7 +210,6 @@ function vcl.private.decode(buffer, root, ref, padding)
                 local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, ref - 1))
                 if #rwLineText <= parser.padding then parser.isType, parser.isErrored = false, 1 end
             end
-            parser.isErrored = (not parser.isErrored and parser.isTypeParsed and not parser.__isParsed and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) and (parser.isErrored or 1)) or parser.isErrored
             if not parser.isErrored then
                 if parser.__isParsed then
                     parser.isParsed = vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.newline
@@ -221,7 +219,7 @@ function vcl.private.decode(buffer, root, ref, padding)
                 parser.__isParsed = parser.isTypeParsed
             end
         end
-        parser.isType = (not parser.isType and not parser.isErrored and ((vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.list) or not vcl.private.isVoid(vcl.private.fetchRW(buffer, parser.ref))) and "object") or parser.isType
+        parser.isType = (not parser.isType and not parser.isErrored and ((vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.list) or not string.isVoid(vcl.private.fetchRW(buffer, parser.ref))) and "object") or parser.isType
         parser.isErrored = (not parser.isErrored and not vcl.private.parseObject(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) and (parser.isErrored or 1)) or parser.isErrored
         if parser.isErrored or parser.isParsed then break end
         parser.ref = parser.ref + 1
