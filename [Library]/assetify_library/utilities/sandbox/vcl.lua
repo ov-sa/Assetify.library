@@ -36,15 +36,8 @@ vcl.private.types = {
     list = "-",
     negative = "-",
     decimal = ".",
-    bool = {
-        ["true"] = "true",
-        ["false"] = "false"
-    },
-    string = {
-        ["`"] = true,
-        ["'"] = true,
-        ["\""] = true
-    }
+    bool = {["true"] = true, ["false"] = true},
+    string = {["`"] = "template", ["'"] = true, ["\""] = true}
 }
 
 function vcl.private.fetchRW(rw, index) return string.sub(rw, index, index) end
@@ -105,7 +98,29 @@ function vcl.private.parseString(parser, buffer, rw)
                 if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
                     parser.ref, parser.value, parser.isType, parser.isTypeChar, parser.isValueSkipAppend = parser.ref - #parser.value - 1, "", "object", nil, nil, true
                 elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
-                else parser.isTypeParsed, parser.isValueSkipAppend = true, true end
+                else
+                    parser.isTypeParsed, parser.isValueSkipAppend = true, true
+                    if vcl.private.types.string[rw] == "template" then
+                        print("Template it!")
+                        local parsedString = ""
+                        local startIndex, endIndex = string.find(parser.value, "${", startIndex)
+                        while(startIndex) do
+                            endIndex = string.find(parser.value, "}", startIndex)
+                            local templateIndex = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "[.]")
+                            local templateValue = nil
+                            for i, j in ipairs(templateIndex) do
+                                if not parser.root[j] or ((type(parser.root[j]) ~= "table") and (#templateIndex > 1))  then
+                                    templateValue = tostring(parser.root[j])
+                                    break
+                                end
+                            end
+                            parsedString = parsedString..""..tostring(templateValue)
+                            print(tostring(startIndex).." : "..tostring(endIndex))
+                            startIndex, endIndex = string.find(parser.value, "${", endIndex)
+                        end
+                        print("PARSED STRING: "..parsedString)
+                    end
+                end
             end
         end
     end
@@ -116,7 +131,8 @@ function vcl.private.parseObject(parser, buffer, rw)
     if parser.isType == "object" then
         parser.isValueSkipAppend = true
         if string.isVoid(parser.index) and (rw == vcl.private.types.list) then parser.isTypeID = parser.ref
-        elseif (vcl.private.types.string[rw] or parser.isTypeQuoted or string.find(rw, "%w")) and (rw ~= vcl.private.types.init) then
+        elseif (parser.isTypeQuoted or (rw ~= vcl.private.types.space)) and (rw ~= vcl.private.types.newline) and (rw ~= vcl.private.types.init) then
+            if not vcl.private.types.string[rw] and not parser.isTypeQuoted and not string.find(rw, "%w") then return false end
             if not vcl.private.types.string[rw] or (parser.isTypeQuoted and (parser.isTypeQuoted ~= rw)) then parser.index = parser.index..rw
             else
                 if not parser.isTypeQuoted then parser.isTypeQuoted = rw
