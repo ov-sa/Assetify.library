@@ -187,27 +187,44 @@ end
 function vcl.private.encode(buffer, padding)
     if not buffer or (imports.type(buffer) ~= "table") then return false end
     padding = padding or ""
-    local result, indexes = "", {numeric = {}, index = {}}
+    local index, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
     for i, j in imports.pairs(buffer) do
+        local rwType = imports.type(i)
         if imports.type(j) == "table" then
-            table.insert(((imports.type(i) == "number") and indexes.numeric) or indexes.index, i)
+            table.insert(((rwType == "number") and index.numeric) or index.string, i)
         else
-            if imports.type(i) == "number" then i = "-"..imports.tostring(i)
+            if rwType == "number" then i = "-"..imports.tostring(i)
             elseif not string.isVoid(string.gsub(i, "%w", "")) then i = "\""..i.."\"" end
             if imports.type(j) == "string" then j = "\""..j.."\"" end
-            result = result..vcl.private.types.newline..padding..i..vcl.private.types.init..vcl.private.types.space..imports.tostring(j)
+            table.insert(((rwType == "number") and index.static.numeric) or index.static.string, {i, j})
         end
     end
-    table.sort(indexes.numeric, function(a, b) return a < b end)
-    for i = 1, table.length(indexes.numeric), 1 do
-        local j = indexes.numeric[i]
-        result = result..vcl.private.types.newline..padding..vcl.private.types.list..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+    local areStaticIndexVoid, areNestedIndexVoid = table.length(index.static.numeric) + table.length(index.static.string), table.length(index.numeric) + table.length(index.string)
+    if (areStaticIndexVoid > 0) or (areNestedIndexVoid > 0) then
+        table.sort(index.static.numeric, function(a, b) return a[1] < b[1] end)
+        table.sort(index.numeric, function(a, b) return a < b end)
+        for i = 1, table.length(index.static.numeric), 1 do
+            local j = index.static.numeric[i]
+            result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
+        end
+        for i = 1, table.length(index.numeric), 1 do
+            local j = index.numeric[i]
+            local __result = vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+            if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
+            else result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..vcl.private.types.list..j..vcl.private.types.init..__result end
+        end
+        for i = 1, table.length(index.static.string), 1 do
+            local j = index.static.string[i]
+            result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
+        end
+        for i = 1, table.length(index.string), 1 do
+            local j = index.string[i]
+            local __result = vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+            if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
+            else result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab) end
+        end
     end
-    for i = 1, table.length(indexes.index), 1 do
-        local j = indexes.index[i]
-        result = result..vcl.private.types.newline..padding..j..vcl.private.types.init..vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
-    end
-    return result
+    return (((areStaticIndexVoid > 0) or (areNestedIndexVoid > 0)) and result) or false
 end
 function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
 
@@ -219,7 +236,10 @@ function vcl.private.decode(buffer, root, ref, padding)
         index = "", value = "", padding = padding or 0,
         errorMsg = "Failed to decode vcl. [Line: %s] [Reason: %s]"
     }
-    buffer = (not parser.isChild and (string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")..(((vcl.private.fetchRW(buffer, #buffer) ~= vcl.private.types.newline) and (buffer..vcl.private.types.newline)) or ""))) or buffer
+    if not parser.isChild then
+        buffer = string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")
+        buffer = ((vcl.private.fetchRW(buffer, #buffer) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
+    end
     while(parser.ref <= #buffer) do
         vcl.private.parseComment(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
         local ref, isType = parser.ref, parser.isType
@@ -248,23 +268,3 @@ function vcl.private.decode(buffer, root, ref, padding)
     return vcl.private.parseReturn(parser, buffer)
 end
 function vcl.public.decode(buffer) return vcl.private.decode(buffer) end
-
-addEventHandler("onResourceStart", root, function()
-local testCode = [[
-"indexA": #DADADA
-    "indexA": true #DADADA
-    "indexC'@@@": 3131 #DADADA
-    indexB: "WEW" #DADADA
-    "indexAdada": true #DADADA
-    wewA: #DADADA
-        lol: "xD" #DADADA
-        -: "Hello" #DADADA
-            -: #DADADA
-                -: "World" #DADADA
-                -5: "xDD" #DADADA
-]]
-
-testCode = vcl.public.encode(vcl.public.decode(testCode))
-print("\n==============================")
-print(testCode)
-end)
