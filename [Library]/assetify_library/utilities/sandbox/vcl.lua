@@ -37,8 +37,17 @@ vcl.private.types = {
     decimal = ".",
     index = ".",
     init = ":",
-    bool = {["true"] = true, ["false"] = true},
-    string = {["`"] = "template", ["'"] = true, ["\""] = true}
+    bool = {
+        ["true"] = true,
+        ["false"] = true
+    },
+    string = {
+        ["`"] = {
+            isTemplate = {"${", "}"}
+        },
+        ["'"] = true,
+        ["\""] = true
+    }
 }
 
 function vcl.private.fetchRW(rw, index) return string.sub(rw, index, index) end
@@ -101,12 +110,12 @@ function vcl.private.parseString(parser, buffer, rw)
                 elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
                 else
                     parser.isTypeParsed, parser.isValueSkipAppend = true, true
-                    if vcl.private.types.string[rw] == "template" then
+                    if vcl.private.types.string[rw] and (imports.type(vcl.private.types.string[rw]) == "table") and vcl.private.types.string[rw].isTemplate then
                         local queryValue = ""
-                        local startIndex, endIndex = string.find(parser.value, "${", startIndex)
+                        local startIndex, endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], startIndex)
                         queryValue = string.sub(parser.value, 0, (startIndex and (startIndex - 1)) or #parser.value)
                         while(startIndex) do
-                            endIndex = string.find(parser.value, "}", startIndex)
+                            endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[2], startIndex)
                             if not endIndex then return false end
                             local queryIndex = endIndex + 1
                             local templateIndex, templateValue = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "["..vcl.private.types.index.."]"), parser.root
@@ -118,7 +127,7 @@ function vcl.private.parseString(parser, buffer, rw)
                                     break
                                 end
                             end
-                            startIndex, endIndex = string.find(parser.value, "${", endIndex)
+                            startIndex, endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], endIndex)
                             queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, queryIndex, (startIndex and (startIndex - 1)) or #parser.value)
                         end
                         parser.value = queryValue
