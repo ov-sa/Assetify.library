@@ -86,6 +86,7 @@ function vcl.private.parseNumber(parser, buffer, rw)
         if not parser.isType then
             local isNegative = rw == vcl.private.types.negative
             if isNegative or isNumber then parser.isType, parser.isTypeNegative = "number", (isNegative and parser.ref) or false end
+            if isNumber and ((vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.space) or (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.newline)) then parser.isTypeParsed = true end
         else
             if rw == vcl.private.types.decimal then
                 if not parser.isTypeFloat then parser.isTypeFloat = true
