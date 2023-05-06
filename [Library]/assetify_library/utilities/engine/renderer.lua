@@ -238,7 +238,7 @@ if localPlayer then
             else
                 imports.destroyElement(renderer.private.skyRT)
                 renderer.private.skyRT = nil
-                imports.setSkyGradient(table.upack(renderer.private.prevNativeSkyGradient))
+                imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
             for i, j in imports.pairs(shader.buffer.shader) do
