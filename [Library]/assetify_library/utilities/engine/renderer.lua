@@ -95,14 +95,14 @@ if localPlayer then
 
     function renderer.public:syncShader(syncShader)
         if not syncShader then return false end
+        local isTexSampler = syncShader.shaderData.shaderName == "Assetify_TextureSampler"
+        if isTexSampler then shader.preLoaded["Assetify_TextureSampler"] = syncShader end
         renderer.public:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
         renderer.public:setTimeSync(_, syncShader, syncer.librarySerial)
         renderer.public:setServerTick(_, syncShader, syncer.librarySerial)
         renderer.public:setMinuteDuration(_, syncShader, syncer.librarySerial)
         renderer.public:setDynamicSky(_, syncShader, syncer.librarySerial)
-        if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"].cShader == syncShader) then
-            shader.preLoaded["Assetify_TextureSampler"].isSynced = true
-        end
+        if isTexSampler then syncShader.isTexSamplerLoaded = true end
         return true
     end
 
@@ -113,7 +113,6 @@ if localPlayer then
             if renderer.public.isVirtualRendering == state then return false end
             renderer.public.isVirtualRendering = state
             if renderer.public.isVirtualRendering then
-                shader.preLoaded["Assetify_TextureSampler"] = shader:create(_, "Assetify-PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.shaderPriority + 1, shader.shaderDistance, true)
                 renderer.public.virtualSource = imports.dxCreateScreenSource(renderer.public.resolution[1], renderer.public.resolution[2])
                 renderer.public.virtualRTs = renderer.public.virtualRTs or {}
                 if rtModes and rtModes.diffuse then
@@ -122,12 +121,12 @@ if localPlayer then
                         renderer.public.virtualRTs.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end
+                shader:create(_, "Assetify-PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.shaderPriority + 1, shader.shaderDistance, true, syncer.librarySerial)
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 renderer.public:setEmissiveMode(false)
-                shader.preLoaded["Assetify_TextureSampler"].destroy()
-                shader.preLoaded["Assetify_TextureSampler"] = nil
+                shader.preLoaded["Assetify_TextureSampler"]:destroy(true, syncer.librarySerial)
                 imports.destroyElement(renderer.public.virtualSource)
                 renderer.public.virtualSource = nil
                 for i, j in imports.pairs(renderer.public.virtualRTs) do
@@ -204,7 +203,7 @@ if localPlayer then
             if renderer.public.isAntiAliased == intensity then return false end
             renderer.public.isAntiAliased = intensity
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.isAntiAliased) end
+        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.isAntiAliased or false) end
         return true
     end
 
@@ -238,6 +237,7 @@ if localPlayer then
                 renderer.private.skyRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
             else
                 imports.destroyElement(renderer.private.skyRT)
+                renderer.private.skyRT = nil
                 imports.setSkyGradient(table.upack(renderer.private.prevNativeSkyGradient))
             end
             imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
@@ -247,9 +247,9 @@ if localPlayer then
         else
             if not manager:isInternal(isInternal) then return false end
             syncShader:setValue("vDynamicSkyEnabled", renderer.public.isDynamicSkyEnabled or false)
-            if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"].cShader == syncShader) then
+            if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"] == syncShader) then
                 shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
-                if not shader.preLoaded["Assetify_TextureSampler"].isSynced then
+                if not shader.preLoaded["Assetify_TextureSampler"].isTexSamplerLoaded then
                     renderer.public:setAntiAliasing(_, syncer.librarySerial)
                     renderer.public:setDynamicSunColor(_, _, _, syncer.librarySerial)
                     renderer.public:setDynamicStars(_, syncer.librarySerial)
