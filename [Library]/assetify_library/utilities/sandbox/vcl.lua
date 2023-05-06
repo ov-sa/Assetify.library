@@ -47,7 +47,8 @@ vcl.private.types = {
         },
         ["'"] = true,
         ["\""] = true
-    }
+    },
+    color = {"rgba(", ")"}
 }
 
 function vcl.private.fetchRW(rw, index) return string.sub(rw, index, index) end
@@ -58,7 +59,7 @@ function vcl.private.fetchLine(rw, index)
 end
 
 function vcl.private.parseComment(parser, buffer, rw)
-    if (not parser.isType or parser.isTypeParsed) and (rw == vcl.private.types.comment) then
+    if (not parser.isType or parser.isTypeParsed or ((parser.isType == "object") and not parser.isTypeID and string.isVoid(parser.index))) and (rw == vcl.private.types.comment) then
         local rwLine, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
         local rwLines = string.split(buffer, vcl.private.types.newline)
         parser.ref = parser.ref - #rwLineText + #rwLines[rwLine] + 1
@@ -139,6 +140,36 @@ function vcl.private.parseString(parser, buffer, rw)
     return true
 end
 
+function vcl.private.parseColor(parser, buffer, rw)
+    if not parser.isType or (parser.isType == "color") then
+        if not parser.isType then
+            if string.sub(buffer, parser.ref, parser.ref + #vcl.private.types.color[1] - 1) == vcl.private.types.color[1] then
+                parser.ref, parser.isType, parser.isTypeColor, parser.isValueSkipAppend = parser.ref + #vcl.private.types.color[1] - 1, "color", {}, true
+            end
+        elseif not parser.isTypeParsed and (rw ~= vcl.private.types.space) then
+            parser.isValueSkipAppend = true
+            local isNumber = imports.tonumber(rw)
+            parser.isTypeColor.queryIndex = parser.isTypeColor.queryIndex or 1
+            if rw == "," then
+                if not parser.isTypeColor[(parser.isTypeColor.queryIndex)] or string.isVoid(parser.isTypeColor[(parser.isTypeColor.queryIndex)]) then return false end
+                parser.isTypeColor.queryIndex = parser.isTypeColor.queryIndex + 1
+            elseif rw == vcl.private.types.color[2] then
+                if (parser.isTypeColor.queryIndex < 3) then return false
+                elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false end
+                for i = 1, 4, 1 do
+                    parser.isTypeColor[i] = imports.tonumber(parser.isTypeColor[i]) or 255
+                    if (parser.isTypeColor[i] < 0) or (parser.isTypeColor[i] > 255) then return false end
+                end
+                parser.value, parser.isTypeParsed = parser.isTypeColor, true
+            elseif isNumber then
+                parser.isTypeColor[(parser.isTypeColor.queryIndex)] = parser.isTypeColor[(parser.isTypeColor.queryIndex)] or ""
+                parser.isTypeColor[(parser.isTypeColor.queryIndex)] = parser.isTypeColor[(parser.isTypeColor.queryIndex)]..rw
+            else return false end
+        end
+    end
+    return true
+end
+
 function vcl.private.parseObject(parser, buffer, rw)
     if parser.isType == "object" then
         parser.isValueSkipAppend = true
@@ -182,7 +213,8 @@ function vcl.private.parseReturn(parser, buffer)
     if parser.isParsed then
         if (parser.isType == "object") then parser.value = parser.pointer
         elseif (parser.isType == "bool") then parser.value = ((parser.value == "true") and true) or false
-        elseif (parser.isType == "number") then parser.value = imports.tonumber(parser.value) end
+        elseif (parser.isType == "number") then parser.value = imports.tonumber(parser.value)
+        elseif (parser.isType == "color") then parser.value = string.format("#%.2X%.2X%.2X%.2X", parser.value[1], parser.value[2], parser.value[3], parser.value[4]) end
     else
         parser.value = false
         if not parser.isErrored or (parser.isErrored == 1) then
@@ -253,7 +285,7 @@ function vcl.private.decode(buffer, root, ref, padding)
         vcl.private.parseComment(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
         local ref, isType = parser.ref, parser.isType
         parser.isValueSkipAppend = nil
-        parser.isErrored = (parser.isChild and (not vcl.private.parseBoolean(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseNumber(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseString(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))) and (parser.isErrored or 1)) or parser.isErrored
+        parser.isErrored = (parser.isChild and (not vcl.private.parseBoolean(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseNumber(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseString(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseColor(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))) and (parser.isErrored or 1)) or parser.isErrored
         if parser.isType then
             if not isType then
                 local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, ref - 1))
