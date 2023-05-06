@@ -15,7 +15,7 @@
 local identity = "Assetify_TextureChanger"
 shaderRW.buffer[identity] = {
     exec = function()
-        return shaderRW.create({diffuse = true, emissive = true})..[[
+        return shaderRW.create({diffuse = true, emissive = true}, true)..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
