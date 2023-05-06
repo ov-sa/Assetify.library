@@ -161,9 +161,7 @@ function vcl.private.parseColor(parser, buffer, rw)
                     if (parser.isTypeColor[i] < 0) or (parser.isTypeColor[i] > 255) then return false end
                 end
                 parser.value, parser.isTypeParsed = parser.isTypeColor, true
-            elseif isNumber then
-                parser.isTypeColor[(parser.isTypeColor.queryIndex)] = parser.isTypeColor[(parser.isTypeColor.queryIndex)] or ""
-                parser.isTypeColor[(parser.isTypeColor.queryIndex)] = parser.isTypeColor[(parser.isTypeColor.queryIndex)]..rw
+            elseif isNumber then parser.isTypeColor[(parser.isTypeColor.queryIndex)] = (parser.isTypeColor[(parser.isTypeColor.queryIndex)] or "")..rw
             else return false end
         end
     end
