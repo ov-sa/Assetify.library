@@ -46,7 +46,7 @@ manager.private.buffer = {
 
 function manager.public:isInternal(serial)
     local isExternal = sourceResource and (sourceResource ~= syncer.libraryResource)
-    return (not isExternal and true) or (serial and (serial == syncer.librarySerial)) or false
+    return (not isExternal and not serial and true) or (serial and (serial == syncer.librarySerial)) or false
 end
 
 function manager.public:exportAPI(moduleName, moduleAPIs)
