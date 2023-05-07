@@ -80,7 +80,7 @@ function file.public:parseURL(path)
             break
         end
     end
-    local url = string.sub(path, pointerEndN or 1, #path - ((extension and (#extension + 1)) or 0))
+    local url = string.sub(path, pointerEndN or 1, string.len(path) - ((extension and (string.len(extension) + 1)) or 0))
     if string.match(url, "%w") then
         local cURL = {
             pointer = pointer or false,
@@ -88,7 +88,7 @@ function file.public:parseURL(path)
             extension = extension,
             directory = string.match(url, "(.*[/\\])") or false
         }
-        cURL.file = (cURL.extension and string.sub(cURL.url, (cURL.directory and (#cURL.directory + 1)) or 1)) or false
+        cURL.file = (cURL.extension and string.sub(cURL.url, (cURL.directory and (string.len(cURL.directory) + 1)) or 1)) or false
         return cURL
     end
     return false
@@ -102,7 +102,7 @@ function file.public:resolveURL(path, chroot)
     local cDirs = string.split(cURL.url, "/")
     if table.length(cDirs) > 0 then
         if chroot then
-            chroot = file.public:parseURL(((string.sub(chroot, #chroot) ~= "/") and chroot.."/") or chroot)
+            chroot = file.public:parseURL(((string.sub(chroot, string.len(chroot)) ~= "/") and chroot.."/") or chroot)
             chroot = (chroot and chroot.pointer and string.gsub(chroot.url, file.public.validPointers[(chroot.pointer)], "")) or chroot
         end
         cURL.url = false

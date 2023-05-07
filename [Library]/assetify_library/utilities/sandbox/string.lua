@@ -97,7 +97,7 @@ end
 function string.public.minify(baseString)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     local result = ""
-    for i = 1, #baseString, 1 do
+    for i = 1, string.public.len(baseString), 1 do
         result = result..(string.private.minifier)..string.public.byte(baseString, i)
     end
     return [[
