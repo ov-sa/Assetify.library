@@ -97,7 +97,7 @@ if localPlayer then
         local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
         self.cStreamerInstance = imports.createObject(nativeID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.enableLODs and not nativeID and not cAsset.synced.lodID and cAsset.synced.collisionID and true) or false) or false
         if not self.cStreamerInstance then return false end
-        imports.setElementDoubleSided(self.cStreamerInstance, true)
+        imports.setElementDoubleSided(self.cStreamerInstance, sceneManifest.enableDoublefaces)
         if not nativeID then
             imports.setElementCollisionsEnabled(self.cStreamerInstance, false)
             self.cCollisionInstance = (cAsset.synced.collisionID and imports.createObject(cAsset.synced.collisionID, posX, posY, posZ, rotX, rotY, rotZ)) or false
@@ -113,7 +113,7 @@ if localPlayer then
                     imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
                     imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
                     if self.cLODInstance then
-                        imports.setElementDoubleSided(self.cLODInstance, true)
+                        imports.setElementDoubleSided(self.cLODInstance, sceneManifest.enableDoublefaces)
                         imports.setLowLODElement(self.cStreamerInstance, self.cLODInstance)
                         attacher:attachElements(self.cLODInstance, self.cCollisionInstance)
                         imports.setElementDimension(self.cLODInstance, sceneManifest.sceneDimension)
@@ -128,7 +128,7 @@ if localPlayer then
             self.cLODInstance = (sceneManifest.enableLODs and imports.createObject(nativeLOD or nativeID, posX, posY, posZ, rotX, rotY, rotZ, true)) or false
             self.cCollisionInstance = self.cStreamerInstance
             if self.cLODInstance then
-                imports.setElementDoubleSided(self.cLODInstance, true)
+                imports.setElementDoubleSided(self.cLODInstance, sceneManifest.enableDoublefaces)
                 imports.setLowLODElement(self.cStreamerInstance, self.cLODInstance)
                 attacher:attachElements(self.cLODInstance, self.cStreamerInstance)
                 imports.setElementDimension(self.cLODInstance, sceneManifest.sceneDimension)
