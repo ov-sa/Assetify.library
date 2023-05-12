@@ -41,6 +41,12 @@ function string.public.isVoid(baseString)
     return (not string.public.match(baseString, "[%W%w]") and true) or false
 end
 
+local __string_len = string.public.len
+function string.public.len(baseString)
+    if not baseString or (imports.type(baseString) ~= "string") then return false end
+    return __string_len(baseString)
+end
+
 local __string_gsub = string.public.gsub
 function string.public.gsub(baseString, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
     if not baseString or (imports.type(baseString) ~= "string") or not matchWord or (imports.type(matchWord) ~= "string") or not replaceWord or (imports.type(replaceWord) ~= "string") then return false end
