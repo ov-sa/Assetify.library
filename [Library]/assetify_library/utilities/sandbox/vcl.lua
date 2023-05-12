@@ -308,12 +308,3 @@ function vcl.private.decode(buffer, root, ref, padding)
     return vcl.private.parseReturn(parser, buffer)
 end
 function vcl.public.decode(buffer) return vcl.private.decode(buffer) end
-
-addEventHandler("onResourceStart", root, function()
-    local vclBuffer = [[
-        UI:
-            Login:
-                "Background:": "SomethingInHere"
-    ]]
-    iprint(vcl.public.decode(vclBuffer))
-end)
