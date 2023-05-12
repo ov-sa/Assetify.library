@@ -173,7 +173,7 @@ function vcl.private.parseObject(parser, buffer, rw)
     if parser.isType == "object" then
         parser.isValueSkipAppend = true
         if string.isVoid(parser.index) and (rw == vcl.private.types.list) then parser.isTypeID = parser.ref
-        elseif (parser.isTypeQuoted or (rw ~= vcl.private.types.space)) and (rw ~= vcl.private.types.newline) and (rw ~= vcl.private.types.init) then
+        elseif (parser.isTypeQuoted or (rw ~= vcl.private.types.space)) and (rw ~= vcl.private.types.newline) and (parser.isTypeQuoted or (rw ~= vcl.private.types.init)) then
             if not vcl.private.types.string[rw] and not parser.isTypeQuoted and not string.find(rw, "%w") then return false end
             if not vcl.private.types.string[rw] or (parser.isTypeQuoted and (parser.isTypeQuoted ~= rw)) then parser.index = parser.index..rw
             else
@@ -308,3 +308,12 @@ function vcl.private.decode(buffer, root, ref, padding)
     return vcl.private.parseReturn(parser, buffer)
 end
 function vcl.public.decode(buffer) return vcl.private.decode(buffer) end
+
+addEventHandler("onResourceStart", root, function()
+    local vclBuffer = [[
+        UI:
+            Login:
+                "Background:": "SomethingInHere"
+    ]]
+    iprint(vcl.public.decode(vclBuffer))
+end)
