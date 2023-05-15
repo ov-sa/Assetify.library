@@ -2,8 +2,9 @@
     "encryptKey": "vStudio - Aviril",
     "sceneDimension": 0,
     "sceneInterior": 0,
-    "sceneOffset": {"x": 0, "y": 0, "z": 2000},
+    "sceneOffsets": {"x": 0, "y": 0, "z": 2000},
     "enableLODs": true,
+    "enableDoublefaces": true,
     "shaderMaps": {
         "control": {
             "sand_terrain": [
