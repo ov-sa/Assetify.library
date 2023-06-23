@@ -121,7 +121,7 @@ if localPlayer then
                         renderer.public.virtualRTs.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end
-                shader:create(_, "Assetify-PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.shaderPriority + 1, shader.shaderDistance, true, syncer.librarySerial)
+                shader:create(_, "Assetify | PreLoad", "Assetify_TextureSampler", _, {}, {}, {}, _, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
@@ -217,7 +217,7 @@ if localPlayer then
             local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
             renderer.private.emissiveBuffer = {
                 rt = resultRT,
-                shader = shader:create(_, "Assetify-PreLoaded", "Assetify_TextureBloomer", _, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, _, _, shader.shaderPriority + 1, shader.shaderDistance, true)
+                shader = shader:create(_, "Assetify | PreLoad", "Assetify_TextureBloomer", _, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, _, _, shader.shaderPriority + 1, _, true)
             }
         else
             renderer.private.emissiveBuffer.shader:destroy()

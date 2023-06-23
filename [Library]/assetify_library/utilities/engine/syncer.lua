@@ -94,12 +94,12 @@ if localPlayer then
             return not imports.isElement(element)
         end, function()
             if clumpMaps then
-                shader.clearElementBuffer(element, asset.references.clump)
+                shader.clearElementBuffer(element, "Assetify | Clump")
                 local cAsset = manager:getAssetData(assetType, assetName, syncer.public.librarySerial)
                 if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps[(asset.references.clump)] then
                     for i, j in imports.pairs(clumpMaps) do
                         if cAsset.manifestData.shaderMaps[(asset.references.clump)][i] and cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j] then
-                            shader:create(element, asset.references.clump, "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
+                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
                         end
                     end
                     if syncer.public.syncedElementTones[element] and syncer.public.syncedElementTones[element][assetType] and syncer.public.syncedElementTones[element][assetType][assetName] then

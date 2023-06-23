@@ -97,7 +97,7 @@ function planar.public:load(lightType, lightData, shaderInputs, isScoped, isDefa
         self.cStreamer = streamer:create(self.cModelInstance, "light", {self.cCollisionInstance}, self.syncRate)
     end
     self.cLight = self.cModelInstance
-    self.cShader = shader:create(self.cLight, "Assetify-Planar-Light", "Assetify_LightPlanar", lightCache.textureName, {}, shaderInputs, {})
+    self.cShader = shader:create(self.cLight, "Assetify | Light:Planar", "Assetify_LightPlanar", lightCache.textureName, {}, shaderInputs, {}, _, _, _, _, _, syncer.public.librarySerial)
     planar.public.buffer[(self.cLight)] = self
     self.lightType = lightType
     self.lightData = lightData
