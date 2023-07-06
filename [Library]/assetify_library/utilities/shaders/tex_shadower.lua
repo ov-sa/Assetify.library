@@ -39,8 +39,9 @@ shaderRW.buffer[identity] = {
 
         float4 PSHandler(PSInput PS) : COLOR0 {
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
-            float4 shadowTexel = tex2D(baseSampler, PS.TexCoord - float2(shadowSize*-0.5, shadowSize)) + tex2D(baseSampler, PS.TexCoord - float2(shadowSize*0.5, shadowSize));
+            float4 shadowTexel = tex2D(baseSampler, PS.TexCoord - float2(0, shadowSize)) + tex2D(baseSampler, PS.TexCoord + float2(0, shadowSize)) + tex2D(baseSampler, PS.TexCoord - float2(shadowSize, 0)) + tex2D(baseSampler, PS.TexCoord + float2(shadowSize, 0));
             shadowTexel.rgb = 1;
+            shadowTexel.a = shadowTexel.a > 0 ? 1 : 0;
             shadowTexel *= shadowColor;
             sampledTexel.rgb = pow(sampledTexel.rgb*1.5, 1.5);
             sampledTexel += shadowTexel;
