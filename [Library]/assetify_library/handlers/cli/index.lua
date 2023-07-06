@@ -32,9 +32,9 @@ cli.private.validActions = {
 }
 
 
-----------------------
---[[ CLI Handlers ]]--
-----------------------
+-----------------------
+--[[ CLI: Handlers ]]--
+-----------------------
 
 function cli.public:uid(isAction)
     imports.outputServerLog("Assetify: UID ━│  "..syncer.librarySerial)
