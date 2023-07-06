@@ -69,8 +69,8 @@ function string.public.parseHex(baseString)
     return imports.tonumber("0x"..string.public.sub(baseString, 1, 2)) or 0, imports.tonumber("0x"..string.public.sub(baseString, 3, 4)) or 0, imports.tonumber("0x"..string.public.sub(baseString, 5, 6)) or 0
 end
 
-function string.public.formatTime(baseString)
-    baseString = imports.tonumber(baseString)
+function string.public.formatTime(milliseconds)
+    milliseconds = imports.tonumber(milliseconds)
     if not baseString then return false end
     baseString = math.floor(baseString)
     local totalSeconds = math.floor(baseString/1000)
