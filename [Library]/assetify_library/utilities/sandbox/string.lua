@@ -71,9 +71,9 @@ end
 
 function string.public.formatTime(milliseconds)
     milliseconds = imports.tonumber(milliseconds)
-    if not baseString then return false end
-    baseString = math.floor(baseString)
-    local totalSeconds = math.floor(baseString/1000)
+    if not milliseconds then return false end
+    milliseconds = math.floor(milliseconds)
+    local totalSeconds = math.floor(milliseconds/1000)
     local seconds = totalSeconds%60
     local minutes = math.floor(totalSeconds/60)
     local hours = math.floor(minutes/60)
