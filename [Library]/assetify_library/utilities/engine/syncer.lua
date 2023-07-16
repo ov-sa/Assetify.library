@@ -99,6 +99,7 @@ if localPlayer then
                 if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps[(asset.references.clump)] then
                     for i, j in imports.pairs(clumpMaps) do
                         if cAsset.manifestData.shaderMaps[(asset.references.clump)][i] and cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j] then
+                            cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].prelight = cAsset.manifestData.shaderMaps[(asset.references.clump)][i].prelight
                             shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
                         end
                     end

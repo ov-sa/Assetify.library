@@ -25,8 +25,8 @@ settings = {
 
     downloader = {
         isAccessSafe = true,
-        syncRate = 50,
-        buildRate = 500,
+        syncRate = 100,
+        buildRate = 1000,
         trackRate = 300
     },
 

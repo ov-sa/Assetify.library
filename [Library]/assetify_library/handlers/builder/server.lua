@@ -27,12 +27,14 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
     thread:create(function(self)
         if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
         for i, j in imports.pairs(settings.assetPacks) do
-            asset:buildPack(i, j, function(state, assetType)
-                if assetType == "module" then network:emit("Assetify:onModuleLoad", false) end
-                timer:create(function()
-                    self:resume()
-                end, 1, 1)
-            end)
+            thread:create(function()
+                asset:buildPack(i, j, function(state, assetType)
+                    if assetType == "module" then network:emit("Assetify:onModuleLoad", false) end
+                    timer:create(function()
+                        self:resume()
+                    end, 1, 1)
+                end)
+            end):resume({executions = settings.downloader.buildRate, frames = 1})
             thread:pause()
         end
         network:emit("Assetify:onLoad", false)
