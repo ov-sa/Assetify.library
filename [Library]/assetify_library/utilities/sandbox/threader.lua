@@ -113,6 +113,7 @@ function thread.public:status()
 end
 
 function thread.public:pause()
+    if not thread.public:getThread() then return false end
     return imports.coroutine.yield()
 end
 
