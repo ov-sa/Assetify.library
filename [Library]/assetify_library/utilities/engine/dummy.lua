@@ -74,7 +74,7 @@ function dummy.public.clearElementBuffer(element)
 end
 
 if localPlayer then
-    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, remoteSignature)
+    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, remoteSignature)
         if not dummy.public:isInstance(self) then return false end
         local cAsset, cData = manager:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
@@ -105,6 +105,7 @@ if localPlayer then
         if not self.cModelInstance then return false end
         self.cDummy = (remoteSignature and remoteSignature.element) or self.cCollisionInstance or self.cModelInstance
         dummy.public.buffer[(self.cDummy)] = self
+        if isScoped then manager:setElementScoped(self.cDummy) end
         self.cHeartbeat = thread:createHeartbeat(function()
             if not self.cModelInstance then
                 return false
@@ -141,9 +142,9 @@ if localPlayer then
         return true
     end
 else
-    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, targetPlayer)
+    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, targetPlayer)
         if not dummy.public:isInstance(self) or self.isUnloading then return false end
-        if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, self.remoteSignature) end
+        if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, _, self.remoteSignature) end
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
         local dummyType = settings.assetPacks[assetType].assetType
@@ -168,6 +169,7 @@ else
         imports.setElementAlpha(self.cModelInstance, 0)
         imports.setElementDimension(self.cModelInstance, dummyData.dimension)
         imports.setElementInterior(self.cModelInstance, dummyData.interior)
+        if isScoped then manager:setElementScoped(self.cDummy) end
         thread:create(function(__self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 self:load(_, _, _, _, _, i)
@@ -200,16 +202,16 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
-function syncer.public.syncDummySpawn(length, ...) return dummy.public:create(table.unpack(table.pack(...), length or 5)) end
+function syncer.public.syncDummySpawn(length, ...) return dummy.public:create(table.unpack(table.pack(...), length or 6)) end
 function syncer.public.syncDummyDespawn(length, element) local cDummy = dummy.public:fetchInstance(element); if not cDummy then return false end; return cDummy:destroy() end
 if localPlayer then
-    network:create("Assetify:Dummy:onSpawn"):on(function(...) syncer.public.syncDummySpawn(6, ...) end)
+    network:create("Assetify:Dummy:onSpawn"):on(function(...) syncer.public.syncDummySpawn(7, ...) end)
     network:create("Assetify:Dummy:onDespawn"):on(function(...) syncer.public.syncDummySpawn(_, ...) end)
 else
     network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(dummy.public.buffer) do
-            if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.dummyData, j.remoteSignature) end
+            if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.dummyData, _, j.remoteSignature) end
             thread:pause()
         end
     end, {isAsync = true})
