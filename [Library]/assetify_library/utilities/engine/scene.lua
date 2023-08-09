@@ -13,7 +13,9 @@
 -----------------
 
 local imports = {
+    tonumber = tonumber,
     loadstring = loadstring,
+    addEventHandler = addEventHandler,
     destroyElement = destroyElement,
     createObject = createObject,
     setElementAlpha = setElementAlpha,
@@ -30,6 +32,7 @@ local imports = {
 ----------------------
 
 local scene = class:create("scene")
+scene.private.cache = {col = {}}
 scene.private.separators = {IPL = ", ", IDE = ", "}
 scene.private.native = {
     buffer = imports.loadstring(file:read("utilities/rw/native/buffer.rw"))(),
@@ -53,7 +56,8 @@ function scene.public:parseIDE(rw)
         data[2] = (data[2] and string.gsub(data[2], "%s", "")) or data[2]
         if data[2] then
             result[(data[2])] = {
-                (data[3] and string.gsub(data[3], "%s", "")) or false
+                (data[3] and string.gsub(data[3], "%s", "")) or false,
+                imports.tonumber(data[4])
             }
         end
     end
@@ -105,6 +109,7 @@ if localPlayer then
                 imports.setElementAlpha(self.cCollisionInstance, 0)
                 imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
                 imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
+                imports.setElementCollisionsEnabled(self.cCollisionInstance, false)
                 if sceneManifest.enableLODs then
                     self.cModelInstance = imports.createObject(cAsset.synced.collisionID, posX, posY, posZ, rotX, rotY, rotZ, true) or false
                     self.cLODInstance = (cAsset.synced.lodID and imports.createObject(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true)) or false
@@ -119,9 +124,9 @@ if localPlayer then
                         imports.setElementDimension(self.cLODInstance, sceneManifest.sceneDimension)
                         imports.setElementInterior(self.cLODInstance, sceneManifest.sceneInterior)
                     end
-                    self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance, self.cModelInstance})
+                    self.cStreamer = (not sceneManifest.sceneDefaultStreamer and streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance, self.cModelInstance})) or false
                 else
-                    self.cStreamer = streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance})
+                    self.cStreamer = (not sceneManifest.sceneDefaultStreamer and streamer:create(self.cStreamerInstance, "scene", {self.cCollisionInstance})) or false
                 end
             end
         else
@@ -138,6 +143,7 @@ if localPlayer then
         self.cModelInstance = (self.cModelInstance or self.cStreamerInstance) or false
         self.cLODInstance = self.cLODInstance or false
         self.cCollisionInstance = self.cCollisionInstance or false
+        if self.cCollisionInstance then scene.private.cache.col[(self.cCollisionInstance)] = true end
         cAsset.cScenes = cAsset.cScenes or {}
         cAsset.cScenes[self] = true
         return true
@@ -145,6 +151,7 @@ if localPlayer then
 
     function scene.public:unload()
         if not scene.public:isInstance(self) then return false end
+        if self.cCollisionInstance then scene.private.cache.col[(self.cCollisionInstance)] = nil end
         if self.cStreamer then self.cStreamer:destroy() end
         imports.destroyElement(self.cStreamerInstance)
         imports.destroyElement(self.cModelInstance)
@@ -153,4 +160,20 @@ if localPlayer then
         self:destroyInstance()
         return true
     end
+end
+
+
+---------------------
+--[[ API Syncers ]]--
+---------------------
+
+if localPlayer then
+    imports.addEventHandler("onClientElementStreamIn", resourceRoot, function()
+        if not scene.private.cache.col[source] then return false end
+        imports.setElementCollisionsEnabled(source, true)
+    end)
+    imports.addEventHandler("onClientElementStreamOut", resourceRoot, function()
+        if not scene.private.cache.col[source] then return false end
+        imports.setElementCollisionsEnabled(source, false)
+    end)
 end

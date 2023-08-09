@@ -44,13 +44,14 @@ local asset = class:create("asset", {
         asset = "asset",
         scene = "scene",
         clump = "clump",
+        control = "control",
         txd = "txd", dff = "dff", lod = "lod", col = "col",
         map = "map", dep = "dep"
     },
     ranges = {
         dimension = {-1, 65535},
         interior = {0, 255},
-        streamRange = 170
+        stream = 170
     }
 })
 
@@ -73,12 +74,14 @@ function asset.private:fetchMap(assetPath, shaderMaps)
         local mapData = shaderMaps[i] 
         if j and mapData then
             for k, v in imports.pairs(mapData) do
-                for m = 1, table.length(v), 1 do
-                    local n = v[m]
-                    if i == asset.public.references.clump then
+                if i == asset.public.references.clump then
+                    for m, n in imports.pairs(v) do
                         n.clump = asset.private:validateMap(cPointer, n.clump, cMaps)
                         n.bump = asset.private:validateMap(cPointer, n.bump, cMaps)
-                    elseif i == "control" then
+                    end
+                elseif i == asset.public.references.control then
+                    for m = 1, table.length(v), 1 do
+                        local n = v[m]
                         n.control = asset.private:validateMap(cPointer, n.control, cMaps)
                         n.bump = asset.private:validateMap(cPointer, n.bump, cMaps)
                         for x = 1, table.length(shader.validChannels), 1 do
@@ -151,7 +154,8 @@ if localPlayer then
         return true
     end
 
-    function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths)
+    function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, rwStreamRange)
+        rwStreamRange = imports.tonumber(rwStreamRange) or assetManifest.streamRange
         if not asset.public:isInstance(self) then return false end
         if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
         local loadState = false
@@ -190,9 +194,9 @@ if localPlayer then
                         end
                         rwCache.col[(rwPaths.col)] = rwCache.col[(rwPaths.col)] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(rwPaths.col, assetManifest.encryptKey))) or false
                         collisionID = (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
-                        imports.engineSetModelLODDistance(modelID, asset.public.ranges.streamRange)
-                        if lodID then imports.engineSetModelLODDistance(lodID, asset.public.ranges.streamRange) end
-                        if collisionID then imports.engineSetModelLODDistance(collisionID, asset.public.ranges.streamRange) end
+                        imports.engineSetModelLODDistance(modelID, rwStreamRange)
+                        if lodID then imports.engineSetModelLODDistance(lodID, rwStreamRange) end
+                        if collisionID then imports.engineSetModelLODDistance(collisionID, rwStreamRange) end
                     end
                 end
             end
@@ -242,12 +246,12 @@ if localPlayer then
     end
 else
     asset.private.properties = {
-        reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects"},
+        reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
         whitelisted = {
             ["module"] = {},
             ["animation"] = {"assetAnimations"},
             ["sound"] = {"assetSounds"},
-            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects"},
+            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
             ["*"] = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
         }
     }
@@ -362,7 +366,7 @@ else
                     assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
                     assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                     assetManifestData.enableDoublefaces = (assetManifestData.enableDoublefaces and true) or false
-                    assetManifestData.streamRange = math.max(imports.tonumber(assetManifestData.streamRange) or 0, asset.public.ranges.streamRange)
+                    assetManifestData.streamRange = imports.tonumber(assetManifestData.streamRange) or asset.public.ranges.stream
                     assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
                     assetManifestData.assetAnimations = (assetManifestData.assetAnimations and (imports.type(assetManifestData.assetAnimations) == "table") and assetManifestData.assetAnimations) or false
                     assetManifestData.assetSounds = (assetManifestData.assetSounds and (imports.type(assetManifestData.assetSounds) == "table") and assetManifestData.assetSounds) or false
@@ -408,6 +412,7 @@ else
                         assetManifestData.sceneOffsets = (assetManifestData.sceneOffsets and (imports.type(assetManifestData.sceneOffsets) == "table") and assetManifestData.sceneOffsets) or false
                         assetManifestData.sceneMapped = (assetManifestData.sceneMapped and true) or false
                         assetManifestData.sceneNativeObjects = (assetManifestData.sceneNativeObjects and true) or false
+                        assetManifestData.sceneDefaultStreamer = (assetManifestData.sceneDefaultStreamer and true) or false
                         if assetManifestData.sceneOffsets then
                             for i, j in imports.pairs(assetManifestData.sceneOffsets) do
                                 assetManifestData.sceneOffsets[i] = imports.tonumber(j)
