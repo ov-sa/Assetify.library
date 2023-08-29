@@ -48,6 +48,10 @@ local asset = class:create("asset", {
         txd = "txd", dff = "dff", lod = "lod", col = "col",
         map = "map", dep = "dep"
     },
+    encryptions = {
+        ["tea"] = {},
+        ["aes128"] = {keyLimit = 16}
+    },
     ranges = {
         dimension = {-1, 65535},
         interior = {0, 255},
@@ -364,6 +368,11 @@ else
                         assetManifestData[v] = (assetProperties[v] and assetManifestData[v]) or false
                     end
                     assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
+                    assetManifestData.encryptMode = (assetManifestData.encryptKey and not assetManifestData.encryptMode and "tea") or assetManifestData.encryptMode
+                    assetManifestData.encryptMode = (assetManifestData.encryptMode and asset.public.encryptions[(assetManifestData.encryptMode)] and assetManifestData.encryptMode) or false
+                    assetManifestData.encryptKey = (assetManifestData.encryptMode and assetManifestData.encryptKey) or false
+                    assetManifestData.encryptMode = (assetManifestData.encryptKey and assetManifestData.encryptMode) or false
+                    assetManifestData.encryptKey = (assetManifestData.encryptKey and string.sub(assetManifestData.encryptKey, 0, asset.public.encryptions[(assetManifestData.encryptMode)].keyLimit or #assetManifestData.encryptKey)) or assetManifestData.encryptKey
                     assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
                     assetManifestData.enableDoublefaces = (assetManifestData.enableDoublefaces and true) or false
                     assetManifestData.streamRange = imports.tonumber(assetManifestData.streamRange) or asset.public.ranges.stream
