@@ -288,8 +288,8 @@ else
         return manifestData
     end
 
-    function asset.public:buildFile(filePath, filePointer, encryptKey, rawPointer, skipSync, debugExistence)
-        if not filePath or not filePointer then return false end
+    function asset.public:buildFile(assetManifest, filePath, filePointer, rawPointer, skipSync, debugExistence)
+        if not assetManifest or not filePath or not filePointer then return false end
         if (not skipSync and not filePointer.unSynced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
@@ -297,7 +297,7 @@ else
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
-                    filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
+                    filePointer.unSynced.fileData[filePath] = (assetManifest.encryptKey and string.encode(builtFileData, "tea", {key = assetManifest.encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
@@ -308,21 +308,21 @@ else
         return true
     end
 
-    function asset.public:buildShader(assetPath, shaderMaps, filePointer, encryptKey)
-        if not assetPath or not shaderMaps or not filePointer then return false end
-        for i, j in imports.pairs(asset.private:fetchMap(assetPath, shaderMaps)) do
+    function asset.public:buildShader(assetManifest, assetPath, filePointer)
+        if not assetManifest or not assetPath or not assetManifest.shaderMaps or not filePointer then return false end
+        for i, j in imports.pairs(asset.private:fetchMap(assetPath, assetManifest.shaderMaps)) do
             if j then
-                asset.public:buildFile(i, filePointer, encryptKey, _, _, true)
+                asset.public:buildFile(assetManifest, i, filePointer, _, _, true)
             end
             thread:pause()
         end
         return true
     end
 
-    function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptKey)
-        if not assetPath or not assetDeps or not filePointer then return false end
+    function asset.public:buildDep(assetManifest, assetPath, filePointer)
+        if not assetManifest or not assetPath or not assetManifest.assetDeps or not filePointer then return false end
         local cAssetDeps = {}
-        for i, j in imports.pairs(assetDeps) do
+        for i, j in imports.pairs(assetManifest.assetDeps) do
             if j and (imports.type(j) == "table") then
                 cAssetDeps[i] = {}
                 for k, v in imports.pairs(j) do
@@ -337,7 +337,7 @@ else
                     else
                         j[k] = assetPath..(asset.public.references.dep).."/"..j[k]
                         cAssetDeps[i][k] = j[k]
-                        asset.public:buildFile(cAssetDeps[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        asset.public:buildFile(assetManifest, cAssetDeps[i][k], filePointer, filePointer.unSynced.rawData, _, true)
                     end
                     thread:pause()
                 end
@@ -360,30 +360,30 @@ else
             for i = 1, table.length(cAssetPack.manifestData), 1 do
                 local assetName = cAssetPack.manifestData[i]
                 local assetPath = (asset.public.references.root)..string.lower(assetType).."/"..assetName.."/"
-                local assetManifestData = asset.public:buildManifest(assetPath, _, asset.public.references.asset..((file:exists(assetPath..(asset.public.references.asset)..".json") and ".json") or ".vcl"))
-                if assetManifestData then
+                local assetManifest = asset.public:buildManifest(assetPath, _, asset.public.references.asset..((file:exists(assetPath..(asset.public.references.asset)..".json") and ".json") or ".vcl"))
+                if assetManifest then
                     local assetProperties = asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"]
                     for k = 1, table.length(asset.private.properties.reserved), 1 do
                         local v = asset.private.properties.reserved[k]
-                        assetManifestData[v] = (assetProperties[v] and assetManifestData[v]) or false
+                        assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
-                    assetManifestData.encryptKey = (assetManifestData.encryptKey and imports.md5(imports.tostring(assetManifestData.encryptKey))) or false
-                    assetManifestData.encryptMode = (assetManifestData.encryptKey and not assetManifestData.encryptMode and "tea") or assetManifestData.encryptMode
-                    assetManifestData.encryptMode = (assetManifestData.encryptMode and asset.public.encryptions[(assetManifestData.encryptMode)] and assetManifestData.encryptMode) or false
-                    assetManifestData.encryptKey = (assetManifestData.encryptMode and assetManifestData.encryptKey) or false
-                    assetManifestData.encryptMode = (assetManifestData.encryptKey and assetManifestData.encryptMode) or false
-                    assetManifestData.encryptKey = (assetManifestData.encryptKey and string.sub(assetManifestData.encryptKey, 0, asset.public.encryptions[(assetManifestData.encryptMode)].keyLimit or #assetManifestData.encryptKey)) or assetManifestData.encryptKey
-                    assetManifestData.enableLODs = (assetManifestData.enableLODs and true) or false
-                    assetManifestData.enableDoublefaces = (assetManifestData.enableDoublefaces and true) or false
-                    assetManifestData.streamRange = imports.tonumber(assetManifestData.streamRange) or asset.public.ranges.stream
-                    assetManifestData.assetClumps = (assetManifestData.assetClumps and (imports.type(assetManifestData.assetClumps) == "table") and assetManifestData.assetClumps) or false
-                    assetManifestData.assetAnimations = (assetManifestData.assetAnimations and (imports.type(assetManifestData.assetAnimations) == "table") and assetManifestData.assetAnimations) or false
-                    assetManifestData.assetSounds = (assetManifestData.assetSounds and (imports.type(assetManifestData.assetSounds) == "table") and assetManifestData.assetSounds) or false
-                    assetManifestData.shaderMaps = (assetManifestData.shaderMaps and (imports.type(assetManifestData.shaderMaps) == "table") and assetManifestData.shaderMaps) or false
-                    assetManifestData.assetDeps = (assetManifestData.assetDeps and (imports.type(assetManifestData.assetDeps) == "table") and assetManifestData.assetDeps) or false
+                    assetManifest.encryptKey = (assetManifest.encryptKey and imports.md5(imports.tostring(assetManifest.encryptKey))) or false
+                    assetManifest.encryptMode = (assetManifest.encryptKey and not assetManifest.encryptMode and "tea") or assetManifest.encryptMode
+                    assetManifest.encryptMode = (assetManifest.encryptMode and asset.public.encryptions[(assetManifest.encryptMode)] and assetManifest.encryptMode) or false
+                    assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey) or false
+                    assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode) or false
+                    assetManifest.encryptKey = (assetManifest.encryptKey and string.sub(assetManifest.encryptKey, 0, asset.public.encryptions[(assetManifest.encryptMode)].keyLimit or #assetManifest.encryptKey)) or assetManifest.encryptKey
+                    assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
+                    assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
+                    assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
+                    assetManifest.assetClumps = (assetManifest.assetClumps and (imports.type(assetManifest.assetClumps) == "table") and assetManifest.assetClumps) or false
+                    assetManifest.assetAnimations = (assetManifest.assetAnimations and (imports.type(assetManifest.assetAnimations) == "table") and assetManifest.assetAnimations) or false
+                    assetManifest.assetSounds = (assetManifest.assetSounds and (imports.type(assetManifest.assetSounds) == "table") and assetManifest.assetSounds) or false
+                    assetManifest.shaderMaps = (assetManifest.shaderMaps and (imports.type(assetManifest.shaderMaps) == "table") and assetManifest.shaderMaps) or false
+                    assetManifest.assetDeps = (assetManifest.assetDeps and (imports.type(assetManifest.assetDeps) == "table") and assetManifest.assetDeps) or false
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
-                            manifestData = assetManifestData,
+                            manifestData = assetManifest,
                             bandwidthData = {total = 0, file = {}}
                         },
                         unSynced = {
@@ -395,87 +395,87 @@ else
                     if assetType == "module" then
                         table.insert(syncer.libraryModules, assetName)
                     elseif assetType == "animation" then
-                        asset.public:buildFile(assetPath..(asset.public.references.asset)..".ifp", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.asset)..".ifp", cAssetPack.rwDatas[assetName], _, _, true)
                         thread:pause()
                     elseif assetType == "sound" then
-                        if assetManifestData.assetSounds then
+                        if assetManifest.assetSounds then
                             local assetSounds = {}
-                            for i, j in imports.pairs(assetManifestData.assetSounds) do
+                            for i, j in imports.pairs(assetManifest.assetSounds) do
                                 if j and (imports.type(j) == "table") then
                                     assetSounds[i] = {}
                                     for k, v in imports.pairs(j) do
                                         if v then
                                             assetSounds[i][k] = v
-                                            asset.public:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetManifest, assetPath.."sound/"..v, cAssetPack.rwDatas[assetName], _, _, true)
                                             thread:pause()
                                         end
                                     end
                                 end
                             end
-                            assetManifestData.assetSounds = assetSounds
+                            assetManifest.assetSounds = assetSounds
                         end
                         thread:pause()
                     elseif assetType == "scene" then
-                        assetManifestData.sceneDimension = math.max(asset.public.ranges.dimension[1], math.min(asset.public.ranges.dimension[2], imports.tonumber(assetManifestData.sceneDimension) or 0))
-                        assetManifestData.sceneInterior = math.max(asset.public.ranges.interior[1], math.min(asset.public.ranges.interior[2], imports.tonumber(assetManifestData.sceneInterior) or 0))
-                        assetManifestData.sceneOffsets = (assetManifestData.sceneOffsets and (imports.type(assetManifestData.sceneOffsets) == "table") and assetManifestData.sceneOffsets) or false
-                        assetManifestData.sceneMapped = (assetManifestData.sceneMapped and true) or false
-                        assetManifestData.sceneNativeObjects = (assetManifestData.sceneNativeObjects and true) or false
-                        assetManifestData.sceneDefaultStreamer = (assetManifestData.sceneDefaultStreamer and true) or false
-                        if assetManifestData.sceneOffsets then
-                            for i, j in imports.pairs(assetManifestData.sceneOffsets) do
-                                assetManifestData.sceneOffsets[i] = imports.tonumber(j)
+                        assetManifest.sceneDimension = math.max(asset.public.ranges.dimension[1], math.min(asset.public.ranges.dimension[2], imports.tonumber(assetManifest.sceneDimension) or 0))
+                        assetManifest.sceneInterior = math.max(asset.public.ranges.interior[1], math.min(asset.public.ranges.interior[2], imports.tonumber(assetManifest.sceneInterior) or 0))
+                        assetManifest.sceneOffsets = (assetManifest.sceneOffsets and (imports.type(assetManifest.sceneOffsets) == "table") and assetManifest.sceneOffsets) or false
+                        assetManifest.sceneMapped = (assetManifest.sceneMapped and true) or false
+                        assetManifest.sceneNativeObjects = (assetManifest.sceneNativeObjects and true) or false
+                        assetManifest.sceneDefaultStreamer = (assetManifest.sceneDefaultStreamer and true) or false
+                        if assetManifest.sceneOffsets then
+                            for i, j in imports.pairs(assetManifest.sceneOffsets) do
+                                assetManifest.sceneOffsets[i] = imports.tonumber(j)
                             end
                         end
                         local sceneIPLPath = assetPath..(asset.public.references.scene)..".ipl"
-                        local sceneIPLDatas = scene:parseIPL(file:read(sceneIPLPath), assetManifestData.sceneNativeObjects)
+                        local sceneIPLDatas = scene:parseIPL(file:read(sceneIPLPath), assetManifest.sceneNativeObjects)
                         if sceneIPLDatas then
-                            asset.public:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                            if not assetManifestData.sceneMapped then
+                            asset.public:buildFile(assetManifest, sceneIPLPath, cAssetPack.rwDatas[assetName])
+                            if not assetManifest.sceneMapped then
                                 local debugTXDExistence = false
                                 local sceneIDEPath = assetPath..(asset.public.references.scene)..".ide"
                                 local sceneIDEDatas = scene:parseIDE(file:read(sceneIDEPath))
-                                asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                asset.public:buildFile(assetManifest, sceneIDEPath, cAssetPack.rwDatas[assetName])
                                 cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
                                 for k = 1, table.length(sceneIPLDatas), 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetManifest, assetPath..(asset.public.references.txd).."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], _, _, true)
                                         else
                                             local childTXDPath = assetPath..(asset.public.references.txd).."/"..v[2]..".txd"
                                             debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                            asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                            asset.public:buildFile(assetManifest, childTXDPath, cAssetPack.rwDatas[assetName])
                                         end
-                                        asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
-                                        asset.public:buildFile(assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                        asset.public:buildFile(assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.dff).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], _, _, true)
+                                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.dff).."/"..(asset.public.references.lod).."/"..v[2]..".dff", cAssetPack.rwDatas[assetName])
+                                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.col).."/"..v[2]..".col", cAssetPack.rwDatas[assetName])
                                     end
                                     thread:pause()
                                 end
-                                asset.public:buildFile(assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, debugTXDExistence)
+                                asset.public:buildFile(assetManifest, assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], _, _, debugTXDExistence)
                             end
                         end
                     else
                         local debugTXDExistence = false
-                        if assetManifestData.assetClumps then
-                            for i, j in imports.pairs(assetManifestData.assetClumps) do
+                        if assetManifest.assetClumps then
+                            for i, j in imports.pairs(assetManifest.assetClumps) do
                                 local childTXDPath = assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".txd"
                                 debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                                asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
-                                asset.public:buildFile(assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                                asset.public:buildFile(assetManifest, childTXDPath, cAssetPack.rwDatas[assetName])
+                                asset.public:buildFile(assetManifest, assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], _, _, true)
+                                asset.public:buildFile(assetManifest, assetPath..(asset.public.references.clump).."/"..j.."/"..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName])
                                 thread:pause()
                             end
                         else
-                            asset.public:buildFile(assetPath..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, true)
+                            asset.public:buildFile(assetManifest, assetPath..(asset.public.references.asset)..".dff", cAssetPack.rwDatas[assetName], _, _, true)
                         end
-                        asset.public:buildFile(assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey, _, _, debugTXDExistence)
-                        asset.public:buildFile(assetPath..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.asset)..".txd", cAssetPack.rwDatas[assetName], _, _, debugTXDExistence)
+                        asset.public:buildFile(assetManifest, assetPath..(asset.public.references.asset)..".col", cAssetPack.rwDatas[assetName])
                         thread:pause()
                     end
-                    asset.public:buildShader(assetPath, assetManifestData.shaderMaps, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
-                    assetManifestData.assetDeps = asset.public:buildDep(assetPath, assetManifestData.assetDeps, cAssetPack.rwDatas[assetName], assetManifestData.encryptKey)
+                    asset.public:buildShader(assetManifest, assetPath, cAssetPack.rwDatas[assetName])
+                    assetManifest.assetDeps = asset.public:buildDep(assetManifest, assetPath, cAssetPack.rwDatas[assetName])
                 end
             end
             assetPack.assetPack = cAssetPack
