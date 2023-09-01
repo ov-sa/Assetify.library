@@ -297,7 +297,11 @@ else
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
-                    filePointer.unSynced.fileData[filePath] = (assetManifest.encryptKey and string.encode(builtFileData, "tea", {key = assetManifest.encryptKey})) or builtFileData
+                    if assetManifest.encryptKey then
+                        filePointer.unSynced.fileData[filePath], filePointer.unSynced.fileIV[filePath] = string.encode(builtFileData, assetManifest.encryptMode, {key = assetManifest.encryptKey})
+                    else
+                        filePointer.unSynced.fileData[filePath] = fileData
+                    end
                     filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
@@ -389,6 +393,7 @@ else
                         unSynced = {
                             rawData = {},
                             fileData = {},
+                            fileIV = {},
                             fileHash = {}
                         }
                     }
