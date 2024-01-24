@@ -57,8 +57,8 @@ local asset = class:create("asset", {
 
 function asset.public:readFile(filePath, encryptKey, ...)
     if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
-    if not encryptKey then return filePath end
     local rw = file:read(filePath)
+    if not encryptKey then return rw end
     return (rw and string.decode(rw, "tea", {key = encryptKey}, ...)) or false
 end
 
