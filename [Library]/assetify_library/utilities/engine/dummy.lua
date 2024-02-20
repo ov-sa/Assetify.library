@@ -172,7 +172,7 @@ else
         if isScoped then manager:setElementScoped(self.cDummy) end
         thread:create(function(__self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                self:load(_, _, _, _, _, i)
+                self:load(_, _, _, _, _, _, i)
                 thread:pause()
             end
         end):resume({executions = settings.downloader.syncRate, frames = 1})
