@@ -5,7 +5,7 @@
 ###### **Made with :heart: from 🇺🇸, 🇷🇺 & 🇧🇭**
 **━ Maintainer(s):** [**Aviril**](https://github.com/Aviril), [**Mario**](https://github.com/OvileAmriam), [**Tron**](https://github.com/OvileAmriam), [**Anisa**](https://github.com/Anisa-Nur)
 
-**Assetify Library** is a open-source custom asset loading library made by **Aviril** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/).
+**Assetify Library** is an open-source custom asset loading library made by **vStudio** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/).
 
 **Assetify** combines custom asset loading/unloading, rendering techniques towards gamemode perspective for efficient & faster asset manipulation, giving you the full capabilities to customize the environment without stressing about performances issues, since the library is developed with '**Performance-First**' in mind!
 
