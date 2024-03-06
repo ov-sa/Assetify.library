@@ -31,9 +31,9 @@ function rest.public:get(route, timeout)
     if not route or (imports.type(route) ~= "string") then return false end
     timeout = math.max(imports.tonumber(timeout) or 10000, 1)
     local cPromise = thread:createPromise()
-    imports.fetchRemote(route, {connectionAttempts = 1, connectTimeout = timeout}, function(result, status)
+    imports.fetchRemote(route, {queueName = "assetify_library", connectionAttempts = 1, connectTimeout = timeout}, function(result, status)
         if status.success then cPromise.resolve(result)
-        else cPromise.reject(result, status.statusCode) end
+        else cPromise.reject(false, status.statusCode) end
     end)
     return cPromise
 end
@@ -43,13 +43,13 @@ if localPlayer then
 else
     function rest.public:post(route, data, timeout)
         if self ~= rest.public then return false end
-        if not route or (imports.type(route) ~= "string") or not data or (imports.type(data) ~= "table") then return false end
+        if not route or (imports.type(route) ~= "string") then return false end
         timeout = math.max(imports.tonumber(timeout) or 10000, 1)
         local cPromise = thread:createPromise()
-        imports.callRemote(route, 1, timeout, function(result, status)
-            if status.success then cPromise.resolve(result)
-            else cPromise.reject(result, status.statusCode) end
-        end)
+        imports.callRemote(route, "assetify_library", 1, timeout, function(result, status)
+            if result ~= "ERROR" then cPromise.resolve(result)
+            else cPromise.reject(false, status) end
+        end, data)
         return cPromise
     end
 end
