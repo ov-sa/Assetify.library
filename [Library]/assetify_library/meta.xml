@@ -77,7 +77,7 @@
     <script src="handlers/bundler/shared.lua" type="shared"/>
     <script src="handlers/cli/index.lua" type="server"/>
     <script src="handlers/cli/updater.lua" type="server"/>
-    <script src="handlers/cli/debug.lua" type="client"/>
+    <script src="handlers/cli/debugger.lua" type="client"/>
     <script src="handlers/api/library/exports.lua" type="shared"/>
     <script src="handlers/api/library/shared.lua" type="shared"/>
     <script src="handlers/api/library/client.lua" type="client"/>
