@@ -23,6 +23,7 @@ local imports = {
     outputConsole = outputConsole,
     getResourceFromName = getResourceFromName,
     getLatentEventHandles = getLatentEventHandles,
+    requestBrowserDomains = requestBrowserDomains,
     getPlayerSerial = getPlayerSerial
 }
 
@@ -112,16 +113,23 @@ if localPlayer then
                 fileData = nil
                 thread:pause()
             end
-            --TODO: IMPROVE THE BELOW AND REFACTOR ONSYNCHASH
-            --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
-            requestBrowserDomains({syncer.public.libraryWebserver}, true)
-            for i, j in pairs(fetchFiles) do
-                try({
-                    exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
-                    catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
-                })
-            end
-            imports.collectgarbage()
+            self.cHeartbeat = thread:createHeartbeat(function()
+                outputChatBox("LOOPING HEARTBEAT")
+                if true then return false end
+                imports.requestBrowserDomains({syncer.public.libraryWebserver}, true)
+            end, function()
+                outputChatBox("executed heartbeat")
+                for i, j in pairs(fetchFiles) do
+                    try({
+                        exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
+                        catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
+                    })
+                end
+                imports.collectgarbage()
+                self.cHeartbeat = nil
+                --TODO: IMPROVE THE BELOW AND REFACTOR ONSYNCHASH
+                --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+            end, settings.downloader.buildRate)
         end):resume({executions = settings.downloader.buildRate, frames = 1})
     end)
 
