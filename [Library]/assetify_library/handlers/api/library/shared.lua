@@ -12,8 +12,6 @@
 --[[ APIs: Library ]]--
 -----------------------
 
-manager.API.Library = {}
-
 function manager.API.Library.isBooted()
     return syncer.isLibraryBooted
 end

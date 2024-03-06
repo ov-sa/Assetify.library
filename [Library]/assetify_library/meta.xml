@@ -82,13 +82,10 @@
     <script src="handlers/api/library/client.lua" type="client"/>
     <script src="handlers/api/library/server.lua" type="server"/>
     <script src="handlers/api/world/exports.lua" type="shared"/>
-    <script src="handlers/api/world/shared.lua" type="shared"/>
     <script src="handlers/api/world/client.lua" type="client"/>
     <script src="handlers/api/anim/exports.lua" type="shared"/>
-    <script src="handlers/api/anim/shared.lua" type="shared"/>
     <script src="handlers/api/anim/client.lua" type="client"/>
     <script src="handlers/api/sound/exports.lua" type="shared"/>
-    <script src="handlers/api/sound/shared.lua" type="shared"/>
     <script src="handlers/api/sound/client.lua" type="client"/>
 
     <!-- Exports -->
