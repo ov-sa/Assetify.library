@@ -91,9 +91,7 @@ function thread.public:createPromise(callback, config)
     thread.private.promises[cPromise] = {}
     if not config.isAsync then execFunction(callback, cPromise.resolve, cPromise.reject)
     else thread.public:create(function(self) execFunction(callback, self, cPromise.resolve, cPromise.reject) end):resume() end
-    if config.timeout then
-        cTimer = timer:create(function() cPromise.reject("Promise - Timed Out") end, config.timeout, 1)
-    end
+    if config.timeout then cTimer = timer:create(function() cPromise.reject("Promise - Timed Out") end, config.timeout, 1) end
     return cPromise
 end
 
