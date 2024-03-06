@@ -206,29 +206,44 @@ else
             syncer.public.libraryClients.scheduled[player] = true
         else
             syncer.public.libraryClients.scheduled[player] = nil
-            syncer.public.libraryClients.loading[player] = thread:createHeartbeat(function()
-                local self = syncer.public.libraryClients.loading[player]
-                if self and not syncer.public.libraryClients.loaded[player] and thread:isInstance(self) then
-                    self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
-                    for i, j in imports.pairs(self.cQueue) do
-                        local queueStatus = imports.getLatentEventStatus(player, i)
-                        if queueStatus then
-                            self.cStatus[(j.assetType)] = self.cStatus[(j.assetType)] or {}
-                            self.cStatus[(j.assetType)][(j.assetName)] = self.cStatus[(j.assetType)][(j.assetName)] or {}
-                            self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = queueStatus
-                        else
-                            self.cQueue[i] = nil
-                            if self.cStatus[(j.assetType)] and self.cStatus[(j.assetType)][(j.assetName)] then
-                                self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = (self.cStatus[(j.assetType)][(j.assetName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
+            thread:create(function()
+                try({
+                    exec = function(self)
+                        self:await(rest:post("http://localhost:33022/onSyncPeer", {
+                            token = syncer.public.libraryToken,
+                            peer = getPlayerSerial(player),
+                            state = true
+                        }))
+                        syncer.public.libraryClients.loading[player] = thread:createHeartbeat(function()
+                            local self = syncer.public.libraryClients.loading[player]
+                            if self and not syncer.public.libraryClients.loaded[player] and thread:isInstance(self) then
+                                self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
+                                for i, j in imports.pairs(self.cQueue) do
+                                    local queueStatus = imports.getLatentEventStatus(player, i)
+                                    if queueStatus then
+                                        self.cStatus[(j.assetType)] = self.cStatus[(j.assetType)] or {}
+                                        self.cStatus[(j.assetType)][(j.assetName)] = self.cStatus[(j.assetType)][(j.assetName)] or {}
+                                        self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = queueStatus
+                                    else
+                                        self.cQueue[i] = nil
+                                        if self.cStatus[(j.assetType)] and self.cStatus[(j.assetType)][(j.assetName)] then
+                                            self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = (self.cStatus[(j.assetType)][(j.assetName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
+                                        end
+                                    end
+                                end
+                                network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus)
+                                return true
                             end
-                        end
+                            return false
+                        end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
+                        syncer.private:syncPack(player, _, true)
+                    end,
+                    catch = function() 
+                        --TODO: Replace...
+                        print("Failed to whitelist peer: "..getPlayerSerial(player))
                     end
-                    network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus)
-                    return true
-                end
-                return false
-            end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
-            syncer.private:syncPack(player, _, true)
+                })
+            end):resume()
         end
         return true
     end
@@ -312,6 +327,12 @@ else
         end):resume({executions = settings.downloader.syncRate, frames = 1})
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
+        if not syncer.public.isLibraryLoaded then return false end
+        rest:post("http://localhost:33022/onSyncPeer", {
+            token = syncer.public.libraryToken,
+            peer = getPlayerSerial(source),
+            state = true
+        })
         if syncer.public.libraryClients.loading[source] then syncer.public.libraryClients.loading[source]:destroy() end
         syncer.public.libraryClients.loaded[source] = nil
         syncer.public.libraryClients.loading[source] = nil

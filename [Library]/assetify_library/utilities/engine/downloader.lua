@@ -20,7 +20,8 @@ local imports = {
     md5 = md5,
     collectgarbage = collectgarbage,
     getResourceFromName = getResourceFromName,
-    getLatentEventHandles = getLatentEventHandles
+    getLatentEventHandles = getLatentEventHandles,
+    getPlayerSerial = getPlayerSerial
 }
 
 
@@ -82,7 +83,7 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onSyncHash"):on(function(assetType, assetName, hashes, bandwidth, remoteResource)
+    network:create("Assetify:Downloader:onSyncHash"):on(function(accessTokens, assetType, assetName, hashes, bandwidth, remoteResource)
         if not remoteResource then
             syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
             syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
@@ -109,7 +110,22 @@ if localPlayer then
                 fileData = nil
                 thread:pause()
             end
-            network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+            --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+            outputChatBox("DOWNLOAD FILES: ")
+            requestBrowserDomains({ "http://localhost:33022/onFetchContent" }, true)
+            for i, j in pairs(fetchFiles) do
+                try({
+                    exec = function(self)
+                        file:write(i, base64Decode(self:await(rest:get("http://localhost:33022/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i))))
+                        --TODO: ADD O/P
+                        print("DOWNLOADED FILE: "..i)
+                    end,
+                    catch = function()
+                        --TODO: ADD O/P
+                        print("FAILED TO DOWNLOAD")
+                    end
+                })
+            end
             imports.collectgarbage()
         end):resume({executions = settings.downloader.buildRate, frames = 1})
     end)
@@ -189,7 +205,7 @@ if localPlayer then
         end
     end)
 else
-    function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onSyncHash", true, true, player, ...) end
+    function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onSyncHash", true, true, player, {syncer.public.libraryToken, imports.getPlayerSerial(player)}, ...) end
     function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, true, player, ...) end
     function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onSyncContent", true, true, player, ...) end
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end

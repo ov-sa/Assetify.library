@@ -225,6 +225,7 @@ imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceS
     network:emit("Assetify:onResourceUnload", false, resourceName, resourceSource)
 end)
 imports.addEventHandler("onPlayerQuit", root, function()
+    if not syncer.public.isLibraryLoaded then return false end
     if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
     resource.private.resourceSchedules.client[source] = nil
     resource.private.resourceClients.loaded[source] = nil
