@@ -53,8 +53,8 @@ end
 function debug.public:toggle(state)
     if debug.private.state == state then return false end
     debug.private.state = state
-    if debug.private.state then imports.addEventHandler("onClientRender", root, debug.private.render)
-    else imports.removeEventHandler("onClientRender", root, debug.private.render) end
+    if debug.private.state then imports.addEventHandler("onClientHUDRender", root, debug.private.render)
+    else imports.removeEventHandler("onClientHUDRender", root, debug.private.render) end
     return true
 end
 

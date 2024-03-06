@@ -69,15 +69,14 @@
     <script src="utilities/engine/light/planar.lua" type="client"/>
 
     <!-- Handlers -->
-    <script src="handlers/builder/server.lua" type="server"/>
-    <script src="handlers/builder/client.lua" type="client"/>
+    <script src="handlers/cli/index.lua" type="server"/>
+    <script src="handlers/cli/builder.lua" type="shared"/>
+    <script src="handlers/cli/updater.lua" type="server"/>
+    <script src="handlers/cli/debugger.lua" type="client"/>
     <script src="handlers/bundler/index.lua" type="shared"/>
     <script src="handlers/bundler/importer.lua" type="shared"/>
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
     <script src="handlers/bundler/shared.lua" type="shared"/>
-    <script src="handlers/cli/index.lua" type="server"/>
-    <script src="handlers/cli/updater.lua" type="server"/>
-    <script src="handlers/cli/debugger.lua" type="client"/>
     <script src="handlers/api/library/exports.lua" type="shared"/>
     <script src="handlers/api/library/shared.lua" type="shared"/>
     <script src="handlers/api/library/client.lua" type="client"/>

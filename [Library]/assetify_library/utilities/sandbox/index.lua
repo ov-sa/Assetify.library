@@ -28,7 +28,6 @@ local imports = {
 --[[ Utils ]]--
 ---------------
 
-
 localPlayer = (imports.getLocalPlayer and imports.getLocalPlayer()) or false
 execFunction = function(exec, ...) if not exec or (imports.type(exec) ~= "function") then return false end; return exec(...) end
 isElement = function(element) return (element and imports.isElement(element)) or false end
