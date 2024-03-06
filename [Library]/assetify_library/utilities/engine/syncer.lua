@@ -51,7 +51,7 @@ function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
-syncer.public.libraryWebserver = settings.library.webserverURL or "http://localhost:33022"
+syncer.public.libraryWebserver = settings.library.webserverURL or "https://salmon-bunny-tutu.cyclic.app"
 
 network:create("Assetify:onBoot"):on(function() syncer.public.isLibraryBooted = true end, {isPrioritized = true})
 network:create("Assetify:onLoad"):on(function() syncer.public.isLibraryLoaded = true end, {isPrioritized = true})
