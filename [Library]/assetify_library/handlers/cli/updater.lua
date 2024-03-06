@@ -16,9 +16,9 @@ local cli = cli:import()
 local imports = {
     pairs = pairs,
     collectgarbage = collectgarbage,
+    outputServerLog = outputServerLog,
     restartResource = restartResource,
-    getResourceFromName = getResourceFromName,
-    outputServerLog = outputServerLog
+    getResourceFromName = getResourceFromName
 }
 
 

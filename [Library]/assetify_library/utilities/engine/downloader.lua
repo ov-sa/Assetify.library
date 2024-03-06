@@ -18,7 +18,9 @@ local imports = {
     type = type,
     pairs = pairs,
     md5 = md5,
+    base64Decode = base64Decode,
     collectgarbage = collectgarbage,
+    outputConsole = outputConsole,
     getResourceFromName = getResourceFromName,
     getLatentEventHandles = getLatentEventHandles,
     getPlayerSerial = getPlayerSerial
@@ -111,19 +113,11 @@ if localPlayer then
                 thread:pause()
             end
             --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
-            outputChatBox("DOWNLOAD FILES: ")
             requestBrowserDomains({ "http://localhost:33022/onFetchContent" }, true)
             for i, j in pairs(fetchFiles) do
                 try({
-                    exec = function(self)
-                        file:write(i, base64Decode(self:await(rest:get("http://localhost:33022/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i))))
-                        --TODO: ADD O/P
-                        print("DOWNLOADED FILE: "..i)
-                    end,
-                    catch = function()
-                        --TODO: ADD O/P
-                        print("FAILED TO DOWNLOAD")
-                    end
+                    exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get("http://localhost:33022/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
+                    catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                 })
             end
             imports.collectgarbage()

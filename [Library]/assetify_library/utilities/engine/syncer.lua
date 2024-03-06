@@ -19,6 +19,7 @@ local imports = {
     tonumber = tonumber,
     tostring = tostring,
     collectgarbage = collectgarbage,
+    outputDebugString = outputDebugString,
     isElement = isElement,
     getElementType = getElementType,
     getRealTime = getRealTime,
@@ -238,10 +239,7 @@ else
                         end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
                         syncer.private:syncPack(player, _, true)
                     end,
-                    catch = function() 
-                        --TODO: Replace...
-                        print("Failed to whitelist peer: "..getPlayerSerial(player))
-                    end
+                    catch = function() imports.outputDebugString("Assetify: Webserver ━│  Failed to whitelist Peer: "..getPlayerSerial(player).."...") end
                 })
             end):resume()
         end
