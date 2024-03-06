@@ -14,8 +14,8 @@
 
 local imports = {
     getElementType = getElementType,
+    outputServerLog = outputServerLog,
     addCommandHandler = addCommandHandler,
-    outputServerLog = outputServerLog
 }
 
 
