@@ -78,9 +78,7 @@
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
     <script src="handlers/bundler/shared.lua" type="shared"/>
     <script src="handlers/api/library/exports.lua" type="shared"/>
-    <script src="handlers/api/library/shared.lua" type="shared"/>
-    <script src="handlers/api/library/client.lua" type="client"/>
-    <script src="handlers/api/library/server.lua" type="server"/>
+    <script src="handlers/api/library/api.lua" type="shared"/>
     <script src="handlers/api/world/exports.lua" type="shared"/>
     <script src="handlers/api/world/api.lua" type="shared"/>
     <script src="handlers/api/anim/exports.lua" type="shared"/>

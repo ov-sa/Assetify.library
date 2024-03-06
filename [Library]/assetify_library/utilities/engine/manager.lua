@@ -51,6 +51,7 @@ end
 
 function manager.public:exportAPI(moduleName, moduleAPIs)
     if not moduleName or (imports.type(moduleName) ~= "string") or not moduleAPIs or (imports.type(moduleAPIs) ~= "table") then return false end
+    manager.public.API[moduleName] = {}
     for i, j in imports.pairs(moduleAPIs) do
         if (i  == "shared") or (i == ((localPlayer and "client") or "server")) then
             for k = 1, table.length(j), 1 do
