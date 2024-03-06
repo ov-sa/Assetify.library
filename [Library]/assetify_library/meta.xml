@@ -84,9 +84,9 @@
     <script src="handlers/api/world/exports.lua" type="shared"/>
     <script src="handlers/api/world/client.lua" type="client"/>
     <script src="handlers/api/anim/exports.lua" type="shared"/>
-    <script src="handlers/api/anim/client.lua" type="client"/>
+    <script src="handlers/api/anim/api.lua" type="shared"/>
     <script src="handlers/api/sound/exports.lua" type="shared"/>
-    <script src="handlers/api/sound/client.lua" type="client"/>
+    <script src="handlers/api/sound/api.lua" type="shared"/>
 
     <!-- Exports -->
     <export function="import" type="shared"/>
