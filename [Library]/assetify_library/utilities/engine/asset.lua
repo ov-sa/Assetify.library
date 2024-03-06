@@ -300,12 +300,12 @@ else
                     local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
                     for i = 1, maxChunks, 1 do
                         local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
-                        rest:post("http://localhost:33022/onSyncContent", {
-                            path = filePath,
+                        thread:getThread():await(rest:post("http://localhost:33022/onSyncContent", {
                             token = syncer.libraryToken,
+                            path = filePath,
                             chunk = {i, maxChunks},
                             content = string.sub(filePointer.unSynced.fileData[filePath], index, math.min(#filePointer.unSynced.fileData[filePath], index + syncer.libraryWebDataLimit - 1))
-                        })
+                        }))
                     end
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
