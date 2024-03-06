@@ -51,6 +51,7 @@ function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
 syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
+syncer.public.libraryWebserver = settings.library.webserverURL or "http://localhost:33022"
 
 network:create("Assetify:onBoot"):on(function() syncer.public.isLibraryBooted = true end, {isPrioritized = true})
 network:create("Assetify:onLoad"):on(function() syncer.public.isLibraryLoaded = true end, {isPrioritized = true})
@@ -210,7 +211,7 @@ else
             thread:create(function()
                 try({
                     exec = function(self)
-                        self:await(rest:post("http://localhost:33022/onSyncPeer", {
+                        self:await(rest:post(syncer.public.libraryWebserver.."/onSyncPeer", {
                             token = syncer.public.libraryToken,
                             peer = getPlayerSerial(player),
                             state = true
@@ -326,7 +327,7 @@ else
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
         if not syncer.public.isLibraryLoaded then return false end
-        rest:post("http://localhost:33022/onSyncPeer", {
+        rest:post(syncer.public.libraryWebserver.."/onSyncPeer", {
             token = syncer.public.libraryToken,
             peer = getPlayerSerial(source),
             state = true

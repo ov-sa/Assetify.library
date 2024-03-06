@@ -20,7 +20,8 @@ settings = {
     },
 
     library = {
-        autoUpdate = true
+        autoUpdate = true,
+        webserverURL = false
     },
 
     downloader = {

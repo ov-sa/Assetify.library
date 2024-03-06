@@ -28,7 +28,7 @@ imports.addEventHandler("onResourceStart", resourceRoot, function()
     thread:create(function()
         try({
             exec = function(self)
-                syncer.libraryToken = self:await(rest:post("http://localhost:33022/onSetConnection", true)).token
+                syncer.libraryToken = self:await(rest:post(syncer.libraryWebserver.."/onSetConnection", true)).token
                 imports.outputServerLog("Assetify: Webserver ━│  Connection successfully established!")
                 if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
                 for i, j in imports.pairs(settings.assetPacks) do
@@ -49,5 +49,5 @@ end)
 
 imports.addEventHandler("onResourceStop", resourceRoot, function()
     network:emit("Assetify:onUnload", false)
-    if syncer.libraryToken then rest:post("http://localhost:33022/onSetConnection", false) end
+    if syncer.libraryToken then rest:post(syncer.libraryWebserver.."/onSetConnection", false) end
 end)

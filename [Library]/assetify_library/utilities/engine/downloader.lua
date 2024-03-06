@@ -112,11 +112,12 @@ if localPlayer then
                 fileData = nil
                 thread:pause()
             end
+            --TODO: IMPROVE THE BELOW AND REFACTOR ONSYNCHASH
             --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
-            requestBrowserDomains({ "http://localhost:33022/onFetchContent" }, true)
+            requestBrowserDomains({syncer.public.libraryWebserver}, true)
             for i, j in pairs(fetchFiles) do
                 try({
-                    exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get("http://localhost:33022/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
+                    exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
                     catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                 })
             end
