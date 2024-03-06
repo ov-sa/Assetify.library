@@ -20,9 +20,9 @@ local imports = {
 }
 
 
---------------------------
---[[ Builder Handlers ]]--
---------------------------
+-----------------------
+--[[ CLI: Handlers ]]--
+-----------------------
 
 if localPlayer then
     imports.addEventHandler("onClientResourceStart", resourceRoot, function()
