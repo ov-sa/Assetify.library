@@ -18,6 +18,7 @@ local imports = {
     md5 = md5,
     tonumber = tonumber,
     tostring = tostring,
+    base64Encode = base64Encode,
     outputDebugString = outputDebugString,
     destroyElement = destroyElement,
     engineRequestModel = engineRequestModel,
@@ -295,7 +296,7 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
-                    filePointer.unSynced.fileData[filePath] = base64Encode(filePointer.unSynced.fileData[filePath])
+                    filePointer.unSynced.fileData[filePath] = imports.base64Encode(filePointer.unSynced.fileData[filePath])
                     local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
                     for i = 1, maxChunks, 1 do
                         local index = ((i - 1)*syncer.libraryWebDataLimit) + 1

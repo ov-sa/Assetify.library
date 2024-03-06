@@ -16,7 +16,6 @@ local cli = cli:import()
 local imports = {
     pairs = pairs,
     collectgarbage = collectgarbage,
-    fetchRemote = fetchRemote,
     restartResource = restartResource,
     getResourceFromName = getResourceFromName,
     outputServerLog = outputServerLog
@@ -93,12 +92,19 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
             for i = 1, table.length(updateResources), 1 do
                 local resourcePointer, resourceResponse = updateResources[i], false
                 local resourceMeta = updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/meta.xml"
-                imports.fetchRemote(resourceMeta, function(...) resourceResponse = table.pack(...); updateResources.updateThread:resume() end)
+                thread:create(function()
+                    try({
+                        exec = function(self)
+                            resourceResponse = self:await(rest:get(resourceMeta))
+                            updateResources.updateThread:resume()
+                        end,
+                        catch = function() updateResources.onUpdateCallback(false, true) end
+                    })
+                end):resume()
                 updateResources.updateThread:pause()
-                if not resourceResponse[1] or not resourceResponse[2] or (resourceResponse[2] ~= 0) then return updateResources.onUpdateCallback(false, true) end
                 local isLastIndex = false
                 for i = 1, table.length(updateResources.updateTags), 1 do
-                    for j in string.gmatch(resourceResponse[1], "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
+                    for j in string.gmatch(resourceResponse, "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
                         if (string.len(string.gsub(j, "%s", "")) > 0) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
                             cli.private:update(resourcePointer, {updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/"..j, j})
                             timer:create(function()
@@ -111,7 +117,7 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                     end
                 end
                 isLastIndex = true
-                cli.private:update(resourcePointer, {resourceMeta, "meta.xml", resourceResponse[1]})
+                cli.private:update(resourcePointer, {resourceMeta, "meta.xml", resourceResponse})
             end
             updateResources.onUpdateCallback(true, true)
         end)
@@ -126,11 +132,15 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
             outputPointer[(responsePointer[2])] = responsePointer[3]
             updateResources.updateThread:resume()
         else
-            imports.fetchRemote(responsePointer[1], function(response, status)
-                if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
-                outputPointer[(responsePointer[2])] = response
-                updateResources.updateThread:resume()
-            end)
+            thread:create(function()
+                try({
+                    exec = function(self)
+                        outputPointer[(responsePointer[2])] = self:await(rest:get(responsePointer[1]))
+                        updateResources.updateThread:resume()
+                    end,
+                    catch = function() updateResources.onUpdateCallback(false, true) end
+                })
+            end):resume()
         end
     end
     return true
@@ -139,26 +149,29 @@ end
 function cli.public:update(isAction)
     if cli.public.isLibraryBeingUpdated then return imports.outputServerLog("Assetify: Updater ━│  An update request is already being processed; Kindly have patience...") end
     cli.public.isLibraryBeingUpdated = true
-    if isAction then imports.outputServerLog("Assetify: Updater ━│  Fetching latest version; Hold up...") end
-    imports.fetchRemote(syncer.librarySource, function(response, status)
-        if not response or not status or (status ~= 0) then return updateResources.onUpdateCallback(false, true) end
-        response = table.decode(response, "json")
-        if not response or not response.tag_name then return updateResources.onUpdateCallback(false, true) end
-        if syncer.libraryVersion == response.tag_name then
-            if isAction then imports.outputServerLog("Assetify: Updater ━│  Already upto date - "..response.tag_name) end
-            return updateResources.onUpdateCallback()
-        end
-        local isToBeUpdated, isAutoUpdate = (isAction and true) or settings.library.autoUpdate, (not isAction and settings.library.autoUpdate) or false
-        imports.outputServerLog("Assetify: Updater ━│  "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name)
-        if not isToBeUpdated then return updateResources.onUpdateCallback() end
-        updateResources.updateCache = {
-            output = {}, backup = {},
-            isAutoUpdate = isAutoUpdate,
-            libraryVersion = response.tag_name,
-            libraryVersionSource = updateResources.fetchSource(updateResources[1].resourceSource, response.tag_name),
-            isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") == string.match(response.tag_name, "(%d+)%.")
-        }
-        cli.private:update()
-    end)
+    thread:create(function()
+        try({
+            exec = function(self)
+                if isAction then imports.outputServerLog("Assetify: Updater ━│  Fetching latest version; Hold up...") end
+                local response = table.decode(self:await(rest:get(syncer.librarySource)), "json")
+                if syncer.libraryVersion == response.tag_name then
+                    if isAction then imports.outputServerLog("Assetify: Updater ━│  Already upto date - "..response.tag_name) end
+                    return updateResources.onUpdateCallback()
+                end
+                local isToBeUpdated, isAutoUpdate = (isAction and true) or settings.library.autoUpdate, (not isAction and settings.library.autoUpdate) or false
+                imports.outputServerLog("Assetify: Updater ━│  "..((isToBeUpdated and not isAutoUpdate and "Updating to latest version") or (isToBeUpdated and isAutoUpdate and "Auto-updating to latest version") or "Latest version available").." - "..response.tag_name)
+                if not isToBeUpdated then return updateResources.onUpdateCallback() end
+                updateResources.updateCache = {
+                    output = {}, backup = {},
+                    isAutoUpdate = isAutoUpdate,
+                    libraryVersion = response.tag_name,
+                    libraryVersionSource = updateResources.fetchSource(updateResources[1].resourceSource, response.tag_name),
+                    isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") == string.match(response.tag_name, "(%d+)%.")
+                }
+                cli.private:update()
+            end,
+            catch = function() updateResources.onUpdateCallback(false, true) end
+        })
+    end):resume()
     return true
 end
