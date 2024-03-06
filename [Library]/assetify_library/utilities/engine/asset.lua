@@ -295,6 +295,17 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
+                    filePointer.unSynced.fileData[filePath] = base64Encode(filePointer.unSynced.fileData[filePath])
+                    local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
+                    for i = 1, maxChunks, 1 do
+                        local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
+                        rest:post("http://localhost:33022/onSyncContent", {
+                            path = filePath,
+                            token = syncer.libraryToken,
+                            chunk = {i, maxChunks},
+                            content = string.sub(filePointer.unSynced.fileData[filePath], index, math.min(#filePointer.unSynced.fileData[filePath], index + syncer.libraryWebDataLimit - 1))
+                        })
+                    end
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
             else
