@@ -48,7 +48,7 @@ local syncer = class:create("syncer", {
 })
 function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
-syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
+syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify.library/releases/latest"
 syncer.public.librarySerial = imports.sha256(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
 syncer.public.libraryWebserver = settings.library.webserverURL or "http://localhost:33022"
 

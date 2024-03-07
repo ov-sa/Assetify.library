@@ -62,7 +62,7 @@ updateResources = {
         isSilentResource = false,
         resourceREF = syncer.libraryName,
         resourceName = "assetify_library",
-        resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/%s/[Library]/",
+        resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify.library/%s/[Library]/",
         resourceBackup = {
             ["settings/shared.lua"] = true,
             ["settings/server.lua"] = true
@@ -72,7 +72,7 @@ updateResources = {
     {
         isSilentResource = true,
         resourceName = "assetify_mapper",
-        resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify-Library/mapper/[Library]/"
+        resourceSource = "https://raw.githubusercontent.com/ov-sa/Assetify.library/mapper/[Library]/"
     }
     ]]
 }
