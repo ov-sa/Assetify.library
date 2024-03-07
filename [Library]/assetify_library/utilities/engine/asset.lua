@@ -54,8 +54,25 @@ local asset = class:create("asset", {
         dimension = {-1, 65535},
         interior = {0, 255},
         stream = 170
+    },
+    properties = {
+        reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
+        whitelisted = {
+            ["module"] = {},
+            ["animation"] = {"assetAnimations"},
+            ["sound"] = {"assetSounds"},
+            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
+            ["*"] = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
+        }
     }
 })
+for i, j in imports.pairs(asset.private.properties.whitelisted) do
+    for k = 1, table.length(j), 1 do
+        local v = j[k]
+        j[v] = true
+        j[k] = nil
+    end
+end
 
 function asset.public:readFile(filePath, encryptKey, ...)
     if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
@@ -247,24 +264,6 @@ if localPlayer then
         return true
     end
 else
-    asset.private.properties = {
-        reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
-        whitelisted = {
-            ["module"] = {},
-            ["animation"] = {"assetAnimations"},
-            ["sound"] = {"assetSounds"},
-            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
-            ["*"] = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
-        }
-    }
-    for i, j in imports.pairs(asset.private.properties.whitelisted) do
-        for k = 1, table.length(j), 1 do
-            local v = j[k]
-            j[v] = true
-            j[k] = nil
-        end
-    end
-
     function asset.public:buildManifest(rootPath, localPath, manifestPath)
         if not manifestPath then return false end
         localPath = localPath or rootPath
@@ -297,17 +296,17 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
-                    filePointer.unSynced.fileData[filePath] = imports.base64Encode(filePointer.unSynced.fileData[filePath])
-                    local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
-                    for i = 1, maxChunks, 1 do
+                    local encodedFileData = imports.base64Encode(filePointer.unSynced.fileData[filePath])
+                    local maxFileChunks = math.ceil(#encodedFileData/syncer.libraryWebDataLimit)
+                    for i = 1, maxFileChunks, 1 do
                         local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
                             token = syncer.libraryToken,
                             path = filePath,
-                            chunk = {i, maxChunks},
-                            content = string.sub(filePointer.unSynced.fileData[filePath], index, math.min(#filePointer.unSynced.fileData[filePath], index + syncer.libraryWebDataLimit - 1))
+                            chunk = {i, maxFileChunks},
+                            content = string.sub(encodedFileData, index, math.min(#encodedFileData, index + syncer.libraryWebDataLimit - 1))
                         }))
-                        imports.outputServerLog("Assetify: Webserver ━│  Syncing file: "..filePath.." ["..i.."/"..maxChunks.."]")
+                        imports.outputServerLog("Assetify: Webserver ━│  Syncing file: "..filePath.." ["..i.."/"..maxFileChunks.."]")
                     end
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
