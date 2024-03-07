@@ -66,7 +66,7 @@ if localPlayer then
         return true
     end
 
-    --TODO: DISABLE FOR NOW
+    --TODO: DISABLED FOR NOW TEMPORARILY
     network:create("Assetify:Downloader:onSyncProgress"):on(function(status, bandwidth, isResource)
         if not isResource then
             if bandwidth then
@@ -129,7 +129,7 @@ if localPlayer then
                     })
                 end
                 --TODO: RENAME APPROPRIATELY
-                network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+                network:emit("Assetify:Downloader:onSyncData", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
                 imports.collectgarbage()
                 self.cHeartbeat = nil
             end, settings.downloader.buildRate)
@@ -209,8 +209,7 @@ else
     function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onSyncHash", true, true, player, {syncer.public.libraryToken, imports.getPlayerSerial(player)}, ...) end
     function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, true, player, ...) end
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
-    network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, remoteResource)
-        --TODO: IMPROVE THS FUNCTION
+    network:create("Assetify:Downloader:onSyncData"):on(function(source, assetType, assetName, hashes, remoteResource)
         if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
         else syncer.private:syncResource(source, remoteResource, hashes) end
     end)
@@ -232,12 +231,6 @@ else
         else
             resource.private:loadClient(player, resourceName)
             thread:create(function(self)
-                for i, j in imports.pairs(hashes) do
-                    syncer.private:syncContent(player, _, _, i, resource.private.buffer.name[resourceName].unSynced.fileData[i], resourceName)
-                    local cQueue = imports.getLatentEventHandles(player)
-                    resource.private.resourceClients.loading[player].cQueue[(cQueue[table.length(cQueue)])] = {resourceName = resourceName, file = i}
-                    thread:pause()
-                end
                 syncer.private:syncState(player, _, _, resourceName)
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         end
