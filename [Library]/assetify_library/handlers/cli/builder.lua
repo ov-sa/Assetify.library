@@ -55,6 +55,7 @@ else
                         end):resume({executions = settings.downloader.buildRate, frames = 1})
                         thread:pause()
                     end
+                    imports.outputServerLog("Assetify: Webserver ━│  Assets successfully synced!")
                     network:emit("Assetify:onLoad", false)
                 end,
                 catch = function() imports.outputServerLog("Assetify: Webserver ━│  Connection failed; Kindly ensure the webserver is running prior connection...") end

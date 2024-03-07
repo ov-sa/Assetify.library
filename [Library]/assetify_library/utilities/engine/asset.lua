@@ -19,6 +19,7 @@ local imports = {
     tonumber = tonumber,
     tostring = tostring,
     base64Encode = base64Encode,
+    outputServerLog = outputServerLog,
     outputDebugString = outputDebugString,
     destroyElement = destroyElement,
     engineRequestModel = engineRequestModel,
@@ -300,12 +301,13 @@ else
                     local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
                     for i = 1, maxChunks, 1 do
                         local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
-                        local result = thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
+                        thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
                             token = syncer.libraryToken,
                             path = filePath,
                             chunk = {i, maxChunks},
                             content = string.sub(filePointer.unSynced.fileData[filePath], index, math.min(#filePointer.unSynced.fileData[filePath], index + syncer.libraryWebDataLimit - 1))
                         }))
+                        imports.outputServerLog("Assetify: Webserver ━│  Syncing file: "..filePath.." ["..i.."/"..maxChunks.."]")
                     end
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end
