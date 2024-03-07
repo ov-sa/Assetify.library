@@ -28,7 +28,6 @@ local imports = {
     getResourceInfo = getResourceInfo,
     setElementModel = setElementModel,
     addEventHandler = addEventHandler,
-    getLatentEventStatus = getLatentEventStatus,
     getResourceRootElement = getResourceRootElement
 }
 
