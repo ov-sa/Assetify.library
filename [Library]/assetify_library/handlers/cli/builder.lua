@@ -39,10 +39,10 @@ if localPlayer then
     end)
 else
     imports.addEventHandler("onResourceStart", resourceRoot, function()
-        cli:update()
         thread:create(function()
             try({
                 exec = function(self)
+                    self:await(cli:update())
                     syncer.libraryToken = self:await(rest:post(syncer.libraryWebserver.."/onSetConnection", true)).token
                     imports.outputServerLog("Assetify: Webserver ━│  Connection successfully established!")
                     if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end

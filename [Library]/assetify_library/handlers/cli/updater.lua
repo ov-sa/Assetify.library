@@ -50,6 +50,7 @@ updateResources = {
             end
         end
         if isNotification and not isCompleted then imports.outputServerLog("Assetify: Updater ━│  Update failed due to connectivity issues; Try again later...") end
+        if updateResources.updatePromise then updateResources.updatePromise.resolve() end
         if updateResources.updateThread then updateResources.updateThread:destroy() end
         updateResources.updateCache = nil
         updateResources.updateThread = nil
@@ -88,6 +89,7 @@ end
 
 function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
     if not responsePointer then
+        updateResources.updatePromise = thread:createPromise()
         updateResources.updateThread = thread:create(function()
             for i = 1, table.length(updateResources), 1 do
                 local resourcePointer, resourceResponse = updateResources[i], false
@@ -143,12 +145,13 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
             end):resume()
         end
     end
-    return true
+    return updateResources.updatePromise
 end
 
 function cli.public:update(isAction)
     if cli.public.isLibraryBeingUpdated then return imports.outputServerLog("Assetify: Updater ━│  An update request is already being processed; Kindly have patience...") end
     cli.public.isLibraryBeingUpdated = true
+    local cPromise = thread:createPromise()
     thread:create(function()
         try({
             exec = function(self)
@@ -168,10 +171,11 @@ function cli.public:update(isAction)
                     libraryVersionSource = updateResources.fetchSource(updateResources[1].resourceSource, response.tag_name),
                     isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") == string.match(response.tag_name, "(%d+)%.")
                 }
-                cli.private:update()
+                self:await(cli.private:update())
             end,
             catch = function() updateResources.onUpdateCallback(false, true) end
         })
+        cPromise.resolve()
     end):resume()
-    return true
+    return cPromise
 end
