@@ -37,10 +37,7 @@ shaderRW.buffer[identity] = {
 
         float4 PSHandler(PSInput PS) : COLOR0 {
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
-            float averageTexel = (sampledTexel.r + sampledTexel.g + sampledTexel.b)/3;
-            float4 grayscaleTexel = float4(averageTexel, averageTexel, averageTexel, sampledTexel.a);
-            sampledTexel.rgb = pow(sampledTexel.rgb*1.5, 1.5);
-            sampledTexel = lerp(sampledTexel, grayscaleTexel, grayscaleIntensity);
+            sampledTexel.rgb = lerp(sampledTexel, length(sampledTexel.rgb), grayscaleIntensity);
             if (vWeatherBlend) sampledTexel.a *= (1 - vWeatherBlend) + (vWeatherBlend*MTAGetWeatherValue());
             return saturate(sampledTexel);
         }

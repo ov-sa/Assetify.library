@@ -231,8 +231,7 @@ if localPlayer then
         return imports.dxSetShaderValue(self.cShader, i, j or false)
     end
 
-    shader.public.preLoaded["Assetify_TextureClearer"] = shader.public:create(_, "Assetify | PreLoad", "Assetify_TextureClearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.public.preLoadedTex.invisibleMap}}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
-    shader.public.preLoaded["Assetify_OverlayGoogle"] = shader.public:create(_, "Assetify | PreLoad", "Assetify_OverlayGoogle", _, {}, {}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+    shader.public.preLoaded["Assetify_TextureClearer"] = shader.public:create(_, "Assetify ━ PreLoaded", "Assetify_TextureClearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.public.preLoadedTex.invisibleMap}}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
     renderer:setAntiAliasing(0)
     renderer:setDynamicPrelights(true)
     renderer:setDynamicSunColor(1*255, 0.7*255, 0.4*255)
