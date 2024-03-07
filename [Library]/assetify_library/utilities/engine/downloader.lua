@@ -229,7 +229,8 @@ else
         if not hashes then
             syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resource.private.buffer.name[resourceName].bandwidthData, resourceName)
         else
-            resource.private:loadClient(player, resourceName)
+            --TODO: DISABLED TEMPORARILY
+            --resource.private:loadClient(player, resourceName)
             thread:create(function(self)
                 syncer.private:syncState(player, _, _, resourceName)
             end):resume({executions = settings.downloader.syncRate, frames = 1})
