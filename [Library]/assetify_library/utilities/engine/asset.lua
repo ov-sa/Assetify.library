@@ -300,7 +300,7 @@ else
                     local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
                     for i = 1, maxChunks, 1 do
                         local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
-                        thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
+                        local result = thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
                             token = syncer.libraryToken,
                             path = filePath,
                             chunk = {i, maxChunks},
