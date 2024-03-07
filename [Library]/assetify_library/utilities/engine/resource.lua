@@ -15,7 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    md5 = md5,
+    sha256 = sha256,
     collectgarbage = collectgarbage,
     outputDebugString = outputDebugString,
     getResourceName = getResourceName,
@@ -149,7 +149,7 @@ else
                     self.bandwidthData.file[j] = builtFileSize
                     self.bandwidthData.total = self.bandwidthData.total + self.bandwidthData.file[j]
                     self.unSynced.fileData[j] = builtFileData
-                    self.unSynced.fileHash[j] = imports.md5(builtFileData)
+                    self.unSynced.fileHash[j] = imports.sha256(builtFileData)
                 else
                     imports.outputDebugString("Assetify: Invalid File ━│  "..j)
                 end

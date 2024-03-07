@@ -15,7 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    md5 = md5,
+    sha256 = sha256,
     tonumber = tonumber,
     tostring = tostring,
     base64Encode = base64Encode,
@@ -296,7 +296,7 @@ else
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
-                    filePointer.unSynced.fileHash[filePath] = imports.md5(filePointer.unSynced.fileData[filePath])
+                    filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     filePointer.unSynced.fileData[filePath] = imports.base64Encode(filePointer.unSynced.fileData[filePath])
                     local maxChunks = math.ceil(#filePointer.unSynced.fileData[filePath]/syncer.libraryWebDataLimit)
                     for i = 1, maxChunks, 1 do
@@ -377,7 +377,7 @@ else
                         local v = asset.private.properties.reserved[k]
                         assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
-                    assetManifest.encryptKey = (assetManifest.encryptKey and imports.md5(imports.tostring(assetManifest.encryptKey))) or false
+                    assetManifest.encryptKey = (assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream

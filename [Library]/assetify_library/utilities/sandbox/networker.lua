@@ -15,7 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    md5 = md5,
+    sha256 = sha256,
     tonumber = tonumber,
     tostring = tostring,
     isElement = isElement,
@@ -35,7 +35,7 @@ local imports = {
 ------------------------
 
 local network = class:create("network", {
-    identifier = imports.md5(imports.getResourceName(imports.getThisResource())),
+    identifier = imports.sha256(imports.getResourceName(imports.getThisResource())),
     isServerInstance = (not localPlayer and true) or false,
     bandwidth = 1250000
 })
@@ -137,7 +137,7 @@ end
 
 function network.private.serializeExec(exec)
     if not exec or (imports.type(exec) ~= "function") then return false end
-    local cSerial = imports.md5(network.public.identifier..":"..imports.tostring(exec))
+    local cSerial = imports.sha256(network.public.identifier..":"..imports.tostring(exec))
     network.private.cache.execSerials[cSerial] = exec
     return cSerial
 end

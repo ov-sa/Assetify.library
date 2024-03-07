@@ -17,7 +17,7 @@ local resource = resource:import()
 local imports = {
     type = type,
     pairs = pairs,
-    md5 = md5,
+    sha256 = sha256,
     base64Decode = base64Decode,
     collectgarbage = collectgarbage,
     outputConsole = outputConsole,
@@ -102,7 +102,7 @@ if localPlayer then
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local fileData = file:read(i)
-                if not fileData or (imports.md5(fileData) ~= j) then
+                if not fileData or (imports.sha256(fileData) ~= j) then
                     fetchFiles[i] = true
                 else
                     cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total

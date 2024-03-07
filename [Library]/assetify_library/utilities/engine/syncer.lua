@@ -15,7 +15,7 @@
 local imports = {
     type = type,
     pairs = pairs,
-    md5 = md5,
+    sha256 = sha256,
     tonumber = tonumber,
     tostring = tostring,
     collectgarbage = collectgarbage,
@@ -50,7 +50,7 @@ local syncer = class:create("syncer", {
 function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
 syncer.public.librarySource = "https://api.github.com/repos/ov-sa/Assetify-Library/releases/latest"
-syncer.public.librarySerial = imports.md5(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
+syncer.public.librarySerial = imports.sha256(syncer.public.libraryName..":"..imports.tostring(syncer.public.libraryResource)..":"..table.encode(imports.getRealTime()))
 syncer.public.libraryWebserver = settings.library.webserverURL or "http://localhost:33022"
 
 network:create("Assetify:onBoot"):on(function() syncer.public.isLibraryBooted = true end, {isPrioritized = true})
