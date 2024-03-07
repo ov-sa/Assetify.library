@@ -146,7 +146,7 @@ else
     syncer.public.libraryVersion = imports.getResourceInfo(syncer.public.libraryResource, "version")
     syncer.public.libraryVersion = (syncer.public.libraryVersion and "v."..syncer.public.libraryVersion) or false
     syncer.public.libraryModules = {}
-    syncer.public.libraryClients = {loaded = {}, loading = {}, scheduled = {}}
+    syncer.public.libraryClients = {loaded = {}, scheduled = {}}
     network:create("Assetify:Syncer:onLoadClient"):on(function(source)
         syncer.public.libraryClients.loaded[source] = true
         network:emit("Assetify:Syncer:onSyncPostPool", false, source)
@@ -309,9 +309,7 @@ else
             peer = getPlayerSerial(source),
             state = true
         })
-        if syncer.public.libraryClients.loading[source] then syncer.public.libraryClients.loading[source]:destroy() end
         syncer.public.libraryClients.loaded[source] = nil
-        syncer.public.libraryClients.loading[source] = nil
         syncer.public.libraryClients.scheduled[source] = nil
     end)
 end
