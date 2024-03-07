@@ -128,8 +128,8 @@ if localPlayer then
                         catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                     })
                 end
-                --TODO: IMPROVE THE BELOW AND REFACTOR ONSYNCHASH
-                --network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+                --TODO: RENAME APPROPRIATELY
+                network:emit("Assetify:Downloader:onSyncHash", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
                 imports.collectgarbage()
                 self.cHeartbeat = nil
             end, settings.downloader.buildRate)
@@ -210,6 +210,7 @@ else
     function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, true, player, ...) end
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
     network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, remoteResource)
+        --TODO: IMPROVE THS FUNCTION
         if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
         else syncer.private:syncResource(source, remoteResource, hashes) end
     end)
