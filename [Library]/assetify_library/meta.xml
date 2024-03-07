@@ -14,14 +14,14 @@
     <script src="settings/server.lua" type="server"/>
 
     <!-- Utilities: RW -->
-    <file src="utilities/rw/dict.rw"/>
-    <file src="utilities/rw/buffer.rw"/>
-    <file src="utilities/rw/timecyc.rw"/>
     <file src="utilities/rw/native/buffer.rw"/>
     <file src="utilities/rw/native/buffer_lod.rw"/>
-    <file src="utilities/rw/planar_1x1/dict.rw"/>
-    <file src="utilities/rw/planar_1x1/buffer.rw"/>
-    <file src="utilities/rw/planar_1x1/collision.rw"/>
+    <file src="utilities/rw/mesh_void/dict.rw"/>
+    <file src="utilities/rw/mesh_void/buffer.rw"/>
+    <file src="utilities/rw/mesh_plane/dict.rw"/>
+    <file src="utilities/rw/mesh_plane/buffer.rw"/>
+    <file src="utilities/rw/mesh_plane/collision.rw"/>
+    <file src="utilities/rw/timecyc.rw"/>
 
     <!-- Utilities: Sandbox -->
     <script src="utilities/sandbox/index.lua" type="shared"/>

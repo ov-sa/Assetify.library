@@ -120,8 +120,8 @@ end
 
 if localPlayer then
     asset.public.rwAssets = {
-        txd = imports.engineLoadTXD("utilities/rw/dict.rw"),
-        dff = imports.engineLoadDFF("utilities/rw/buffer.rw")
+        txd = imports.engineLoadTXD("utilities/rw/mesh_void/dict.rw"),
+        dff = imports.engineLoadDFF("utilities/rw/mesh_void/buffer.rw")
     }
 
     function asset.public:create(...)

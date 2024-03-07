@@ -38,7 +38,7 @@ local syncer = syncer:import()
 local planar = class:create("planar", {
     cache = {
         validTypes = {
-            {index = "planar_1x1", textureName = "assetify_light_planar"}
+            {index = "plane", textureName = "assetify_light_planar"}
         }
     },
     buffer = {}
