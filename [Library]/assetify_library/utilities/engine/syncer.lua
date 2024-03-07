@@ -216,28 +216,6 @@ else
                             peer = getPlayerSerial(player),
                             state = true
                         }))
-                        syncer.public.libraryClients.loading[player] = thread:createHeartbeat(function()
-                            local self = syncer.public.libraryClients.loading[player]
-                            if self and not syncer.public.libraryClients.loaded[player] and thread:isInstance(self) then
-                                self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
-                                for i, j in imports.pairs(self.cQueue) do
-                                    local queueStatus = imports.getLatentEventStatus(player, i)
-                                    if queueStatus then
-                                        self.cStatus[(j.assetType)] = self.cStatus[(j.assetType)] or {}
-                                        self.cStatus[(j.assetType)][(j.assetName)] = self.cStatus[(j.assetType)][(j.assetName)] or {}
-                                        self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = queueStatus
-                                    else
-                                        self.cQueue[i] = nil
-                                        if self.cStatus[(j.assetType)] and self.cStatus[(j.assetType)][(j.assetName)] then
-                                            self.cStatus[(j.assetType)][(j.assetName)][(j.file)] = (self.cStatus[(j.assetType)][(j.assetName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
-                                        end
-                                    end
-                                end
-                                network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus)
-                                return true
-                            end
-                            return false
-                        end, function() syncer.public.libraryClients.loading[player] = nil end, settings.downloader.trackRate)
                         syncer.private:syncPack(player, _, true)
                     end,
                     catch = function() imports.outputDebugString("Assetify: Webserver ━│  Failed to whitelist Peer: "..getPlayerSerial(player).."...") end

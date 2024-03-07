@@ -66,6 +66,7 @@ if localPlayer then
         return true
     end
 
+    --TODO: DISABLE FOR NOW
     network:create("Assetify:Downloader:onSyncProgress"):on(function(status, bandwidth, isResource)
         if not isResource then
             if bandwidth then
@@ -154,11 +155,6 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:onSyncContent"):on(function(assetType, assetName, contentPath, content, remoteResource)
-        file:write(contentPath, content)
-        imports.collectgarbage()
-    end)
-
     network:create("Assetify:Downloader:onSyncState"):on(function(assetType, assetName, remoteResource)
         local cPointer = nil
         if not remoteResource then cPointer = settings.assetPacks[assetType].rwDatas[assetName]
@@ -212,7 +208,6 @@ if localPlayer then
 else
     function syncer.private:syncHash(player, ...) return network:emit("Assetify:Downloader:onSyncHash", true, true, player, {syncer.public.libraryToken, imports.getPlayerSerial(player)}, ...) end
     function syncer.private:syncData(player, ...) return network:emit("Assetify:Downloader:onSyncData", true, true, player, ...) end
-    function syncer.private:syncContent(player, ...) return network:emit("Assetify:Downloader:onSyncContent", true, true, player, ...) end
     function syncer.private:syncState(player, ...) return network:emit("Assetify:Downloader:onSyncState", true, true, player, ...) end
     network:create("Assetify:Downloader:onSyncHash"):on(function(source, assetType, assetName, hashes, remoteResource)
         if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
@@ -307,12 +302,6 @@ else
                 local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(cAsset.synced) do
                     if i ~= "bandwidthData" then syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j) end
-                    thread:pause()
-                end
-                for i, j in imports.pairs(assetDatas.hashes) do
-                    syncer.private:syncContent(player, assetDatas.type, assetDatas.name, i, cAsset.unSynced.fileData[i])
-                    local cQueue = imports.getLatentEventHandles(player)
-                    syncer.public.libraryClients.loading[player].cQueue[(cQueue[table.length(cQueue)])] = {assetType = assetDatas.type, assetName = assetDatas.name, file = i}
                     thread:pause()
                 end
                 syncer.private:syncState(player, assetDatas.type, assetDatas.name)
