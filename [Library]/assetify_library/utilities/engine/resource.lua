@@ -100,15 +100,10 @@ if localPlayer then
     end
 else
     resource.private.resourceSchedules = {resource = {}, client = {}}
-    resource.private.resourceClients = {loaded = {}, loading = {}}
+    resource.private.resourceClients = {loaded = {}}
     network:create("Assetify:Resource:onLoadClient"):on(function(source, resourceName)
-        local isVoid = true
-        resource.private.resourceClients.loading[source].resources[resourceName] = nil
-        for i, j in imports.pairs(resource.private.resourceClients.loading[source].resources) do
-            isVoid = false
-            break
-        end
-        if isVoid then resource.private.resourceClients.loaded[source] = true end
+        --TODO: STORE RESOURCES DOWNLOAD LIST AND DO THE BELOW UPON VOID LIST ONLY
+        resource.private.resourceClients.loaded[source] = true
     end)
     syncer.private.execOnLoad(function()
         for i, j in imports.pairs(resource.private.resourceSchedules.resource) do
@@ -169,35 +164,6 @@ else
         network:emit("Assetify:onResourceLoad", false, self.name, self.resource) 
         return true
     end
-
-    function resource.private:loadClient(player, resourceName)
-        if not resource.private.resourceClients.loading[player] then
-            resource.private.resourceClients.loaded[player] = nil
-            resource.private.resourceClients.loading[player] = thread:createHeartbeat(function()
-                local self = resource.private.resourceClients.loading[player]
-                if self and not resource.private.resourceClients.loaded[player] and thread:isInstance(self) then
-                    self.cStatus, self.cQueue = self.cStatus or {}, self.cQueue or {}
-                    for i, j in imports.pairs(self.cQueue) do
-                        local queueStatus = imports.getLatentEventStatus(player, i)
-                        if queueStatus then
-                            self.cStatus[(j.resourceName)] = self.cStatus[(j.resourceName)] or {}
-                            self.cStatus[(j.resourceName)][(j.file)] = queueStatus
-                        else
-                            self.cQueue[i] = nil
-                            if self.cStatus[(j.resourceName)] then
-                                self.cStatus[(j.resourceName)][(j.file)] = (self.cStatus[(j.resourceName)][(j.file)] and {tickEnd = 0, percentComplete = 100}) or nil
-                            end
-                        end
-                    end
-                    network:emit("Assetify:Downloader:onSyncProgress", true, false, player, self.cStatus, _, true)
-                    return true
-                end
-                return false
-            end, function() resource.private.resourceClients.loading[player] = nil end, settings.downloader.trackRate)
-        end
-        resource.private.resourceClients.loading[player].resources = resource.private.resourceClients.loading[player].resources or {}
-        resource.private.resourceClients.loading[player].resources[resourceName] = true
-    end
 end
 
 
@@ -226,8 +192,6 @@ imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceS
 end)
 imports.addEventHandler("onPlayerQuit", root, function()
     if not syncer.public.isLibraryLoaded then return false end
-    if resource.private.resourceClients.loading[source] then resource.private.resourceClients.loading[source]:destroy() end
     resource.private.resourceSchedules.client[source] = nil
     resource.private.resourceClients.loaded[source] = nil
-    resource.private.resourceClients.loading[source] = nil
 end)
