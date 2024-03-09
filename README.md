@@ -29,7 +29,7 @@
 * Built-In Asset-Pack & Resource Downloader & Broadcaster (No more `meta.xml` boredom!)
 * Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
 * Built-In Asset-Pack Synchronization (via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver))
-* Built-In Asset-Pack Encryption (Configurable key, Unreadable by any existing plugins)
+* Built-In Asset-Pack Encryption (Configurable key)
 * Built-In Asset-Pack Clumper (Supports only `character`, `vehicle`, `weapon`, `object` asset-packs)
 * Built-In Asset-Pack Dependency Broadcaster
 * Built-In Control & Bump Mapping
