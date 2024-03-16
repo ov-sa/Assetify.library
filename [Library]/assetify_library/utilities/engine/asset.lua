@@ -296,24 +296,10 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
-                    local encodedFileData = imports.base64Encode(filePointer.unSynced.fileData[filePath])
-                    local isFileVerified = thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent", {
-                        token = syncer.libraryToken,
-                        path = filePath,
-                        hash = imports.sha256(encodedFileData)
-                    }))
-                    if not isFileVerified or not isFileVerified.status then
-                        local maxFileChunks = math.ceil(#encodedFileData/syncer.libraryWebDataLimit)
-                        for i = 1, maxFileChunks, 1 do
-                            local index = ((i - 1)*syncer.libraryWebDataLimit) + 1
-                            thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent", {
-                                token = syncer.libraryToken,
-                                path = filePath,
-                                chunk = {i, maxFileChunks},
-                                content = string.sub(encodedFileData, index, math.min(#encodedFileData, index + syncer.libraryWebDataLimit - 1))
-                            }))
-                            imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath.." ["..i.."/"..maxFileChunks.."]")
-                        end
+                    local builtFileContent = imports.base64Encode(filePointer.unSynced.fileData[filePath])
+                    if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
+                        thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
+                        imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)
                     end
                 end
                 if rawPointer then rawPointer[filePath] = builtFileData end

@@ -38,7 +38,7 @@ function rest.public:get(route, timeout)
 end
 
 function rest.public:post(route, data, timeout)
-    if self ~= rest.public then return false end
+    if (self ~= rest.public) or not data then return false end
     if not route or (imports.type(route) ~= "string") then return false end
     timeout = math.max(imports.tonumber(timeout) or 10000, 1)
     local cPromise = thread:createPromise()

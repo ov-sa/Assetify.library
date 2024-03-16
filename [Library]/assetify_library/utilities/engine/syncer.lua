@@ -42,7 +42,6 @@ local syncer = class:create("syncer", {
     isLibraryLoaded = false,
     isModuleLoaded = false,
     libraryBandwidth = 0,
-    libraryWebDataLimit = 60000,
     syncedElements = {},
     syncedElementTones = {}
 })
