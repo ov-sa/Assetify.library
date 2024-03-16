@@ -1,9 +1,8 @@
 <meta>
 
-    <info author="vStudio" name="Assetify.library" type="Library" version="8.0.6"/>
+    <info author="vStudio" name="Assetify.library" type="Library" version="8.0.7"/>
     <min_mta_version server="1.6.0-9.22195" client="1.6.0-9.22195"/>
     <aclrequest>
-        <right name="function.callRemote" access="true"/>
         <right name="function.fetchRemote" access="true"/>
         <right name="function.restartResource" access="true"/>
         <right name="function.loadstring" access="true"/>
