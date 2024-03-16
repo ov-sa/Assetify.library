@@ -209,11 +209,7 @@ else
             thread:create(function()
                 try({
                     exec = function(self)
-                        self:await(rest:post(syncer.public.libraryWebserver.."/onSyncPeer", {
-                            token = syncer.public.libraryToken,
-                            peer = getPlayerSerial(player),
-                            state = true
-                        }))
+                        self:await(rest:post(syncer.public.libraryWebserver.."/onSyncPeer?token="..syncer.public.libraryToken, {peer = getPlayerSerial(player), state = true}))
                         syncer.private:syncPack(player, _, true)
                     end,
                     catch = function() imports.outputDebugString("Assetify: Webserver ━│  Failed to whitelist Peer: "..getPlayerSerial(player).."...") end
@@ -303,11 +299,7 @@ else
     end)
     imports.addEventHandler("onPlayerQuit", root, function()
         if not syncer.public.isLibraryLoaded then return false end
-        rest:post(syncer.public.libraryWebserver.."/onSyncPeer", {
-            token = syncer.public.libraryToken,
-            peer = getPlayerSerial(source),
-            state = true
-        })
+        rest:post(syncer.public.libraryWebserver.."/onSyncPeer?token="..syncer.public.libraryToken, {peer = getPlayerSerial(source), state = false})
         syncer.public.libraryClients.loaded[source] = nil
         syncer.public.libraryClients.scheduled[source] = nil
     end)
