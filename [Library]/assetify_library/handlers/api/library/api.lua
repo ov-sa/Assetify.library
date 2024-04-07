@@ -115,12 +115,12 @@ function manager.API.Library.setBoneAttachment(...)
     return syncer.syncBoneAttachment(_, ...)
 end
 
-function manager.API.Library.syncBoneDetachment(...)
+function manager.API.Library.setBoneDetachment(...)
     return syncer.syncBoneDetachment(_, ...)
 end
 
 function manager.API.Library.setBoneRefreshment(...)
-    return syncer:setBoneRefreshment(_, ...)
+    return syncer.syncBoneRefreshment(_, ...)
 end
 
 function manager.API.Library.clearBoneAttachment(...)

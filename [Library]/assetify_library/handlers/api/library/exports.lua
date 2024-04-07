@@ -38,7 +38,7 @@ manager:exportAPI("Library", {
         {name = "clearAttachment"},
         {name = "createAssetDummy"},
         {name = "setBoneAttachment"},
-        {name = "syncBoneDetachment"},
+        {name = "setBoneDetachment"},
         {name = "setBoneRefreshment"},
         {name = "clearBoneAttachment"}
     },
