@@ -67,7 +67,7 @@ end
 function streamer.public:load(streamerInstance, streamType, occlusionInstances, syncRate)
     if not streamer.public:isInstance(self) then return false end
     if not streamerInstance or not streamType or not imports.isElement(streamerInstance) or not occlusionInstances or not occlusionInstances[1] or not imports.isElement(occlusionInstances[1]) then return false end
-    self.streamer, self.isStreamerCollidable = streamerInstance, imports.getElementCollisionsEnabled(streamerInstance)
+    self.streamer, self.isCollidable = streamerInstance, imports.getElementCollisionsEnabled(streamerInstance)
     self.streamType, self.occlusions = streamType, occlusionInstances
     self.dimension, self.interior = imports.getElementDimension(occlusionInstances[1]), imports.getElementInterior(occlusionInstances[1])
     self.syncRate = settings.streamer.streamRate
@@ -101,7 +101,7 @@ function streamer.public:resume()
         end
     end
     self.isResumed = true
-    imports.setElementCollisionsEnabled(self.streamer, self.isStreamerCollidable)
+    imports.setElementCollisionsEnabled(self.streamer, self.isCollidable)
     streamer.private.buffer[(self.dimension)] = streamer.private.buffer[(self.dimension)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)] = streamer.private.buffer[(self.dimension)][(self.interior)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] = streamer.private.buffer[(self.dimension)][(self.interior)][(self.streamType)] or {}

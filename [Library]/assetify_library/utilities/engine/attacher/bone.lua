@@ -21,6 +21,7 @@ local imports = {
     setElementMatrix = setElementMatrix,
     getElementRotation = getElementRotation,
     getElementBoneMatrix = getElementBoneMatrix,
+    getElementCollisionsEnabled = getElementCollisionsEnabled,
     setElementCollisionsEnabled = setElementCollisionsEnabled,
     getElementDimension = getElementDimension,
     setElementDimension = setElementDimension
@@ -120,6 +121,7 @@ if localPlayer then
             self.cDummy = dummy:fetchInstance(self.element)
             if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:pause() end
             self.cElement = (self.cDummy and self.cDummy.cModelInstance) or self.element
+            self.isCollidable = imports.getElementCollisionsEnabled(self.cElement)
             imports.setElementCollisionsEnabled(self.cElement, false)
             self.cStreamer = streamer:create(self.cElement, "bone", {parent})
             bone.public.buffer.element[(self.cElement)] = self
@@ -137,7 +139,10 @@ if localPlayer then
         local prevDimension = imports.getElementDimension(self.cElement)
         if self.cHeartbeat then self.cHeartbeat:destroy() end
         if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:resume()
-        else imports.setElementDimension(self.cElement, prevDimension) end
+        else
+            imports.setElementDimension(self.cElement, prevDimension)
+            imports.setElementCollisionsEnabled(self.cElement, self.isCollidable)
+        end
         bone.public.cache.element[(self.element)] = nil
         bone.public.buffer.element[(self.element)] = nil
         bone.public.buffer.element[(self.cElement)] = nil
