@@ -138,6 +138,7 @@ if localPlayer then
         if not bone.public:isInstance(self) then return false end
         local prevDimension = imports.getElementDimension(self.cElement)
         if self.cHeartbeat then self.cHeartbeat:destroy() end
+        if self.cStreamer then self.cStreamer:destroy() end
         if self.cDummy and self.cDummy.cStreamer then self.cDummy.cStreamer:resume()
         else
             imports.setElementDimension(self.cElement, prevDimension)
