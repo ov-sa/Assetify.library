@@ -87,6 +87,7 @@ function streamer.public:resume()
         if not streamer.private.allocator.validStreams[(self.streamType)] or not streamer.private.allocator.validStreams[(self.streamType)].skipAttachment then
             attacher:attachElements(self.streamer, self.occlusions[1])
         end
+        self.dimension, self.interior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
         imports.setElementDimension(self.streamer, self.dimension)
         imports.setElementInterior(self.streamer, self.interior)
     end
@@ -99,7 +100,6 @@ function streamer.public:resume()
         end
     end
     self.isResumed = true
-    self.dimension, self.interior = imports.getElementDimension(self.occlusions[1]), imports.getElementInterior(self.occlusions[1])
     imports.setElementCollisionsEnabled(self.streamer, self.isCollidable)
     streamer.private.buffer[(self.dimension)] = streamer.private.buffer[(self.dimension)] or {}
     streamer.private.buffer[(self.dimension)][(self.interior)] = streamer.private.buffer[(self.dimension)][(self.interior)] or {}
@@ -252,6 +252,19 @@ streamer.private.onEntityStream = function(streamBuffer, isStreamAltered)
     return true
 end
 
+streamer.private.onEntityStreamChange = function(element)
+    if not element then return false end
+    if element == localPlayer then streamer.private:update() end
+    if not streamer.private.ref[element] then return false end
+    for i, j in imports.pairs(streamer.private.ref[element]) do
+        if i.occlusions[1] == element then
+            i:pause()
+            i:resume()
+        end
+    end
+    return true
+end
+
 streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
     attacher.bone.cache.streamTick = imports.getTickCount()
@@ -311,13 +324,13 @@ end)
 --[[ API Syncers ]]--
 ---------------------
 
-imports.addEventHandler("onClientElementDimensionChange", localPlayer, function() streamer.private:update() end)
-imports.addEventHandler("onClientElementInteriorChange", localPlayer, function() streamer.private:update() end)
+imports.addEventHandler("onClientElementDimensionChange", root, function() streamer.private.onEntityStreamChange(source) end)
+imports.addEventHandler("onClientElementInteriorChange", root, function() streamer.private.onEntityStreamChange(source) end)
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not source or not streamer.private.ref[source] then return false end
     for i, j in imports.pairs(streamer.private.ref[source]) do
-        if j.occlusions[1] == source then
-            j:destroy()
+        if i.occlusions[1] == source then
+            i:destroy()
         end
     end
     streamer.private.ref[source] = nil
