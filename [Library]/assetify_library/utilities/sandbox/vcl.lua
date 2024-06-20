@@ -188,10 +188,9 @@ function vcl.private.parseObject(parser, buffer, rw)
             parser.index = (parser.isTypeID and string.isVoid(parser.index) and imports.tostring(table.length(parser.pointer) + 1)) or parser.index
             if string.isVoid(parser.index) or ((vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline)) then return false end
             local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
-            local rwTypePadding = (parser.isTypeID and (parser.ref - parser.isTypeID - 1)) or 0
-            local rwIndexPadding = string.len(rwLineText) - string.len(parser.index) - rwTypePadding - 1
+            local rwIndexPadding = string.len(rwLineText) - string.len(parser.index) - 1 - ((parser.isTypeID and #vcl.private.types.list) or 0)
             if parser.isChild and (rwIndexPadding <= parser.padding) then
-                parser.ref, parser.isParsed = parser.ref - string.len(parser.index) - rwTypePadding, true
+                parser.ref, parser.isParsed = parser.ref - string.len(parser.index), true
             else
                 if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
