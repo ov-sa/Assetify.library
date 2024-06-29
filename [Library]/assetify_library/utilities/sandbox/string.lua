@@ -33,7 +33,7 @@ local string = class:create("string", utf8)
 for i, j in imports.pairs(imports.string) do
     string.public[i] = (not string.public[i] and j) or string.public[i]
 end
-string.private.minifier = imports.sha256("vStudio")
+string.private.ref = imports.sha256("vStudio")
 
 function string.public.isVoid(baseString)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
@@ -107,12 +107,10 @@ end
 function string.public.minify(baseString)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
     local result = ""
-    for i = 1, string.public.len(baseString), 1 do
-        result = result..(string.private.minifier)..string.public.byte(baseString, i)
-    end
-    return [[
-    local b, __b = string.split("]]..result..[[", "]]..(string.private.minifier)..[["), ""
-    for i = 1, table.length(b), 1 do __b = __b..(string.char(b[i]) or "") end
-    loadstring(__b)()
-    ]]
+    baseString = string.gsub(baseString, "%-%-%[%[(.-)%]%]", "")
+    baseString = string.gsub(baseString, "%-%-.-\n", "")
+    baseString = string.gsub(baseString, "\n", " ")
+    baseString = string.gsub(baseString, "%s+$", "")
+    baseString = string.gsub(baseString, "%s+", " ")
+    return baseString
 end
