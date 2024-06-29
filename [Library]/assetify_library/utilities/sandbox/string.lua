@@ -106,10 +106,43 @@ end
 
 function string.public.minify(baseString)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
-    baseString = string.public.gsub(baseString, "%-%-%[%[(.-)%]%]", "")
-    baseString = string.public.gsub(baseString, "%-%-.-\n", "")
-    baseString = string.public.gsub(baseString, "\n", " ")
-    baseString = string.public.gsub(baseString, "%s+$", "")
-    baseString = string.public.gsub(baseString, "%s+", " ")
+    baseString = string.public.gsub(baseString, "%-%-%[%[(.-)%]%]", "") --Removes single-line comments
+    baseString = string.public.gsub(baseString, "%-%-.-\n", "") --Removes multi-line comments
+    do
+        --Encodes strings into bytes
+        local index, key, result = 1, false, [[
+            local function vsdk_processbyte(byte)
+                local result = ""
+                for num in string.gmatch(byte, "(%d+):") do
+                    result = result..string.char(num)
+                end
+                return result
+            end
+        ]]
+        repeat
+            local rw = string.public.sub(baseString, index, index)
+            local isEscaped = string.public.sub(baseString, index - 1, index - 1) == "\\"
+            if not key then
+                if not isEscaped and ((rw == "\"") or (rw == "\'")) then
+                    key = rw
+                    result = result.."vsdk_processbyte(\""
+                else
+                    result = result..rw
+                end
+            else
+                if not isEscaped and (key == rw) then
+                    key = false
+                    result = result.."\")"
+                else
+                    result = result..string.public.byte(rw)..":"
+                end
+            end
+            index = index + 1
+        until(index > #baseString)
+        baseString = result
+    end
+    baseString = string.public.gsub(baseString, "\n", " ") --Removes newlines
+    baseString = string.public.gsub(baseString, "%s+$", "") --Removes trailing spaces
+    baseString = string.public.gsub(baseString, "%s+", " ") --Removes trailing spaces
     return baseString
 end
