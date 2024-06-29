@@ -47,14 +47,6 @@ function string.public.len(baseString)
     return __string_len(baseString)
 end
 
-local __string_gsub = string.public.gsub
-function string.public.gsub(baseString, matchWord, replaceWord, matchLimit, isStrictcMatch, matchPrefix, matchPostfix)
-    if not baseString or (imports.type(baseString) ~= "string") or not matchWord or (imports.type(matchWord) ~= "string") or not replaceWord or (imports.type(replaceWord) ~= "string") then return false end
-    matchPrefix, matchPostfix = (matchPrefix and (imports.type(matchPrefix) == "string") and matchPrefix) or "", (matchPostfix and (imports.type(matchPostfix) == "string") and matchPostfix) or ""
-    matchWord = (isStrictcMatch and "%f[^"..matchPrefix.."%z%s]"..matchWord.."%f["..matchPostfix.."%z%s]") or matchPrefix..matchWord..matchPostfix
-    return __string_gsub(baseString, matchWord, replaceWord, matchLimit)
-end
-
 function string.public.parse(baseString)
     if not baseString then return false end
     if imports.tostring(baseString) == "nil" then return
