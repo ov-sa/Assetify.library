@@ -106,11 +106,10 @@ end
 
 function string.public.minify(baseString)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
-    local result = ""
-    baseString = string.gsub(baseString, "%-%-%[%[(.-)%]%]", "")
-    baseString = string.gsub(baseString, "%-%-.-\n", "")
-    baseString = string.gsub(baseString, "\n", " ")
-    baseString = string.gsub(baseString, "%s+$", "")
-    baseString = string.gsub(baseString, "%s+", " ")
+    baseString = string.public.gsub(baseString, "%-%-%[%[(.-)%]%]", "")
+    baseString = string.public.gsub(baseString, "%-%-.-\n", "")
+    baseString = string.public.gsub(baseString, "\n", " ")
+    baseString = string.public.gsub(baseString, "%s+$", "")
+    baseString = string.public.gsub(baseString, "%s+", " ")
     return baseString
 end
