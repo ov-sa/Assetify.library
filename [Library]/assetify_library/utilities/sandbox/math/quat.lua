@@ -90,7 +90,7 @@ function quat.public:setAxisAngle(x, y, z, angle)
     if not x or not y or not z or not angle then return false end
     angle = angle*0.5
     local sine, cosine = math.sin(angle), math.cos(angle)
-    self.x, self.y, self.z, self.w = self.x*sine, self.y*sine, self.z*sine, cosine
+    self.x, self.y, self.z, self.w = x*sine, y*sine, z*sine, cosine
     return self
 end
 
