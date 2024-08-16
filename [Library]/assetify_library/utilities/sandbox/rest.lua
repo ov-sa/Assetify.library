@@ -37,12 +37,13 @@ function rest.public:get(route, timeout)
     return cPromise
 end
 
-function rest.public:post(route, data, timeout)
+function rest.public:post(route, data, timeout, credentials)
     if (self ~= rest.public) or not data then return false end
     if not route or (imports.type(route) ~= "string") then return false end
     timeout = math.max(imports.tonumber(timeout) or 10000, 1)
+    credentials = ((imports.type(credentials) == "table") and credentials) or false
     local cPromise = thread:createPromise()
-    imports.fetchRemote(route, {queueName = "assetify_library", connectionAttempts = 1, connectTimeout = timeout, method = "POST", formFields = data}, function(result, status)
+    imports.fetchRemote(route, {queueName = "assetify_library", connectionAttempts = 1, connectTimeout = timeout, method = "POST", username = (credentials and credentials.username) or nil, password = (credentials and credentials.password) or nil, formFields = data}, function(result, status)
         if status.success then cPromise.resolve(result)
         else cPromise.reject(false, status.statusCode) end
     end)
