@@ -54,9 +54,10 @@ function table.public.pack(...)
     }, ...}
 end
 
-function table.public.unpack(baseTable)
+function table.public.unpack(baseTable, length)
+    length = tonumber(length)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
-    return imports.unpack(baseTable, 1, table.public.length(baseTable))
+    return imports.unpack(baseTable, 1, length or table.public.length(baseTable))
 end
 
 function table.public.encode(baseTable, encoding)
