@@ -48,7 +48,7 @@ local asset = class:create("asset", {
         clump = "clump",
         control = "control",
         txd = "txd", dff = "dff", lod = "lod", col = "col",
-        map = "map", dep = "dep"
+        map = "map", replace = "replace", dep = "dep"
     },
     replacements = {"txd", "dff", "col"},
     ranges = {
@@ -331,8 +331,8 @@ else
                 for k = 1, table.length(asset.public.replacements) do
                     local v = asset.public.replacements[k]
                     if j[v] then
-                        result[i][v] = assetPath..(asset.public.references.dep).."/"..j[v]
-                        asset.public:buildFile(result[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        result[i][v] = assetPath..(asset.public.references.replace).."/"..j[v]
+                        asset.public:buildFile(result[i][v], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
                         thread:pause()
                     end
                 end
