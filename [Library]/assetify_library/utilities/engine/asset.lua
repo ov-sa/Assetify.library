@@ -269,21 +269,21 @@ else
         if not manifestPath then return false end
         localPath = localPath or rootPath
         manifestPath = localPath..manifestPath
-        local manifestData = file:read(manifestPath)
-        manifestData = (manifestData and table.decode(manifestData, file:parseURL(manifestPath).extension)) or false
-        if manifestData then
-            for i, j in imports.pairs(manifestData) do
+        local result = file:read(manifestPath)
+        result = (result and table.decode(result, file:parseURL(manifestPath).extension)) or false
+        if result then
+            for i, j in imports.pairs(result) do
                 local cURL = file:parseURL(j)
                 if cURL and cURL.url and cURL.extension and cURL.pointer and ((cURL.extension == "vcl") or (cURL.extension == "json")) then
                     local pointerPath = ((cURL.pointer == "rootDir") and rootPath) or ((cURL.pointer == "localDir") and localPath) or false
                     if pointerPath then
                         local __cURL = file:parseURL(file:resolveURL(pointerPath..(cURL.directory or "")..cURL.file, file.validPointers["localDir"]..rootPath))
-                        manifestData[i] = asset.public:buildManifest(rootPath, __cURL.directory or "", __cURL.file)
+                        result[i] = asset.public:buildManifest(rootPath, __cURL.directory or "", __cURL.file)
                     end
                 end
             end
         end
-        return manifestData
+        return result
     end
 
     function asset.public:buildFile(filePath, filePointer, encryptKey, rawPointer, skipSync, debugExistence)
@@ -324,50 +324,50 @@ else
 
     function asset.public:buildReplacement(assetPath, assetReplacements, filePointer, encryptKey)
         if not assetPath or not assetReplacements or not filePointer then return false end
-        local cAssetReplacements = {}
+        local result = {}
         for i, j in imports.pairs(assetReplacements) do
             if j and (imports.type(j) == "table") then
-                cAssetReplacements[i] = {}
+                result[i] = {}
                 for k = 1, table.length(asset.public.replacements) do
                     local v = asset.public.replacements[k]
                     if j[v] then
-                        cAssetReplacements[i][v] = assetPath..(asset.public.references.dep).."/"..j[v]
-                        asset.public:buildFile(cAssetReplacements[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        result[i][v] = assetPath..(asset.public.references.dep).."/"..j[v]
+                        asset.public:buildFile(result[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
                         thread:pause()
                     end
                 end
             end
             thread:pause()
         end
-        return cAssetReplacements
+        return result
     end
 
     function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptKey)
         if not assetPath or not assetDeps or not filePointer then return false end
-        local cAssetDeps = {}
+        local result = {}
         for i, j in imports.pairs(assetDeps) do
             if j and (imports.type(j) == "table") then
-                cAssetDeps[i] = {}
+                result[i] = {}
                 for k, v in imports.pairs(j) do
-                    cAssetDeps[i][k] = {}
+                    result[i][k] = {}
                     if i == "script" then
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath..(asset.public.references.dep).."/"..v[m]
-                            cAssetDeps[i][k][m] = v[m]
-                            asset.public:buildFile(cAssetDeps[i][k][m], filePointer, encryptKey, filePointer.unSynced.rawData, k == "server", true)
+                            result[i][k][m] = v[m]
+                            asset.public:buildFile(result[i][k][m], filePointer, encryptKey, filePointer.unSynced.rawData, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath..(asset.public.references.dep).."/"..j[k]
-                        cAssetDeps[i][k] = j[k]
-                        asset.public:buildFile(cAssetDeps[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        result[i][k] = j[k]
+                        asset.public:buildFile(result[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
                     end
                     thread:pause()
                 end
             end
             thread:pause()
         end
-        return cAssetDeps
+        return result
     end
 
     function asset.public:buildPack(assetType, assetPack, callback)
