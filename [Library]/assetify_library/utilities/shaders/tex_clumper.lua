@@ -15,7 +15,7 @@
 local identity = "Assetify_TextureClumper"
 shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
-        if not shaderMaps or not shaderMaps[(asset.references.clump)] then return false end
+        if not shaderMaps or not shaderMaps[asset.references.clump] then return false end
         local controlVars, handlerBody, handlerFooter = [[
             float2 clumpTone = float2(1, 0.25);
             texture clumpTex;

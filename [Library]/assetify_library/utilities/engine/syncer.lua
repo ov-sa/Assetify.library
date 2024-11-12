@@ -97,11 +97,11 @@ if localPlayer then
             if clumpMaps then
                 shader.clearElementBuffer(element, "Assetify | Clump")
                 local cAsset = manager:getAssetData(assetType, assetName, syncer.public.librarySerial)
-                if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps[(asset.references.clump)] then
+                if cAsset and cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps[asset.references.clump] then
                     for i, j in imports.pairs(clumpMaps) do
-                        if cAsset.manifestData.shaderMaps[(asset.references.clump)][i] and cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j] then
-                            cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].prelight = cAsset.manifestData.shaderMaps[(asset.references.clump)][i].prelight
-                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[(asset.references.clump)][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
+                        if cAsset.manifestData.shaderMaps[asset.references.clump][i] and cAsset.manifestData.shaderMaps[asset.references.clump][i][j] then
+                            cAsset.manifestData.shaderMaps[asset.references.clump][i][j].prelight = cAsset.manifestData.shaderMaps[asset.references.clump][i].prelight
+                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifestData.shaderMaps[asset.references.clump][i][j].clump, clumpTex_bump = cAsset.manifestData.shaderMaps[asset.references.clump][i][j].bump}, {}, cAsset.unSynced.rwCache.map, cAsset.manifestData.shaderMaps[asset.references.clump][i][j], cAsset.manifestData.encryptKey, _, _, _, syncer.public.librarySerial)
                         end
                     end
                     if syncer.public.syncedElementTones[element] and syncer.public.syncedElementTones[element][assetType] and syncer.public.syncedElementTones[element][assetType][assetName] then
@@ -121,7 +121,7 @@ if localPlayer then
         if not element or (not remoteSignature and not imports.isElement(element)) then return false end
         if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
         local cAsset = manager:getAssetData(assetType, assetName)
-        if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[(asset.references.clump)] or not cAsset.manifestData.shaderMaps[(asset.references.clump)][textureName] then return false end
+        if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[asset.references.clump] or not cAsset.manifestData.shaderMaps[asset.references.clump][textureName] then return false end
         isBumpTone = (isBumpTone and true) or false
         tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
         tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
@@ -243,7 +243,7 @@ else
         if not element or not imports.isElement(element) then return false end
         if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
         local cAsset = manager:getAssetData(assetType, assetName)
-        if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[(asset.references.clump)] or not cAsset.manifestData.shaderMaps[(asset.references.clump)][textureName] then return false end
+        if not cAsset or not cAsset.manifestData.assetClumps or not cAsset.manifestData.shaderMaps or not cAsset.manifestData.shaderMaps[asset.references.clump] or not cAsset.manifestData.shaderMaps[asset.references.clump][textureName] then return false end
         isBumpTone = (isBumpTone and true) or false
         tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
         tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
