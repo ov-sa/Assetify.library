@@ -50,6 +50,7 @@ local asset = class:create("asset", {
         txd = "txd", dff = "dff", lod = "lod", col = "col",
         map = "map", dep = "dep"
     },
+    replacements = {"txd", "dff", "col"},
     ranges = {
         dimension = {-1, 65535},
         interior = {0, 255},
@@ -321,6 +322,26 @@ else
         return true
     end
 
+    function asset.public:buildReplacement(assetPath, assetReplacements, filePointer, encryptKey)
+        if not assetPath or not assetReplacements or not filePointer then return false end
+        local cAssetReplacements = {}
+        for i, j in imports.pairs(assetReplacements) do
+            if j and (imports.type(j) == "table") then
+                cAssetReplacements[i] = {}
+                for k = 1, table.length(asset.public.replacements) do
+                    local v = asset.public.replacements[k]
+                    if j[v] then
+                        cAssetReplacements[i][v] = assetPath..(asset.public.references.dep).."/"..j[v]
+                        asset.public:buildFile(cAssetReplacements[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        thread:pause()
+                    end
+                end
+            end
+            thread:pause()
+        end
+        return cAssetReplacements
+    end
+
     function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptKey)
         if not assetPath or not assetDeps or not filePointer then return false end
         local cAssetDeps = {}
@@ -377,6 +398,7 @@ else
                     assetManifest.assetAnimations = (assetManifest.assetAnimations and (imports.type(assetManifest.assetAnimations) == "table") and assetManifest.assetAnimations) or false
                     assetManifest.assetSounds = (assetManifest.assetSounds and (imports.type(assetManifest.assetSounds) == "table") and assetManifest.assetSounds) or false
                     assetManifest.shaderMaps = (assetManifest.shaderMaps and (imports.type(assetManifest.shaderMaps) == "table") and assetManifest.shaderMaps) or false
+                    assetManifest.assetReplacements = (assetManifest.assetReplacements and (imports.type(assetManifest.assetReplacements) == "table") and assetManifest.assetReplacements) or false
                     assetManifest.assetDeps = (assetManifest.assetDeps and (imports.type(assetManifest.assetDeps) == "table") and assetManifest.assetDeps) or false
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
@@ -472,6 +494,7 @@ else
                         thread:pause()
                     end
                     asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                    assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
                     assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
                 end
             end
