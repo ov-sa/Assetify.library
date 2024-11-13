@@ -429,7 +429,8 @@ else
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and string.sub(imports.sha256(imports.tostring(assetManifest.encryptKey)), 1, asset.public.encryptions[assetManifest.encryptMode].keylength or nil)) or false
-                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and {}) or nil
+                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and (table.decode(string.decode(file:read(assetPath.."asset.iv"), "base64")) or {})) or nil
+                    iprint(assetManifest.encryptIV)
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
@@ -535,6 +536,7 @@ else
                     asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                     assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                     assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
+                    if assetManifest.encryptIV then file:write(assetPath.."asset.iv", string.encode(table.encode(assetManifest.encryptIV), "base64")) end
                 end
             end
             assetPack.assetPack = cAssetPack
