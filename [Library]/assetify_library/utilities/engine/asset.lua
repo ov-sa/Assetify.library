@@ -57,7 +57,7 @@ local asset = class:create("asset", {
     },
     encryptions = {
         ["tea"] = {},
-        ["aes128"] = {}
+        ["aes128"] = {iv = true}
     },
     properties = {
         reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
@@ -423,7 +423,7 @@ else
                         local v = asset.private.properties.reserved[k]
                         assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
-                    assetManifest.encryptMode = (assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
+                    assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
@@ -434,6 +434,7 @@ else
                     assetManifest.shaderMaps = (assetManifest.shaderMaps and (imports.type(assetManifest.shaderMaps) == "table") and assetManifest.shaderMaps) or false
                     assetManifest.assetReplacements = (assetManifest.assetReplacements and (imports.type(assetManifest.assetReplacements) == "table") and assetManifest.assetReplacements) or false
                     assetManifest.assetDeps = (assetManifest.assetDeps and (imports.type(assetManifest.assetDeps) == "table") and assetManifest.assetDeps) or false
+                    assetManifest.assetIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and {}) or nil
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
                             manifestData = assetManifest,
