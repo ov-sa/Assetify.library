@@ -423,8 +423,8 @@ else
                         local v = asset.private.properties.reserved[k]
                         assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
-                    assetManifest.encryptMode = (assetManifest.encryptMode and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
-                    assetManifest.encryptKey = (assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
+                    assetManifest.encryptMode = (assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
+                    assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
