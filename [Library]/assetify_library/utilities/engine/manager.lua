@@ -206,7 +206,7 @@ if localPlayer then
         if not manager.public:isInternal(isInternal) then
             cAsset = table.clone(cAsset, true)
             cAsset.manifestData.encryptKey = nil
-            cAsset.manifestData.assetIV = nil
+            cAsset.manifestData.encryptIV = nil
             cAsset.unSynced = nil
         end
         if cAsset.manifestData.assetClumps or (assetType == "module") or (assetType == "animation") or (assetType == "sound") or (assetType == "scene") then
@@ -355,7 +355,7 @@ else
             if cAsset.manifestData.encryptKey then
                 cAsset = table.clone(cAsset, true)
                 cAsset.manifestData.encryptKey = nil
-                cAsset.manifestData.assetIV = nil
+                cAsset.manifestData.encryptIV = nil
             end
         end
         return cAsset, false

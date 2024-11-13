@@ -425,6 +425,7 @@ else
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
+                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and {}) or nil
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
@@ -434,7 +435,6 @@ else
                     assetManifest.shaderMaps = (assetManifest.shaderMaps and (imports.type(assetManifest.shaderMaps) == "table") and assetManifest.shaderMaps) or false
                     assetManifest.assetReplacements = (assetManifest.assetReplacements and (imports.type(assetManifest.assetReplacements) == "table") and assetManifest.assetReplacements) or false
                     assetManifest.assetDeps = (assetManifest.assetDeps and (imports.type(assetManifest.assetDeps) == "table") and assetManifest.assetDeps) or false
-                    assetManifest.assetIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and {}) or nil
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
                             manifestData = assetManifest,
