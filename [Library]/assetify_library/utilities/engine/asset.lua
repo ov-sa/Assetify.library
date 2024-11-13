@@ -57,7 +57,7 @@ local asset = class:create("asset", {
     },
     encryptions = {
         ["tea"] = {},
-        ["aes128"] = {iv = true}
+        ["aes128"] = {key = 16, iv = true}
     },
     properties = {
         reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
