@@ -143,8 +143,17 @@ if localPlayer then
         for i, j in imports.pairs(assetReplacements) do
             rwCache[i] = {}
             for k, v in imports.pairs(j) do
-                rwCache[i][k] = asset.public:readFile(v, encryptKey)
-                print(k)
+                rwCache[k] = rwCache[k] or {}
+                if k == "txd" then
+                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadTXD(asset.public:readFile(v, encryptKey))) or false
+                    if rwCache[k][v] then imports.engineImportTXD(rwCache[k][v], i) end
+                elseif k == "dff" then
+                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadDFF(asset.public:readFile(v, encryptKey))) or false
+                    if rwCache[k][v] then imports.engineReplaceModel(rwCache[k][v], i) end
+                elseif k == "col" then
+                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadCOL(asset.public:readFile(v, encryptKey))) or false
+                    if rwCache[k][v] then imports.engineReplaceCOL(rwCache[k][v], i) end
+                end
             end
         end
         return true
