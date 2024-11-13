@@ -188,8 +188,12 @@ if localPlayer then
     function asset.public.clearAssetBuffer(rwCache)
         if not rwCache then return false end
         for i, j in imports.pairs(rwCache) do
-            imports.destroyElement(j)
-            rwCache[i] = nil
+            if imports.type(j) == "table" then
+                asset.public.clearAssetBuffer(j)
+            else
+                imports.destroyElement(j)
+                rwCache[i] = nil
+            end
         end
         return true
     end
