@@ -449,7 +449,7 @@ else
                     if assetType == "module" then
                         table.insert(syncer.libraryModules, assetName)
                     elseif assetType == "animation" then
-                        asset.public:buildFile(assetPath..asset.public.references.asset..".ifp", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
+                        asset.public:buildFile(assetPath..asset.public.references.asset..".ifp", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, true)
                         thread:pause()
                     elseif assetType == "sound" then
                         if assetManifest.assetSounds then
@@ -460,7 +460,7 @@ else
                                     for k, v in imports.pairs(j) do
                                         if v then
                                             assetSounds[i][k] = v
-                                            asset.public:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetPath.."sound/"..v, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, true)
                                             thread:pause()
                                         end
                                     end
@@ -484,30 +484,30 @@ else
                         local sceneIPLPath = assetPath..asset.public.references.scene..".ipl"
                         local sceneIPLDatas = scene:parseIPL(file:read(sceneIPLPath), assetManifest.sceneNativeObjects)
                         if sceneIPLDatas then
-                            asset.public:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                            asset.public:buildFile(sceneIPLPath, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                             if not assetManifest.sceneMapped then
                                 local debugTXDExistence = false
                                 local sceneIDEPath = assetPath..asset.public.references.scene..".ide"
                                 local sceneIDEDatas = scene:parseIDE(file:read(sceneIDEPath))
-                                asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                                asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                                 cAssetPack.rwDatas[assetName].synced.sceneIDE = (sceneIDEDatas and true) or false
                                 for k = 1, table.length(sceneIPLDatas), 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(assetPath..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
+                                            asset.public:buildFile(assetPath..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, true)
                                         else
                                             local childTXDPath = assetPath..asset.public.references.txd.."/"..v[2]..".txd"
                                             debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                            asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                                            asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                                         end
-                                        asset.public:buildFile(assetPath..asset.public.references.dff.."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
-                                        asset.public:buildFile(assetPath..asset.public.references.dff.."/"..asset.public.references.lod.."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
-                                        asset.public:buildFile(assetPath..asset.public.references.col.."/"..v[2]..".col", cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                                        asset.public:buildFile(assetPath..asset.public.references.dff.."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], {assetManifest.encryptMode, {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, assetManifest.encryptIV}, _, _, true)
+                                        asset.public:buildFile(assetPath..asset.public.references.dff.."/"..asset.public.references.lod.."/"..v[2]..".dff", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
+                                        asset.public:buildFile(assetPath..asset.public.references.col.."/"..v[2]..".col", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                                     end
                                     thread:pause()
                                 end
-                                asset.public:buildFile(assetPath..asset.public.references.asset..".txd", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, debugTXDExistence)
+                                asset.public:buildFile(assetPath..asset.public.references.asset..".txd", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, debugTXDExistence)
                             end
                         end
                     else
@@ -516,21 +516,21 @@ else
                             for i, j in imports.pairs(assetManifest.assetClumps) do
                                 local childTXDPath = assetPath..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".txd"
                                 debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
-                                asset.public:buildFile(assetPath..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
-                                asset.public:buildFile(assetPath..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".col", cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                                asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
+                                asset.public:buildFile(assetPath..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, true)
+                                asset.public:buildFile(assetPath..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".col", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                                 thread:pause()
                             end
                         else
-                            asset.public:buildFile(assetPath..asset.public.references.asset..".dff", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, true)
+                            asset.public:buildFile(assetPath..asset.public.references.asset..".dff", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, true)
                         end
-                        asset.public:buildFile(assetPath..asset.public.references.asset..".txd", cAssetPack.rwDatas[assetName], assetManifest.encryptKey, _, _, debugTXDExistence)
-                        asset.public:buildFile(assetPath..asset.public.references.asset..".col", cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                        asset.public:buildFile(assetPath..asset.public.references.asset..".txd", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}, _, _, debugTXDExistence)
+                        asset.public:buildFile(assetPath..asset.public.references.asset..".col", cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                         thread:pause()
                     end
-                    asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
-                    assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
-                    assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], assetManifest.encryptKey)
+                    asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
+                    assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
+                    assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], {mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV})
                 end
             end
             assetPack.assetPack = cAssetPack
