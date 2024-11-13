@@ -55,6 +55,10 @@ local asset = class:create("asset", {
         interior = {0, 255},
         stream = 170
     },
+    encryptions = {
+        ["tea"] = {},
+        ["aes128"] = {}
+    },
     properties = {
         reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
         whitelisted = {
@@ -243,9 +247,9 @@ if localPlayer then
                         end
                         rwCache.col[(rwPaths.col)] = rwCache.col[(rwPaths.col)] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(rwPaths.col, assetManifest.encryptKey))) or false
                         collisionID = (rwCache.col[(rwPaths.col)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
-                        imports.engineSetModelLODDistance(modelID, rwStreamRange)
-                        if lodID then imports.engineSetModelLODDistance(lodID, rwStreamRange) end
-                        if collisionID then imports.engineSetModelLODDistance(collisionID, rwStreamRange) end
+                        imports.engineSetModelLODDistance(modelID, rwStreamRange, true)
+                        if lodID then imports.engineSetModelLODDistance(lodID, rwStreamRange, true) end
+                        if collisionID then imports.engineSetModelLODDistance(collisionID, rwStreamRange, true) end
                     end
                 end
             end
@@ -419,6 +423,7 @@ else
                         local v = asset.private.properties.reserved[k]
                         assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
+                    assetManifest.encryptMode = (assetManifest.encryptMode and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
                     assetManifest.encryptKey = (assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
