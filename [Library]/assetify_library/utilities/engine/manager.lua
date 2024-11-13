@@ -36,7 +36,15 @@ local manager = class:create("manager", {
 manager.private.rwFormat = {
     assetRef = {}, assetCache = {},
     rwCache = {
-        ifp = {}, sound = {}, txd = {}, dff = {}, lod = {}, col = {}, map = {}, dep = {}
+        ifp = {},
+        sound = {}, 
+        txd = {},
+        dff = {},
+        lod = {},
+        col = {},
+        map = {},
+        replace = {},
+        dep = {}
     }
 }
 manager.private.buffer = {
@@ -118,6 +126,7 @@ if localPlayer then
     function manager.private:createDep(cAsset)
         if not cAsset then return false end
         shader:createTex(cAsset.manifestData.shaderMaps, cAsset.unSynced.rwCache.map, cAsset.manifestData.encryptKey)
+        asset:createDep(cAsset.manifestData.assetReplacements, cAsset.unSynced.rwCache.replace, cAsset.manifestData.encryptKey)
         asset:createDep(cAsset.manifestData.assetDeps, cAsset.unSynced.rwCache.dep, cAsset.manifestData.encryptKey)
         if cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.control then
             for i, j in imports.pairs(cAsset.manifestData.shaderMaps.control) do

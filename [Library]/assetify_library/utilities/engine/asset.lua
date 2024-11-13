@@ -138,6 +138,18 @@ if localPlayer then
         return asset.private:fetchMap(_, shaderMaps)
     end
 
+    function asset.public:createReplacement(assetReplacements, rwCache, encryptKey)
+        if not assetReplacements or not rwCache then return false end
+        for i, j in imports.pairs(assetReplacements) do
+            rwCache[i] = {}
+            for k, v in imports.pairs(j) do
+                rwCache[i][k] = asset.public:readFile(v, encryptKey)
+                print(k)
+            end
+        end
+        return true
+    end
+    
     function asset.public:createDep(assetDeps, rwCache, encryptKey)
         if not assetDeps or not rwCache then return false end
         for i, j in imports.pairs(assetDeps) do
