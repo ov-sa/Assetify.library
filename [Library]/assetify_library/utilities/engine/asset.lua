@@ -328,8 +328,11 @@ else
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
-                    print(encryptOptions, encryptOptions.mode, encryptOptions.key)
-                    filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})) or builtFileData
+                    filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
+                    if imports.type(filePointer.unSynced.fileData[filePath]) == "table" then
+                        encryptOptions.iv[filePath] = filePointer.unSynced.fileData[filePath][2]
+                        filePointer.unSynced.fileData[filePath] = filePointer.unSynced.fileData[filePath][1]
+                    end
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
