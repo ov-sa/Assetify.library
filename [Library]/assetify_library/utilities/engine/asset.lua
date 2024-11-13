@@ -57,7 +57,7 @@ local asset = class:create("asset", {
     },
     encryptions = {
         ["tea"] = {},
-        ["aes128"] = {key = 16, iv = true}
+        ["aes128"] = {keylength = 16, iv = true}
     },
     properties = {
         reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
@@ -425,7 +425,7 @@ else
                         assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
-                    assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and imports.sha256(imports.tostring(assetManifest.encryptKey))) or false
+                    assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and string.sub(imports.sha256(imports.tostring(assetManifest.encryptKey)), 1, asset.public.encryptions[assetManifest.encryptMode].keylength or nil)) or false
                     assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and {}) or nil
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
