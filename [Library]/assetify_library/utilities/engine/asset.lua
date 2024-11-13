@@ -140,20 +140,25 @@ if localPlayer then
     function asset.public:createReplacement(assetReplacements, rwCache, encryptKey)
         if not assetReplacements or not rwCache then return false end
         for i, j in imports.pairs(assetReplacements) do
-            rwCache[i] = {}
-            for k, v in imports.pairs(j) do
-                rwCache[k] = rwCache[k] or {}
-                if k == "txd" then
-                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadTXD(asset.public:readFile(v, encryptKey))) or false
-                    if rwCache[k][v] then imports.engineImportTXD(rwCache[k][v], i) end
-                elseif k == "dff" then
-                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadDFF(asset.public:readFile(v, encryptKey))) or false
-                    if rwCache[k][v] then imports.engineReplaceModel(rwCache[k][v], i) end
-                elseif k == "col" then
-                    rwCache[k][v] = rwCache[k][v] or (v and file:exists(v) and imports.engineLoadCOL(asset.public:readFile(v, encryptKey))) or false
-                    if rwCache[k][v] then imports.engineReplaceCOL(rwCache[k][v], i) end
+            j.LODDistance = imports.tonumber(j.LODDistance)
+            j.isTransparency = (j.isTransparency and true) or false
+            for k = 1, table.length(asset.public.replacements) do
+                local v = asset.public.replacements[k]
+                if j[v] then
+                    rwCache[v] = {}
+                    if v == "txd" then
+                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(j[v], encryptKey))) or false
+                        if rwCache[v][j[v]] then imports.engineImportTXD(rwCache[v][j[v]], i) end
+                    elseif v == "dff" then
+                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(j[v], encryptKey), j.isTransparency)) or false
+                        if rwCache[v][j[v]] then imports.engineReplaceModel(rwCache[v][j[v]], i) end
+                    elseif v == "col" then
+                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(j[v], encryptKey))) or false
+                        if rwCache[v][j[v]] then imports.engineReplaceCOL(rwCache[v][j[v]], i) end
+                    end
                 end
             end
+            if j.LODDistance then engineSetModelLODDistance(i, j.LODDistance, true) end
         end
         return true
     end
@@ -351,11 +356,11 @@ else
         local result = {}
         for i, j in imports.pairs(assetReplacements) do
             if j and (imports.type(j) == "table") then
-                result[i] = {}
+                result[i] = j
                 for k = 1, table.length(asset.public.replacements) do
                     local v = asset.public.replacements[k]
                     if j[v] then
-                        result[i][v] = assetPath..(asset.public.references.replace).."/"..j[v]
+                        result[i][v] = assetPath..asset.public.references.replace.."/"..j[v]
                         asset.public:buildFile(result[i][v], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
                         thread:pause()
                     end
