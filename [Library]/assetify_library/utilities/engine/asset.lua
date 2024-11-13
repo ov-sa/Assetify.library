@@ -18,7 +18,6 @@ local imports = {
     sha256 = sha256,
     tonumber = tonumber,
     tostring = tostring,
-    base64Encode = base64Encode,
     outputServerLog = outputServerLog,
     outputDebugString = outputDebugString,
     destroyElement = destroyElement,
@@ -318,7 +317,7 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
-                    local builtFileContent = imports.base64Encode(filePointer.unSynced.fileData[filePath])
+                    local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)

@@ -18,7 +18,6 @@ local imports = {
     type = type,
     pairs = pairs,
     sha256 = sha256,
-    base64Decode = base64Decode,
     collectgarbage = collectgarbage,
     outputConsole = outputConsole,
     getResourceFromName = getResourceFromName,
@@ -124,7 +123,7 @@ if localPlayer then
             end, function()
                 for i, j in pairs(fetchFiles) do
                     try({
-                        exec = function(self) file:write(i, imports.base64Decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)))) end,
+                        exec = function(self) file:write(i, string.decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)), "base64")) end,
                         catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                     })
                 end
