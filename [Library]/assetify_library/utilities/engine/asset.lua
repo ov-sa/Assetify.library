@@ -319,7 +319,7 @@ else
         return result
     end
 
-    function asset.public:buildFile(filePath, filePointer, encryptKey, rawPointer, skipSync, debugExistence)
+    function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
         if not filePath or not filePointer then return false end
         if (not skipSync and not filePointer.unSynced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFileData, builtFileSize = file:read(filePath)
@@ -328,7 +328,8 @@ else
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
-                    filePointer.unSynced.fileData[filePath] = (encryptKey and string.encode(builtFileData, "tea", {key = encryptKey})) or builtFileData
+                    print(encryptOptions, encryptOptions.mode, encryptOptions.key)
+                    filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})) or builtFileData
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
@@ -344,18 +345,18 @@ else
         return true
     end
 
-    function asset.public:buildShader(assetPath, shaderMaps, filePointer, encryptKey)
+    function asset.public:buildShader(assetPath, shaderMaps, filePointer, encryptOptions)
         if not assetPath or not shaderMaps or not filePointer then return false end
         for i, j in imports.pairs(asset.private:fetchMap(assetPath, shaderMaps)) do
             if j then
-                asset.public:buildFile(i, filePointer, encryptKey, _, _, true)
+                asset.public:buildFile(i, filePointer, encryptOptions, _, _, true)
             end
             thread:pause()
         end
         return true
     end
 
-    function asset.public:buildReplacement(assetPath, assetReplacements, filePointer, encryptKey)
+    function asset.public:buildReplacement(assetPath, assetReplacements, filePointer, encryptOptions)
         if not assetPath or not assetReplacements or not filePointer then return false end
         local result = {}
         for i, j in imports.pairs(assetReplacements) do
@@ -365,7 +366,7 @@ else
                     local v = asset.public.replacements[k]
                     if j[v] then
                         result[i][v] = assetPath..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(result[i][v], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        asset.public:buildFile(result[i][v], filePointer, encryptOptions, filePointer.unSynced.rawData, _, true)
                         thread:pause()
                     end
                 end
@@ -375,7 +376,7 @@ else
         return result
     end
 
-    function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptKey)
+    function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptOptions)
         if not assetPath or not assetDeps or not filePointer then return false end
         local result = {}
         for i, j in imports.pairs(assetDeps) do
@@ -387,13 +388,13 @@ else
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath..asset.public.references.dep.."/"..v[m]
                             result[i][k][m] = v[m]
-                            asset.public:buildFile(result[i][k][m], filePointer, encryptKey, filePointer.unSynced.rawData, k == "server", true)
+                            asset.public:buildFile(result[i][k][m], filePointer, encryptOptions, filePointer.unSynced.rawData, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath..asset.public.references.dep.."/"..j[k]
                         result[i][k] = j[k]
-                        asset.public:buildFile(result[i][k], filePointer, encryptKey, filePointer.unSynced.rawData, _, true)
+                        asset.public:buildFile(result[i][k], filePointer, encryptOptions, filePointer.unSynced.rawData, _, true)
                     end
                     thread:pause()
                 end
