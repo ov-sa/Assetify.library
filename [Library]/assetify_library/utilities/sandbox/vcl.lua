@@ -222,7 +222,7 @@ function vcl.private.parseReturn(parser, buffer)
     return parser.value, parser.ref, not parser.isParsed, parser.root
 end
 
-function vcl.private.encode(buffer, padding)
+function vcl.private.encode(buffer, root, padding)
     if not buffer or (imports.type(buffer) ~= "table") then return false end
     padding = padding or ""
     local query, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
@@ -248,7 +248,7 @@ function vcl.private.encode(buffer, padding)
         end
         for i = 1, table.length(query.numeric), 1 do
             local j = query.numeric[i]
-            local value = vcl.private.encode(j[2], padding..vcl.private.types.tab)
+            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
             if not value then count_nested = count_nested - 1
             else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..value end
         end
@@ -258,11 +258,12 @@ function vcl.private.encode(buffer, padding)
         end
         for i = 1, table.length(query.string), 1 do
             local j = query.string[i]
-            local value = vcl.private.encode(j[2], padding..vcl.private.types.tab)
+            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
             if not value then count_nested = count_nested - 1
             else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
     end
+    result = (not root and string.match(result, "^\n*(.*)")) or result
     return (((count_static > 0) or (count_nested > 0)) and result) or false
 end
 function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
