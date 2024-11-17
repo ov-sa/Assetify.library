@@ -108,16 +108,16 @@ function vcl.private.parseString(parser, buffer, rw)
             if not parser.isType then parser.isValueSkipAppend, parser.isType, parser.isTypeChar = true, "string", rw
             elseif not parser.isTypeParsed and (rw == parser.isTypeChar) then
                 if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-                    parser.ref, parser.value, parser.isType, parser.isTypeChar, parser.isValueSkipAppend = parser.ref - string.len(parser.value) - 1, "", "object", nil, nil, true
+                    parser.ref, parser.value, parser.isType, parser.isTypeChar, parser.isValueSkipAppend = parser.ref - string.len(parser.value) - 1, "", "object", nil, true
                 elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
                 else
                     parser.isTypeParsed, parser.isValueSkipAppend = true, true
                     if vcl.private.types.string[rw] and (imports.type(vcl.private.types.string[rw]) == "table") and vcl.private.types.string[rw].isTemplate then
                         local queryValue = ""
-                        local startIndex, endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], startIndex)
+                        local startIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], startIndex)
                         queryValue = string.sub(parser.value, 0, (startIndex and (startIndex - 1)) or string.len(parser.value))
                         while(startIndex) do
-                            endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[2], startIndex)
+                            local endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[2], startIndex)
                             if not endIndex then return false end
                             local queryIndex = endIndex + 1
                             local templateIndex, templateValue = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "["..vcl.private.types.index.."]"), parser.root
@@ -129,7 +129,7 @@ function vcl.private.parseString(parser, buffer, rw)
                                     break
                                 end
                             end
-                            startIndex, endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], endIndex)
+                            startIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], endIndex)
                             queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, queryIndex, (startIndex and (startIndex - 1)) or string.len(parser.value))
                         end
                         parser.value = queryValue
@@ -179,7 +179,8 @@ function vcl.private.parseObject(parser, buffer, rw)
             else
                 if not parser.isTypeQuoted then parser.isTypeQuoted = rw
                 elseif parser.isTypeQuoted == rw then
-                    parser.isTypeQuoted = false
+                    parser.isTypeQuoted = nil
+                    parser.wasTypeQuoted = true
                     if vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.init then return false end
                 end
             end
@@ -188,9 +189,10 @@ function vcl.private.parseObject(parser, buffer, rw)
             parser.index = (parser.isTypeID and string.isVoid(parser.index) and imports.tostring(table.length(parser.pointer) + 1)) or parser.index
             if string.isVoid(parser.index) or ((vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline)) then return false end
             local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
-            local rwIndexPadding = string.len(rwLineText) - string.len(parser.index) - 1 - ((parser.isTypeID and #vcl.private.types.list) or 0)
+            local rwIndexPadding = string.len(rwLineText) - string.len(parser.index) - 1 - ((parser.wasTypeQuoted and 2) or 0) - ((parser.isTypeID and #vcl.private.types.list) or 0)
+            parser.wasTypeQuoted = nil
             if parser.isChild and (rwIndexPadding <= parser.padding) then
-                parser.ref, parser.isParsed = parser.ref - string.len(parser.index), true
+                parser.ref, parser.isParsed = parser.ref - string.len(rwLineText) + rwIndexPadding, true
             else
                 if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
@@ -198,6 +200,7 @@ function vcl.private.parseObject(parser, buffer, rw)
                     if not isErrored then
                         if not parser.isChild then parser.root[(parser.index)] = value end
                         parser.pointer[(parser.index)], parser.ref, parser.index = value, ref - 1, ""
+                        parser.isTypeQuoted = nil
                     else parser.isErrored = 0 end
                 else parser.isErrored = 1 end
                 if parser.isErrored then return false end
