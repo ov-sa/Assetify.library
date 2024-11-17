@@ -333,10 +333,9 @@ else
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
                     if imports.type(filePointer.unSynced.fileData[filePath]) == "table" then
-                        local builtFileCache = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
-                        if encryptOptions.iv[builtFilePathHash] and (encryptOptions.iv[builtFilePathHash].hash ~= builtFileHash) then encryptOptions.iv[builtFilePathHash] = nil end
+                        local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
                         if encryptOptions.iv[builtFilePathHash] then
-                            local builtFileCacheData = file:read(builtFileCache)
+                            local builtFileCacheData = file:read(builtFileCachePath)
                             local builtFileCacheRWData = string.decode(builtFileCacheData, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash].iv, "base64")})
                             if not builtFileCacheRWData or (imports.sha256(builtFileCacheRWData) ~= builtFileHash) then encryptOptions.iv[builtFilePathHash] = nil end
                             filePointer.unSynced.fileData[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheData) or filePointer.unSynced.fileData[filePath][1]
@@ -348,7 +347,7 @@ else
                         end
                         encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or {hash = builtFileHash, iv = string.encode(filePointer.unSynced.fileData[filePath][2], "base64")}
                         filePointer.unSynced.fileData[filePath] = filePointer.unSynced.fileData[filePath][1]
-                        file:write(builtFileCache, filePointer.unSynced.fileData[filePath])
+                        file:write(builtFileCachePath, filePointer.unSynced.fileData[filePath])
                     end
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
