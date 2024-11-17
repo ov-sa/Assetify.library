@@ -187,14 +187,14 @@ function vcl.private.parseObject(parser, buffer, rw)
             local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, parser.ref))
             local rwIndexPadding = string.len(rwLineText) - string.len(parser.index) - 1 - ((parser.wasTypeQuoted and 2) or 0) - ((parser.isTypeID and #vcl.private.types.list) or 0)
             parser.wasTypeQuoted = nil
-            if parser.isChild and (rwIndexPadding <= parser.padding) then
+            if parser.child and (rwIndexPadding <= parser.padding) then
                 parser.ref, parser.isParsed = parser.ref - string.len(rwLineText) + rwIndexPadding, true
             else
                 if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
                     local value, ref, isErrored = vcl.private.decode(buffer, parser.root, parser.ref + 1, rwIndexPadding)
                     if not isErrored then
-                        if not parser.isChild then parser.root[(parser.index)] = value end
+                        if not parser.child then parser.root[(parser.index)] = value end
                         parser.pointer[(parser.index)], parser.ref, parser.index = value, ref - 1, ""
                         parser.isTypeQuoted = nil
                     else parser.isErrored = 0 end
@@ -250,7 +250,7 @@ function vcl.private.encode(buffer, padding)
             local j = index.numeric[i]
             local __result = vcl.private.encode(j[2], padding..vcl.private.types.tab)
             if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
-            else result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..vcl.private.types.list..j..vcl.private.types.init..__result end
+            else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..__result end
         end
         for i = 1, table.length(index.static.string), 1 do
             local j = index.static.string[i]
@@ -271,11 +271,11 @@ function vcl.private.decode(buffer, root, ref, padding)
     if not buffer or (imports.type(buffer) ~= "string") then return false end
     if string.isVoid(buffer) then return {} end
     local parser = {
-        root = root or {}, ref = ref or 1, isChild = (root and true) or false,
+        root = root or {}, ref = ref or 1, child = (root and true) or false,
         index = "", value = "", padding = padding or 0,
         error = "Failed to decode vcl. [Line: %s] [Reason: %s]"
     }
-    if not parser.isChild then
+    if not parser.child then
         buffer = string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")
         buffer = ((vcl.private.fetchRW(buffer, string.len(buffer)) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
     end
@@ -283,7 +283,7 @@ function vcl.private.decode(buffer, root, ref, padding)
         vcl.private.parseComment(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
         local ref, isType = parser.ref, parser.isType
         parser.isValueSkipAppend = nil
-        parser.isErrored = (parser.isChild and (not vcl.private.parseBoolean(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseNumber(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseString(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseColor(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))) and (parser.isErrored or 1)) or parser.isErrored
+        parser.isErrored = (parser.child and (not vcl.private.parseBoolean(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseNumber(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseString(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) or not vcl.private.parseColor(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))) and (parser.isErrored or 1)) or parser.isErrored
         if parser.isType then
             if not isType then
                 local _, rwLineText = vcl.private.fetchLine(string.sub(buffer, 0, ref - 1))
