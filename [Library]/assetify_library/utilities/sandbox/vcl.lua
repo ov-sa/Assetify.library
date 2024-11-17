@@ -244,23 +244,23 @@ function vcl.private.encode(buffer, padding)
         table.sort(index.numeric, function(a, b) return a < b end)
         for i = 1, table.length(index.static.numeric), 1 do
             local j = index.static.numeric[i]
-            result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
+            result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
         end
         for i = 1, table.length(index.numeric), 1 do
             local j = index.numeric[i]
-            local __result = vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
+            local __result = vcl.private.encode(j[2], padding..vcl.private.types.tab)
             if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
             else result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..vcl.private.types.list..j..vcl.private.types.init..__result end
         end
         for i = 1, table.length(index.static.string), 1 do
             local j = index.static.string[i]
-            result = result..((not string.isVoid(result) and vcl.private.types.newline) or "")..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
+            result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
         end
         for i = 1, table.length(index.string), 1 do
             local j = index.string[i]
-            local __result = vcl.private.encode(buffer[j], padding..vcl.private.types.tab)
             local __result = vcl.private.encode(j[2], padding..vcl.private.types.tab)
             if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
+            else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..__result end
         end
     end
     return (((areStaticIndexVoid > 0) or (areNestedIndexVoid > 0)) and result) or false
