@@ -225,45 +225,45 @@ end
 function vcl.private.encode(buffer, padding)
     if not buffer or (imports.type(buffer) ~= "table") then return false end
     padding = padding or ""
-    local index, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
+    local query, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
     for i, j in imports.pairs(buffer) do
         local rwType = imports.type(i)
         if imports.type(j) == "table" then
             i = "\""..i.."\""
-            table.insert(((rwType == "number") and index.numeric) or index.string, {i, j})
+            table.insert(((rwType == "number") and query.numeric) or query.string, {i, j})
         else
             if rwType == "number" then i = "-"..imports.tostring(i)
             else i = "\""..i.."\"" end
             if imports.type(j) == "string" then j = "\""..j.."\"" end
-            table.insert(((rwType == "number") and index.static.numeric) or index.static.string, {i, j})
+            table.insert(((rwType == "number") and query.static.numeric) or query.static.string, {i, j})
         end
     end
-    local areStaticIndexVoid, areNestedIndexVoid = table.length(index.static.numeric) + table.length(index.static.string), table.length(index.numeric) + table.length(index.string)
-    if (areStaticIndexVoid > 0) or (areNestedIndexVoid > 0) then
-        table.sort(index.static.numeric, function(a, b) return a[1] < b[1] end)
-        table.sort(index.numeric, function(a, b) return a < b end)
-        for i = 1, table.length(index.static.numeric), 1 do
-            local j = index.static.numeric[i]
+    local count_static, count_nested = table.length(query.static.numeric) + table.length(query.static.string), table.length(query.numeric) + table.length(query.string)
+    if (count_static > 0) or (count_nested > 0) then
+        table.sort(query.static.numeric, function(a, b) return a[1] < b[1] end)
+        table.sort(query.numeric, function(a, b) return a < b end)
+        for i = 1, table.length(query.static.numeric), 1 do
+            local j = query.static.numeric[i]
             result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
         end
-        for i = 1, table.length(index.numeric), 1 do
-            local j = index.numeric[i]
-            local __result = vcl.private.encode(j[2], padding..vcl.private.types.tab)
-            if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
-            else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..__result end
+        for i = 1, table.length(query.numeric), 1 do
+            local j = query.numeric[i]
+            local value = vcl.private.encode(j[2], padding..vcl.private.types.tab)
+            if not value then count_nested = count_nested - 1
+            else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..value end
         end
-        for i = 1, table.length(index.static.string), 1 do
-            local j = index.static.string[i]
+        for i = 1, table.length(query.static.string), 1 do
+            local j = query.static.string[i]
             result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
         end
-        for i = 1, table.length(index.string), 1 do
-            local j = index.string[i]
-            local __result = vcl.private.encode(j[2], padding..vcl.private.types.tab)
-            if not __result then areNestedIndexVoid = areNestedIndexVoid - 1
-            else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..__result end
+        for i = 1, table.length(query.string), 1 do
+            local j = query.string[i]
+            local value = vcl.private.encode(j[2], padding..vcl.private.types.tab)
+            if not value then count_nested = count_nested - 1
+            else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
     end
-    return (((areStaticIndexVoid > 0) or (areNestedIndexVoid > 0)) and result) or false
+    return (((count_static > 0) or (count_nested > 0)) and result) or false
 end
 function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
 
