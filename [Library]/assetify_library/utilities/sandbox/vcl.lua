@@ -42,9 +42,7 @@ vcl.private.types = {
         ["false"] = true
     },
     string = {
-        ["`"] = {
-            isTemplate = {"${", "}"}
-        },
+        ["`"] = {"${", "}"},
         ["'"] = true,
         ["\""] = true
     },
@@ -112,12 +110,12 @@ function vcl.private.parseString(parser, buffer, rw)
                 elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
                 else
                     parser.isTypeParsed, parser.isValueSkipAppend = true, true
-                    if vcl.private.types.string[rw] and (imports.type(vcl.private.types.string[rw]) == "table") and vcl.private.types.string[rw].isTemplate then
+                    if vcl.private.types.string[rw] and (imports.type(vcl.private.types.string[rw]) == "table") and vcl.private.types.string[rw] then
                         local queryValue = ""
-                        local startIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], startIndex)
+                        local startIndex = string.find(parser.value, vcl.private.types.string[rw][1], startIndex)
                         queryValue = string.sub(parser.value, 0, (startIndex and (startIndex - 1)) or string.len(parser.value))
                         while(startIndex) do
-                            local endIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[2], startIndex)
+                            local endIndex = string.find(parser.value, vcl.private.types.string[rw][2], startIndex)
                             if not endIndex then return false end
                             local queryIndex = endIndex + 1
                             local templateIndex, templateValue = string.split(string.sub(parser.value, startIndex + 2, endIndex - 1), "["..vcl.private.types.index.."]"), parser.root
@@ -129,7 +127,7 @@ function vcl.private.parseString(parser, buffer, rw)
                                     break
                                 end
                             end
-                            startIndex = string.find(parser.value, vcl.private.types.string[rw].isTemplate[1], endIndex)
+                            startIndex = string.find(parser.value, vcl.private.types.string[rw][1], endIndex)
                             queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, queryIndex, (startIndex and (startIndex - 1)) or string.len(parser.value))
                         end
                         parser.value = queryValue
@@ -233,10 +231,11 @@ function vcl.private.encode(buffer, padding)
     for i, j in imports.pairs(buffer) do
         local rwType = imports.type(i)
         if imports.type(j) == "table" then
-            table.insert(((rwType == "number") and index.numeric) or index.string, i)
+            i = "\""..i.."\""
+            table.insert(((rwType == "number") and index.numeric) or index.string, {i, j})
         else
             if rwType == "number" then i = "-"..imports.tostring(i)
-            elseif not string.isVoid(string.gsub(i, "%w", "")) then i = "\""..i.."\"" end
+            else i = "\""..i.."\"" end
             if imports.type(j) == "string" then j = "\""..j.."\"" end
             table.insert(((rwType == "number") and index.static.numeric) or index.static.string, {i, j})
         end
