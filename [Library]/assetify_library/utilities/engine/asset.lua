@@ -326,28 +326,24 @@ else
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
-                local builtFileHash = imports.sha256(builtFileData)
                 if not skipSync then
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
                     filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
                     if imports.type(filePointer.unSynced.fileData[filePath]) == "table" then
-                        local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
-                        if encryptOptions.iv[builtFilePathHash] then
-                            local builtFileCacheData = file:read(builtFileCachePath)
-                            local builtFileCacheRWData = string.decode(builtFileCacheData, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash].iv, "base64")})
-                            if not builtFileCacheRWData or (imports.sha256(builtFileCacheRWData) ~= builtFileHash) then encryptOptions.iv[builtFilePathHash] = nil end
-                            filePointer.unSynced.fileData[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheData) or filePointer.unSynced.fileData[filePath][1]
+                        if encryptOptions.iv then
+                            local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
+                            if encryptOptions.iv[builtFilePathHash] then
+                                local builtFileCacheContent = file:read(builtFileCachePath)
+                                local builtFileCacheData = string.decode(builtFileCacheContent, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash], "base64")})
+                                if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then encryptOptions.iv[builtFilePathHash] = nil end
+                                filePointer.unSynced.fileData[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unSynced.fileData[filePath][1]
+                            end
+                            encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unSynced.fileData[filePath][2], "base64")
+                            file:write(builtFileCachePath, filePointer.unSynced.fileData[filePath][1])
                         end
-                        if encryptOptions.iv[builtFilePathHash] then
-                            print("VALID CACHE FOR "..filePath)
-                        else
-                            print("INVALID CACHE FOR "..filePath)
-                        end
-                        encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or {hash = builtFileHash, iv = string.encode(filePointer.unSynced.fileData[filePath][2], "base64")}
                         filePointer.unSynced.fileData[filePath] = filePointer.unSynced.fileData[filePath][1]
-                        file:write(builtFileCachePath, filePointer.unSynced.fileData[filePath])
                     end
                     filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
@@ -445,7 +441,7 @@ else
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and string.sub(imports.sha256(imports.tostring(assetManifest.encryptKey)), 1, asset.public.encryptions[assetManifest.encryptMode].keylength or nil)) or false
-                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and (table.decode(string.decode(file:read(assetPath.."asset.iv"), "base64")) or {})) or nil
+                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and (table.decode(string.decode(file:read(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
@@ -552,7 +548,7 @@ else
                     asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], assetEncryptOptions)
                     assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], assetEncryptOptions)
                     assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], assetEncryptOptions)
-                    if assetManifest.encryptIV then file:write(assetPath.."asset.iv", string.encode(table.encode(assetManifest.encryptIV), "base64")) end
+                    if assetManifest.encryptIV then file:write(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(assetManifest.encryptIV), "base64")) end
                 end
             end
             assetPack.assetPack = cAssetPack
