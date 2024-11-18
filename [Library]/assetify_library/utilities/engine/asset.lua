@@ -58,7 +58,7 @@ local asset = class:create("asset", {
     },
     encryptions = {
         ["tea"] = {},
-        ["aes128"] = {keylength = 16, iv = true}
+        ["aes128"] = {keylength = 16, ivlength = 16}
     },
     properties = {
         reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
@@ -334,6 +334,7 @@ else
                     if imports.type(filePointer.unSynced.fileData[filePath]) == "table" then
                         if encryptOptions.iv then
                             local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
+                            encryptOptions.iv[builtFilePathHash] = (encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[encryptOptions.mode].ivlength or (#string.decode(encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[encryptOptions.mode].ivlength)) and encryptOptions.iv[builtFilePathHash]) or nil
                             if encryptOptions.iv[builtFilePathHash] then
                                 local builtFileCacheContent = file:read(builtFileCachePath)
                                 local builtFileCacheData = string.decode(builtFileCacheContent, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash], "base64")})
@@ -441,7 +442,7 @@ else
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and string.sub(imports.sha256(imports.tostring(assetManifest.encryptKey)), 1, asset.public.encryptions[assetManifest.encryptMode].keylength or nil)) or false
-                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].iv and (table.decode(string.decode(file:read(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
+                    assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].ivlength and (table.decode(string.decode(file:read(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
                     assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
