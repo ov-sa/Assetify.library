@@ -301,8 +301,7 @@ function vcl.private.decode(buffer, root, ref, padding)
         parser.isErrored = (not parser.isErrored and not vcl.private.parseObject(parser, buffer, vcl.private.fetchRW(buffer, parser.ref)) and (parser.isErrored or 1)) or parser.isErrored
         if parser.isErrored or parser.isParsed then break end
         parser.ref = parser.ref + 1
-        parser.thread = thread:getThread()
-        if parser.thread and parser.thread.syncRate.executions and parser.thread.syncRate.frames then thread:pause() end
+        if thread:getThread() and thread:getThread().syncRate.executions and thread:getThread().syncRate.frames then thread:pause() end
     end
     parser.isParsed = (not parser.isErrored and (((parser.type == "object") and not parser.isTypeID and string.isVoid(parser.index)) or parser.isParsed) and true) or false
     return vcl.private.parseReturn(parser, buffer)
