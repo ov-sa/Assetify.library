@@ -9,7 +9,7 @@
 
 **Frustrated with replacing objects?** Assetify.library streamlines the process by utilizing an asset-pack method, allowing you to load your assets seamlessly without altering the default ones. 
 
-**Creating a fully custom map?** This library is designed precisely for that purpose! It provides unlimited support for various asset categories, including `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, and `Inventory` Asset-Packs, in addition to custom graphics.
+**Creating a fully custom map?** This library is designed precisely for that purpose! It provides unlimited support for various asset categories, including `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` Asset-Packs, in addition to custom graphics.
 
 ## ━ Features
 
