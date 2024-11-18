@@ -9,7 +9,7 @@
 
 **Frustrated with replacing objects?** Assetify.library streamlines the process by utilizing an asset-pack method, allowing you to load your assets seamlessly without altering the default ones. 
 
-**Looking to create a fully custom map?** This library is specifically designed for that purpose! It offers extensive support for a wide range of asset categories, including `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` asset packs, as well as custom graphics!
+**Looking to create a fully custom map?** This library is specifically designed for that purpose! It offers extensive support for a wide range of asset categories, including `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` asset-packs, as well as custom graphics!
 
 ## ━ Features
 
@@ -18,7 +18,7 @@
 * Fully Open-Source
 * Modular Programming Architecture
 * Highly Performance-Friendly
-* Unlimited Configurable Asset Packs Inspired by Unreal Engine
+* Unlimited Configurable Asset-Packs Inspired by Unreal Engine
 * Comprehensive Built-In Libraries ft `namespace`, `class`, `table`, `math`, `string` and more!
 * Integrated File System
 * Integrated Timer and Threader (Including Async/Await, Heartbeats, Promises and more!)
@@ -26,10 +26,10 @@
 * Integrated Scalable Data System (Global and Entity Datas)
 * Integrated Library Command Line Interface (CLI)
 * Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
-* Extensible Asset Packs ft `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` by default!
-* Integrated Asset Encrypter (Supports only `tea` & `aes128` apparently)
+* Extensible Asset-Packs ft `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object` and `inventory` by default!
+* Integrated Asset Encrypter (Supports `tea` & `aes128` apparently)
 * Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
-* Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon`, and `object` asset packs)
+* Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon` and `object` asset-packs apparently)
 * Integrated Asset Shader-Map support
 * Integrated Asset Dependency
 * Integrated Asset Streamer
