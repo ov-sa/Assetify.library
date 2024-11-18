@@ -79,12 +79,12 @@ if localPlayer then
         return cShader
     end
 
-    function shader.public:createTex(shaderMaps, rwCache, encryptKey)
+    function shader.public:createTex(shaderMaps, rwCache, encryptOptions)
         if not shaderMaps or not rwCache then return false end
         rwCache.shader, rwCache.texture = {}, {}
         for i, j in imports.pairs(asset:buildShader(shaderMaps)) do
             if j then
-                rwCache.texture[i] = shader.public:loadTex(i, encryptKey)
+                rwCache.texture[i] = shader.public:loadTex(i, encryptOptions)
             end
         end
         return true
@@ -140,11 +140,11 @@ if localPlayer then
         return true
     end
 
-    function shader.public:loadTex(texturePath, encryptKey)
+    function shader.public:loadTex(texturePath, encryptOptions)
         if texturePath then
-            if encryptKey then
+            if encryptOptions then
                 local cTexturePath = texturePath..".tmp"
-                if file:write(cTexturePath, asset:readFile(texturePath, encryptKey)) then
+                if file:write(cTexturePath, asset:readFile(texturePath, encryptOptions)) then
                     local cTexture = imports.dxCreateTexture(cTexturePath, "dxt5", true)
                     file:delete(cTexturePath)
                     return cTexture
@@ -156,7 +156,7 @@ if localPlayer then
         return false
     end
 
-    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, encryptKey, shaderPriority, shaderDistance, isStandalone, isInternal)
+    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, shaderPriority, shaderDistance, isStandalone, isInternal)
         if not shader.public:isInstance(self) then return false end
         if not shaderCategory or not shaderName or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
         element = ((element and imports.isElement(element)) and element) or false

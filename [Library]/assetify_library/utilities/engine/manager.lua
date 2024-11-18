@@ -125,9 +125,9 @@ end
 if localPlayer then
     function manager.private:createDep(cAsset)
         if not cAsset then return false end
-        shader:createTex(cAsset.manifestData.shaderMaps, cAsset.unSynced.rwCache.map, cAsset.manifestData.encryptKey)
-        asset:createReplacement(cAsset.manifestData.assetReplacements, cAsset.unSynced.rwCache.replace, cAsset.manifestData.encryptKey)
-        asset:createDep(cAsset.manifestData.assetDeps, cAsset.unSynced.rwCache.dep, cAsset.manifestData.encryptKey)
+        shader:createTex(cAsset.manifestData.shaderMaps, cAsset.unSynced.rwCache.map, cAsset.manifestData.encryptOptions)
+        asset:createReplacement(cAsset.manifestData.assetReplacements, cAsset.unSynced.rwCache.replace, cAsset.manifestData.encryptOptions)
+        asset:createDep(cAsset.manifestData.assetDeps, cAsset.unSynced.rwCache.dep, cAsset.manifestData.encryptOptions)
         if cAsset.manifestData.shaderMaps and cAsset.manifestData.shaderMaps.control then
             for i, j in imports.pairs(cAsset.manifestData.shaderMaps.control) do
                 local shaderTextures, shaderInputs = {}, {}
@@ -144,7 +144,7 @@ if localPlayer then
                         end
                     end
                 end
-                shader:create(nil, "Assetify | Control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unSynced.rwCache.map, j, cAsset.manifestData.encryptKey, _, _, _, syncer.librarySerial)
+                shader:create(nil, "Assetify | Control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unSynced.rwCache.map, j, _, _, _, syncer.librarySerial)
             end
         end
         return true
@@ -205,8 +205,7 @@ if localPlayer then
         local unSynced = cAsset.unSynced
         if not manager.public:isInternal(isInternal) then
             cAsset = table.clone(cAsset, true)
-            cAsset.manifestData.encryptKey = nil
-            cAsset.manifestData.encryptIV = nil
+            cAsset.manifestData.encryptOptions = nil
             cAsset.unSynced = nil
         end
         if cAsset.manifestData.assetClumps or (assetType == "module") or (assetType == "animation") or (assetType == "sound") or (assetType == "scene") then
@@ -251,9 +250,9 @@ if localPlayer then
                 end
             end
         elseif assetType == "scene" then
-            local sceneIPLDatas = scene:parseIPL(asset:readFile(assetPath..asset.references.scene..".ipl", cAsset.manifestData.encryptKey), cAsset.manifestData.sceneNativeObjects)
+            local sceneIPLDatas = scene:parseIPL(asset:readFile(assetPath..asset.references.scene..".ipl", cAsset.manifestData.encryptOptions), cAsset.manifestData.sceneNativeObjects)
             if sceneIPLDatas then
-                local sceneIDEDatas = scene:parseIDE(asset:readFile(assetPath..asset.references.scene..".ide", cAsset.manifestData.encryptKey))
+                local sceneIDEDatas = scene:parseIDE(asset:readFile(assetPath..asset.references.scene..".ide", cAsset.manifestData.encryptOptions))
                 for i = 1, table.length(sceneIPLDatas), 1 do
                     local j = sceneIPLDatas[i]
                     local sceneData = {
@@ -351,12 +350,8 @@ else
         local cAsset = settings.assetPacks[assetType].assetPack.rwDatas[assetName]
         if not cAsset then return false end
         if not manager.public:isInternal(isInternal) then
-            cAsset = cAsset.synced
-            if cAsset.manifestData.encryptKey then
-                cAsset = table.clone(cAsset, true)
-                cAsset.manifestData.encryptKey = nil
-                cAsset.manifestData.encryptIV = nil
-            end
+            cAsset = table.clone(cAsset.synced, true)
+            cAsset.manifestData.encryptOptions = nil
         end
         return cAsset, false
     end
