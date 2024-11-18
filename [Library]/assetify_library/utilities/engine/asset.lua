@@ -83,7 +83,7 @@ function asset.public:readFile(filePath, encryptOptions, ...)
     if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
     local rw = file:read(filePath)
     if not rw then return false end
-    return (not encryptOptions and rw) or string.decode(rw, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[imports.sha256(filePath)], "base64")}, ...) or false
+    return (not encryptOptions and rw) or string.decode(rw, encryptOptions.mode, {key = encryptOptions.key, iv = (encryptOptions.iv and string.decode(encryptOptions.iv[imports.sha256(filePath)], "base64")) or nil}, ...) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
