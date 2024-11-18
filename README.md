@@ -19,15 +19,15 @@
 * Modular Programming Architecture
 * Highly Performance-Friendly
 * Unlimited Configurable Asset Packs Inspired by Unreal Engine
-* Comprehensive Built-In Libraries featuring `namespace`, `class`, `table`, `math`, `string` and more!
+* Comprehensive Built-In Libraries ft `namespace`, `class`, `table`, `math`, `string` and more!
 * Integrated File System
 * Integrated Timer and Threader (Including Async/Await, Heartbeats, Promises and more!)
 * Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
 * Integrated Scalable Data System (Global and Entity Datas)
 * Integrated Library Command Line Interface (CLI)
 * Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
-* Extensible Asset Packs featuring `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` by default!
-* Integrated Asset Encrypter (Supports only `tea`, `aes128` apparently)
+* Extensible Asset Packs ft `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` by default!
+* Integrated Asset Encrypter (Supports only `tea` & `aes128` apparently)
 * Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
 * Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon`, and `object` asset packs)
 * Integrated Asset Shader-Map support
@@ -35,7 +35,7 @@
 * Integrated Asset Streamer
 * Integrated Dummy System
 * Integrated Bone Attachments
-* Integrated IPL & IDE support for `scene`(s) featuring abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions—simply drag and drop!)
+* Integrated IPL & IDE support for `scene`(s) ft abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions—simply drag and drop!)
 * Integrated functionality to replace native models (Eliminating the need for third-party mod loaders!)
 * Comprehensive Control & Bump Mapping support
 * Essential Integration APIs
