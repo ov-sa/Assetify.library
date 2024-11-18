@@ -9,43 +9,35 @@
 
 **Frustrated with replacing objects?** Assetify.library streamlines the process by utilizing an asset-pack method, allowing you to load your assets seamlessly without altering the default ones. 
 
-**Creating a fully custom map?** This library is designed precisely for that purpose! It provides unlimited support for various asset categories, including `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` Asset-Packs, in addition to custom graphics.
+**Creating a fully custom map?** This library is designed precisely for that purpose! It provides unlimited support for various asset categories, including `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` asset-packs, in addition to custom graphics.
 
 ## ━ Features
 
 💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovstudio) **US TO SUPPORT THE DEVELOPMENT.**
 
-* Completely Open-Source
-* Modular Programming
-* Completely Performance-Friendly
-* Gamemode Perspective
-* UE inspired Unlimited & Configurable Asset Packs
-* Built-In Namespacer (Inclusive of `Class` simulator)
-* Built-In Table, Math, String library
-* Built-In File System
-* Built-In Timer & Threader (Threads, Async/Await, Heartbeats, Promises & much more!)
-* Built-In Networker, Scheduler, Renderer & Attacher
-* Built-In Library CLI
-* Built-In Library Updater (If enabled, Latest version will be pulled automatically and be replaced)
-* Built-In Asset-Pack & Resource Downloader & Broadcaster (No more `meta.xml` boredom!)
-* Built-In Asset-Pack Cache (Only modified assets are re-downloaded!)
-* Built-In Asset-Pack Synchronization (via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver))
-* Built-In Asset-Pack Encryption (Configurable key)
-* Built-In Asset-Pack Clumper (Supports only `character`, `vehicle`, `weapon`, `object` asset-packs)
-* Built-In Asset-Pack Dependency Broadcaster
-* Built-In Control & Bump Mapping
-* Built-In Global & Entity Data Syncer
-* Built-In Asset-Pack Streamer
-* Built-In LOD Streamer (Integrated w/ Assetify's Streamer)
-* Built-In Bone Attacher (Integrated w/ Assetify's Streamer)
-* Built-In Dummy Creator (Integrated w/ Assetify's Streamer)
-* Built-In Custom Lights (Integrated w/ Assetify's Streamer)
-* Built-In Model Clearer & Restorer
-* Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
-* Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
-* Supports Scene Instancing, IDE, Dimension, Interior, Offsets (Useful for mass movement!) & Native-Objects (Combine native objects w/ your custom ones!)
-* Supports `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` Asset-Packs
-* Necessary Integration APIs
+* Fully Open-Source
+* Modular Programming Architecture
+* Highly Performance-Friendly
+* Unlimited Configurable Asset Packs Inspired by Unreal Engine
+* Comprehensive Built-In Libraries for `namespace`, `class`, `table`, `math`, `string` and more!
+* Integrated File System
+* Integrated Timer and Threader (Includes, Async/Await, Heartbeats, Promises, and more!)
+* Integrated Data System (Global and Entity Datas)
+* Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
+* Integrated Library Command Line Interface (CLI)
+* Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
+* Extensible Asset Packs featuring `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` by default!
+* Integrated Asset Encrypter (`tea`, `aes128`)
+* Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
+* Integrated Asset Clumping (Supports only `character`, `vehicle`, `weapon`, and `object` asset packs)
+* Integrated Asset Dependency
+* Integrated Asset Streamer
+* Integrated Dummy System
+* Integrated Bone Attachments
+* Integrated IPL & IDE support for `scene`(s) featuring abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions—simply drag and drop!)
+* Shader Maps Support for Asset Packs
+* Comprehensive Control & Bump Mapping support
+* Essential Integration APIs
 
 ## ━ Contents
 
