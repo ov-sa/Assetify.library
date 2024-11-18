@@ -9,7 +9,7 @@
 
 **Frustrated with replacing objects?** Assetify.library streamlines the process by utilizing an asset-pack method, allowing you to load your assets seamlessly without altering the default ones. 
 
-**Creating a fully custom map?** This library is designed precisely for that purpose! It provides unlimited support for various asset categories, including `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` asset-packs, in addition to custom graphics.
+**Looking to create a fully custom map?** This library is specifically designed for that purpose! It offers extensive support for a wide range of asset categories, including `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` asset packs, as well as custom graphics!
 
 ## ━ Features
 
@@ -19,23 +19,24 @@
 * Modular Programming Architecture
 * Highly Performance-Friendly
 * Unlimited Configurable Asset Packs Inspired by Unreal Engine
-* Comprehensive Built-In Libraries for `namespace`, `class`, `table`, `math`, `string` and more!
+* Comprehensive Built-In Libraries featuring `namespace`, `class`, `table`, `math`, `string` and more!
 * Integrated File System
-* Integrated Timer and Threader (Includes, Async/Await, Heartbeats, Promises, and more!)
-* Integrated Data System (Global and Entity Datas)
+* Integrated Timer and Threader (Including Async/Await, Heartbeats, Promises and more!)
 * Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
+* Integrated Scalable Data System (Global and Entity Datas)
 * Integrated Library Command Line Interface (CLI)
 * Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
 * Extensible Asset Packs featuring `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` by default!
-* Integrated Asset Encrypter (`tea`, `aes128`)
+* Integrated Asset Encrypter (Supports only `tea`, `aes128` apparently)
 * Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
-* Integrated Asset Clumping (Supports only `character`, `vehicle`, `weapon`, and `object` asset packs)
+* Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon`, and `object` asset packs)
+* Integrated Asset Shader-Map support
 * Integrated Asset Dependency
 * Integrated Asset Streamer
 * Integrated Dummy System
 * Integrated Bone Attachments
 * Integrated IPL & IDE support for `scene`(s) featuring abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions—simply drag and drop!)
-* Shader Maps Support for Asset Packs
+* Integrated functionality to replace native models (Eliminating the need for third-party mod loaders!)
 * Comprehensive Control & Bump Mapping support
 * Essential Integration APIs
 
