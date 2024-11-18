@@ -45,7 +45,7 @@
 * Supports IPL Map format (No more annoying janky conversions; Just drag & drop it!)
 * Supports Shader-Maps for Asset-Packs (As easy as modifying the config!)
 * Supports Scene Instancing, IDE, Dimension, Interior, Offsets (Useful for mass movement!) & Native-Objects (Combine native objects w/ your custom ones!)
-* Supports `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object`, `Inventory`, `Loot` Asset-Packs
+* Supports `Module`, `Animation`, `Sound`, `Scene`, `Character`, `Vehicle`, `Weapon`, `Object` and `Inventory` Asset-Packs
 * Necessary Integration APIs
 
 ## ━ Contents
