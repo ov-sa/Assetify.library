@@ -98,36 +98,38 @@ function vcl.private.parseNumber(parser, buffer, rw)
 end
 
 function vcl.private.parseString(parser, buffer, rw)
-    if not parser.type or (parser.type == "string") then
-        if (not parser.isTypeString and vcl.private.types.string[rw]) or parser.isTypeString then
-            if not parser.type then parser.isValueSkipAppend, parser.type, parser.isTypeString = true, "string", rw
-            elseif not parser.isTypeParsed and (rw == parser.isTypeString) then
-                if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-                    parser.ref, parser.value, parser.type, parser.isTypeString, parser.isValueSkipAppend = parser.ref - string.len(parser.value) - 1, "", "object", nil, true
-                elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
-                else
-                    parser.isTypeParsed, parser.isValueSkipAppend = true, true
-                    if vcl.private.types.string[rw] and (imports.type(vcl.private.types.string[rw]) == "table") and vcl.private.types.string[rw] then
-                        local parseIndex = {string.find(parser.value, vcl.private.types.string[rw][1])}
-                        local queryValue = string.sub(parser.value, 0, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
-                        while(parseIndex[1]) do
-                            parseIndex[2] = string.find(parser.value, vcl.private.types.string[rw][2], parseIndex[1])
-                            if not parseIndex[2] then return false end
-                            local parseIndex = parseIndex[2] + 1
-                            local templateIndex, templateValue = string.split(string.sub(parser.value, parseIndex[1] + 2, parseIndex[2] - 1), "["..vcl.private.types.index.."]"), parser.root
-                            for i = 1, #templateIndex, 1 do
-                                local j = templateIndex[i]
-                                if (imports.type(templateValue) == "table") and (templateValue[j] ~= nil) then templateValue = templateValue[j]
-                                else
-                                    templateValue = nil
-                                    break
-                                end
+    if not parser.type and vcl.private.types.string[rw] then
+        parser.type, parser.isValueSkipAppend = "string", true
+        local matchIndex = string.find(buffer, rw, parser.ref + 1)
+        if not matchIndex or (vcl.private.fetchLine(string.sub(buffer, 0, parser.ref)) ~= vcl.private.fetchLine(string.sub(buffer, 0, matchIndex))) then return false end
+        parser.value = string.sub(buffer, parser.ref + 1, matchIndex - 1)
+        parser.ref = matchIndex
+        if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
+            parser.ref, parser.value, parser.type = parser.ref - string.len(parser.value) - 2, "", "object"
+        elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
+        else
+            parser.isTypeParsed = true
+            for i, j in pairs(vcl.private.types.string) do
+                if type(j) == "table" then
+                    local parseIndex = {string.find(parser.value, j[1])}
+                    local queryValue = string.sub(parser.value, 0, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
+                    while(parseIndex[1]) do
+                        parseIndex[2] = string.find(parser.value, j[2], parseIndex[1])
+                        if not parseIndex[2] then return false end
+                        local matchIndex = parseIndex[2] + 1
+                        local templateIndex, templateValue = string.split(string.sub(parser.value, parseIndex[1] + 2, parseIndex[2] - 1), "["..vcl.private.types.index.."]"), parser.root
+                        for i = 1, #templateIndex, 1 do
+                            local j = templateIndex[i]
+                            if (imports.type(templateValue) == "table") and (templateValue[j] ~= nil) then templateValue = templateValue[j]
+                            else
+                                templateValue = nil
+                                break
                             end
-                            parseIndex[1] = string.find(parser.value, vcl.private.types.string[rw][1], parseIndex[2])
-                            queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, parseIndex, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
                         end
-                        parser.value = queryValue
+                        parseIndex[1] = string.find(parser.value, j[1], parseIndex[2])
+                        queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, matchIndex, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
                     end
+                    parser.value = queryValue
                 end
             end
         end
@@ -236,8 +238,11 @@ function vcl.private.encode(buffer, root, padding)
             table.insert(((rwType == "number") and query.static.numeric) or query.static.string, {i, j})
         end
     end
-    local count_static, count_nested = table.length(query.static.numeric) + table.length(query.static.string), table.length(query.numeric) + table.length(query.string)
-    if (count_static > 0) or (count_nested > 0) then
+    local count = {
+        static = table.length(query.static.numeric) + table.length(query.static.string),
+        nested = table.length(query.numeric) + table.length(query.string)
+    }
+    if (count.static > 0) or (count.nested > 0) then
         table.sort(query.static.numeric, function(a, b) return a[1] < b[1] end)
         table.sort(query.numeric, function(a, b) return a < b end)
         for i = 1, table.length(query.static.numeric), 1 do
@@ -247,7 +252,7 @@ function vcl.private.encode(buffer, root, padding)
         for i = 1, table.length(query.numeric), 1 do
             local j = query.numeric[i]
             local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
-            if not value then count_nested = count_nested - 1
+            if not value then count.nested = count.nested - 1
             else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..value end
         end
         for i = 1, table.length(query.static.string), 1 do
@@ -257,12 +262,12 @@ function vcl.private.encode(buffer, root, padding)
         for i = 1, table.length(query.string), 1 do
             local j = query.string[i]
             local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
-            if not value then count_nested = count_nested - 1
+            if not value then count.nested = count.nested - 1
             else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
     end
     result = (not root and string.match(result, "^\n*(.*)")) or result
-    return (((count_static > 0) or (count_nested > 0)) and result) or false
+    return (((count.static > 0) or (count.nested > 0)) and result) or false
 end
 function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
 

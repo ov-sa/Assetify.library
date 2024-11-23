@@ -164,6 +164,7 @@ function table.public.remove(baseTable, index)
     baseTable.__T = baseTable.__T or {}
     baseTable.__T.length = table.public.length(baseTable)
     if (index <= 0) or (index > baseTable.__T.length) then return false end
+    local value = baseTable[index]
     baseTable[index] = nil
     if index < baseTable.__T.length then
         for i = index + 1, baseTable.__T.length, 1 do
@@ -172,7 +173,7 @@ function table.public.remove(baseTable, index)
         end
     end
     baseTable.__T.length = baseTable.__T.length - 1
-    return true
+    return value
 end
 
 function table.public.forEach(baseTable, exec)
