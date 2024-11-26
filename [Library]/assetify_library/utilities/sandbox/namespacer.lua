@@ -33,24 +33,24 @@ class = {}
 class.__index = class
 local namespace = nil
 
-function class:create(type, parent, nspace)
+function class:create(name, parent, nspace)
     if self ~= class then return false end
-    if not type or (imports.type(type) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) or buffer.types[type] then return false end
+    if not name or (imports.type(name) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) or buffer.types[name] then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
     if nspace and not namespace.private.types[nspace] then return false end
     parent = parent or {}
     parent.__index = parent
     if nspace then
-        namespace.private.types[nspace].public[type] = parent
+        namespace.private.types[nspace].public[name] = parent
         namespace.private.classes[nspace] = parent
     else
-        _G[type] = parent
+        _G[name] = parent
     end
-    buffer.types[type] = true
-    buffer.parents[parent], buffer.instances[parent] = {}, {type = type, nspace = nspace, public = parent, private = imports.setmetatable({}, {__index = parent})}
-    function parent:getType()
+    buffer.types[name] = true
+    buffer.parents[parent], buffer.instances[parent] = {}, {name = name, nspace = nspace, public = parent, private = imports.setmetatable({}, {__index = parent})}
+    function parent:getName()
         if not self or not buffer.instances[self] then return false end
-        return (buffer.parents[self] and buffer.instances[self].type) or (buffer.instances[(buffer.instances[self])].type) or false
+        return (buffer.parents[self] and buffer.instances[self].name) or (buffer.instances[(buffer.instances[self])].name) or false
     end
     function parent:isInstance(instance)
         if (self ~= parent) or not buffer.parents[parent] then return false end
@@ -80,17 +80,17 @@ function class:destroy(instance)
             i:destroyInstance()
         end
     end
-    local type, nspace = buffer.instances[instance].type, buffer.instances[instance].nspace
+    local name, nspace = buffer.instances[instance].name, buffer.instances[instance].nspace
     if buffer.instances[instance].nspace then
-        if namespace.private.types[nspace] and namespace.private.types[nspace][type] and (namespace.private.types[nspace][type] == buffer.instances[instance].public) then
-            namespace.private.types[nspace][type] = nil
+        if namespace.private.types[nspace] and namespace.private.types[nspace][name] and (namespace.private.types[nspace][name] == buffer.instances[instance].public) then
+            namespace.private.types[nspace][name] = nil
         end
     else
-        if _G[type] and (_G[type] == buffer.instances[instance].public) then
-            _G[type] = nil
+        if _G[name] and (_G[name] == buffer.instances[instance].public) then
+            _G[name] = nil
         end
     end
-    buffer.types[type] = nil
+    buffer.types[name] = nil
     buffer.instances[instance], buffer.parents[instance] = nil, nil
     instance = nil
     imports.collectgarbage()
@@ -106,29 +106,29 @@ namespace = class:create("namespace")
 namespace.private.types = {}
 namespace.private.classes = {}
 
-function namespace.public:create(type, parent)
+function namespace.public:create(name, parent)
     if (self ~= namespace.public) and (self ~= namespace.private) or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) then return false end
-    if not type or (imports.type(type) ~= "string") or namespace.private.types[type] then return false end
+    if not name or (imports.type(name) ~= "string") or namespace.private.types[name] then return false end
     local parent = parent or {}
-    _G[type] = parent
+    _G[name] = parent
     local cNamespace = self:createInstance()
-    namespace.private.classes[type] = {}
-    namespace.private.types[type] = {instance = cNamespace, public = parent, private = imports.setmetatable({}, {__index = parent})}
-    return {public = namespace.private.types[type].public, private = namespace.private.types[type].private}
+    namespace.private.classes[name] = {}
+    namespace.private.types[name] = {instance = cNamespace, public = parent, private = imports.setmetatable({}, {__index = parent})}
+    return {public = namespace.private.types[name].public, private = namespace.private.types[name].private}
 end
 
-function namespace.public:destroy(type)
+function namespace.public:destroy(name)
     if (self ~= namespace.public) and (self ~= namespace.private) then return false end
-    if not type or (imports.type(type) ~= "string") or not namespace.private.types[type] then return false end
-    if _G[type] and (_G[type] == namespace.private.types[type].public) then
-        _G[type] = nil
+    if not name or (imports.type(name) ~= "string") or not namespace.private.types[name] then return false end
+    if _G[name] and (_G[name] == namespace.private.types[name].public) then
+        _G[name] = nil
     end
-    for i, j in imports.pairs(namespace.private.classes[type]) do
+    for i, j in imports.pairs(namespace.private.classes[name]) do
         if i then
             class:destroy(i)
         end
     end
-    namespace.private.types[type].instance:destroyInstance()
-    namespace.private.types[type], namespace.private.classes[type] = nil, nil
+    namespace.private.types[name].instance:destroyInstance()
+    namespace.private.types[name], namespace.private.classes[name] = nil, nil
     return true
 end
