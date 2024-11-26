@@ -113,7 +113,7 @@ namespace.private.buffer = {}
 function namespace.public:create(name, parent)
     if ((self ~= namespace.public) and (self ~= namespace.private)) or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) then return false end
     if not name or (imports.type(name) ~= "string") or namespace.private.buffer[name] then return false end
-    local parent = parent or {}
+    parent = parent or {}
     _G[name] = parent
     local cNamespace = self:createInstance()
     namespace.private.buffer[name] = {
