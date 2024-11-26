@@ -27,8 +27,8 @@ local cli = class:create("cli")
 function cli.public:import() return cli end
 cli.private.validActions = {
     ["serial"] = true,
-    ["webserver"] = true,
     ["version"] = true,
+    ["webserver"] = true,
     ["update"] = true
 }
 
@@ -42,13 +42,13 @@ function cli.public:serial(isAction)
     return true
 end
 
-function cli.public:webserver(isAction)
-    imports.outputServerLog("Assetify: Webserver ━│  "..(manager.API.Library.fetchWebserver() or "N/A"))
+function cli.public:version(isAction)
+    imports.outputServerLog("Assetify: Version ━│  "..(syncer.libraryVersion or "N/A"))
     return true
 end
 
-function cli.public:version(isAction)
-    imports.outputServerLog("Assetify: Version ━│  "..(syncer.libraryVersion or "N/A"))
+function cli.public:webserver(isAction)
+    imports.outputServerLog("Assetify: Webserver ━│  "..(manager.API.Library.fetchWebserver() or "N/A"))
     return true
 end
 
