@@ -43,7 +43,7 @@ function cli.public:serial(isAction)
 end
 
 function cli.public:version(isAction)
-    imports.outputServerLog("Assetify: Version ━│  "..(syncer.libraryVersion or "N/A"))
+    imports.outputServerLog("Assetify: Version ━│  "..(manager.API.Library.fetchVersion() or "N/A"))
     return true
 end
 

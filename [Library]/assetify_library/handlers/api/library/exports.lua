@@ -21,6 +21,7 @@ manager:exportAPI("Library", {
         {name = "isResourceFlushed"},
         {name = "isResourceUnloaded"},
         {name = "getLibrarySerial", API = "fetchSerial"},
+        {name = "getLibraryVersion", API = "fetchVersion"},
         {name = "getLibraryWebserver", API = "fetchWebserver"},
         {name = "getLibraryAssets", API = "fetchAssets"},
         {name = "getAssetData"},

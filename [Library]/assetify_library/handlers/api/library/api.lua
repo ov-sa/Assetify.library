@@ -40,6 +40,10 @@ function manager.API.Library.fetchSerial()
     return syncer.librarySerial
 end
 
+function manager.API.Library.fetchVersion()
+    return syncer.libraryVersion
+end
+
 function manager.API.Library.fetchWebserver()
     return syncer.libraryWebserver
 end
