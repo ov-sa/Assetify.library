@@ -156,7 +156,7 @@ if localPlayer then
         asset.clearAssetBuffer(cAsset.unSynced.rwCache.replace)
         asset.clearAssetBuffer(cAsset.unSynced.rwCache.dep)
         cAsset.unSynced = nil
-        imports.collectgarbage()
+        imports.collectgarbage("collect")
         return true
     end
 

@@ -129,7 +129,7 @@ if localPlayer then
                 end
                 --TODO: RENAME APPROPRIATELY
                 network:emit("Assetify:Downloader:onSyncData", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
-                imports.collectgarbage()
+                imports.collectgarbage("collect")
                 self.cHeartbeat = nil
             end, settings.downloader.buildRate)
         end):resume({executions = settings.downloader.buildRate, frames = 1})

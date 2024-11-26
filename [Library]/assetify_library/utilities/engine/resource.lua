@@ -69,7 +69,7 @@ function resource.public:unload(isFlush)
             resource.private.buffer.name[(self.name)] = nil
             resource.private.buffer.source[(self.resource)] = nil
             self:destroyInstance()
-            imports.collectgarbage()
+            imports.collectgarbage("collect")
         end, 1, 1)
     end
     return true
