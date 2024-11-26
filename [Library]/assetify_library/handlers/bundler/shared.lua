@@ -57,6 +57,7 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.isResourceLoaded", exportName = "isResourceLoaded"},
             {exportIndex = "assetify.__core.isResourceFlushed", exportName = "isResourceFlushed"},
             {exportIndex = "assetify.__core.isResourceUnloaded", exportName = "isResourceUnloaded"},
+            {exportIndex = "assetify.__core.getWebserver", exportName = "getLibraryWebserver"},
             {exportIndex = "assetify.__core.getAssets", exportName = "getLibraryAssets"},
             {exportIndex = "assetify.__core.getAsset", exportName = "getAssetData"},
             {exportIndex = "assetify.__core.getAssetDep", exportName = "getAssetDep"},
