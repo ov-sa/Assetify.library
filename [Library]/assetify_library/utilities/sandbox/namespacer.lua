@@ -25,7 +25,7 @@ local imports = {
 ----------------------
 
 local buffer = {
-    types = {},
+    global = {},
     parents = {},
     instances = {}
 }
@@ -35,18 +35,18 @@ local namespace = nil
 
 function class:create(name, parent, nspace)
     if self ~= class then return false end
-    if not name or (imports.type(name) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) or buffer.types[name] then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
-    if nspace and not namespace.private.buffer[nspace] then return false end
+    if not name or (imports.type(name) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instances[parent])) then return false end
+    if (nspace and (not namespace.private.buffer[nspace] or namespace.private.buffer[nspace].class[name])) or buffer.global[name] then return false end
     parent = parent or {}
     parent.__index = parent
     if nspace then
         namespace.private.buffer[nspace].public[name] = parent
         namespace.private.buffer[nspace].class[name] = parent
     else
+        buffer.global[name] = true
         _G[name] = parent
     end
-    buffer.types[name] = true
     buffer.parents[parent], buffer.instances[parent] = {}, {
         name = name,
         nspace = nspace,
@@ -95,7 +95,7 @@ function class:destroy(instance)
             _G[name] = nil
         end
     end
-    buffer.types[name] = nil
+    buffer.global[name] = nil
     buffer.instances[instance], buffer.parents[instance] = nil, nil
     instance = nil
     imports.collectgarbage()
