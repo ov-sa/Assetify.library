@@ -26,7 +26,8 @@ local imports = {
 local cli = class:create("cli")
 function cli.public:import() return cli end
 cli.private.validActions = {
-    ["uid"] = true,
+    ["serial"] = true,
+    ["webserver"] = true,
     ["version"] = true,
     ["update"] = true
 }
@@ -36,8 +37,13 @@ cli.private.validActions = {
 --[[ CLI: Handlers ]]--
 -----------------------
 
-function cli.public:uid(isAction)
-    imports.outputServerLog("Assetify: UID ━│  "..syncer.librarySerial)
+function cli.public:serial(isAction)
+    imports.outputServerLog("Assetify: Serial ━│  "..(manager.API.Library.fetchSerial() or "N/A"))
+    return true
+end
+
+function cli.public:webserver(isAction)
+    imports.outputServerLog("Assetify: Webserver ━│  "..(manager.API.Library.fetchWebserver() or "N/A"))
     return true
 end
 

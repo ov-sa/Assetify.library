@@ -36,6 +36,10 @@ function manager.API.Library.isResourceUnloaded()
     return resource.isResourceUnloaded()
 end
 
+function manager.API.Library.fetchSerial()
+    return syncer.librarySerial
+end
+
 function manager.API.Library.fetchWebserver()
     return syncer.libraryWebserver
 end
