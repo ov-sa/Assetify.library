@@ -37,11 +37,11 @@ function class:create(name, parent, nspace)
     if self ~= class then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
     if not name or (imports.type(name) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instance[parent])) then return false end
-    if (nspace and (not namespace.private.buffer[nspace] or namespace.private.buffer[nspace].clss[name])) or buffer.global[name] then return false end
+    if (nspace and (not namespace.private.buffer[nspace] or namespace.private.buffer[nspace].global[name])) or buffer.global[name] then return false end
     parent = parent or {}
     parent.__index = parent
     if nspace then
-        namespace.private.buffer[nspace].clss[name] = parent
+        namespace.private.buffer[nspace].global[name] = parent
         namespace.private.buffer[nspace].public[name] = parent
     else
         buffer.global[name] = true
@@ -87,7 +87,7 @@ function class:destroy(instance)
     end
     local name, nspace = buffer.instance[instance].name, buffer.instance[instance].nspace
     if nspace then
-        namespace.private.buffer[nspace].clss[name] = nil
+        namespace.private.buffer[nspace].global[name] = nil
         if namespace.private.buffer[nspace] and namespace.private.buffer[nspace].public[name] and (namespace.private.buffer[nspace].public[name] == buffer.instance[instance].public) then
             namespace.private.buffer[nspace].public[name] = nil
         end
@@ -119,7 +119,7 @@ function namespace.public:create(name, parent)
     local cNamespace = self:createInstance()
     namespace.private.buffer[name] = {
         instance = cNamespace,
-        clss = {},
+        global = {},
         public = parent,
         private = imports.setmetatable({}, {__index = parent})
     }
@@ -132,7 +132,7 @@ function namespace.public:destroy(name)
     if _G[name] and (_G[name] == namespace.private.buffer[name].public) then
         _G[name] = nil
     end
-    for i, j in imports.pairs(namespace.private.buffer[name].clss) do
+    for i, j in imports.pairs(namespace.private.buffer[name].global) do
         if j then
             class:destroy(j)
         end
