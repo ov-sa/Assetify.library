@@ -37,7 +37,7 @@ function class:create(name, parent, nspace)
     if self ~= class then return false end
     nspace = (nspace and (imports.type(nspace) == "string") and nspace) or false
     if not name or (imports.type(name) ~= "string") or (parent and ((imports.type(parent) ~= "table") or buffer.instance[parent])) then return false end
-    if (nspace and (not namespace.private.buffer[nspace] or namespace.private.buffer[nspace].global[name])) or buffer.global[name] then return false end
+    if (not nspace and buffer.global[name]) or (nspace and (not namespace.private.buffer[nspace] or namespace.private.buffer[nspace].global[name])) then return false end
     parent = parent or {}
     parent.__index = parent
     if nspace then
