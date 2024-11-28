@@ -243,7 +243,7 @@ function vcl.private.encode(buffer, root, padding)
     }
     if (count.static > 0) or (count.nested > 0) then
         table.sort(query.static.numeric, function(a, b) return a[1] < b[1] end)
-        table.sort(query.numeric, function(a, b) return a < b end)
+        table.sort(query.numeric, function(a, b) return a[1] < b[1] end)
         for i = 1, table.length(query.static.numeric), 1 do
             local j = query.static.numeric[i]
             result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..vcl.private.types.space..imports.tostring(j[2])
