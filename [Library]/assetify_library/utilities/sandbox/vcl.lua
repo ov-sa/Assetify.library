@@ -265,8 +265,11 @@ function vcl.private.encode(buffer, root, padding)
             else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
     end
-    result = (not root and string.match(result, "^\n*(.*)")) or result
-    return (((count.static > 0) or (count.nested > 0)) and result) or false
+    if not root then
+        if (count.static + count.nested) <= 0 then return result
+        else result = string.match(result, "^\n*(.*)") or result end
+    end
+    return (((count.static + count.nested) > 0) and result) or false
 end
 function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
 
