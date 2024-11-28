@@ -228,12 +228,11 @@ function vcl.private.encode(buffer, root, padding)
     local query, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
     for i, j in imports.pairs(buffer) do
         local rwType = imports.type(i)
+        if rwType == "number" then i = vcl.private.types.list..imports.tostring(i)
+        else i = "\""..i.."\"" end
         if imports.type(j) == "table" then
-            i = "\""..i.."\""
             table.insert(((rwType == "number") and query.numeric) or query.string, {i, j})
         else
-            if rwType == "number" then i = "-"..imports.tostring(i)
-            else i = "\""..i.."\"" end
             if imports.type(j) == "string" then j = "\""..j.."\"" end
             table.insert(((rwType == "number") and query.static.numeric) or query.static.string, {i, j})
         end
@@ -253,7 +252,7 @@ function vcl.private.encode(buffer, root, padding)
             local j = query.numeric[i]
             local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
             if not value then count.nested = count.nested - 1
-            else result = result..vcl.private.types.newline..padding..vcl.private.types.list..j[1]..vcl.private.types.init..value end
+            else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
         for i = 1, table.length(query.static.string), 1 do
             local j = query.static.string[i]
