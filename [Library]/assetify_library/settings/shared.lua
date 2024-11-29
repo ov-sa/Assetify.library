@@ -28,10 +28,10 @@ settings = {
         appID = "1311797731932766248",
         logo = {asset = "logo", tooltip = "ᴏᴠ ━ ꜱᴛᴜᴅɪᴏ"},
         minAge = 3,
-        details = "author: ᴏᴠ ━ ꜱᴛᴜᴅɪᴏ",
+        details = "author: ovstudio",
         trackRate = 30*1000,
         buttons = {
-            {name = "Download", url = "https://github.com/ov-sa/Assetify.library/releases/tag/v.8.2.7"},
+            {name = "Download", url = "https://github.com/ov-sa/Assetify.library/releases/latest"},
             {name = "Donate", url = "https://ko-fi.com/ovstudio"}
         }
     },
