@@ -12,7 +12,6 @@
 --[[ Settings ]]--
 ------------------
 
-settings.library.serial = false
 settings.assetPacks = {
     ["module"] = {
         autoLoad = true
