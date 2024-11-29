@@ -26,10 +26,10 @@ settings = {
 
     discord = {
         appID = "1311797731932766248",
-        minAge = 3,
-        trackRate = 30*1000,
         logo = {asset = "logo", tooltip = "ᴏᴠ ━ ꜱᴛᴜᴅɪᴏ"},
+        minAge = 3,
         details = "version: 8.2.7",
+        trackRate = 30*1000,
         buttons = {
             {name = "Download Build", url = "https://github.com/ov-sa/Assetify.library/releases/tag/v.8.2.7"},
             {name = "Donate", url = "https://ko-fi.com/ovstudio"}
