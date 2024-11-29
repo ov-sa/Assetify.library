@@ -31,7 +31,6 @@ function rest.public:get(route, timeout, headers, credentials)
     timeout = math.max(imports.tonumber(timeout) or 10000, 1)
     local cPromise = thread:createPromise()
     imports.fetchRemote(route, {queueName = "assetify_library", connectionAttempts = 1, connectTimeout = timeout, method = "GET", headers = headers, username = (credentials and credentials.username) or nil, password = (credentials and credentials.password) or nil}, function(result, status)
-        print(result, status.success)
         if status.success then cPromise.resolve(result)
         else cPromise.reject(false, status.statusCode) end
     end)

@@ -38,6 +38,7 @@
     <script src="utilities/sandbox/rest.lua" type="shared"/>
     <script src="utilities/engine/syncer.lua" type="shared"/>
     <script src="utilities/sandbox/datasystem.lua" type="shared"/>
+    <script src="utilities/sandbox/discord.lua" type="shared"/>
 
     <!-- Utilities: Shaders -->
     <script src="utilities/shaders/index.lua" type="client"/>
