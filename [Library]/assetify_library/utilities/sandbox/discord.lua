@@ -41,7 +41,6 @@ end
 if localPlayer then
     if settings.discord and settings.discord.appID then
         thread:createHeartbeat(function()
-            imports.resetDiscordRichPresenceData()
             local userID = settings.discord.userID
             settings.discord.userID = false
             imports.setDiscordApplicationID(settings.discord.appID)
@@ -69,6 +68,8 @@ if localPlayer then
             end
             return true
         end, function() end, settings.discord.trackRate)
+    else
+        imports.resetDiscordRichPresenceData()
     end
 else
     network:create("Assetify:Discord:KickPlayer"):on(function(player, reason) kickPlayer(player, reason) end)
