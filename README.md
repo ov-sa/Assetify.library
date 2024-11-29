@@ -1,4 +1,4 @@
-# ━ S Y N O P S I S
+# » Synopsis
 
 ![](https://raw.githubusercontent.com/ov-studio/.github/main/profile/banner.png)
 
@@ -11,7 +11,7 @@
 
 **Looking to create a fully custom map?** This library is specifically designed for that purpose! It offers extensive support for a wide range of asset categories, including `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object`, and `inventory` asset-packs, as well as custom graphics!
 
-## ━ Features
+## » Features
 
 💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovstudio) **US TO SUPPORT THE DEVELOPMENT.**
 
@@ -65,7 +65,7 @@
 * Comprehensive Control & Bump Mapping support
 * Essential Integration APIs
 
-## ━ Contents
+## » Contents
 
 * [**Official Releases**](https://github.com/ov-sa/Assetify.library/releases)
 * [**Installation Guide**](https://github.com/ov-sa/Assetify.library/wiki)
