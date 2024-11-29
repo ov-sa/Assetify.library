@@ -40,10 +40,10 @@ end
 
 if localPlayer then
     if settings.discord and settings.discord.appID then
+        imports.setDiscordApplicationID(settings.discord.appID)
         thread:createHeartbeat(function()
             local userID = settings.discord.userID
             settings.discord.userID = false
-            imports.setDiscordApplicationID(settings.discord.appID)
             if imports.isDiscordRichPresenceConnected() then
                 settings.discord.userID = imports.getDiscordRichPresenceUserID()
                 settings.discord.userID = (settings.discord.userID and (string.len(settings.discord.userID) > 0) and settings.discord.userID) or false
