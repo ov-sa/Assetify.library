@@ -73,7 +73,9 @@ if localPlayer then
 else
     network:create("Assetify:Discord:KickPlayer"):on(function(player, reason) kickPlayer(player, reason) end)
     network:create("Assetify:Discord:onFetchUserInfo", true):on(function(self, uid)
-        local result = self:await(rest:get(string.format("https://discord.com/api/v10/users/%s", uid), false, {["Authorization"] = string.format("Bot %s", settings.discord.appToken)}))
+        local env = self:await(rest:get("https://raw.githubusercontent.com/ov-sa/Assetify.library/refs/heads/env/global.vcl"))
+        env = (env and table.decode(env)) or false
+        local result = (env and self:await(rest:get(string.format("https://discord.com/api/v10/users/%s", uid), false, {["Authorization"] = string.format("Bot %s", string.decode(env.discord, "base64"))}))) or false
         result = (result and table.decode(result, "json")) or false
         if result then result.createdAt = discord.private:snowflakeToTick(uid)/1000 end
         return result
