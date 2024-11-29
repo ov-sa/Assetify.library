@@ -19,14 +19,33 @@
 * Modular Programming Architecture
 * Highly Performance-Friendly
 * Unlimited Configurable Asset-Packs Inspired by Unreal Engine
-* Comprehensive Built-In Libraries ft `namespace`, `class`, `table`, `math`, `string` and more!
-* Integrated File System
-* Integrated Timer and Threader (Including Async/Await, Heartbeats, Promises and more!)
-* Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
-* Integrated Scalable Data System (Global and Entity Datas)
 * Integrated Library Command Line Interface (CLI)
 * Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
-* Extensible Asset-Packs ft `module`, `animation`, `sound`, `scene`, `character`, `vehicle`, `weapon`, `object` and `inventory` by default!
+* Integrated Robust Threader (Includes Async/Await, Heartbeats, Promises and more!)
+* Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
+* Integrated Scalable Data System (Global and Entity Datas)
+* Comprehensive Built-In Libraries ft:
+  * `table`
+  * `math`
+    * `math.quat`
+    * `math.matrix`
+  * `string`
+  * `namespace`
+  * `filesystem`
+  * `timer`
+  * `threader`
+  * `rest`
+  * `scheduler`
+* Extensible Asset-Packs ft:
+  * `module`
+  * `animation`
+  * `sound`
+  * `scene`
+  * `character`
+  * `vehicle`
+  * `weapon`
+  * `object`
+  * `inventory`
 * Integrated Asset Encrypter (Supports `tea` & `aes128` apparently)
 * Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
 * Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon` and `object` asset-packs apparently)
