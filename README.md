@@ -16,14 +16,25 @@
 💎**CONSIDER** [**SPONSORING**](https://ko-fi.com/ovstudio) **US TO SUPPORT THE DEVELOPMENT.**
 
 * Fully Open-Source
-* Modular Programming Architecture
 * Highly Performance-Friendly
-* Unlimited Configurable Asset-Packs Inspired by Unreal Engine
+* Modular Programming Architecture
 * Integrated Library Command Line Interface (CLI)
 * Automatic Library Updater (If enabled, the latest version will be downloaded and automatically replaced!)
-* Integrated Robust Threader (Includes Async/Await, Heartbeats, Promises and more!)
+* Integrated Robust Threader (Includes async/await, heartbeats, promises and much more!)
 * Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
-* Integrated Scalable Data System (Global and Entity Datas)
+* Integrated Scalable Global and Entity Data System
+* Integrated Asset Encrypter (Supports `tea` & `aes128` apparently)
+* Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
+* Extensible Asset-Packs ft:
+  * `module`
+  * `animation`
+  * `sound`
+  * `scene`
+  * `character`
+  * `vehicle`
+  * `weapon`
+  * `object`
+  * `inventory`
 * Comprehensive Built-In Libraries ft:
   * `table`
   * `math`
@@ -36,25 +47,13 @@
   * `threader`
   * `rest`
   * `scheduler`
-* Extensible Asset-Packs ft:
-  * `module`
-  * `animation`
-  * `sound`
-  * `scene`
-  * `character`
-  * `vehicle`
-  * `weapon`
-  * `object`
-  * `inventory`
-* Integrated Asset Encrypter (Supports `tea` & `aes128` apparently)
-* Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
 * Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon` and `object` asset-packs apparently)
 * Integrated Asset Shader-Map support
 * Integrated Asset Dependency
 * Integrated Asset Streamer
 * Integrated Dummy System
 * Integrated Bone Attachments
-* Integrated IPL & IDE support for `scene`(s) ft abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions—simply drag and drop!)
+* Integrated IPL & IDE support for `scene`(s) ft abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions — simply drag and drop!)
 * Integrated functionality to replace native models (Eliminating the need for third-party mod loaders!)
 * Integrated real-time Discord presence tracking with automated user kick provided if 'minAge' is enabled and any of the following criteria are unmet:
   * Discord presence is disabled
