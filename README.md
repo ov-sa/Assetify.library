@@ -36,17 +36,20 @@
   * `object`
   * `inventory`
 * Comprehensive Built-In Libraries ft:
-  * `table`
-  * `math`
-    * `math.quat`
-    * `math.matrix`
-  * `string`
-  * `namespace`
-  * `filesystem`
-  * `timer`
-  * `threader`
-  * `rest`
-  * `scheduler`
+  * [Table](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Table)
+  * [Math](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Math)
+    * [Quat](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Math:-Quat)
+    * [Matrix](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Math:-Matrix)
+  * [String](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-String)
+  * [Namespacer](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Namespacer)
+  * [File](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-File-System)
+  * [Timer](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Timer)
+  * [Threader](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Threader)
+  * [Networker](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Networker)
+  * [Rest](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-REST)
+  * [Scheduler](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Scheduler)
+  * [Renderer](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Renderer)
+  * [Syncer](https://github.com/ov-sa/Assetify-Library/wiki/Feature:-Syncer)
 * Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon` and `object` asset-packs apparently)
 * Integrated Asset Shader-Map support
 * Integrated Asset Dependency
