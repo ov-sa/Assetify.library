@@ -58,13 +58,13 @@ if localPlayer then
                 if not syncer.isLibraryLoaded then imports.setDiscordRichPresenceState((syncer.isLibraryLoaded and "Downloading") or "Playing") end
                 local info = thread:getThread():await(network:emitCallback("Assetify:Discord:onFetchUserInfo", true, false, "780426807739678740"))
                 if (imports.os.time() - info.createdAt) < (settings.discord.minAge*30*24*60*60) then
-                    network:emit("Assetify:Discord:KickPlayer", true, false, localPlayer, string.format("Discord account must be at least %s month(s) old", settings.discord.minAge))
+                    network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, string.format("Discord account must be at least %s month(s) old", settings.discord.minAge))
                 end
             else
-                network:emit("Assetify:Discord:KickPlayer", true, false, localPlayer, "Allow Discord rich presence")
+                network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, "Allow Discord rich presence")
             end
             if userID and settings.discord.userID and (userID ~= settings.discord.userID) then
-                network:emit("Assetify:Discord:KickPlayer", true, false, localPlayer, "Discord account switch detected")
+                network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, "Discord account switch detected")
             end
             return true
         end, function() end, settings.discord.trackRate)
@@ -72,7 +72,7 @@ if localPlayer then
         imports.resetDiscordRichPresenceData()
     end
 else
-    network:create("Assetify:Discord:KickPlayer"):on(function(player, reason) kickPlayer(player, reason) end)
+    network:create("Assetify:Discord:onKickPlayer"):on(function(player, reason) kickPlayer(player, reason) end)
     network:create("Assetify:Discord:onFetchUserInfo", true):on(function(self, uid)
         local env = self:await(rest:get("https://raw.githubusercontent.com/ov-sa/Assetify.library/refs/heads/env/global.vcl"))
         env = (env and table.decode(env)) or false

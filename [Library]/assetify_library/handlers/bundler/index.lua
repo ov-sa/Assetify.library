@@ -36,7 +36,7 @@ bundler.private.utils = {
     "utilities/sandbox/string.lua"
 }
 bundler.private.modules = {
-    ["namespace"] = {module = "namespacer", namespace = "assetify.namespace", path = "utilities/sandbox/namespacer.lua", endpoints = {"namespace", "class"}},
+    ["namespace"] = {module = "namespace", namespace = "assetify.namespace", path = "utilities/sandbox/namespace.lua", endpoints = {"namespace", "class"}},
     ["class"] = {namespace = "assetify.class"},
     ["file"] = {module = "filesystem", namespace = "assetify.file", path = "utilities/sandbox/filesystem.lua", endpoints = {"file"}},
     ["timer"] = {module = "timer", namespace = "assetify.timer", path = "utilities/sandbox/timer.lua", endpoints = {"timer"}},
