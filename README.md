@@ -40,7 +40,7 @@
     * [Quat](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Math:-Quat)
     * [Matrix](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Math:-Matrix)
   * [String](https://github.com/ov-sa/Assetify-Library/wiki/Library:-String)
-  * [Namespacer](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Namespacer)
+  * [Namespace](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Namespace)
   * [File](https://github.com/ov-sa/Assetify-Library/wiki/Library:-File)
   * [Timer](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Timer)
   * [Threader](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Threader)
