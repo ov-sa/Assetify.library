@@ -66,8 +66,8 @@ local asset = class:create("asset", {
             ["module"] = {},
             ["animation"] = {"assetAnimations"},
             ["sound"] = {"assetSounds"},
-            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneBuildings", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
-            ["*"] = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
+            ["scene"] = {"enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneBuildings", "sceneMapped", "sceneLODs", "sceneNativeObjects", "sceneDefaultStreamer"},
+            ["*"] = {"enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
         }
     }
 })
@@ -444,7 +444,6 @@ else
                     assetManifest.encryptIV = (assetManifest.encryptMode and assetManifest.encryptKey and asset.public.encryptions[assetManifest.encryptMode].ivlength and (table.decode(string.decode(file:read(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
                     assetManifest.encryptOptions = (assetManifest.encryptKey and {path = assetPath, mode = assetManifest.encryptMode, key = assetManifest.encryptKey, iv = assetManifest.encryptIV}) or nil
                     assetManifest.encryptMode, assetManifest.encryptKey, assetManifest.encryptIV = nil, nil, nil
-                    assetManifest.enableLODs = (assetManifest.enableLODs and true) or false
                     assetManifest.enableDoublefaces = (assetManifest.enableDoublefaces and true) or false
                     assetManifest.streamRange = imports.tonumber(assetManifest.streamRange) or asset.public.ranges.stream
                     assetManifest.assetClumps = (assetManifest.assetClumps and (imports.type(assetManifest.assetClumps) == "table") and assetManifest.assetClumps) or false
@@ -493,6 +492,7 @@ else
                         assetManifest.sceneOffsets = (assetManifest.sceneOffsets and (imports.type(assetManifest.sceneOffsets) == "table") and assetManifest.sceneOffsets) or false
                         assetManifest.sceneBuildings = (assetManifest.sceneBuildings and true) or false
                         assetManifest.sceneMapped = (assetManifest.sceneMapped and true) or false
+                        assetManifest.sceneLODs = (assetManifest.sceneLODs and true) or false
                         assetManifest.sceneNativeObjects = (assetManifest.sceneNativeObjects and true) or false
                         assetManifest.sceneDefaultStreamer = (assetManifest.sceneDefaultStreamer and true) or false
                         if assetManifest.sceneOffsets then

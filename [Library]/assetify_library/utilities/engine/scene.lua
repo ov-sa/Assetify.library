@@ -104,7 +104,7 @@ if localPlayer then
         if not scene.public:isInstance(self) then return false end
         if not cAsset or (not cAsset.nativeID and not cAsset.synced) or not sceneManifest or not sceneData then return false end
         local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
-        self.cStreamerInstance = scene.private:createObject(cAsset.nativeID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.enableLODs and not cAsset.nativeID and not cAsset.synced.lodID and cAsset.synced.collisionID and true) or false, sceneManifest.sceneBuildings) or false
+        self.cStreamerInstance = scene.private:createObject(cAsset.nativeID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, (sceneManifest.sceneLODs and not cAsset.nativeID and not cAsset.synced.lodID and cAsset.synced.collisionID and true) or false, sceneManifest.sceneBuildings) or false
         if not self.cStreamerInstance then return false end
         imports.setElementDoubleSided(self.cStreamerInstance, sceneManifest.enableDoublefaces)
         if not cAsset.nativeID then
@@ -115,7 +115,7 @@ if localPlayer then
                 imports.setElementDimension(self.cCollisionInstance, sceneManifest.sceneDimension)
                 imports.setElementInterior(self.cCollisionInstance, sceneManifest.sceneInterior)
                 imports.setElementCollisionsEnabled(self.cCollisionInstance, false)
-                if sceneManifest.enableLODs then
+                if sceneManifest.sceneLODs then
                     self.cModelInstance = scene.private:createObject(cAsset.synced.collisionID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings) or false
                     self.cLODInstance = (cAsset.synced.lodID and scene.private:createObject(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings)) or false
                     attacher:attachElements(self.cModelInstance, self.cCollisionInstance)
@@ -135,7 +135,7 @@ if localPlayer then
                 end
             end
         else
-            self.cLODInstance = (sceneManifest.enableLODs and scene.private:createObject(cAsset.nativeLOD or cAsset.nativeID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings)) or false
+            self.cLODInstance = (sceneManifest.sceneLODs and scene.private:createObject(cAsset.nativeLOD or cAsset.nativeID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings)) or false
             self.cCollisionInstance = self.cStreamerInstance
             if self.cLODInstance then
                 imports.setElementDoubleSided(self.cLODInstance, sceneManifest.enableDoublefaces)
