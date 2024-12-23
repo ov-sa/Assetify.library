@@ -61,7 +61,7 @@ local asset = class:create("asset", {
         ["aes128"] = {keylength = 16, ivlength = 16}
     },
     properties = {
-        reserved = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "assetAnimations", "assetSounds", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
+        reserved = {},
         whitelisted = {
             ["module"] = {},
             ["animation"] = {"assetAnimations"},
@@ -74,6 +74,7 @@ local asset = class:create("asset", {
 for i, j in imports.pairs(asset.private.properties.whitelisted) do
     for k = 1, table.length(j), 1 do
         local v = j[k]
+        asset.private.properties.reserved[v] = true
         j[v] = true
         j[k] = nil
     end
@@ -435,10 +436,8 @@ else
                 local assetPath = asset.public.references.root..string.lower(assetType).."/"..assetName.."/"
                 local assetManifest = asset.public:buildManifest(assetPath, _, asset.public.references.asset..((file:exists(assetPath..asset.public.references.asset..".json") and ".json") or ".vcl"))
                 if assetManifest then
-                    local assetProperties = asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"]
-                    for k = 1, table.length(asset.private.properties.reserved), 1 do
-                        local v = asset.private.properties.reserved[k]
-                        assetManifest[v] = (assetProperties[v] and assetManifest[v]) or false
+                    for k, v in pairs(asset.private.properties.reserved) do
+                        assetManifest[k] = ((asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"])[k] and assetManifest[k]) or false
                     end
                     assetManifest.encryptMode = (assetManifest.encryptKey and assetManifest.encryptMode and asset.public.encryptions[assetManifest.encryptMode] and assetManifest.encryptMode) or false
                     assetManifest.encryptKey = (assetManifest.encryptMode and assetManifest.encryptKey and string.sub(imports.sha256(imports.tostring(assetManifest.encryptKey)), 1, asset.public.encryptions[assetManifest.encryptMode].keylength or nil)) or false
