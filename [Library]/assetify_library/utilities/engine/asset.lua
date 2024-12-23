@@ -66,7 +66,7 @@ local asset = class:create("asset", {
             ["module"] = {},
             ["animation"] = {"assetAnimations"},
             ["sound"] = {"assetSounds"},
-            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
+            ["scene"] = {"enableLODs", "enableDoublefaces", "streamRange", "shaderMaps", "sceneDimension", "sceneInterior", "sceneOffsets", "sceneBuildings", "sceneMapped", "sceneNativeObjects", "sceneDefaultStreamer"},
             ["*"] = {"enableLODs", "enableDoublefaces", "streamRange", "assetClumps", "shaderMaps"}
         }
     }
@@ -491,6 +491,7 @@ else
                         assetManifest.sceneDimension = math.max(asset.public.ranges.dimension[1], math.min(asset.public.ranges.dimension[2], imports.tonumber(assetManifest.sceneDimension) or 0))
                         assetManifest.sceneInterior = math.max(asset.public.ranges.interior[1], math.min(asset.public.ranges.interior[2], imports.tonumber(assetManifest.sceneInterior) or 0))
                         assetManifest.sceneOffsets = (assetManifest.sceneOffsets and (imports.type(assetManifest.sceneOffsets) == "table") and assetManifest.sceneOffsets) or false
+                        assetManifest.sceneBuildings = (assetManifest.sceneBuildings and true) or false
                         assetManifest.sceneMapped = (assetManifest.sceneMapped and true) or false
                         assetManifest.sceneNativeObjects = (assetManifest.sceneNativeObjects and true) or false
                         assetManifest.sceneDefaultStreamer = (assetManifest.sceneDefaultStreamer and true) or false
