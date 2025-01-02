@@ -48,7 +48,8 @@ function scene.private:fetchNativeLOD(modelName)
 end
 
 function scene.private:createEntity(...)
-    return ((params[9] and imports.createBuilding) or imports.createObject)(table.unpack(params, (params[9] and 7) or 8))
+    local cArgs = table.pack(...)
+    return ((cArgs[9] and imports.createBuilding) or imports.createObject)(table.unpack(cArgs, (cArgs[9] and 7) or 8))
 end
 
 function scene.public:parseIDE(rw)
@@ -120,7 +121,7 @@ if localPlayer then
                 imports.setElementCollisionsEnabled(self.cCollisionInstance, false)
                 if sceneManifest.sceneLODs then
                     self.cModelInstance = scene.private:createEntity(cAsset.synced.collisionID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings) or false
-                    self.cLODInstance = (cAsset.synced.lodID and scene.private:createEntity(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true, sceneManifest.sceneBuildings)) or false
+                    self.cLODInstance = (cAsset.synced.lodID and scene.private:createEntity(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true, false)) or false
                     attacher:attachElements(self.cModelInstance, self.cCollisionInstance)
                     imports.setElementAlpha(self.cModelInstance, 0)
                     imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
