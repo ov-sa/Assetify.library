@@ -114,7 +114,7 @@ if localPlayer then
         imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
         self.cLODInstance = sceneManifest.sceneLODs and (
             (cAsset.nativeID and scene.private:createEntity(cAsset.nativeLOD or cAsset.nativeID, posX, posY, posZ, rotX, rotY, rotZ, true, false)) or 
-            (not cAsset.nativeID and cAsset.synced.lodID and scene.private:createEntity(cAsset.synced.lodID, posX, posY, posZ, rotX, rotY, rotZ, true, false))
+            (not cAsset.nativeID and scene.private:createEntity(cAsset.synced.lodID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, true, false))
         ) or false
         if self.cLODInstance then
             imports.setElementDoubleSided(self.cLODInstance, sceneManifest.sceneDoublesided)
