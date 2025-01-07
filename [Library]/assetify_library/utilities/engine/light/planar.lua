@@ -47,12 +47,10 @@ syncer.private.execOnBoot(function()
     for i = 1, table.length(planar.private.cache.validTypes), 1 do
         local j = planar.private.cache.validTypes[i]
         local modelPath = "utilities/rw/"..j.index.."/"
-        j.modelID, j.collisionID = imports.engineRequestModel("object"), imports.engineRequestModel("object")
+        j.modelID = imports.engineRequestModel("object")
         imports.engineImportTXD(imports.engineLoadTXD(modelPath.."dict.rw"), j.modelID)
         imports.engineReplaceModel(imports.engineLoadDFF(modelPath.."buffer.rw"), j.modelID, true)
         imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.modelID)
-        manager.API.World.clearModel(j.collisionID)
-        imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.collisionID)
         planar.private.cache.validTypes[i] = nil
         planar.private.cache.validTypes[(j.index)] = j
         planar.private.cache.validTypes[(j.index)].index = nil
@@ -91,11 +89,6 @@ function planar.public:load(lightType, lightData, shaderInputs, isScoped, isDefa
     self.syncRate = imports.tonumber(lightData.syncRate)
     imports.setElementDimension(self.cModelInstance, imports.tonumber(lightData.dimension) or 0)
     imports.setElementInterior(self.cModelInstance, imports.tonumber(lightData.interior) or 0)
-    if not isDefaultStreamer and lightCache.collisionID then
-        self.cCollisionInstance = imports.createObject(lightCache.collisionID, lightData.position.x, lightData.position.y, lightData.position.z, lightData.rotation.x, lightData.rotation.y, lightData.rotation.z)
-        imports.setElementAlpha(self.cCollisionInstance, 0)
-        self.cStreamer = streamer:create(self.cModelInstance, "light", {self.cCollisionInstance}, self.syncRate)
-    end
     self.cLight = self.cModelInstance
     self.cShader = shader:create(self.cLight, "Assetify | Light:Planar", "Assetify_LightPlanar", lightCache.textureName, {}, shaderInputs, {}, _, _, _, _, syncer.public.librarySerial)
     planar.public.buffer[(self.cLight)] = self
@@ -109,7 +102,6 @@ end
 
 function planar.public:unload()
     if not self or (self == planar.public) then return false end
-    if self.cStreamer then self.cStreamer:destroy() end
     planar.public.buffer[(self.cModelInstance)] = nil
     imports.destroyElement(self.cModelInstance)
     imports.destroyElement(self.cCollisionInstance)
