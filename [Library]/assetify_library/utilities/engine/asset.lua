@@ -23,6 +23,7 @@ local imports = {
     destroyElement = destroyElement,
     engineRequestModel = engineRequestModel,
     engineSetModelLODDistance = engineSetModelLODDistance,
+    engineRestreamWorld = engineRestreamWorld,
     engineFreeModel = engineFreeModel,
     engineLoadIFP = engineLoadIFP,
     engineLoadTXD = engineLoadTXD,
@@ -164,8 +165,9 @@ if localPlayer then
                     end
                 end
             end
-            if j.LODDistance then engineSetModelLODDistance(i, j.LODDistance, true) end
+            if j.LODDistance then imports.engineSetModelLODDistance(i, j.LODDistance, true) end
         end
+        imports.engineRestreamWorld(true)
         return true
     end
     
