@@ -27,7 +27,7 @@ local imports = {
 if localPlayer then
     imports.addEventHandler("onClientResourceStart", resourceRoot, function()
         if settings.GTA.clearWorld then manager.API.World.clearWorld()
-        else manager.API.World.restoreWorld() end
+        elseif settings.GTA.restoreWorld then manager.API.World.restoreWorld() end
         if settings.GTA.waterLevel then
             if streamer.waterBuffer then imports.setWaterLevel(streamer.waterBuffer, settings.GTA.waterLevel) end
             imports.setWaterLevel(settings.GTA.waterLevel, true, true, true, true)
