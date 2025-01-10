@@ -210,7 +210,7 @@ else
                     for k, v in imports.pairs(j) do
                         isPackVoid = false
                         if isModule or syncModules then syncer.private:syncData(player, packName, i, {k, "bandwidthData"}, v.synced.bandwidthData) end
-                        if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.unSynced.fileHash) end
+                        if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.synced.fileHash) end
                         thread:pause()
                     end
                 end

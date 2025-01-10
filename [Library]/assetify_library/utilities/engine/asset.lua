@@ -317,7 +317,7 @@ else
 
     function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
         if not filePath or not filePointer then return false end
-        if (not skipSync and not filePointer.unSynced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
+        if (not skipSync and not filePointer.synced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
@@ -341,7 +341,7 @@ else
                         end
                         filePointer.unSynced.fileData[filePath] = filePointer.unSynced.fileData[filePath][1]
                     end
-                    filePointer.unSynced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
+                    filePointer.synced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
                     local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
@@ -447,12 +447,12 @@ else
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
                             manifestData = assetManifest,
-                            bandwidthData = {total = 0, file = {}}
+                            bandwidthData = {total = 0, file = {}},
+                            fileHash = {}
                         },
                         unSynced = {
                             rawData = {},
-                            fileData = {},
-                            fileHash = {}
+                            fileData = {}
                         }
                     }
                     if assetType == "module" then
