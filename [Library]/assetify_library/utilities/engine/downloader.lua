@@ -86,17 +86,11 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:syncHash"):on(function(accessTokens, assetType, assetName, hashes, bandwidth, remoteResource)
-        if not remoteResource then
-            syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
-            syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
-        else
-            resource.public:create(imports.getResourceFromName(remoteResource), bandwidth)
-        end
+    network:create("Assetify:Downloader:syncHash"):on(function(accessTokens, assetType, assetName, hashes, bandwidth)
+        syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
+        syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
         thread:create(function(self)
-            local cPointer = nil
-            if not remoteResource then cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            else cPointer = resource.private.buffer.name[remoteResource] end
+            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
             cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
@@ -105,10 +99,8 @@ if localPlayer then
                     fetchFiles[i] = true
                 else
                     cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total
-                    if not remoteResource then
-                        cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                    else cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + cPointer.bandwidthData.file[i] end
+                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                    syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
                 end
                 fileData = nil
                 thread:pause()
@@ -127,7 +119,7 @@ if localPlayer then
                     })
                 end
                 --TODO: RENAME APPROPRIATELY
-                network:emit("Assetify:Downloader:syncData", true, true, localPlayer, assetType, assetName, fetchFiles, remoteResource)
+                network:emit("Assetify:Downloader:syncData", true, true, localPlayer, assetType, assetName, fetchFiles)
                 imports.collectgarbage("collect")
                 self.cHeartbeat = nil
             end, settings.downloader.buildRate)
@@ -153,60 +145,52 @@ if localPlayer then
         end
     end)
 
-    network:create("Assetify:Downloader:syncState"):on(function(assetType, assetName, remoteResource)
-        local cPointer = nil
-        if not remoteResource then cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-        else cPointer = resource.private.buffer.name[remoteResource] end
+    network:create("Assetify:Downloader:syncState"):on(function(assetType, assetName)
+        local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
         cPointer.bandwidthData.isDownloaded = true
-        if not remoteResource then
-            local isPackVoid = true
-            if cPointer.bandwidthData.status and cPointer.bandwidthData.status.isLibraryETACounted then
-                syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidthData.status.eta
-                syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count - 1
+        local isPackVoid = true
+        if cPointer.bandwidthData.status and cPointer.bandwidthData.status.isLibraryETACounted then
+            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidthData.status.eta
+            syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count - 1
+        end
+        cPointer.bandwidthData.status = nil
+        syncer.private.scheduledAssets[assetType][assetName] = nil
+        for i, j in imports.pairs(syncer.private.scheduledAssets[assetType]) do
+            if j then
+                isPackVoid = false
+                break
             end
-            cPointer.bandwidthData.status = nil
-            syncer.private.scheduledAssets[assetType][assetName] = nil
-            for i, j in imports.pairs(syncer.private.scheduledAssets[assetType]) do
+        end
+        if isPackVoid then
+            local isSyncDone = true
+            syncer.private.scheduledAssets[assetType] = nil
+            for i, j in imports.pairs(syncer.private.scheduledAssets) do
                 if j then
-                    isPackVoid = false
+                    isSyncDone = false
                     break
                 end
             end
-            if isPackVoid then
-                local isSyncDone = true
-                syncer.private.scheduledAssets[assetType] = nil
-                for i, j in imports.pairs(syncer.private.scheduledAssets) do
-                    if j then
-                        isSyncDone = false
-                        break
-                    end
-                end
-                if isSyncDone then
-                    if assetType == "module" then
-                        network:emit("Assetify:Downloader:syncPack", true, false, localPlayer)
-                        thread:create(function(self)
-                            bootPack("module")
-                            network:emit("Assetify:onModuleLoad", false)
-                        end):resume({executions = settings.downloader.buildRate, frames = 1})
-                    else
-                        syncer.private.scheduledAssets = nil
-                        syncer.public.libraryBandwidth.isDownloaded = true
-                        syncer.public.libraryBandwidth.status = nil
-                        thread:create(function(self)
-                            for i, j in imports.pairs(settings.assetPacks) do
-                                if i ~= "module" then
-                                    bootPack(i)
-                                end
+            if isSyncDone then
+                if assetType == "module" then
+                    network:emit("Assetify:Downloader:syncPack", true, false, localPlayer)
+                    thread:create(function(self)
+                        bootPack("module")
+                        network:emit("Assetify:onModuleLoad", false)
+                    end):resume({executions = settings.downloader.buildRate, frames = 1})
+                else
+                    syncer.private.scheduledAssets = nil
+                    syncer.public.libraryBandwidth.isDownloaded = true
+                    syncer.public.libraryBandwidth.status = nil
+                    thread:create(function(self)
+                        for i, j in imports.pairs(settings.assetPacks) do
+                            if i ~= "module" then
+                                bootPack(i)
                             end
-                            network:emit("Assetify:onLoad", false)
-                        end):resume({executions = settings.downloader.buildRate, frames = 1})
-                    end
+                        end
+                        network:emit("Assetify:onLoad", false)
+                    end):resume({executions = settings.downloader.buildRate, frames = 1})
                 end
             end
-        else
-            cPointer.bandwidthData.status = nil
-            resource.private.buffer.name[remoteResource].isLoaded = true
-            network:emit("Assetify:onResourceLoad", false, remoteResource, resource.private.buffer.name[remoteResource].resource)
         end
     end)
 else
@@ -266,10 +250,7 @@ else
         return true
     end
     network:create("Assetify:Downloader:syncPack"):on(function(source) syncer.private:syncPack(source) end)
-    network:create("Assetify:Downloader:syncData"):on(function(source, assetType, assetName, hashes, remoteResource)
-        if not remoteResource then syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes})
-        else syncer.private:syncResource(source, remoteResource, hashes) end
-    end)
+    network:create("Assetify:Downloader:syncData"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
 
     function syncer.private:syncResource(player, resourceName, hashes)
         if not resourceName then
