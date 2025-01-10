@@ -251,41 +251,4 @@ else
     end
     network:create("Assetify:Downloader:syncPack"):on(function(source) syncer.private:syncPack(source) end)
     network:create("Assetify:Downloader:syncData"):on(function(source, assetType, assetName, hashes) syncer.private:syncPack(source, {type = assetType, name = assetName, hashes = hashes}) end)
-
-    function syncer.private:syncResource(player, resourceName, hashes)
-        if not resourceName then
-            thread:create(function(self)
-                for i, j in imports.pairs(resource.private.buffer.name) do
-                    if not j.isSilent then syncer.private:syncResource(player, i) end
-                    thread:pause()
-                end
-            end):resume({executions = settings.downloader.syncRate, frames = 1})
-            return true
-        end
-        if not resource.private.buffer.name[resourceName] then return false end
-        if not hashes then
-            syncer.private:syncHash(player, _, _, resource.private.buffer.name[resourceName].unSynced.fileHash, resource.private.buffer.name[resourceName].bandwidthData, resourceName)
-        else
-            --TODO: DISABLED TEMPORARILY
-            --resource.private:loadClient(player, resourceName)
-            thread:create(function(self)
-                syncer.private:syncState(player, _, _, resourceName)
-            end):resume({executions = settings.downloader.syncRate, frames = 1})
-        end
-        return true
-    end
-    function syncer.public:syncResource(player, resourceSource, ...)
-        if player then
-            if not resource.private.buffer.source[resourceSource] or (not syncer.public.isLibraryLoaded and not resource.private.resourceSchedules.resource[resourceSource]) then return false end
-            if not syncer.public.libraryClients.loaded[player] then
-                resource.private.resourceSchedules.client[player] = resource.private.resourceSchedules.client[player] or {}
-                resource.private.resourceSchedules.client[player][resourceSource] = true
-                return false
-            end
-            return syncer.private:syncResource(player, resource.private.buffer.source[resourceSource].name)
-        end
-        if syncer.public.isLibraryLoaded then return resource.public:create(resourceSource, ...) end
-        resource.private.resourceSchedules.resource[resourceSource] = table.pack(...)
-        return true
-    end
 end
