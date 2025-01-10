@@ -73,9 +73,15 @@ shaderRW.buffer[identity] = {
                             MinFilter = Anisotropic;
                         };
                     ]]
-                    handlerBody = handlerBody..[[
-                        float4 controlTexel_]]..i..[[_]]..v..[[ = tex2D(controlSampler_]]..i..[[_]]..v..[[, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
-                    ]]
+                    if not j[v].stochastic then
+                        handlerBody = handlerBody..[[
+                            float4 controlTexel_]]..i..[[_]]..v..[[ = tex2D(controlSampler_]]..i..[[_]]..v..[[, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
+                        ]]
+                    else
+                        handlerBody = handlerBody..[[
+                            float4 controlTexel_]]..i..[[_]]..v..[[ = tex2DStochastic(controlSampler_]]..i..[[_]]..v..[[, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
+                        ]]
+                    end
                     if j[v].bump then
                         controlVars = controlVars..[[
                             texture controlTex_]]..i..[[_]]..v..[[_bump;
@@ -86,9 +92,15 @@ shaderRW.buffer[identity] = {
                                 MipFilter = Linear;
                             };
                         ]]
-                        handlerBody = handlerBody..[[
-                            float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2D(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
-                        ]]
+                        if not j[v].stochastic then
+                            handlerBody = handlerBody..[[
+                                float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2D(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
+                            ]]
+                        else
+                            handlerBody = handlerBody..[[
+                                float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2DStochastic(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
+                            ]]
+                        end
                     end
                     for m = 1, iteration, 1 do
                         handlerBody = handlerBody..[[
@@ -188,8 +200,8 @@ shaderRW.buffer[identity] = {
             pass P0 {
                 AlphaBlendEnable = true;
                 SRGBWriteEnable = false;
-                VertexShader = compile vs_2_0 VSHandler();
-                PixelShader = compile ps_2_0 PSHandler();
+                VertexShader = compile vs_3_0 VSHandler();
+                PixelShader = compile ps_3_0 PSHandler();
             }
         }
 
