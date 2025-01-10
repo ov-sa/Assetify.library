@@ -80,9 +80,19 @@ function scene.public:parseIPL(rw, isNativeModelsEnabled)
             data[k] = string.gsub(data[k], "%s", "")
         end
         if data[2] then
-            data.nativeID = (isNativeModelsEnabled and scene.private:fetchNativeID(data[2])) or nil
-            data.nativeLOD = (data.nativeID and scene.private:fetchNativeLOD(data[2])) or nil
-            table.insert(result, data)
+            local validated = true
+            for k = 4, 10, 1 do
+                data[k] = imports.tonumber(data[k])
+                if not data[k] then
+                    validated = false
+                    break
+                end
+            end
+            if validated then
+                data.nativeID = (isNativeModelsEnabled and scene.private:fetchNativeID(data[2])) or nil
+                data.nativeLOD = (data.nativeID and scene.private:fetchNativeLOD(data[2])) or nil
+                table.insert(result, data)
+            end
         end
     end
     return result
