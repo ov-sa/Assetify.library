@@ -112,7 +112,6 @@
     <export function="clearBoneAttachment" type="shared"/>
     <export function="getLibraryProgress" type="client"/>
     <export function="getDownloadProgress" type="client"/>
-    <export function="getResourceDownloadProgress" type="client"/>
     <export function="isAssetLoaded" type="client"/>
     <export function="getAssetID" type="client"/>
     <export function="loadAsset" type="client"/>

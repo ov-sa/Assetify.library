@@ -39,19 +39,6 @@ local planar = class:create("planar", {
     cache = {},
     buffer = {}
 }, "light")
-syncer.private.execOnBoot(function()
-    for i = 1, table.length(planar.private.cache.validTypes), 1 do
-        local j = planar.private.cache.validTypes[i]
-        local modelPath = "utilities/rw/"..j.index.."/"
-        j.modelID = imports.engineRequestModel("object")
-        imports.engineImportTXD(imports.engineLoadTXD(modelPath.."dict.rw"), j.modelID)
-        imports.engineReplaceModel(imports.engineLoadDFF(modelPath.."buffer.rw"), j.modelID, true)
-        imports.engineReplaceCOL(imports.engineLoadCOL(modelPath.."collision.rw"), j.modelID)
-        planar.private.cache.validTypes[i] = nil
-        planar.private.cache.validTypes[(j.index)] = j
-        planar.private.cache.validTypes[(j.index)].index = nil
-    end
-end)
 
 function planar.public:create(...)
     local cLight = self:createInstance()

@@ -13,7 +13,6 @@
 -----------------
 
 local syncer = syncer:import()
-local resource = resource:import()
 local imports = {
     type = type,
     pairs = pairs,
