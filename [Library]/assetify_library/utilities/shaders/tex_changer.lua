@@ -44,14 +44,8 @@ shaderRW.buffer[identity] = {
             Export output;
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
             if (vRenderingEnabled) {
-                if (vEmissiveSource) {
-                    output.Diffuse = 0;
-                    output.Emissive = sampledTexel;
-                }
-                else {
-                    output.Diffuse = sampledTexel;
-                    output.Emissive = 0;
-                }
+                output.Diffuse = vEmissiveSource ? 0 : sampledTexel;
+                output.Emissive = vEmissiveSource ? sampledTexel : 0;
             }
             else {
                 output.Diffuse = 0;

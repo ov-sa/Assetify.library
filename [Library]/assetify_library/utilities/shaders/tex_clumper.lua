@@ -91,14 +91,8 @@ shaderRW.buffer[identity] = {
             Export output;
             ]]..handlerBody..handlerFooter..[[
             if (vRenderingEnabled) {
-                if (vEmissiveSource) {
-                    output.Diffuse = 0;
-                    output.Emissive = sampledTexel;
-                }
-                else {
-                    output.Diffuse = sampledTexel;
-                    output.Emissive = 0;
-                }
+                output.Diffuse = vEmissiveSource ? 0 : sampledTexel;
+                output.Emissive = vEmissiveSource ? sampledTexel : 0;
             }
             else {
                 output.Diffuse = 0;
