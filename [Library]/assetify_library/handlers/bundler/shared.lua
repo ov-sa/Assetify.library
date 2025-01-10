@@ -84,9 +84,7 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.playSound", exportName = "playSoundAsset"},
             {exportIndex = "assetify.__core.playSound3D", exportName = "playSoundAsset3D"}
         },
-        server = {
-            {exportIndex = "assetify.__core.loadResource", exportName = "loadResource"}
-        }
+        server = {}
     })..[[
     assetify.__core.loadModule = function(assetName, moduleTypes)
         local cAsset = assetify.getAsset("module", assetName)

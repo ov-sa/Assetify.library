@@ -117,7 +117,6 @@
     <export function="getAssetID" type="client"/>
     <export function="loadAsset" type="client"/>
     <export function="unloadAsset" type="client"/>
-    <export function="loadResource" type="server"/>
     <export function="createShader" type="client"/>
     <export function="clearWorld" type="client"/>
     <export function="restoreWorld" type="client"/>

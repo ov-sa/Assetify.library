@@ -289,7 +289,5 @@ if localPlayer then
         return light.planar.buffer[cLight]:setColor(...)
     end
 else
-    function manager.API.Library.loadResource(...)
-        return manager:loadResource(...)
-    end
+
 end
