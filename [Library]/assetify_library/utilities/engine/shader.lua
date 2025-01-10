@@ -48,8 +48,7 @@ local shader = class:create("shader", {
     remoteWhitelist = {
         "Assetify_TextureClearer",
         "Assetify_TextureChanger",
-        "Assetify_TextureExporter",
-        "Assetify_TextureShadower"
+        "Assetify_TextureExporter"
     }
 })
 shader.private.__remoteWhitelist = {}
