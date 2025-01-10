@@ -34,7 +34,7 @@ local shader = class:create("shader", {
     shaderDistance = 0,
     validTypes = {
         [asset.references.clump] = true,
-        ["control"] = true
+        [asset.references.control] = true
     },
     validChannels = {
         {index = "red", channel = "r"},
