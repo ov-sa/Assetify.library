@@ -364,6 +364,9 @@ end
 --[[ API Syncers ]]--
 ---------------------
 
+imports.addEventHandler((localPlayer and "onClientResourceStop") or "onResourceStop", root, function(source)
+    manager.public.clearElementBuffer(source, true)
+end)
 network:fetch("Assetify:onElementDestroy"):on(function(source)
     if not syncer.isLibraryBooted or not source then return false end
     manager.public.clearElementBuffer(source)

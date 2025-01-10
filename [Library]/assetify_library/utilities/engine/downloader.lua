@@ -42,7 +42,7 @@ if localPlayer then
         return true
     end
 
-    local function updateStatus(pointer, rawStatus, isResource)
+    local function updateStatus(pointer, rawStatus)
         if not pointer or pointer.bandwidthData.isDownloaded then return false end
         local prevTotalETA, prevTotalSize = pointer.bandwidthData.status.eta or 0, pointer.bandwidthData.status.total or 0
         for file, status in imports.pairs(rawStatus) do
@@ -54,33 +54,25 @@ if localPlayer then
             pointer.bandwidthData.status.total = pointer.bandwidthData.status.total - prevSize + currentSize
             pointer.bandwidthData.status.file[file].eta, pointer.bandwidthData.status.file[file].size = currentETA, currentSize
         end
-        if not isResource then
-            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
-            syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
-            syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
-            pointer.bandwidthData.status.isLibraryETACounted = true
-        end
+        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
+        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
+        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
+        pointer.bandwidthData.status.isLibraryETACounted = true
         return true
     end
 
     --TODO: DISABLED FOR NOW TEMPORARILY
-    network:create("Assetify:Downloader:syncProgress"):on(function(status, bandwidth, isResource)
-        if not isResource then
-            if bandwidth then
-                syncer.public.libraryBandwidth = {
-                    total = bandwidth,
-                    status = {total = 0, eta = 0, eta_count = 0}
-                }
-                return true
-            end
-            for assetType, i in imports.pairs(status) do
-                for assetName, j in imports.pairs(i) do
-                    updateStatus(settings.assetPacks[assetType].rwDatas[assetName], j)
-                end
-            end
-        else
-            for resourceName, i in imports.pairs(status) do
-                updateStatus(resource.private.buffer.name[resourceName], i, true)
+    network:create("Assetify:Downloader:syncProgress"):on(function(status, bandwidth)
+        if bandwidth then
+            syncer.public.libraryBandwidth = {
+                total = bandwidth,
+                status = {total = 0, eta = 0, eta_count = 0}
+            }
+            return true
+        end
+        for assetType, i in imports.pairs(status) do
+            for assetName, j in imports.pairs(i) do
+                updateStatus(settings.assetPacks[assetType].rwDatas[assetName], j)
             end
         end
     end)
