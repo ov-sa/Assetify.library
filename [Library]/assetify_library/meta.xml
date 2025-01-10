@@ -51,7 +51,6 @@
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
-    <script src="utilities/engine/resource.lua" type="shared"/>
     <script src="utilities/engine/manager.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>
     <script src="utilities/engine/streamer.lua" type="client"/>
@@ -87,9 +86,6 @@
     <export function="isLibraryBooted" type="shared"/>
     <export function="isLibraryLoaded" type="shared"/>
     <export function="isModuleLoaded" type="shared"/>
-    <export function="isResourceLoaded" type="shared"/>
-    <export function="isResourceFlushed" type="shared"/>
-    <export function="isResourceUnloaded" type="shared"/>
     <export function="getLibrarySerial" type="shared"/>
     <export function="getLibraryVersion" type="shared"/>
     <export function="getLibraryWebserver" type="shared"/>

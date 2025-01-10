@@ -23,11 +23,6 @@ bundler.private.schedulers = {
         ["execOnBoot"] = {exec = "assetify.isBooted", network = "Assetify:onBoot"},
         ["execOnLoad"] = {exec = "assetify.isLoaded", network = "Assetify:onLoad"},
         ["execOnModuleLoad"] = {exec = "assetify.isModuleLoaded", network = "Assetify:onModuleLoad"},
-    },
-    resource = {
-        ["execOnResourceLoad"] = {exec = "assetify.isResourceLoaded", network = "Assetify:onResourceLoad"},
-        ["execOnResourceFlush"] = {exec = "assetify.isResourceFlushed", network = "Assetify:onResourceFlush"},
-        ["execOnResourceUnload"] = {exec = "assetify.isResourceUnloaded", network = "Assetify:onResourceUnload"}
     }
 }
 
