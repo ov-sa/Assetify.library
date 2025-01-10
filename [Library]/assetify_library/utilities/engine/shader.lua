@@ -49,7 +49,6 @@ local shader = class:create("shader", {
         "Assetify_TextureClearer",
         "Assetify_TextureChanger",
         "Assetify_TextureExporter",
-        "Assetify_TextureGrayscaler",
         "Assetify_TextureShadower"
     }
 })

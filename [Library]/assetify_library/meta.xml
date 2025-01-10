@@ -49,7 +49,6 @@
     <script src="utilities/shaders/tex_sampler.lua" type="client"/>
     <script src="utilities/shaders/tex_exporter.lua" type="client"/>
     <script src="utilities/shaders/tex_shadower.lua" type="client"/>
-    <script src="utilities/shaders/tex_grayscaler.lua" type="client"/>
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
