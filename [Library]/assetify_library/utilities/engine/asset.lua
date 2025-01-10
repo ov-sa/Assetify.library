@@ -317,7 +317,7 @@ else
 
     function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
         if not filePath or not filePointer then return false end
-        if (not skipSync and not filePointer.synced.fileHash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
+        if (not skipSync and not filePointer.synced.hash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
@@ -325,8 +325,8 @@ else
                     filePointer.synced.bandwidthData.file[filePath] = builtFileSize
                     filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
-                    filePointer.unSynced.fileData[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
-                    if imports.type(filePointer.unSynced.fileData[filePath]) == "table" then
+                    filePointer.unsynced.data[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
+                    if imports.type(filePointer.unsynced.data[filePath]) == "table" then
                         if encryptOptions.iv then
                             local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
                             encryptOptions.iv[builtFilePathHash] = (encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[encryptOptions.mode].ivlength or (#string.decode(encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[encryptOptions.mode].ivlength)) and encryptOptions.iv[builtFilePathHash]) or nil
@@ -334,15 +334,15 @@ else
                                 local builtFileCacheContent = file:read(builtFileCachePath)
                                 local builtFileCacheData = string.decode(builtFileCacheContent, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash], "base64")})
                                 if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then encryptOptions.iv[builtFilePathHash] = nil end
-                                filePointer.unSynced.fileData[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unSynced.fileData[filePath][1]
+                                filePointer.unsynced.data[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unsynced.data[filePath][1]
                             end
-                            encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unSynced.fileData[filePath][2], "base64")
-                            file:write(builtFileCachePath, filePointer.unSynced.fileData[filePath][1])
+                            encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unsynced.data[filePath][2], "base64")
+                            file:write(builtFileCachePath, filePointer.unsynced.data[filePath][1])
                         end
-                        filePointer.unSynced.fileData[filePath] = filePointer.unSynced.fileData[filePath][1]
+                        filePointer.unsynced.data[filePath] = filePointer.unsynced.data[filePath][1]
                     end
-                    filePointer.synced.fileHash[filePath] = imports.sha256(filePointer.unSynced.fileData[filePath])
-                    local builtFileContent = string.encode(filePointer.unSynced.fileData[filePath], "base64")
+                    filePointer.synced.hash[filePath] = imports.sha256(filePointer.unsynced.data[filePath])
+                    local builtFileContent = string.encode(filePointer.unsynced.data[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)
@@ -377,7 +377,7 @@ else
                     local v = asset.public.replacements[k]
                     if j[v] then
                         result[i][v] = assetPath..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(result[i][v], filePointer, encryptOptions, filePointer.unSynced.rawData, _, true)
+                        asset.public:buildFile(result[i][v], filePointer, encryptOptions, filePointer.unsynced.raw, _, true)
                         thread:pause()
                     end
                 end
@@ -399,13 +399,13 @@ else
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath..asset.public.references.dep.."/"..v[m]
                             result[i][k][m] = v[m]
-                            asset.public:buildFile(result[i][k][m], filePointer, encryptOptions, filePointer.unSynced.rawData, k == "server", true)
+                            asset.public:buildFile(result[i][k][m], filePointer, encryptOptions, filePointer.unsynced.raw, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath..asset.public.references.dep.."/"..j[k]
                         result[i][k] = j[k]
-                        asset.public:buildFile(result[i][k], filePointer, encryptOptions, filePointer.unSynced.rawData, _, true)
+                        asset.public:buildFile(result[i][k], filePointer, encryptOptions, filePointer.unsynced.raw, _, true)
                     end
                     thread:pause()
                 end
@@ -419,13 +419,13 @@ else
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
         local cAssetPack = table.clone(assetPack, true)
         local manifestPath = asset.public.references.root..string.lower(assetType).."/"..asset.public.references.manifest..".vcl"
-        cAssetPack.manifestData = file:read(manifestPath)
-        cAssetPack.manifestData = (cAssetPack.manifestData and table.decode(cAssetPack.manifestData, file:parseURL(manifestPath).extension)) or false
-        if not cAssetPack.manifestData then execFunction(callback, false, assetType); return false end
+        cAssetPack.manifest = file:read(manifestPath)
+        cAssetPack.manifest = (cAssetPack.manifest and table.decode(cAssetPack.manifest, file:parseURL(manifestPath).extension)) or false
+        if not cAssetPack.manifest then execFunction(callback, false, assetType); return false end
         thread:create(function(self)
             cAssetPack.rwDatas = {}
-            for i = 1, table.length(cAssetPack.manifestData), 1 do
-                local assetName = cAssetPack.manifestData[i]
+            for i = 1, table.length(cAssetPack.manifest), 1 do
+                local assetName = cAssetPack.manifest[i]
                 local assetPath = asset.public.references.root..string.lower(assetType).."/"..assetName.."/"
                 local assetManifest = asset.public:buildManifest(assetPath, _, asset.public.references.asset..".vcl")
                 if assetManifest then
@@ -446,13 +446,13 @@ else
                     assetManifest.assetDeps = (assetManifest.assetDeps and (imports.type(assetManifest.assetDeps) == "table") and assetManifest.assetDeps) or false
                     cAssetPack.rwDatas[assetName] = {
                         synced = {
-                            manifestData = assetManifest,
+                            manifest = assetManifest,
                             bandwidthData = {total = 0, file = {}},
-                            fileHash = {}
+                            hash = {}
                         },
-                        unSynced = {
-                            rawData = {},
-                            fileData = {}
+                        unsynced = {
+                            raw = {},
+                            data = {}
                         }
                     }
                     if assetType == "module" then

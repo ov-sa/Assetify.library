@@ -89,15 +89,15 @@ bundler.private:createBuffer("core", "__core", [[
     assetify.__core.loadModule = function(assetName, moduleTypes)
         local cAsset = assetify.getAsset("module", assetName)
         if not cAsset or not moduleTypes or (table.length(moduleTypes) <= 0) then return false end
-        if not cAsset.manifestData.assetDeps or not cAsset.manifestData.assetDeps.script then return false end
+        if not cAsset.manifest.assetDeps or not cAsset.manifest.assetDeps.script then return false end
         for i = 1, table.length(moduleTypes), 1 do
             local j = moduleTypes[i]
-            if cAsset.manifestData.assetDeps.script[j] then
-                for k = 1, table.length(cAsset.manifestData.assetDeps.script[j]), 1 do
+            if cAsset.manifest.assetDeps.script[j] then
+                for k = 1, table.length(cAsset.manifest.assetDeps.script[j]), 1 do
                     local rwData = assetify.getAssetDep("module", assetName, "script", j, k)
                     local status, error = assetify.imports.pcall(assetify.imports.loadstring(rwData))
                     if not status then
-                        assetify.imports.outputDebugString("Module - "..assetName..": Importing Failed ━│  "..cAsset.manifestData.assetDeps.script[j][k].." ("..j..")")
+                        assetify.imports.outputDebugString("Module - "..assetName..": Importing Failed ━│  "..cAsset.manifest.assetDeps.script[j][k].." ("..j..")")
                         assetify.imports.assert(assetify.imports.loadstring(rwData))
                         assetify.imports.outputDebugString(error)
                     end

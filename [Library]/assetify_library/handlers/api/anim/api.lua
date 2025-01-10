@@ -29,9 +29,9 @@ if localPlayer then
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)
         if not cAsset or not isLoaded then return false end
-        if cAsset.manifestData.assetAnimations then
-            for i = 1, table.length(cAsset.manifestData.assetAnimations), 1 do
-                local j = cAsset.manifestData.assetAnimations[i]
+        if cAsset.manifest.assetAnimations then
+            for i = 1, table.length(cAsset.manifest.assetAnimations), 1 do
+                local j = cAsset.manifest.assetAnimations[i]
                 imports.engineReplaceAnimation(element, j.defaultBlock, j.defaultAnim, "animation."..assetName, j.assetAnim)
             end
         end
@@ -43,9 +43,9 @@ if localPlayer then
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)
         if not cAsset or not isLoaded then return false end
-        if cAsset.manifestData.assetAnimations then
-            for i = 1, table.length(cAsset.manifestData.assetAnimations), 1 do
-                local j = cAsset.manifestData.assetAnimations[i]
+        if cAsset.manifest.assetAnimations then
+            for i = 1, table.length(cAsset.manifest.assetAnimations), 1 do
+                local j = cAsset.manifest.assetAnimations[i]
                 imports.engineRestoreAnimation(element, j.defaultBlock, j.defaultAnim)
             end
         end

@@ -77,8 +77,8 @@ if localPlayer then
     function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, remoteSignature)
         if not dummy.public:isInstance(self) then return false end
         local cAsset, cData = manager:getAssetData(assetType, assetName, syncer.librarySerial)
-        if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
-        if assetClump then cData = cAsset.unSynced.assetCache[assetClump].cAsset.synced end
+        if not cAsset or not dummyData or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
+        if assetClump then cData = cAsset.unsynced.assetCache[assetClump].cAsset.synced end
         if not cAsset or not cData then return false end
         local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end
@@ -127,7 +127,7 @@ else
         if not dummy.public:isInstance(self) or self.isUnloading then return false end
         if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, _, self.remoteSignature) end
         local cAsset = manager:getAssetData(assetType, assetName)
-        if not cAsset or not dummyData or (cAsset.manifestData.assetClumps and (not assetClump or not cAsset.manifestData.assetClumps[assetClump])) then return false end
+        if not cAsset or not dummyData or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
         local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end
         dummy.private:validateOffset(self, dummyData)

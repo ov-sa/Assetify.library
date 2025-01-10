@@ -94,15 +94,15 @@ if localPlayer then
             cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
-                local fileData = file:read(i)
-                if not fileData or (imports.sha256(fileData) ~= j) then
+                local data = file:read(i)
+                if not data or (imports.sha256(data) ~= j) then
                     fetchFiles[i] = true
                 else
                     cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total
                     cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
                     syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
                 end
-                fileData = nil
+                data = nil
                 thread:pause()
             end
             self.cHeartbeat = thread:createHeartbeat(function()
@@ -210,7 +210,7 @@ else
                     for k, v in imports.pairs(j) do
                         isPackVoid = false
                         if isModule or syncModules then syncer.private:syncData(player, packName, i, {k, "bandwidthData"}, v.synced.bandwidthData) end
-                        if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.synced.fileHash) end
+                        if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.synced.hash) end
                         thread:pause()
                     end
                 end
