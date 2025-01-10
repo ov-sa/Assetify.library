@@ -207,6 +207,7 @@ if localPlayer then
         return true
     end
 
+    --[[
     function renderer.public:setEmissiveMode(state)
         state = (state and true) or false
         if not renderer.public.isVirtualRendering or not renderer.public.virtualRTs.emissive then return false end
@@ -225,7 +226,8 @@ if localPlayer then
         end
         return true
     end
-
+    ]]
+    
     function renderer.public:setDynamicSky(state, syncShader, isInternal)
         if not syncShader then
             state = (state and true) or false
