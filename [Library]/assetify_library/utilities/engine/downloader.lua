@@ -109,7 +109,6 @@ if localPlayer then
                         catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                     })
                 end
-                --TODO: RENAME APPROPRIATELY
                 network:emit("Assetify:Downloader:syncData", true, true, localPlayer, assetType, assetName, fetchFiles)
                 imports.collectgarbage("collect")
                 self.cHeartbeat = nil
