@@ -78,7 +78,7 @@ if localPlayer then
         if not dummy.public:isInstance(self) then return false end
         local cAsset, cData = manager:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not dummyData or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
-        if assetClump then cData = cAsset.unsynced.assetCache[assetClump].cAsset.synced end
+        if assetClump then cData = cAsset.unsynced.cache[assetClump].cAsset.synced end
         if not cAsset or not cData then return false end
         local dummyType = settings.assetPacks[assetType].assetType
         if not dummyType then return false end

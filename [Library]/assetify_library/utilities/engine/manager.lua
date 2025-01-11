@@ -33,9 +33,13 @@ local imports = {
 local manager = class:create("manager", {
     API = {}
 })
-manager.private.rwFormat = {
-    assetRef = {}, assetCache = {},
-    rwCache = {
+manager.private.buffer = {
+    instance = {},
+    scoped = {}
+}
+manager.private.rw = {
+    ref = {}, cache = {},
+    raw = {
         ifp = {},
         sound = {}, 
         txd = {},
@@ -46,10 +50,6 @@ manager.private.rwFormat = {
         replace = {},
         dep = {}
     }
-}
-manager.private.buffer = {
-    instance = {},
-    scoped = {}
 }
 
 function manager.public:isInternal(serial)
@@ -144,7 +144,7 @@ if localPlayer then
                         end
                     end
                 end
-                shader:create(nil, "Assetify | Control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unsynced.rwCache.map, j, _, _, _, syncer.librarySerial)
+                shader:create(nil, "Assetify | Control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unsynced.raw.map, j, _, _, _, syncer.librarySerial)
             end
         end
         return true
@@ -152,9 +152,9 @@ if localPlayer then
 
     function manager.private:freeAsset(cAsset)
         if not cAsset then return false end
-        shader.clearAssetBuffer(cAsset.unsynced.rwCache.map)
-        asset.clearAssetBuffer(cAsset.unsynced.rwCache.replace)
-        asset.clearAssetBuffer(cAsset.unsynced.rwCache.dep)
+        shader.clearAssetBuffer(cAsset.unsynced.raw.map)
+        asset.clearAssetBuffer(cAsset.unsynced.raw.replace)
+        asset.clearAssetBuffer(cAsset.unsynced.raw.dep)
         cAsset.unsynced = nil
         imports.collectgarbage("collect")
         return true
@@ -186,9 +186,9 @@ if localPlayer then
         local cAsset, isLoaded = manager.public:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded or imports.type(cAsset.unsynced) ~= "table" then return false end
         if cAsset.manifest.assetClumps then
-            return (assetClump and cAsset.manifest.assetClumps[assetClump] and cAsset.unsynced.assetCache[assetClump] and cAsset.unsynced.assetCache[assetClump].cAsset and cAsset.unsynced.assetCache[assetClump].cAsset.synced and cAsset.unsynced.assetCache[assetClump].cAsset.synced.modelID) or false
+            return (assetClump and cAsset.manifest.assetClumps[assetClump] and cAsset.unsynced.cache[assetClump] and cAsset.unsynced.cache[assetClump].cAsset and cAsset.unsynced.cache[assetClump].cAsset.synced and cAsset.unsynced.cache[assetClump].cAsset.synced.modelID) or false
         else
-            return (cAsset.unsynced.assetCache.cAsset and cAsset.unsynced.assetCache.cAsset.synced and cAsset.unsynced.assetCache.cAsset.synced.modelID) or false
+            return (cAsset.unsynced.cache.cAsset and cAsset.unsynced.cache.cAsset.synced and cAsset.unsynced.cache.cAsset.synced.modelID) or false
         end
     end
 
@@ -206,7 +206,7 @@ if localPlayer then
         if cAsset.manifest.assetClumps or (assetType == "module") or (assetType == "animation") or (assetType == "sound") or (assetType == "scene") then
             return cAsset, (unsynced and true) or false
         else
-            return cAsset, (unsynced and unsynced.assetCache.cAsset and unsynced.assetCache.cAsset.synced) or false
+            return cAsset, (unsynced and unsynced.cache.cAsset and unsynced.cache.cAsset.synced) or false
         end
     end
 
@@ -215,9 +215,9 @@ if localPlayer then
         if not cAsset or not isLoaded then return false end
         if not depType or not depIndex or not cAsset.manifest.assetDeps or not cAsset.manifest.assetDeps[depType] or not cAsset.manifest.assetDeps[depType][depIndex] or ((imports.type(cAsset.manifest.assetDeps[depType][depIndex]) == "table") and (not depSubIndex or not cAsset.manifest.assetDeps[depType][depIndex][depSubIndex])) then return false end
         if depSubIndex then
-            return cAsset.unsynced.rwCache.dep[depType][depIndex][depSubIndex] or false
+            return cAsset.unsynced.raw.dep[depType][depIndex][depSubIndex] or false
         else
-            return cAsset.unsynced.rwCache.dep[depType][depIndex] or false
+            return cAsset.unsynced.raw.dep[depType][depIndex] or false
         end
     end
 
@@ -226,20 +226,20 @@ if localPlayer then
         if not cAsset or isLoaded then return false end
         local cAssetPack = settings.assetPacks[assetType]
         local assetPath = asset.references.root..assetType.."/"..assetName.."/"
-        cAsset.unsynced = table.clone(manager.private.rwFormat, true)
+        cAsset.unsynced = table.clone(manager.private.rw, true)
         manager.private:createDep(cAsset)
         if assetType == "module" then
-            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {}) then return false end
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache, {}) then return false end
         elseif assetType == "animation" then
-            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache, {
                 ifp = assetPath..asset.references.asset..".ifp"
             }) then return false end
         elseif assetType == "sound" then
             for i, j in imports.pairs(cAsset.manifest.assetSounds) do
-                cAsset.unsynced.assetCache[i] = {}
+                cAsset.unsynced.cache[i] = {}
                 for k, v in imports.pairs(j) do
-                    cAsset.unsynced.assetCache[i][k] = {}
-                    asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i][k], {
+                    cAsset.unsynced.cache[i][k] = {}
+                    asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache[i][k], {
                         sound = assetPath.."sound/"..v,
                     })
                 end
@@ -258,47 +258,47 @@ if localPlayer then
                     sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z = cQuat:toEuler()
                     cQuat:destroy()
                     if not cAsset.manifest.sceneMapped then
-                        if not cAsset.unsynced.assetRef[(j[2])] then
-                            cAsset.unsynced.assetCache[i] = {}
+                        if not cAsset.unsynced.ref[j[2]] then
+                            cAsset.unsynced.cache[i] = {}
                             if not j.nativeID then
                                 local childTXDPath = assetPath..asset.references.txd.."/"..j[2]..".txd"
-                                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i], {
-                                    txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath..asset.references.txd.."/"..(sceneIDEDatas[(j[2])][1])..".txd") or (file:exists(childTXDPath) and childTXDPath) or assetPath..asset.references.asset..".txd",
+                                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache[i], {
+                                    txd = (sceneIDEDatas and sceneIDEDatas[j[2]] and assetPath..asset.references.txd.."/"..(sceneIDEDatas[j[2]][1])..".txd") or (file:exists(childTXDPath) and childTXDPath) or assetPath..asset.references.asset..".txd",
                                     dff = assetPath..asset.references.dff.."/"..j[2]..".dff",
                                     lod = assetPath..asset.references.dff.."/"..asset.references.lod.."/"..j[2]..".dff",
                                     col = assetPath..asset.references.col.."/"..j[2]..".col"
-                                }, (sceneIDEDatas and sceneIDEDatas[(j[2])] and sceneIDEDatas[(j[2])][2]) or false)
+                                }, (sceneIDEDatas and sceneIDEDatas[j[2]] and sceneIDEDatas[j[2]][2]) or false)
                             else
-                                cAsset.unsynced.assetCache[i].isNativeModel = true
-                                cAsset.unsynced.assetCache[i].cAsset = {nativeID = j.nativeID, nativeLOD = j.nativeLOD}
+                                cAsset.unsynced.cache[i].isNativeModel = true
+                                cAsset.unsynced.cache[i].cAsset = {nativeID = j.nativeID, nativeLOD = j.nativeLOD}
                             end
-                            cAsset.unsynced.assetRef[(j[2])] = cAsset.unsynced.assetCache[i].cAsset
+                            cAsset.unsynced.ref[j[2]] = cAsset.unsynced.cache[i].cAsset
                         end
-                        scene:create(cAsset.unsynced.assetRef[(j[2])], cAsset.manifest, sceneData)
+                        scene:create(cAsset.unsynced.ref[j[2]], cAsset.manifest, sceneData)
                     else
-                        cAsset.unsynced.assetCache[i] = {}
+                        cAsset.unsynced.cache[i] = {}
                         sceneData.position.x, sceneData.position.y, sceneData.position.z = sceneData.position.x + ((cAsset.manifest.sceneOffsets and cAsset.manifest.sceneOffsets.x) or 0), sceneData.position.y + ((cAsset.manifest.sceneOffsets and cAsset.manifest.sceneOffsets.y) or 0), sceneData.position.z + ((cAsset.manifest.sceneOffsets and cAsset.manifest.sceneOffsets.z) or 0)
                         sceneData.dimension = cAsset.manifest.sceneDimension
                         sceneData.interior = cAsset.manifest.sceneInterior
                         --TODO: DETECT IF ITS CLUMPED OR NOT...
-                        --cAsset.unsynced.assetCache[i].cDummy = dummy:create("object", j[2], _, _, SsceneData)
+                        --cAsset.unsynced.cache[i].cDummy = dummy:create("object", j[2], _, _, SsceneData)
                     end
                 end
             end
         elseif cAsset.manifest.assetClumps then
             for i, j in imports.pairs(cAsset.manifest.assetClumps) do
-                cAsset.unsynced.assetCache[i] = {}
+                cAsset.unsynced.cache[i] = {}
                 local clumpTXD, clumpDFF, clumpCOL = assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".txd", assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".dff", assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".col"
                 clumpTXD = (file:exists(clumpTXD) and clumpTXD) or assetPath..asset.references.asset..".txd"
                 clumpCOL = (file:exists(clumpCOL) and clumpCOL) or assetPath..asset.references.asset..".col"
-                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i], {
+                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache[i], {
                     txd = clumpTXD,
                     dff = clumpDFF,
                     col = clumpCOL
                 })
             end
         else
-            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.cache, {
                 txd = assetPath..asset.references.asset..".txd",
                 dff = assetPath..asset.references.asset..".dff",
                 col = assetPath..asset.references.asset..".col"
@@ -312,24 +312,34 @@ if localPlayer then
         local cAsset, isLoaded = manager.public:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
         if assetType == "sound" then
-            for i, j in imports.pairs(cAsset.unsynced.assetCache) do
+            for i, j in imports.pairs(cAsset.unsynced.cache) do
                 for k, v in imports.pairs(j) do
-                    if v.cAsset then v.cAsset:destroy(cAsset.unsynced.rwCache) end
+                    if v.cAsset then
+                        v.cAsset:destroy(cAsset.unsynced.raw)
+                    end
                 end
             end
         elseif assetType == "scene" then
-            for i, j in imports.pairs(cAsset.unsynced.assetCache) do
+            for i, j in imports.pairs(cAsset.unsynced.cache) do
                 if j.cAsset then
                     for i, j in imports.pairs(j.cAsset.cScenes) do
-                        if i and j then i:destroy() end
+                        if i and j then
+                            i:destroy()
+                        end
                     end
-                    if not j.isNativeModel then j.cAsset:destroy(cAsset.unsynced.rwCache) end
+                    if not j.isNativeModel then
+                        j.cAsset:destroy(cAsset.unsynced.raw)
+                    end
                 end
-                if j.cDummy then j.cDummy:destroy() end
+                if j.cDummy then
+                    j.cDummy:destroy()
+                end
             end
         elseif cAsset.manifest.assetClumps then
-            for i, j in imports.pairs(cAsset.unsynced.assetCache) do
-                if j.cAsset then j.cAsset:destroy(cAsset.unsynced.rwCache) end
+            for i, j in imports.pairs(cAsset.unsynced.cache) do
+                if j.cAsset then
+                    j.cAsset:destroy(cAsset.unsynced.raw)
+                end
             end
         else
             return false

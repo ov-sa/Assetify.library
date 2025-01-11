@@ -79,10 +79,10 @@ if localPlayer then
 
     function shader.public:createTex(cAsset)
         if not cAsset or not cAsset.manifest.shaderMaps then return false end
-        cAsset.unsynced.rwCache.map.shader, cAsset.unsynced.rwCache.map.texture = {}, {}
+        cAsset.unsynced.raw.map.shader, cAsset.unsynced.raw.map.texture = {}, {}
         for i, j in imports.pairs(asset:buildShader(cAsset.manifest.shaderMaps)) do
             if j then
-                cAsset.unsynced.rwCache.map.texture[i] = shader.public:loadTex(cAsset, i)
+                cAsset.unsynced.raw.map.texture[i] = shader.public:loadTex(cAsset, i)
             end
         end
         return true
@@ -93,18 +93,18 @@ if localPlayer then
         return self:unload(...)
     end
 
-    function shader.public.clearAssetBuffer(rwCache)
-        if not rwCache then return false end
-        if rwCache.shader then
-            for i, j in imports.pairs(rwCache.shader) do
+    function shader.public.clearAssetBuffer(raw)
+        if not raw then return false end
+        if raw.shader then
+            for i, j in imports.pairs(raw.shader) do
                 imports.destroyElement(j)
-                rwCache.shader[i] = nil
+                raw.shader[i] = nil
             end
         end
-        if rwCache.texture then
-            for i, j in imports.pairs(rwCache.texture) do
+        if raw.texture then
+            for i, j in imports.pairs(raw.texture) do
                 imports.destroyElement(j)
-                rwCache.texture[i] = nil
+                raw.texture[i] = nil
             end
         end
         return true
@@ -151,9 +151,9 @@ if localPlayer then
         return false
     end
 
-    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, rwCache, shaderMaps, shaderPriority, shaderDistance, isStandalone, isInternal)
+    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, raw, shaderMaps, shaderPriority, shaderDistance, isStandalone, isInternal)
         if not shader.public:isInstance(self) then return false end
-        if not shaderCategory or not shaderName or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not rwCache then return false end
+        if not shaderCategory or not shaderName or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not raw then return false end
         element = ((element and imports.isElement(element)) and element) or false
         textureName = textureName or false
         shaderPriority = imports.tonumber(shaderPriority) or shader.public.shaderPriority
@@ -174,13 +174,13 @@ if localPlayer then
             isStandalone = isStandalone
         }
         if not self.isPreLoaded then
-            if not isStandalone then rwCache.shader[textureName] = self.cShader end
+            if not isStandalone then raw.shader[textureName] = self.cShader end
             renderer:syncShader(self)
         end
         for i, j in imports.pairs(shaderTextures) do
-            if rwCache.texture then
-                if j and imports.isElement(rwCache.texture[j]) then
-                    self:setValue(i, rwCache.texture[j])
+            if raw.texture then
+                if j and imports.isElement(raw.texture[j]) then
+                    self:setValue(i, raw.texture[j])
                 end
             end
         end

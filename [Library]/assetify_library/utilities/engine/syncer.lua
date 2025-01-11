@@ -101,7 +101,7 @@ if localPlayer then
                     for i, j in imports.pairs(clumpMaps) do
                         if cAsset.manifest.shaderMaps[asset.references.clump][i] and cAsset.manifest.shaderMaps[asset.references.clump][i][j] then
                             cAsset.manifest.shaderMaps[asset.references.clump][i][j].prelight = cAsset.manifest.shaderMaps[asset.references.clump][i].prelight
-                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifest.shaderMaps[asset.references.clump][i][j].clump, clumpTex_bump = cAsset.manifest.shaderMaps[asset.references.clump][i][j].bump}, {}, cAsset.unsynced.rwCache.map, cAsset.manifest.shaderMaps[asset.references.clump][i][j], _, _, _, syncer.public.librarySerial)
+                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifest.shaderMaps[asset.references.clump][i][j].clump, clumpTex_bump = cAsset.manifest.shaderMaps[asset.references.clump][i][j].bump}, {}, cAsset.unsynced.raw.map, cAsset.manifest.shaderMaps[asset.references.clump][i][j], _, _, _, syncer.public.librarySerial)
                         end
                     end
                     if syncer.public.syncedElementTones[element] and syncer.public.syncedElementTones[element][assetType] and syncer.public.syncedElementTones[element][assetType][assetName] then

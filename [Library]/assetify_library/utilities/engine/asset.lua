@@ -152,16 +152,16 @@ if localPlayer then
             for k = 1, table.length(asset.public.replacements) do
                 local v = asset.public.replacements[k]
                 if j[v] then
-                    cAsset.unsynced.rwCache.replace[v] = {}
+                    cAsset.unsynced.raw.replace[v] = {}
                     if v == "txd" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(cAsset, j[v]))) or false
-                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineImportTXD(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
+                        cAsset.unsynced.raw.replace[v][j[v]] = cAsset.unsynced.raw.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(cAsset, j[v]))) or false
+                        if cAsset.unsynced.raw.replace[v][j[v]] then imports.engineImportTXD(cAsset.unsynced.raw.replace[v][j[v]], i) end
                     elseif v == "dff" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(cAsset, j[v]), j.isTransparency)) or false
-                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceModel(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
+                        cAsset.unsynced.raw.replace[v][j[v]] = cAsset.unsynced.raw.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(cAsset, j[v]), j.isTransparency)) or false
+                        if cAsset.unsynced.raw.replace[v][j[v]] then imports.engineReplaceModel(cAsset.unsynced.raw.replace[v][j[v]], i) end
                     elseif v == "col" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(cAsset, j[v]))) or false
-                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
+                        cAsset.unsynced.raw.replace[v][j[v]] = cAsset.unsynced.raw.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(cAsset, j[v]))) or false
+                        if cAsset.unsynced.raw.replace[v][j[v]] then imports.engineReplaceCOL(cAsset.unsynced.raw.replace[v][j[v]], i) end
                     end
                 end
             end
@@ -174,19 +174,19 @@ if localPlayer then
     function asset.public:createDep(cAsset)
         if not cAsset or not cAsset.manifest.assetDeps then return false end
         for i, j in imports.pairs(cAsset.manifest.assetDeps) do
-            cAsset.unsynced.rwCache.dep[i] = {}
+            cAsset.unsynced.raw.dep[i] = {}
             for k, v in imports.pairs(j) do
                 if i == "script" then
-                    cAsset.unsynced.rwCache.dep[i][k] = {}
+                    cAsset.unsynced.raw.dep[i][k] = {}
                     if k ~= "server" then
                         for m, n in imports.pairs(v) do
-                            cAsset.unsynced.rwCache.dep[i][k][m] = asset.public:readFile(cAsset, n, true)
+                            cAsset.unsynced.raw.dep[i][k][m] = asset.public:readFile(cAsset, n, true)
                         end
                     end
                 elseif i == "texture" then
-                    cAsset.unsynced.rwCache.dep[i][k] = shader:loadTex(cAsset, v)
+                    cAsset.unsynced.raw.dep[i][k] = shader:loadTex(cAsset, v)
                 else
-                    cAsset.unsynced.rwCache.dep[i][k] = asset.public:readFile(cAsset, v)
+                    cAsset.unsynced.raw.dep[i][k] = asset.public:readFile(cAsset, v)
                 end
             end
         end
@@ -198,39 +198,39 @@ if localPlayer then
         return self:unload(...)
     end
 
-    function asset.public.clearAssetBuffer(rwCache)
-        if not rwCache then return false end
-        for i, j in imports.pairs(rwCache) do
+    function asset.public.clearAssetBuffer(raw)
+        if not raw then return false end
+        for i, j in imports.pairs(raw) do
             if imports.type(j) == "table" then
                 asset.public.clearAssetBuffer(j)
             else
                 imports.destroyElement(j)
-                rwCache[i] = nil
+                raw[i] = nil
             end
         end
         return true
     end
 
-    function asset.public:load(cAssetPack, cAsset, assetType, assetName, assetData, rwPaths, rwStreamRange)
+    function asset.public:load(cAssetPack, cAsset, assetType, assetName, assetCache, rwPaths, rwStreamRange)
         rwStreamRange = imports.tonumber(rwStreamRange) or assetManifest.streamRange
         if not asset.public:isInstance(self) then return false end
-        if not cAssetPack or not cAsset or not assetType or not assetName or not assetData or not rwPaths then return false end
+        if not cAssetPack or not cAsset or not assetType or not assetName or not assetCache or not rwPaths then return false end
         local result = false
         if assetType == "module" then
-            assetData.cAsset = self
+            assetCache.cAsset = self
             self.rwPaths = rwPaths
             result = true
         elseif assetType == "animation" then
-            cAsset.unsynced.rwCache.ifp[rwPaths.ifp] = cAsset.unsynced.rwCache.ifp[rwPaths.ifp] or (rwPaths.ifp and file:exists(rwPaths.ifp) and imports.engineLoadIFP(asset.public:readFile(cAsset, rwPaths.ifp), assetType.."."..assetName)) or false
-            if cAsset.unsynced.rwCache.ifp[rwPaths.ifp] then
-                assetData.cAsset = self
+            cAsset.unsynced.raw.ifp[rwPaths.ifp] = cAsset.unsynced.raw.ifp[rwPaths.ifp] or (rwPaths.ifp and file:exists(rwPaths.ifp) and imports.engineLoadIFP(asset.public:readFile(cAsset, rwPaths.ifp), assetType.."."..assetName)) or false
+            if cAsset.unsynced.raw.ifp[rwPaths.ifp] then
+                assetCache.cAsset = self
                 self.rwPaths = rwPaths
                 result = true
             end
         elseif assetType == "sound" then
-            cAsset.unsynced.rwCache.sound[rwPaths.sound] = cAsset.unsynced.rwCache.sound[rwPaths.sound] or (rwPaths.sound and file:exists(rwPaths.sound) and asset.public:readFile(cAsset, rwPaths.sound)) or false
-            if cAsset.unsynced.rwCache.sound[rwPaths.sound] then
-                assetData.cAsset = self
+            cAsset.unsynced.raw.sound[rwPaths.sound] = cAsset.unsynced.raw.sound[rwPaths.sound] or (rwPaths.sound and file:exists(rwPaths.sound) and asset.public:readFile(cAsset, rwPaths.sound)) or false
+            if cAsset.unsynced.raw.sound[rwPaths.sound] then
+                assetCache.cAsset = self
                 self.rwPaths = rwPaths
                 result = true
             end
@@ -240,32 +240,32 @@ if localPlayer then
             if rwPaths.dff then
                 modelID = imports.engineRequestModel(cAssetPack.assetType, (cAsset.manifest.assetBase and (imports.type(cAsset.manifest.assetBase) == "number") and cAsset.manifest.assetBase) or cAssetPack.assetBase or nil)
                 if modelID then
-                    cAsset.unsynced.rwCache.dff[rwPaths.dff] = cAsset.unsynced.rwCache.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.dff))) or false
-                    if not cAsset.unsynced.rwCache.dff[rwPaths.dff] then
+                    cAsset.unsynced.raw.dff[rwPaths.dff] = cAsset.unsynced.raw.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.dff))) or false
+                    if not cAsset.unsynced.raw.dff[rwPaths.dff] then
                         imports.engineFreeModel(modelID)
                         return false
                     else
                         if rwPaths.lod then
-                            cAsset.unsynced.rwCache.lod[rwPaths.lod] = cAsset.unsynced.rwCache.lod[rwPaths.lod] or (rwPaths.lod and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.lod))) or false
-                            lodID = (cAsset.unsynced.rwCache.lod[rwPaths.lod] and imports.engineRequestModel(cAssetPack.assetType, cAssetPack.assetBase)) or false
+                            cAsset.unsynced.raw.lod[rwPaths.lod] = cAsset.unsynced.raw.lod[rwPaths.lod] or (rwPaths.lod and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.lod))) or false
+                            lodID = (cAsset.unsynced.raw.lod[rwPaths.lod] and imports.engineRequestModel(cAssetPack.assetType, cAssetPack.assetBase)) or false
                         end
-                        cAsset.unsynced.rwCache.col[rwPaths.col] = cAsset.unsynced.rwCache.col[rwPaths.col] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(cAsset, rwPaths.col))) or false
+                        cAsset.unsynced.raw.col[rwPaths.col] = cAsset.unsynced.raw.col[rwPaths.col] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(cAsset, rwPaths.col))) or false
                     end
                 end
             end
             if modelID then
-                cAsset.unsynced.rwCache.txd[rwPaths.txd] = cAsset.unsynced.rwCache.txd[rwPaths.txd] or (rwPaths.txd and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(cAsset, rwPaths.txd))) or false
-                if cAsset.unsynced.rwCache.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.rwCache.txd[rwPaths.txd], modelID) end
-                imports.engineReplaceModel(cAsset.unsynced.rwCache.dff[rwPaths.dff], modelID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
-                if cAsset.unsynced.rwCache.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.col[rwPaths.col], modelID) end
+                cAsset.unsynced.raw.txd[rwPaths.txd] = cAsset.unsynced.raw.txd[rwPaths.txd] or (rwPaths.txd and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(cAsset, rwPaths.txd))) or false
+                if cAsset.unsynced.raw.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.raw.txd[rwPaths.txd], modelID) end
+                imports.engineReplaceModel(cAsset.unsynced.raw.dff[rwPaths.dff], modelID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
+                if cAsset.unsynced.raw.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.raw.col[rwPaths.col], modelID) end
                 imports.engineSetModelLODDistance(modelID, rwStreamRange, true)
                 if lodID then
-                    if cAsset.unsynced.rwCache.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.rwCache.txd[rwPaths.txd], lodID) end
-                    imports.engineReplaceModel(cAsset.unsynced.rwCache.lod[rwPaths.lod], lodID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
-                    if cAsset.unsynced.rwCache.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.col[rwPaths.col], lodID) end
+                    if cAsset.unsynced.raw.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.raw.txd[rwPaths.txd], lodID) end
+                    imports.engineReplaceModel(cAsset.unsynced.raw.lod[rwPaths.lod], lodID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
+                    if cAsset.unsynced.raw.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.raw.col[rwPaths.col], lodID) end
                     imports.engineSetModelLODDistance(lodID, rwStreamRange, true)
                 end
-                assetData.cAsset = self
+                assetCache.cAsset = self
                 self.rwPaths = rwPaths
                 self.synced = {
                     modelID = modelID,
@@ -277,17 +277,17 @@ if localPlayer then
         return result
     end
 
-    function asset.public:unload(rwCache)
+    function asset.public:unload(raw)
         if not asset.public:isInstance(self) then return false end
-        if not rwCache then return false end
+        if not raw then return false end
         if self.synced then
             if self.synced.modelID then imports.engineFreeModel(self.synced.modelID) end
             if self.synced.lodID then imports.engineFreeModel(self.synced.lodID) end
         end
         if self.rwPaths then
             for i, j in imports.pairs(self.rwPaths) do
-                imports.destroyElement(rwCache[i][j])
-                rwCache[i][j] = nil
+                imports.destroyElement(raw[i][j])
+                raw[i][j] = nil
             end
         end
         self:destroyInstance()
