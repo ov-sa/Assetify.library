@@ -95,7 +95,7 @@ if localPlayer then
         end
         if not self.cModelInstance then return false end
         self.cDummy = (remoteSignature and remoteSignature.element) or self.cModelInstance
-        dummy.public.buffer[(self.cDummy)] = self
+        dummy.public.buffer[self.cDummy] = self
         if isScoped then manager:setElementScoped(self.cDummy) end
         self.cHeartbeat = thread:createHeartbeat(function()
             if not self.cModelInstance then
@@ -117,7 +117,7 @@ if localPlayer then
     function dummy.public:unload()
         if not dummy.public:isInstance(self) then return false end
         if self.cHeartbeat then self.cHeartbeat:destroy() end
-        dummy.public.buffer[(self.cDummy)] = nil
+        dummy.public.buffer[self.cDummy] = nil
         imports.destroyElement(self.cModelInstance)
         self:destroyInstance()
         return true
@@ -146,7 +146,7 @@ else
             elementType = dummyType
         }
         self.cDummy = self.cModelInstance
-        dummy.public.buffer[(self.cDummy)] = self
+        dummy.public.buffer[self.cDummy] = self
         imports.setElementAlpha(self.cModelInstance, 0)
         imports.setElementDimension(self.cModelInstance, dummyData.dimension)
         imports.setElementInterior(self.cModelInstance, dummyData.interior)
@@ -170,7 +170,7 @@ else
                 self:unload(i)
                 thread:pause()
             end
-            dummy.public.buffer[(self.cDummy)] = nil
+            dummy.public.buffer[self.cDummy] = nil
             imports.destroyElement(self.cModelInstance)
             self:destroyInstance()
         end):resume({executions = settings.downloader.syncRate, frames = 1})
