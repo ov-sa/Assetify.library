@@ -242,7 +242,6 @@ if localPlayer then
                 if modelID then
                     cAsset.unsynced.raw.dff[rwPaths.dff] = cAsset.unsynced.raw.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.dff))) or false
                     if not cAsset.unsynced.raw.dff[rwPaths.dff] then
-                        iprint(rwPaths.dff)
                         imports.engineFreeModel(modelID)
                         return false
                     else
