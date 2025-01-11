@@ -315,8 +315,9 @@ else
         return result
     end
 
-    function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
-        if not filePath or not filePointer then return false end
+    --function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
+    function asset.public:buildFile(cAsset, filePath, filePointer, rawPointer, skipSync, debugExistence)
+        if not cAsset or not filePath or not filePointer then return false end
         if (not skipSync and not filePointer.synced.hash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
@@ -325,18 +326,18 @@ else
                     filePointer.synced.bandwidth.file[filePath] = builtFileSize
                     filePointer.synced.bandwidth.total = filePointer.synced.bandwidth.total + filePointer.synced.bandwidth.file[filePath]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidth.file[filePath]
-                    filePointer.unsynced.data[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
+                    filePointer.unsynced.data[filePath] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtFileData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtFileData
                     if imports.type(filePointer.unsynced.data[filePath]) == "table" then
-                        if encryptOptions.iv then
-                            local builtFileCachePath = encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
-                            encryptOptions.iv[builtFilePathHash] = (encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[encryptOptions.mode].ivlength or (#string.decode(encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[encryptOptions.mode].ivlength)) and encryptOptions.iv[builtFilePathHash]) or nil
-                            if encryptOptions.iv[builtFilePathHash] then
+                        if cAsset.manifest.encryptOptions.iv then
+                            local builtFileCachePath = cAsset.manifest.encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
+                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength or (#string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtFilePathHash]) or nil
+                            if cAsset.manifest.encryptOptions.iv[builtFilePathHash] then
                                 local builtFileCacheContent = file:read(builtFileCachePath)
-                                local builtFileCacheData = string.decode(builtFileCacheContent, encryptOptions.mode, {key = encryptOptions.key, iv = string.decode(encryptOptions.iv[builtFilePathHash], "base64")})
-                                if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then encryptOptions.iv[builtFilePathHash] = nil end
-                                filePointer.unsynced.data[filePath][1] = (encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unsynced.data[filePath][1]
+                                local builtFileCacheData = string.decode(builtFileCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64")})
+                                if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then cAsset.manifest.encryptOptions.iv[builtFilePathHash] = nil end
+                                filePointer.unsynced.data[filePath][1] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unsynced.data[filePath][1]
                             end
-                            encryptOptions.iv[builtFilePathHash] = encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unsynced.data[filePath][2], "base64")
+                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = cAsset.manifest.encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unsynced.data[filePath][2], "base64")
                             file:write(builtFileCachePath, filePointer.unsynced.data[filePath][1])
                         end
                         filePointer.unsynced.data[filePath] = filePointer.unsynced.data[filePath][1]
