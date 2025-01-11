@@ -315,10 +315,9 @@ else
         return result
     end
 
-    --function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
-    function asset.public:buildFile(cAsset, filePath, rawPointer, skipSync, debugExistence)
+    function asset.public:buildFile(cAsset, filePath, skipSync, syncRaw, debugExistence)
         if not cAsset or not filePath then return false end
-        if (not skipSync and not cAsset.rw.synced.hash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
+        if (not skipSync and not cAsset.rw.synced.hash[filePath]) or (skipSync and syncRaw and not cAsset.rw.unsynced.raw[filePath]) then
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
@@ -349,9 +348,9 @@ else
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)
                     end
                 end
-                if rawPointer then rawPointer[filePath] = builtFileData end
-            else
-                if debugExistence then imports.outputDebugString("Assetify: Invalid File ━│  "..filePath) end
+                if syncRaw then cAsset.rw.unsynced.raw[filePath] = builtFileData end
+            elseif debugExistence then 
+                imports.outputDebugString("Assetify: Invalid File ━│  "..filePath)
             end
         end
         return true
@@ -361,7 +360,7 @@ else
         if not cAsset or not cAsset.manifest.shaderMaps then return false end
         for i, j in imports.pairs(asset.private:fetchMap(assetPath, cAsset.manifest.shaderMaps)) do
             if j then
-                asset.public:buildFile(cAsset, i, _, _, true)
+                asset.public:buildFile(cAsset, i, false, false, true)
             end
             thread:pause()
         end
@@ -378,7 +377,7 @@ else
                     local v = asset.public.replacements[k]
                     if j[v] then
                         result[i][v] = cAsset.path..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(cAsset, result[i][v], _, _, true)
+                        asset.public:buildFile(cAsset, result[i][v], false, false, true)
                         thread:pause()
                     end
                 end
@@ -401,13 +400,13 @@ else
                         for m, n in imports.pairs(v) do
                             v[m] = cAsset.path..asset.public.references.dep.."/"..v[m]
                             result[i][k][m] = v[m]
-                            asset.public:buildFile(cAsset, result[i][k][m], cAsset.rw.unsynced.raw, k == "server", true)
+                            asset.public:buildFile(cAsset, result[i][k][m], k == "server", cAsset.rw.unsynced.raw, true)
                             thread:pause()
                         end
                     else
                         j[k] = cAsset.path..asset.public.references.dep.."/"..j[k]
                         result[i][k] = j[k]
-                        asset.public:buildFile(cAsset, result[i][k], cAsset.rw.unsynced.raw, _, true)
+                        asset.public:buildFile(cAsset, result[i][k], false, cAsset.rw.unsynced.raw, true)
                     end
                     thread:pause()
                 end
@@ -466,7 +465,7 @@ else
                     if assetType == "module" then
                         table.insert(syncer.libraryModules, cAsset.name)
                     elseif assetType == "animation" then
-                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".ifp", _, _, true)
+                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".ifp", false, false, true)
                         thread:pause()
                     elseif assetType == "sound" then
                         if cAsset.manifest.assetSounds then
@@ -477,7 +476,7 @@ else
                                     for k, v in imports.pairs(j) do
                                         if v then
                                             assetSounds[i][k] = v
-                                            asset.public:buildFile(cAsset, cAsset.path.."sound/"..v, _, _, true)
+                                            asset.public:buildFile(cAsset, cAsset.path.."sound/"..v, false, false, true)
                                             thread:pause()
                                         end
                                     end
@@ -515,19 +514,19 @@ else
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(cAsset, cAsset.path..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", _, _, true)
+                                            asset.public:buildFile(cAsset, cAsset.path..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", false, false, true)
                                         else
                                             local childTXDPath = cAsset.path..asset.public.references.txd.."/"..v[2]..".txd"
                                             debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
                                             asset.public:buildFile(cAsset, childTXDPath)
                                         end
-                                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.dff.."/"..v[2]..".dff", _, _, true)
+                                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.dff.."/"..v[2]..".dff", false, false, true)
                                         asset.public:buildFile(cAsset, cAsset.path..asset.public.references.dff.."/"..asset.public.references.lod.."/"..v[2]..".dff")
                                         asset.public:buildFile(cAsset, cAsset.path..asset.public.references.col.."/"..v[2]..".col")
                                     end
                                     thread:pause()
                                 end
-                                asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".txd", _, _, debugTXDExistence)
+                                asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".txd", false, false, debugTXDExistence)
                             end
                         end
                     else
@@ -537,14 +536,14 @@ else
                                 local childTXDPath = cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".txd"
                                 debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
                                 asset.public:buildFile(cAsset, childTXDPath)
-                                asset.public:buildFile(cAsset, cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", _, _, true)
+                                asset.public:buildFile(cAsset, cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", false, false, true)
                                 asset.public:buildFile(cAsset, cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".col")
                                 thread:pause()
                             end
                         else
-                            asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".dff", _, _, true)
+                            asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".dff", false, false, true)
                         end
-                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".txd", _, _, debugTXDExistence)
+                        asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".txd", false, false, debugTXDExistence)
                         asset.public:buildFile(cAsset, cAsset.path..asset.public.references.asset..".col")
                         thread:pause()
                     end
