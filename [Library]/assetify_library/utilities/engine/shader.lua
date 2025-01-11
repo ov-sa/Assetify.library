@@ -77,12 +77,12 @@ if localPlayer then
         return cShader
     end
 
-    function shader.public:createTex(shaderMaps, rwCache, encryptOptions)
-        if not shaderMaps or not rwCache then return false end
-        rwCache.shader, rwCache.texture = {}, {}
-        for i, j in imports.pairs(asset:buildShader(shaderMaps)) do
+    function shader.public:createTex(cAsset)
+        if not cAsset or not cAsset.manifest.shaderMaps then return false end
+        cAsset.unsynced.rwCache.map.shader, cAsset.unsynced.rwCache.map.texture = {}, {}
+        for i, j in imports.pairs(asset:buildShader(cAsset.manifest.shaderMaps)) do
             if j then
-                rwCache.texture[i] = shader.public:loadTex(i, encryptOptions)
+                cAsset.unsynced.rwCache.map.texture[i] = shader.public:loadTex(i, cAsset.manifest.encryptOptions)
             end
         end
         return true

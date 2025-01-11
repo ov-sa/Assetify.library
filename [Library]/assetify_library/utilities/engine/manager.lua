@@ -125,7 +125,7 @@ end
 if localPlayer then
     function manager.private:createDep(cAsset)
         if not cAsset then return false end
-        shader:createTex(cAsset.manifest.shaderMaps, cAsset.unsynced.rwCache.map, cAsset.manifest.encryptOptions)
+        shader:createTex(cAsset)
         asset:createReplacement(cAsset)
         asset:createDep(cAsset)
         if cAsset.manifest.shaderMaps and cAsset.manifest.shaderMaps.control then
