@@ -171,22 +171,22 @@ if localPlayer then
         return true
     end
     
-    function asset.public:createDep(assetDeps, rwCache, encryptOptions)
-        if not assetDeps or not rwCache then return false end
-        for i, j in imports.pairs(assetDeps) do
-            rwCache[i] = {}
+    function asset.public:createDep(cAsset)
+        if not cAsset or not cAsset.manifest.assetDeps then return false end
+        for i, j in imports.pairs(cAsset.manifest.assetDeps) do
+            cAsset.unsynced.rwCache.dep[i] = {}
             for k, v in imports.pairs(j) do
                 if i == "script" then
-                    rwCache[i][k] = {}
+                    cAsset.unsynced.rwCache.dep[i][k] = {}
                     if k ~= "server" then
                         for m, n in imports.pairs(v) do
-                            rwCache[i][k][m] = asset.public:readFile(n, encryptOptions, true)
+                            cAsset.unsynced.rwCache.dep[i][k][m] = asset.public:readFile(n, cAsset.manifest.encryptOptions, true)
                         end
                     end
                 elseif i == "texture" then
-                    rwCache[i][k] = shader:loadTex(v, encryptOptions)
+                    cAsset.unsynced.rwCache.dep[i][k] = shader:loadTex(v, cAsset.manifest.encryptOptions)
                 else
-                    rwCache[i][k] = asset.public:readFile(v, encryptOptions)
+                    cAsset.unsynced.rwCache.dep[i][k] = asset.public:readFile(v, cAsset.manifest.encryptOptions)
                 end
             end
         end

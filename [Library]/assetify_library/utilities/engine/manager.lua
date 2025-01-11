@@ -127,7 +127,7 @@ if localPlayer then
         if not cAsset then return false end
         shader:createTex(cAsset.manifest.shaderMaps, cAsset.unsynced.rwCache.map, cAsset.manifest.encryptOptions)
         asset:createReplacement(cAsset)
-        asset:createDep(cAsset.manifest.assetDeps, cAsset.unsynced.rwCache.dep, cAsset.manifest.encryptOptions)
+        asset:createDep(cAsset)
         if cAsset.manifest.shaderMaps and cAsset.manifest.shaderMaps.control then
             for i, j in imports.pairs(cAsset.manifest.shaderMaps.control) do
                 local shaderTextures, shaderInputs = {}, {}
