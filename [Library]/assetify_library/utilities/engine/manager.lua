@@ -229,9 +229,9 @@ if localPlayer then
         cAsset.unsynced = table.clone(manager.private.rwFormat, true)
         manager.private:createDep(cAsset)
         if assetType == "module" then
-            if not asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache, {}) then return false end
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {}) then return false end
         elseif assetType == "animation" then
-            if not asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache, {
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {
                 ifp = assetPath..asset.references.asset..".ifp"
             }) then return false end
         elseif assetType == "sound" then
@@ -239,7 +239,7 @@ if localPlayer then
                 cAsset.unsynced.assetCache[i] = {}
                 for k, v in imports.pairs(j) do
                     cAsset.unsynced.assetCache[i][k] = {}
-                    asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache[i][k], {
+                    asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i][k], {
                         sound = assetPath.."sound/"..v,
                     })
                 end
@@ -262,7 +262,7 @@ if localPlayer then
                             cAsset.unsynced.assetCache[i] = {}
                             if not j.nativeID then
                                 local childTXDPath = assetPath..asset.references.txd.."/"..j[2]..".txd"
-                                asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache[i], {
+                                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i], {
                                     txd = (sceneIDEDatas and sceneIDEDatas[(j[2])] and assetPath..asset.references.txd.."/"..(sceneIDEDatas[(j[2])][1])..".txd") or (file:exists(childTXDPath) and childTXDPath) or assetPath..asset.references.asset..".txd",
                                     dff = assetPath..asset.references.dff.."/"..j[2]..".dff",
                                     lod = assetPath..asset.references.dff.."/"..asset.references.lod.."/"..j[2]..".dff",
@@ -291,14 +291,14 @@ if localPlayer then
                 local clumpTXD, clumpDFF, clumpCOL = assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".txd", assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".dff", assetPath..asset.references.clump.."/"..j.."/"..asset.references.asset..".col"
                 clumpTXD = (file:exists(clumpTXD) and clumpTXD) or assetPath..asset.references.asset..".txd"
                 clumpCOL = (file:exists(clumpCOL) and clumpCOL) or assetPath..asset.references.asset..".col"
-                asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache[i], {
+                asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache[i], {
                     txd = clumpTXD,
                     dff = clumpDFF,
                     col = clumpCOL
                 })
             end
         else
-            if not asset:create(assetType, assetName, cAssetPack, cAsset.unsynced.rwCache, cAsset.manifest, cAsset.unsynced.assetCache, {
+            if not asset:create(cAssetPack, cAsset, assetType, assetName, cAsset.unsynced.assetCache, {
                 txd = assetPath..asset.references.asset..".txd",
                 dff = assetPath..asset.references.asset..".dff",
                 col = assetPath..asset.references.asset..".col"

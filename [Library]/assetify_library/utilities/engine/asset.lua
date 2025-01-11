@@ -211,58 +211,58 @@ if localPlayer then
         return true
     end
 
-    function asset.public:load(assetType, assetName, assetPack, rwCache, assetManifest, assetData, rwPaths, rwStreamRange)
+    function asset.public:load(cAssetPack, cAsset, assetType, assetName, assetData, rwPaths, rwStreamRange)
         rwStreamRange = imports.tonumber(rwStreamRange) or assetManifest.streamRange
         if not asset.public:isInstance(self) then return false end
-        if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
+        if not cAssetPack or not cAsset or not assetType or not assetName or not assetData or not rwPaths then return false end
         local result = false
         if assetType == "module" then
             assetData.cAsset = self
             self.rwPaths = rwPaths
             result = true
         elseif assetType == "animation" then
-            rwCache.ifp[rwPaths.ifp] = rwCache.ifp[rwPaths.ifp] or (rwPaths.ifp and file:exists(rwPaths.ifp) and imports.engineLoadIFP(asset.public:readFile(rwPaths.ifp, assetManifest.encryptOptions), assetType.."."..assetName)) or false
-            if rwCache.ifp[rwPaths.ifp] then
+            cAsset.unsynced.rwCache.ifp[rwPaths.ifp] = cAsset.unsynced.rwCache.ifp[rwPaths.ifp] or (rwPaths.ifp and file:exists(rwPaths.ifp) and imports.engineLoadIFP(asset.public:readFile(rwPaths.ifp, cAsset.manifest.encryptOptions), assetType.."."..assetName)) or false
+            if cAsset.unsynced.rwCache.ifp[rwPaths.ifp] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
                 result = true
             end
         elseif assetType == "sound" then
-            rwCache.sound[rwPaths.sound] = rwCache.sound[rwPaths.sound] or (rwPaths.sound and file:exists(rwPaths.sound) and asset.public:readFile(rwPaths.sound, assetManifest.encryptOptions)) or false
-            if rwCache.sound[rwPaths.sound] then
+            cAsset.unsynced.rwCache.sound[rwPaths.sound] = cAsset.unsynced.rwCache.sound[rwPaths.sound] or (rwPaths.sound and file:exists(rwPaths.sound) and asset.public:readFile(rwPaths.sound, cAsset.manifest.encryptOptions)) or false
+            if cAsset.unsynced.rwCache.sound[rwPaths.sound] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
                 result = true
             end
         else
-            if not assetPack.assetType then return false end
+            if not cAssetPack.assetType then return false end
             local modelID, lodID = false, false
             if rwPaths.dff then
-                modelID = imports.engineRequestModel(assetPack.assetType, (assetManifest.assetBase and (imports.type(assetManifest.assetBase) == "number") and assetManifest.assetBase) or assetPack.assetBase or nil)
+                modelID = imports.engineRequestModel(cAssetPack.assetType, (cAsset.manifest.assetBase and (imports.type(cAsset.manifest.assetBase) == "number") and cAsset.manifest.assetBase) or cAssetPack.assetBase or nil)
                 if modelID then
-                    rwCache.dff[rwPaths.dff] = rwCache.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(rwPaths.dff, assetManifest.encryptOptions))) or false
-                    if not rwCache.dff[rwPaths.dff] then
+                    cAsset.unsynced.rwCache.dff[rwPaths.dff] = cAsset.unsynced.rwCache.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(rwPaths.dff, cAsset.manifest.encryptOptions))) or false
+                    if not cAsset.unsynced.rwCache.dff[rwPaths.dff] then
                         imports.engineFreeModel(modelID)
                         return false
                     else
                         if rwPaths.lod then
-                            rwCache.lod[(rwPaths.lod)] = rwCache.lod[(rwPaths.lod)] or (rwPaths.lod and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(rwPaths.lod, assetManifest.encryptOptions))) or false
-                            lodID = (rwCache.lod[(rwPaths.lod)] and imports.engineRequestModel(assetPack.assetType, assetPack.assetBase)) or false
+                            cAsset.unsynced.rwCache.lod[rwPaths.lod] = cAsset.unsynced.rwCache.lod[rwPaths.lod] or (rwPaths.lod and file:exists(rwPaths.lod) and imports.engineLoadDFF(asset.public:readFile(rwPaths.lod, cAsset.manifest.encryptOptions))) or false
+                            lodID = (cAsset.unsynced.rwCache.lod[rwPaths.lod] and imports.engineRequestModel(cAssetPack.assetType, cAssetPack.assetBase)) or false
                         end
-                        rwCache.col[rwPaths.col] = rwCache.col[rwPaths.col] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(rwPaths.col, assetManifest.encryptOptions))) or false
+                        cAsset.unsynced.rwCache.col[rwPaths.col] = cAsset.unsynced.rwCache.col[rwPaths.col] or (rwPaths.col and file:exists(rwPaths.col) and imports.engineLoadCOL(asset.public:readFile(rwPaths.col, cAsset.manifest.encryptOptions))) or false
                     end
                 end
             end
             if modelID then
-                rwCache.txd[rwPaths.txd] = rwCache.txd[rwPaths.txd] or (rwPaths.txd and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(rwPaths.txd, assetManifest.encryptOptions))) or false
-                if rwCache.txd[rwPaths.txd] then imports.engineImportTXD(rwCache.txd[rwPaths.txd], modelID) end
-                imports.engineReplaceModel(rwCache.dff[rwPaths.dff], modelID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
-                if rwCache.col[rwPaths.col] then imports.engineReplaceCOL(rwCache.col[rwPaths.col], modelID) end
+                cAsset.unsynced.rwCache.txd[rwPaths.txd] = cAsset.unsynced.rwCache.txd[rwPaths.txd] or (rwPaths.txd and file:exists(rwPaths.txd) and imports.engineLoadTXD(asset.public:readFile(rwPaths.txd, cAsset.manifest.encryptOptions))) or false
+                if cAsset.unsynced.rwCache.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.rwCache.txd[rwPaths.txd], modelID) end
+                imports.engineReplaceModel(cAsset.unsynced.rwCache.dff[rwPaths.dff], modelID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
+                if cAsset.unsynced.rwCache.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.col[rwPaths.col], modelID) end
                 imports.engineSetModelLODDistance(modelID, rwStreamRange, true)
                 if lodID then
-                    if rwCache.txd[rwPaths.txd] then imports.engineImportTXD(rwCache.txd[rwPaths.txd], lodID) end
-                    imports.engineReplaceModel(rwCache.lod[(rwPaths.lod)], lodID, (assetManifest and assetManifest.assetTransparency and true) or assetPack.assetTransparency)
-                    if rwCache.col[rwPaths.col] then imports.engineReplaceCOL(rwCache.col[rwPaths.col], lodID) end
+                    if cAsset.unsynced.rwCache.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.rwCache.txd[rwPaths.txd], lodID) end
+                    imports.engineReplaceModel(cAsset.unsynced.rwCache.lod[rwPaths.lod], lodID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
+                    if cAsset.unsynced.rwCache.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.col[rwPaths.col], lodID) end
                     imports.engineSetModelLODDistance(lodID, rwStreamRange, true)
                 end
                 assetData.cAsset = self
