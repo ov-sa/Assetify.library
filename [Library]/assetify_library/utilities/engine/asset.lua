@@ -356,41 +356,42 @@ else
         return true
     end
 
-    function asset.public:buildShader(assetPath, shaderMaps, filePointer, encryptOptions)
-        if not assetPath or not shaderMaps or not filePointer then return false end
-        for i, j in imports.pairs(asset.private:fetchMap(assetPath, shaderMaps)) do
+    function asset.public:buildShader(assetPath, assetManifest, filePointer)
+        if not assetPath or not assetManifest or not assetManifest.shaderMaps or not filePointer then return false end
+        for i, j in imports.pairs(asset.private:fetchMap(assetPath, assetManifest.shaderMaps)) do
             if j then
-                asset.public:buildFile(i, filePointer, encryptOptions, _, _, true)
+                asset.public:buildFile(i, filePointer, assetManifest.encryptOptions, _, _, true)
             end
             thread:pause()
         end
         return true
     end
 
-    function asset.public:buildReplacement(assetPath, assetReplacements, filePointer, encryptOptions)
-        if not assetPath or not assetReplacements or not filePointer then return false end
+    function asset.public:buildReplacement(assetPath, assetManifest, filePointer)
+        if not assetPath or not assetManifest or not assetManifest.assetReplacements or not filePointer then return false end
         local result = {}
-        for i, j in imports.pairs(assetReplacements) do
+        for i, j in imports.pairs(assetManifest.assetReplacements) do
             if j and (imports.type(j) == "table") then
                 result[i] = j
                 for k = 1, table.length(asset.public.replacements) do
                     local v = asset.public.replacements[k]
                     if j[v] then
                         result[i][v] = assetPath..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(result[i][v], filePointer, encryptOptions, filePointer.unsynced.raw, _, true)
+                        asset.public:buildFile(result[i][v], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, _, true)
                         thread:pause()
                     end
                 end
             end
             thread:pause()
         end
-        return result
+        assetManifest.assetReplacements = result
+        return true
     end
 
-    function asset.public:buildDep(assetPath, assetDeps, filePointer, encryptOptions)
-        if not assetPath or not assetDeps or not filePointer then return false end
+    function asset.public:buildDep(assetPath, assetManifest, filePointer)
+        if not assetPath or not assetManifest or not assetManifest.assetDeps or not filePointer then return false end
         local result = {}
-        for i, j in imports.pairs(assetDeps) do
+        for i, j in imports.pairs(assetManifest.assetDeps) do
             if j and (imports.type(j) == "table") then
                 result[i] = {}
                 for k, v in imports.pairs(j) do
@@ -399,20 +400,21 @@ else
                         for m, n in imports.pairs(v) do
                             v[m] = assetPath..asset.public.references.dep.."/"..v[m]
                             result[i][k][m] = v[m]
-                            asset.public:buildFile(result[i][k][m], filePointer, encryptOptions, filePointer.unsynced.raw, k == "server", true)
+                            asset.public:buildFile(result[i][k][m], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, k == "server", true)
                             thread:pause()
                         end
                     else
                         j[k] = assetPath..asset.public.references.dep.."/"..j[k]
                         result[i][k] = j[k]
-                        asset.public:buildFile(result[i][k], filePointer, encryptOptions, filePointer.unsynced.raw, _, true)
+                        asset.public:buildFile(result[i][k], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, _, true)
                     end
                     thread:pause()
                 end
             end
             thread:pause()
         end
-        return result
+        assetManifest.assetDeps = result
+        return true
     end
 
     function asset.public:buildPack(assetType, assetPack, callback)
@@ -540,9 +542,9 @@ else
                         asset.public:buildFile(assetPath..asset.public.references.asset..".col", cAssetPack.rwDatas[assetName], assetManifest.encryptOptions)
                         thread:pause()
                     end
-                    asset.public:buildShader(assetPath, assetManifest.shaderMaps, cAssetPack.rwDatas[assetName], assetManifest.encryptOptions)
-                    assetManifest.assetReplacements = asset.public:buildReplacement(assetPath, assetManifest.assetReplacements, cAssetPack.rwDatas[assetName], assetManifest.encryptOptions)
-                    assetManifest.assetDeps = asset.public:buildDep(assetPath, assetManifest.assetDeps, cAssetPack.rwDatas[assetName], assetManifest.encryptOptions)
+                    asset.public:buildShader(assetPath, assetManifest, cAssetPack.rwDatas[assetName])
+                    asset.public:buildReplacement(assetPath, assetManifest, cAssetPack.rwDatas[assetName])
+                    asset.public:buildDep(assetPath, assetManifest, cAssetPack.rwDatas[assetName])
                     if assetManifest.encryptOptions and assetManifest.encryptOptions.iv then file:write(assetPath..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(assetManifest.encryptOptions.iv), "base64")) end
                 end
             end
