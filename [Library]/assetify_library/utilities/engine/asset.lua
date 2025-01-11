@@ -316,18 +316,18 @@ else
     end
 
     --function asset.public:buildFile(filePath, filePointer, encryptOptions, rawPointer, skipSync, debugExistence)
-    function asset.public:buildFile(cAsset, filePath, filePointer, rawPointer, skipSync, debugExistence)
-        if not cAsset or not filePath or not filePointer then return false end
-        if (not skipSync and not filePointer.synced.hash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
+    function asset.public:buildFile(cAsset, filePath, rawPointer, skipSync, debugExistence)
+        if not cAsset or not filePath then return false end
+        if (not skipSync and not cAsset.rw.synced.hash[filePath]) or (skipSync and rawPointer and not rawPointer[filePath]) then
             local builtFilePathHash = imports.sha256(filePath)
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
                 if not skipSync then
-                    filePointer.synced.bandwidth.file[filePath] = builtFileSize
-                    filePointer.synced.bandwidth.total = filePointer.synced.bandwidth.total + filePointer.synced.bandwidth.file[filePath]
-                    syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidth.file[filePath]
-                    filePointer.unsynced.data[filePath] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtFileData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtFileData
-                    if imports.type(filePointer.unsynced.data[filePath]) == "table" then
+                    cAsset.rw.synced.bandwidth.file[filePath] = builtFileSize
+                    cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[filePath]
+                    syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[filePath]
+                    cAsset.rw.unsynced.data[filePath] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtFileData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtFileData
+                    if imports.type(cAsset.rw.unsynced.data[filePath]) == "table" then
                         if cAsset.manifest.encryptOptions.iv then
                             local builtFileCachePath = cAsset.manifest.encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
                             cAsset.manifest.encryptOptions.iv[builtFilePathHash] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength or (#string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtFilePathHash]) or nil
@@ -335,15 +335,15 @@ else
                                 local builtFileCacheContent = file:read(builtFileCachePath)
                                 local builtFileCacheData = string.decode(builtFileCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64")})
                                 if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then cAsset.manifest.encryptOptions.iv[builtFilePathHash] = nil end
-                                filePointer.unsynced.data[filePath][1] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or filePointer.unsynced.data[filePath][1]
+                                cAsset.rw.unsynced.data[filePath][1] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or cAsset.rw.unsynced.data[filePath][1]
                             end
-                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = cAsset.manifest.encryptOptions.iv[builtFilePathHash] or string.encode(filePointer.unsynced.data[filePath][2], "base64")
-                            file:write(builtFileCachePath, filePointer.unsynced.data[filePath][1])
+                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = cAsset.manifest.encryptOptions.iv[builtFilePathHash] or string.encode(cAsset.rw.unsynced.data[filePath][2], "base64")
+                            file:write(builtFileCachePath, cAsset.rw.unsynced.data[filePath][1])
                         end
-                        filePointer.unsynced.data[filePath] = filePointer.unsynced.data[filePath][1]
+                        cAsset.rw.unsynced.data[filePath] = cAsset.rw.unsynced.data[filePath][1]
                     end
-                    filePointer.synced.hash[filePath] = imports.sha256(filePointer.unsynced.data[filePath])
-                    local builtFileContent = string.encode(filePointer.unsynced.data[filePath], "base64")
+                    cAsset.rw.synced.hash[filePath] = imports.sha256(cAsset.rw.unsynced.data[filePath])
+                    local builtFileContent = string.encode(cAsset.rw.unsynced.data[filePath], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)
