@@ -245,9 +245,9 @@ if localPlayer then
                 end
             end
         elseif assetType == "scene" then
-            local sceneIPLDatas = scene:parseIPL(asset:readFile(assetPath..asset.references.scene..".ipl", cAsset.manifest.encryptOptions), cAsset.manifest.sceneNativeObjects)
+            local sceneIPLDatas = scene:parseIPL(asset:readFile(cAsset, assetPath..asset.references.scene..".ipl"), cAsset.manifest.sceneNativeObjects)
             if sceneIPLDatas then
-                local sceneIDEDatas = scene:parseIDE(asset:readFile(assetPath..asset.references.scene..".ide", cAsset.manifest.encryptOptions))
+                local sceneIDEDatas = scene:parseIDE(asset:readFile(cAsset, assetPath..asset.references.scene..".ide"))
                 for i = 1, table.length(sceneIPLDatas), 1 do
                     local j = sceneIPLDatas[i]
                     local sceneData = {

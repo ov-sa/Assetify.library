@@ -81,11 +81,11 @@ for i, j in imports.pairs(asset.private.properties.whitelisted) do
     end
 end
 
-function asset.public:readFile(filePath, encryptOptions, ...)
-    if not filePath or (imports.type(filePath) ~= "string") or not file:exists(filePath) then return false end
-    local rw = file:read(filePath)
+function asset.public:readFile(cAsset, path, ...)
+    if not cAsset or not path or (imports.type(path) ~= "string") or not file:exists(path) then return false end
+    local rw = file:read(path)
     if not rw then return false end
-    return (not encryptOptions and rw) or string.decode(rw, encryptOptions.mode, {key = encryptOptions.key, iv = (encryptOptions.iv and string.decode(encryptOptions.iv[imports.sha256(filePath)], "base64")) or nil}, ...) or false
+    return (not cAsset.encryptOptions and rw) or string.decode(rw, cAsset.encryptOptions.mode, {key = cAsset.encryptOptions.key, iv = (cAsset.encryptOptions.iv and string.decode(cAsset.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
@@ -154,13 +154,13 @@ if localPlayer then
                 if j[v] then
                     cAsset.unsynced.rwCache.replace[v] = {}
                     if v == "txd" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(j[v], cAsset.manifest.encryptOptions))) or false
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(cAsset, j[v]))) or false
                         if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineImportTXD(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     elseif v == "dff" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(j[v], cAsset.manifest.encryptOptions), j.isTransparency)) or false
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(cAsset, j[v]), j.isTransparency)) or false
                         if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceModel(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     elseif v == "col" then
-                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(j[v], cAsset.manifest.encryptOptions))) or false
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(cAsset, j[v]))) or false
                         if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     end
                 end
@@ -180,13 +180,13 @@ if localPlayer then
                     cAsset.unsynced.rwCache.dep[i][k] = {}
                     if k ~= "server" then
                         for m, n in imports.pairs(v) do
-                            cAsset.unsynced.rwCache.dep[i][k][m] = asset.public:readFile(n, cAsset.manifest.encryptOptions, true)
+                            cAsset.unsynced.rwCache.dep[i][k][m] = asset.public:readFile(cAsset, n, true)
                         end
                     end
                 elseif i == "texture" then
-                    cAsset.unsynced.rwCache.dep[i][k] = shader:loadTex(v, cAsset.manifest.encryptOptions)
+                    cAsset.unsynced.rwCache.dep[i][k] = shader:loadTex(cAsset, v)
                 else
-                    cAsset.unsynced.rwCache.dep[i][k] = asset.public:readFile(v, cAsset.manifest.encryptOptions)
+                    cAsset.unsynced.rwCache.dep[i][k] = asset.public:readFile(cAsset, v)
                 end
             end
         end
@@ -294,20 +294,20 @@ if localPlayer then
         return true
     end
 else
-    function asset.public:buildManifest(rootPath, localPath, manifestPath)
-        if not manifestPath then return false end
-        localPath = localPath or rootPath
-        manifestPath = localPath..manifestPath
-        local result = file:read(manifestPath)
-        result = (result and table.decode(result, file:parseURL(manifestPath).extension)) or false
+    function asset.public:buildManifest(rooturl, localurl, path)
+        if not path then return false end
+        localurl = localurl or rooturl
+        path = localurl..path
+        local result = file:read(path)
+        result = (result and table.decode(result, file:parseURL(path).extension)) or false
         if result then
             for i, j in imports.pairs(result) do
                 local cURL = file:parseURL(j)
                 if cURL and cURL.url and cURL.extension and cURL.pointer and (cURL.extension == "vcl") then
-                    local pointerPath = ((cURL.pointer == "rootDir") and rootPath) or ((cURL.pointer == "localDir") and localPath) or false
+                    local pointerPath = ((cURL.pointer == "rootDir") and rooturl) or ((cURL.pointer == "localDir") and localurl) or false
                     if pointerPath then
-                        local __cURL = file:parseURL(file:resolveURL(pointerPath..(cURL.directory or "")..cURL.file, file.validPointers["localDir"]..rootPath))
-                        result[i] = asset.public:buildManifest(rootPath, __cURL.directory or "", __cURL.file)
+                        local __cURL = file:parseURL(file:resolveURL(pointerPath..(cURL.directory or "")..cURL.file, file.validPointers["localDir"]..rooturl))
+                        result[i] = asset.public:buildManifest(rooturl, __cURL.directory or "", __cURL.file)
                     end
                 end
             end
@@ -315,42 +315,42 @@ else
         return result
     end
 
-    function asset.public:buildFile(cAsset, filePath, skipSync, syncRaw, debugExistence)
-        if not cAsset or not filePath then return false end
-        if (not skipSync and not cAsset.rw.synced.hash[filePath]) or (skipSync and syncRaw and not cAsset.rw.unsynced.raw[filePath]) then
-            local builtFilePathHash = imports.sha256(filePath)
-            local builtFileData, builtFileSize = file:read(filePath)
-            if builtFileData then
+    function asset.public:buildFile(cAsset, path, skipSync, syncRaw, debugExistence)
+        if not cAsset or not path then return false end
+        if (not skipSync and not cAsset.rw.synced.hash[path]) or (skipSync and syncRaw and not cAsset.rw.unsynced.raw[path]) then
+            local builtPathHash = imports.sha256(path)
+            local builtData, builtSize = file:read(path)
+            if builtData then
                 if not skipSync then
-                    cAsset.rw.synced.bandwidth.file[filePath] = builtFileSize
-                    cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[filePath]
-                    syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[filePath]
-                    cAsset.rw.unsynced.data[filePath] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtFileData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtFileData
-                    if imports.type(cAsset.rw.unsynced.data[filePath]) == "table" then
+                    cAsset.rw.synced.bandwidth.file[path] = builtSize
+                    cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[path]
+                    syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[path]
+                    cAsset.rw.unsynced.data[path] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtData
+                    if imports.type(cAsset.rw.unsynced.data[path]) == "table" then
                         if cAsset.manifest.encryptOptions.iv then
-                            local builtFileCachePath = cAsset.manifest.encryptOptions.path..asset.public.references.cache.."/"..builtFilePathHash..".rw"
-                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and (not asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength or (#string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64") == asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtFilePathHash]) or nil
-                            if cAsset.manifest.encryptOptions.iv[builtFilePathHash] then
-                                local builtFileCacheContent = file:read(builtFileCachePath)
-                                local builtFileCacheData = string.decode(builtFileCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = string.decode(cAsset.manifest.encryptOptions.iv[builtFilePathHash], "base64")})
-                                if not builtFileCacheData or (imports.sha256(builtFileCacheData) ~= imports.sha256(builtFileData)) then cAsset.manifest.encryptOptions.iv[builtFilePathHash] = nil end
-                                cAsset.rw.unsynced.data[filePath][1] = (cAsset.manifest.encryptOptions.iv[builtFilePathHash] and builtFileCacheContent) or cAsset.rw.unsynced.data[filePath][1]
+                            local builtCachePath = cAsset.manifest.encryptOptions.path..asset.public.references.cache.."/"..builtPathHash..".rw"
+                            cAsset.manifest.encryptOptions.iv[builtPathHash] = (cAsset.manifest.encryptOptions.iv[builtPathHash] and (not asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength or (#string.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64") == asset.public.encryptions[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtPathHash]) or nil
+                            if cAsset.manifest.encryptOptions.iv[builtPathHash] then
+                                local builtCacheContent = file:read(builtCachePath)
+                                local builtCacheData = string.decode(builtCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = string.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64")})
+                                if not builtCacheData or (imports.sha256(builtCacheData) ~= imports.sha256(builtData)) then cAsset.manifest.encryptOptions.iv[builtPathHash] = nil end
+                                cAsset.rw.unsynced.data[path][1] = (cAsset.manifest.encryptOptions.iv[builtPathHash] and builtCacheContent) or cAsset.rw.unsynced.data[path][1]
                             end
-                            cAsset.manifest.encryptOptions.iv[builtFilePathHash] = cAsset.manifest.encryptOptions.iv[builtFilePathHash] or string.encode(cAsset.rw.unsynced.data[filePath][2], "base64")
-                            file:write(builtFileCachePath, cAsset.rw.unsynced.data[filePath][1])
+                            cAsset.manifest.encryptOptions.iv[builtPathHash] = cAsset.manifest.encryptOptions.iv[builtPathHash] or string.encode(cAsset.rw.unsynced.data[path][2], "base64")
+                            file:write(builtCachePath, cAsset.rw.unsynced.data[path][1])
                         end
-                        cAsset.rw.unsynced.data[filePath] = cAsset.rw.unsynced.data[filePath][1]
+                        cAsset.rw.unsynced.data[path] = cAsset.rw.unsynced.data[path][1]
                     end
-                    cAsset.rw.synced.hash[filePath] = imports.sha256(cAsset.rw.unsynced.data[filePath])
-                    local builtFileContent = string.encode(cAsset.rw.unsynced.data[filePath], "base64")
-                    if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = filePath, hash = imports.sha256(builtFileContent)})) ~= "true" then
-                        thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = filePath, content = builtFileContent}))
-                        imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..filePath)
+                    cAsset.rw.synced.hash[path] = imports.sha256(cAsset.rw.unsynced.data[path])
+                    local builtContent = string.encode(cAsset.rw.unsynced.data[path], "base64")
+                    if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = path, hash = imports.sha256(builtContent)})) ~= "true" then
+                        thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = path, content = builtContent}))
+                        imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..path)
                     end
                 end
-                if syncRaw then cAsset.rw.unsynced.raw[filePath] = builtFileData end
+                if syncRaw then cAsset.rw.unsynced.raw[path] = builtData end
             elseif debugExistence then 
-                imports.outputDebugString("Assetify: Invalid File ━│  "..filePath)
+                imports.outputDebugString("Assetify: Invalid File ━│  "..path)
             end
         end
         return true

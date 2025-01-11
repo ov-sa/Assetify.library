@@ -82,7 +82,7 @@ if localPlayer then
         cAsset.unsynced.rwCache.map.shader, cAsset.unsynced.rwCache.map.texture = {}, {}
         for i, j in imports.pairs(asset:buildShader(cAsset.manifest.shaderMaps)) do
             if j then
-                cAsset.unsynced.rwCache.map.texture[i] = shader.public:loadTex(i, cAsset.manifest.encryptOptions)
+                cAsset.unsynced.rwCache.map.texture[i] = shader.public:loadTex(cAsset, i)
             end
         end
         return true
@@ -138,18 +138,15 @@ if localPlayer then
         return true
     end
 
-    function shader.public:loadTex(texturePath, encryptOptions)
-        if texturePath then
-            if encryptOptions then
-                local cTexturePath = texturePath..".tmp"
-                if file:write(cTexturePath, asset:readFile(texturePath, encryptOptions)) then
-                    local cTexture = imports.dxCreateTexture(cTexturePath, "dxt5", true)
-                    file:delete(cTexturePath)
-                    return cTexture
-                end
-            else
-                return imports.dxCreateTexture(texturePath, "dxt5", true)
+    function shader.public:loadTex(cAsset, path)
+        if not cAsset or not path then return false end
+        if cAsset.encryptOptions then
+            local data = asset:readFile(cAsset, path)
+            if data then
+                return imports.dxCreateTexture(data, "dxt5", true)
             end
+        else
+            return imports.dxCreateTexture(path, "dxt5", true)
         end
         return false
     end
