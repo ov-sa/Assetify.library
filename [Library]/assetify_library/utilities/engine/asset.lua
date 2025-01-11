@@ -144,24 +144,24 @@ if localPlayer then
         return asset.private:fetchMap(_, shaderMaps)
     end
 
-    function asset.public:createReplacement(assetReplacements, rwCache, encryptOptions)
-        if not assetReplacements or not rwCache then return false end
-        for i, j in imports.pairs(assetReplacements) do
+    function asset.public:createReplacement(cAsset)
+        if not cAsset or not cAsset.manifest.assetReplacements then return false end
+        for i, j in imports.pairs(cAsset.manifest.encryptOptions) do
             j.LODDistance = imports.tonumber(j.LODDistance)
             j.isTransparency = (j.isTransparency and true) or false
             for k = 1, table.length(asset.public.replacements) do
                 local v = asset.public.replacements[k]
                 if j[v] then
-                    rwCache[v] = {}
+                    cAsset.unsynced.rwCache.replace[v] = {}
                     if v == "txd" then
-                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(j[v], encryptOptions))) or false
-                        if rwCache[v][j[v]] then imports.engineImportTXD(rwCache[v][j[v]], i) end
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadTXD(asset.public:readFile(j[v], cAsset.manifest.encryptOptions))) or false
+                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineImportTXD(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     elseif v == "dff" then
-                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(j[v], encryptOptions), j.isTransparency)) or false
-                        if rwCache[v][j[v]] then imports.engineReplaceModel(rwCache[v][j[v]], i) end
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadDFF(asset.public:readFile(j[v], cAsset.manifest.encryptOptions), j.isTransparency)) or false
+                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceModel(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     elseif v == "col" then
-                        rwCache[v][j[v]] = rwCache[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(j[v], encryptOptions))) or false
-                        if rwCache[v][j[v]] then imports.engineReplaceCOL(rwCache[v][j[v]], i) end
+                        cAsset.unsynced.rwCache.replace[v][j[v]] = cAsset.unsynced.rwCache.replace[v][j[v]] or (v and file:exists(j[v]) and imports.engineLoadCOL(asset.public:readFile(j[v], cAsset.manifest.encryptOptions))) or false
+                        if cAsset.unsynced.rwCache.replace[v][j[v]] then imports.engineReplaceCOL(cAsset.unsynced.rwCache.replace[v][j[v]], i) end
                     end
                 end
             end
