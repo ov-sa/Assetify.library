@@ -215,24 +215,24 @@ if localPlayer then
         rwStreamRange = imports.tonumber(rwStreamRange) or assetManifest.streamRange
         if not asset.public:isInstance(self) then return false end
         if not assetType or not assetName or not assetPack or not rwCache or not assetManifest or not assetData or not rwPaths then return false end
-        local loadState = false
+        local result = false
         if assetType == "module" then
             assetData.cAsset = self
             self.rwPaths = rwPaths
-            loadState = true
+            result = true
         elseif assetType == "animation" then
             rwCache.ifp[rwPaths.ifp] = rwCache.ifp[rwPaths.ifp] or (rwPaths.ifp and file:exists(rwPaths.ifp) and imports.engineLoadIFP(asset.public:readFile(rwPaths.ifp, assetManifest.encryptOptions), assetType.."."..assetName)) or false
             if rwCache.ifp[rwPaths.ifp] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
-                loadState = true
+                result = true
             end
         elseif assetType == "sound" then
             rwCache.sound[rwPaths.sound] = rwCache.sound[rwPaths.sound] or (rwPaths.sound and file:exists(rwPaths.sound) and asset.public:readFile(rwPaths.sound, assetManifest.encryptOptions)) or false
             if rwCache.sound[rwPaths.sound] then
                 assetData.cAsset = self
                 self.rwPaths = rwPaths
-                loadState = true
+                result = true
             end
         else
             if not assetPack.assetType then return false end
@@ -271,10 +271,10 @@ if localPlayer then
                     modelID = modelID,
                     lodID = lodID
                 }
-                loadState = true
+                result = true
             end
         end
-        return loadState
+        return result
     end
 
     function asset.public:unload(rwCache)
@@ -356,64 +356,64 @@ else
         return true
     end
 
-    function asset.public:buildShader(assetPath, assetManifest, filePointer)
-        if not assetPath or not assetManifest or not assetManifest.shaderMaps or not filePointer then return false end
-        for i, j in imports.pairs(asset.private:fetchMap(assetPath, assetManifest.shaderMaps)) do
+    function asset.public:buildShader(cAsset)
+        if not cAsset or not cAsset.manifest.shaderMaps then return false end
+        for i, j in imports.pairs(asset.private:fetchMap(assetPath, cAsset.manifest.shaderMaps)) do
             if j then
-                asset.public:buildFile(i, filePointer, assetManifest.encryptOptions, _, _, true)
+                asset.public:buildFile(i, cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
             end
             thread:pause()
         end
         return true
     end
 
-    function asset.public:buildReplacement(assetPath, assetManifest, filePointer)
-        if not assetPath or not assetManifest or not assetManifest.assetReplacements or not filePointer then return false end
+    function asset.public:buildReplacement(cAsset)
+        if not cAsset or not cAsset.manifest.assetReplacements then return false end
         local result = {}
-        for i, j in imports.pairs(assetManifest.assetReplacements) do
+        for i, j in imports.pairs(cAsset.manifest.assetReplacements) do
             if j and (imports.type(j) == "table") then
                 result[i] = j
                 for k = 1, table.length(asset.public.replacements) do
                     local v = asset.public.replacements[k]
                     if j[v] then
-                        result[i][v] = assetPath..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(result[i][v], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, _, true)
+                        result[i][v] = cAsset.path..asset.public.references.replace.."/"..j[v]
+                        asset.public:buildFile(result[i][v], cAsset.rw, cAsset.manifest.encryptOptions, cAsset.rw.unsynced.raw, _, true)
                         thread:pause()
                     end
                 end
             end
             thread:pause()
         end
-        assetManifest.assetReplacements = result
+        cAsset.manifest.assetReplacements = result
         return true
     end
 
-    function asset.public:buildDep(assetPath, assetManifest, filePointer)
-        if not assetPath or not assetManifest or not assetManifest.assetDeps or not filePointer then return false end
+    function asset.public:buildDep(cAsset)
+        if not cAsset.path or not cAsset.manifest.assetDeps then return false end
         local result = {}
-        for i, j in imports.pairs(assetManifest.assetDeps) do
+        for i, j in imports.pairs(cAsset.manifest.assetDeps) do
             if j and (imports.type(j) == "table") then
                 result[i] = {}
                 for k, v in imports.pairs(j) do
                     result[i][k] = {}
                     if i == "script" then
                         for m, n in imports.pairs(v) do
-                            v[m] = assetPath..asset.public.references.dep.."/"..v[m]
+                            v[m] = cAsset.path..asset.public.references.dep.."/"..v[m]
                             result[i][k][m] = v[m]
-                            asset.public:buildFile(result[i][k][m], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, k == "server", true)
+                            asset.public:buildFile(result[i][k][m], cAsset.rw, cAsset.manifest.encryptOptions, cAsset.rw.unsynced.raw, k == "server", true)
                             thread:pause()
                         end
                     else
-                        j[k] = assetPath..asset.public.references.dep.."/"..j[k]
+                        j[k] = cAsset.path..asset.public.references.dep.."/"..j[k]
                         result[i][k] = j[k]
-                        asset.public:buildFile(result[i][k], filePointer, assetManifest.encryptOptions, filePointer.unsynced.raw, _, true)
+                        asset.public:buildFile(result[i][k], cAsset.rw, cAsset.manifest.encryptOptions, cAsset.rw.unsynced.raw, _, true)
                     end
                     thread:pause()
                 end
             end
             thread:pause()
         end
-        assetManifest.assetDeps = result
+        cAsset.manifest.assetDeps = result
         return true
     end
 
@@ -544,9 +544,9 @@ else
                         asset.public:buildFile(cAsset.path..asset.public.references.asset..".col", cAsset.rw, cAsset.manifest.encryptOptions)
                         thread:pause()
                     end
-                    asset.public:buildShader(cAsset.path, cAsset.manifest, cAsset.rw)
-                    asset.public:buildReplacement(cAsset.path, cAsset.manifest, cAsset.rw)
-                    asset.public:buildDep(cAsset.path, cAsset.manifest, cAsset.rw)
+                    asset.public:buildShader(cAsset)
+                    asset.public:buildReplacement(cAsset)
+                    asset.public:buildDep(cAsset)
                     if cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.iv then file:write(cAsset.path..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64")) end
                 end
             end
