@@ -105,6 +105,6 @@ end
 
 network:fetch("Assetify:onElementDestroy"):on(function(self, source)
     if not syncer.isLibraryBooted or not source then return false end
-    if syncer.syncedEntityDatas[source] ~= nil then self:sleep(settings.syncer.persistenceDuration) end
+    if syncer.syncedEntityDatas[source] ~= nil then self:sleep(settings.syncer.persistence) end
     syncer.syncedEntityDatas[source] = nil
 end, {isAsync = true})

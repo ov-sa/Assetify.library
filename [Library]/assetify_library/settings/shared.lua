@@ -54,7 +54,7 @@ settings = {
     },
 
     syncer = {
-        persistenceDuration = 30*1000
+        persistence = 30*1000
     },
 
     renderer = {
