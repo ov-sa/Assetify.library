@@ -82,7 +82,7 @@ for i, j in imports.pairs(asset.private.properties.whitelisted) do
 end
 
 function asset.public:readFile(cAsset, path, ...)
-    if not cAsset or not path or (imports.type(path) ~= "string") or not file:exists(path) then return false end
+    if not cAsset or not path or (imports.type(path) ~= "string") or not cAsset.hash[path] or not file:exists(path) then return false end
     local rw = file:read(path)
     if not rw then return false end
     return (not cAsset.manifest.encryptOptions and rw) or string.decode(rw, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...) or false
