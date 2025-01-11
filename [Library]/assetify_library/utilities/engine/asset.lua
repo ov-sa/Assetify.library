@@ -432,7 +432,7 @@ else
                 cAsset.path = asset.public.references.root..string.lower(assetType).."/"..cAsset.name.."/"
                 cAsset.manifest = asset.public:buildManifest(cAsset.path, _, asset.public.references.asset..".vcl")
                 if cAsset.manifest then
-                    for k, v in pairs(asset.private.properties.reserved) do
+                    for k, v in imports.pairs(asset.private.properties.reserved) do
                         cAsset.manifest[k] = ((asset.private.properties.whitelisted[assetType] or asset.private.properties.whitelisted["*"])[k] and cAsset.manifest[k]) or false
                     end
                     cAsset.manifest.encryptMode = (cAsset.manifest.encryptKey and cAsset.manifest.encryptMode and asset.public.encryptions[cAsset.manifest.encryptMode] and cAsset.manifest.encryptMode) or false
@@ -447,7 +447,7 @@ else
                     cAsset.manifest.shaderMaps = (cAsset.manifest.shaderMaps and (imports.type(cAsset.manifest.shaderMaps) == "table") and cAsset.manifest.shaderMaps) or false
                     cAsset.manifest.assetReplacements = (cAsset.manifest.assetReplacements and (imports.type(cAsset.manifest.assetReplacements) == "table") and cAsset.manifest.assetReplacements) or false
                     cAsset.manifest.assetDeps = (cAsset.manifest.assetDeps and (imports.type(cAsset.manifest.assetDeps) == "table") and cAsset.manifest.assetDeps) or false
-                    cAssetPack.rwDatas[cAsset.name] = {
+                    cAsset.rw = {
                         synced = {
                             manifest = cAsset.manifest,
                             bandwidthData = {total = 0, file = {}},
@@ -458,10 +458,11 @@ else
                             data = {}
                         }
                     }
+                    cAssetPack.rwDatas[cAsset.name] = cAsset.rw
                     if assetType == "module" then
                         table.insert(syncer.libraryModules, cAsset.name)
                     elseif assetType == "animation" then
-                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".ifp", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
+                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".ifp", cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
                         thread:pause()
                     elseif assetType == "sound" then
                         if cAsset.manifest.assetSounds then
@@ -472,7 +473,7 @@ else
                                     for k, v in imports.pairs(j) do
                                         if v then
                                             assetSounds[i][k] = v
-                                            asset.public:buildFile(cAsset.path.."sound/"..v, cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
+                                            asset.public:buildFile(cAsset.path.."sound/"..v, cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
                                             thread:pause()
                                         end
                                     end
@@ -499,30 +500,30 @@ else
                         local sceneIPLPath = cAsset.path..asset.public.references.scene..".ipl"
                         local sceneIPLDatas = scene:parseIPL(file:read(sceneIPLPath), cAsset.manifest.sceneNativeObjects)
                         if sceneIPLDatas then
-                            asset.public:buildFile(sceneIPLPath, cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
+                            asset.public:buildFile(sceneIPLPath, cAsset.rw, cAsset.manifest.encryptOptions)
                             if not cAsset.manifest.sceneMapped then
                                 local debugTXDExistence = false
                                 local sceneIDEPath = cAsset.path..asset.public.references.scene..".ide"
                                 local sceneIDEDatas = scene:parseIDE(file:read(sceneIDEPath))
-                                asset.public:buildFile(sceneIDEPath, cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
-                                cAssetPack.rwDatas[cAsset.name].synced.sceneIDE = (sceneIDEDatas and true) or false
+                                asset.public:buildFile(sceneIDEPath, cAsset.rw, cAsset.manifest.encryptOptions)
+                                cAsset.rw.synced.sceneIDE = (sceneIDEDatas and true) or false
                                 for k = 1, table.length(sceneIPLDatas), 1 do
                                     local v = sceneIPLDatas[k]
                                     if not v.nativeID then
                                         if sceneIDEDatas and sceneIDEDatas[(v[2])] then
-                                            asset.public:buildFile(cAsset.path..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
+                                            asset.public:buildFile(cAsset.path..asset.public.references.txd.."/"..(sceneIDEDatas[(v[2])][1])..".txd", cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
                                         else
                                             local childTXDPath = cAsset.path..asset.public.references.txd.."/"..v[2]..".txd"
                                             debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                            asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
+                                            asset.public:buildFile(childTXDPath, cAsset.rw, cAsset.manifest.encryptOptions)
                                         end
-                                        asset.public:buildFile(cAsset.path..asset.public.references.dff.."/"..v[2]..".dff", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
-                                        asset.public:buildFile(cAsset.path..asset.public.references.dff.."/"..asset.public.references.lod.."/"..v[2]..".dff", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
-                                        asset.public:buildFile(cAsset.path..asset.public.references.col.."/"..v[2]..".col", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
+                                        asset.public:buildFile(cAsset.path..asset.public.references.dff.."/"..v[2]..".dff", cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
+                                        asset.public:buildFile(cAsset.path..asset.public.references.dff.."/"..asset.public.references.lod.."/"..v[2]..".dff", cAsset.rw, cAsset.manifest.encryptOptions)
+                                        asset.public:buildFile(cAsset.path..asset.public.references.col.."/"..v[2]..".col", cAsset.rw, cAsset.manifest.encryptOptions)
                                     end
                                     thread:pause()
                                 end
-                                asset.public:buildFile(cAsset.path..asset.public.references.asset..".txd", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, debugTXDExistence)
+                                asset.public:buildFile(cAsset.path..asset.public.references.asset..".txd", cAsset.rw, cAsset.manifest.encryptOptions, _, _, debugTXDExistence)
                             end
                         end
                     else
@@ -531,21 +532,21 @@ else
                             for i, j in imports.pairs(cAsset.manifest.assetClumps) do
                                 local childTXDPath = cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".txd"
                                 debugTXDExistence = (not debugTXDExistence and not file:exists(childTXDPath) and true) or debugTXDExistence
-                                asset.public:buildFile(childTXDPath, cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
-                                asset.public:buildFile(cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
-                                asset.public:buildFile(cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".col", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
+                                asset.public:buildFile(childTXDPath, cAsset.rw, cAsset.manifest.encryptOptions)
+                                asset.public:buildFile(cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".dff", cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
+                                asset.public:buildFile(cAsset.path..asset.public.references.clump.."/"..j.."/"..asset.public.references.asset..".col", cAsset.rw, cAsset.manifest.encryptOptions)
                                 thread:pause()
                             end
                         else
-                            asset.public:buildFile(cAsset.path..asset.public.references.asset..".dff", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, true)
+                            asset.public:buildFile(cAsset.path..asset.public.references.asset..".dff", cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
                         end
-                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".txd", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions, _, _, debugTXDExistence)
-                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".col", cAssetPack.rwDatas[cAsset.name], cAsset.manifest.encryptOptions)
+                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".txd", cAsset.rw, cAsset.manifest.encryptOptions, _, _, debugTXDExistence)
+                        asset.public:buildFile(cAsset.path..asset.public.references.asset..".col", cAsset.rw, cAsset.manifest.encryptOptions)
                         thread:pause()
                     end
-                    asset.public:buildShader(cAsset.path, cAsset.manifest, cAssetPack.rwDatas[cAsset.name])
-                    asset.public:buildReplacement(cAsset.path, cAsset.manifest, cAssetPack.rwDatas[cAsset.name])
-                    asset.public:buildDep(cAsset.path, cAsset.manifest, cAssetPack.rwDatas[cAsset.name])
+                    asset.public:buildShader(cAsset.path, cAsset.manifest, cAsset.rw)
+                    asset.public:buildReplacement(cAsset.path, cAsset.manifest, cAsset.rw)
+                    asset.public:buildDep(cAsset.path, cAsset.manifest, cAsset.rw)
                     if cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.iv then file:write(cAsset.path..asset.public.references.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64")) end
                 end
             end
