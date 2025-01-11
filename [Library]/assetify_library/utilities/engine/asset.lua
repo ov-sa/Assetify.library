@@ -85,7 +85,7 @@ function asset.public:readFile(cAsset, path, ...)
     if not cAsset or not path or (imports.type(path) ~= "string") or not file:exists(path) then return false end
     local rw = file:read(path)
     if not rw then return false end
-    return (not cAsset.encryptOptions and rw) or string.decode(rw, cAsset.encryptOptions.mode, {key = cAsset.encryptOptions.key, iv = (cAsset.encryptOptions.iv and string.decode(cAsset.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...) or false
+    return (not cAsset.manifest.encryptOptions and rw) or string.decode(rw, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
@@ -211,8 +211,8 @@ if localPlayer then
         return true
     end
 
-    function asset.public:load(cAssetPack, cAsset, assetType, assetName, assetCache, rwPaths, rwStreamRange)
-        rwStreamRange = imports.tonumber(rwStreamRange) or assetManifest.streamRange
+    function asset.public:load(cAssetPack, cAsset, assetType, assetName, assetCache, rwPaths, streamRange)
+        streamRange = imports.tonumber(streamRange) or cAsset.manifest.streamRange
         if not asset.public:isInstance(self) then return false end
         if not cAssetPack or not cAsset or not assetType or not assetName or not assetCache or not rwPaths then return false end
         local result = false
@@ -242,6 +242,7 @@ if localPlayer then
                 if modelID then
                     cAsset.unsynced.raw.dff[rwPaths.dff] = cAsset.unsynced.raw.dff[rwPaths.dff] or (rwPaths.dff and file:exists(rwPaths.dff) and imports.engineLoadDFF(asset.public:readFile(cAsset, rwPaths.dff))) or false
                     if not cAsset.unsynced.raw.dff[rwPaths.dff] then
+                        iprint(rwPaths.dff)
                         imports.engineFreeModel(modelID)
                         return false
                     else
@@ -258,12 +259,12 @@ if localPlayer then
                 if cAsset.unsynced.raw.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.raw.txd[rwPaths.txd], modelID) end
                 imports.engineReplaceModel(cAsset.unsynced.raw.dff[rwPaths.dff], modelID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
                 if cAsset.unsynced.raw.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.raw.col[rwPaths.col], modelID) end
-                imports.engineSetModelLODDistance(modelID, rwStreamRange, true)
+                imports.engineSetModelLODDistance(modelID, streamRange, true)
                 if lodID then
                     if cAsset.unsynced.raw.txd[rwPaths.txd] then imports.engineImportTXD(cAsset.unsynced.raw.txd[rwPaths.txd], lodID) end
                     imports.engineReplaceModel(cAsset.unsynced.raw.lod[rwPaths.lod], lodID, (cAsset.manifest and cAsset.manifest.assetTransparency and true) or cAssetPack.assetTransparency)
                     if cAsset.unsynced.raw.col[rwPaths.col] then imports.engineReplaceCOL(cAsset.unsynced.raw.col[rwPaths.col], lodID) end
-                    imports.engineSetModelLODDistance(lodID, rwStreamRange, true)
+                    imports.engineSetModelLODDistance(lodID, streamRange, true)
                 end
                 assetCache.cAsset = self
                 self.rwPaths = rwPaths
@@ -358,7 +359,7 @@ else
 
     function asset.public:buildShader(cAsset)
         if not cAsset or not cAsset.manifest.shaderMaps then return false end
-        for i, j in imports.pairs(asset.private:fetchMap(assetPath, cAsset.manifest.shaderMaps)) do
+        for i, j in imports.pairs(asset.private:fetchMap(cAsset.path, cAsset.manifest.shaderMaps)) do
             if j then
                 asset.public:buildFile(cAsset, i, false, false, true)
             end

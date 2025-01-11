@@ -140,10 +140,12 @@ if localPlayer then
 
     function shader.public:loadTex(cAsset, path)
         if not cAsset or not path then return false end
-        if cAsset.encryptOptions then
-            local data = asset:readFile(cAsset, path)
-            if data then
-                return imports.dxCreateTexture(data, "dxt5", true)
+        if cAsset.manifest.encryptOptions then
+            local temp = path..".tmp"
+            if file:write(temp, asset:readFile(cAsset, path)) then
+                local texture = imports.dxCreateTexture(temp, "dxt5", true)
+                file:delete(temp)
+                return texture
             end
         else
             return imports.dxCreateTexture(path, "dxt5", true)
