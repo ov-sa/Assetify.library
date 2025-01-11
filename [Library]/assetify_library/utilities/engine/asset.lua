@@ -322,9 +322,9 @@ else
             local builtFileData, builtFileSize = file:read(filePath)
             if builtFileData then
                 if not skipSync then
-                    filePointer.synced.bandwidthData.file[filePath] = builtFileSize
-                    filePointer.synced.bandwidthData.total = filePointer.synced.bandwidthData.total + filePointer.synced.bandwidthData.file[filePath]
-                    syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidthData.file[filePath]
+                    filePointer.synced.bandwidth.file[filePath] = builtFileSize
+                    filePointer.synced.bandwidth.total = filePointer.synced.bandwidth.total + filePointer.synced.bandwidth.file[filePath]
+                    syncer.libraryBandwidth = syncer.libraryBandwidth + filePointer.synced.bandwidth.file[filePath]
                     filePointer.unsynced.data[filePath] = (encryptOptions and encryptOptions.mode and encryptOptions.key and {string.encode(builtFileData, encryptOptions.mode, {key = encryptOptions.key})}) or builtFileData
                     if imports.type(filePointer.unsynced.data[filePath]) == "table" then
                         if encryptOptions.iv then
@@ -377,7 +377,7 @@ else
                     local v = asset.public.replacements[k]
                     if j[v] then
                         result[i][v] = cAsset.path..asset.public.references.replace.."/"..j[v]
-                        asset.public:buildFile(result[i][v], cAsset.rw, cAsset.manifest.encryptOptions, cAsset.rw.unsynced.raw, _, true)
+                        asset.public:buildFile(result[i][v], cAsset.rw, cAsset.manifest.encryptOptions, _, _, true)
                         thread:pause()
                     end
                 end
@@ -450,7 +450,10 @@ else
                     cAsset.rw = {
                         synced = {
                             manifest = cAsset.manifest,
-                            bandwidthData = {total = 0, file = {}},
+                            bandwidth = {
+                                total = 0,
+                                file = {}
+                            },
                             hash = {}
                         },
                         unsynced = {

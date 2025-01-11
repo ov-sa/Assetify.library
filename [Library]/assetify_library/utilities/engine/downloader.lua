@@ -43,21 +43,21 @@ if localPlayer then
     end
 
     local function updateStatus(pointer, rawStatus)
-        if not pointer or pointer.bandwidthData.isDownloaded then return false end
-        local prevTotalETA, prevTotalSize = pointer.bandwidthData.status.eta or 0, pointer.bandwidthData.status.total or 0
+        if not pointer or pointer.bandwidth.isDownloaded then return false end
+        local prevTotalETA, prevTotalSize = pointer.bandwidth.status.eta or 0, pointer.bandwidth.status.total or 0
         for file, status in imports.pairs(rawStatus) do
-            pointer.bandwidthData.status.file[file] = pointer.bandwidthData.status.file[file] or {}
-            local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*pointer.bandwidthData.file[file]
-            local prevETA, prevSize = pointer.bandwidthData.status.file[file].eta or 0, pointer.bandwidthData.status.file[file].size or 0
-            pointer.bandwidthData.status.eta = pointer.bandwidthData.status.eta - prevETA + currentETA
-            pointer.bandwidthData.status.eta_count = pointer.bandwidthData.status.eta_count + ((not pointer.bandwidthData.status.file[file].eta and 1) or 0)
-            pointer.bandwidthData.status.total = pointer.bandwidthData.status.total - prevSize + currentSize
-            pointer.bandwidthData.status.file[file].eta, pointer.bandwidthData.status.file[file].size = currentETA, currentSize
+            pointer.bandwidth.status.file[file] = pointer.bandwidth.status.file[file] or {}
+            local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*pointer.bandwidth.file[file]
+            local prevETA, prevSize = pointer.bandwidth.status.file[file].eta or 0, pointer.bandwidth.status.file[file].size or 0
+            pointer.bandwidth.status.eta = pointer.bandwidth.status.eta - prevETA + currentETA
+            pointer.bandwidth.status.eta_count = pointer.bandwidth.status.eta_count + ((not pointer.bandwidth.status.file[file].eta and 1) or 0)
+            pointer.bandwidth.status.total = pointer.bandwidth.status.total - prevSize + currentSize
+            pointer.bandwidth.status.file[file].eta, pointer.bandwidth.status.file[file].size = currentETA, currentSize
         end
-        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidthData.status.eta
-        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidthData.status.isLibraryETACounted and 1) or 0)
-        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidthData.status.total
-        pointer.bandwidthData.status.isLibraryETACounted = true
+        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidth.status.eta
+        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidth.status.isLibraryETACounted and 1) or 0)
+        syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidth.status.total
+        pointer.bandwidth.status.isLibraryETACounted = true
         return true
     end
 
@@ -79,19 +79,19 @@ if localPlayer then
 
     network:create("Assetify:Downloader:syncHash"):on(function(accessTokens, assetType, assetName, hashes, bandwidth)
         syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
-        syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidthData = 0}
+        syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidth = 0}
         thread:create(function(self)
             local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cPointer.bandwidthData.status = {total = 0, eta = 0, eta_count = 0, file = {}}
+            cPointer.bandwidth.status = {total = 0, eta = 0, eta_count = 0, file = {}}
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local data = file:read(i)
                 if not data or (imports.sha256(data) ~= j) then
                     fetchFiles[i] = true
                 else
-                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total
-                    cPointer.bandwidthData.status.total = cPointer.bandwidthData.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
-                    syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidthData.file[i]
+                    cPointer.bandwidth.status.total = cPointer.bandwidth.status.total
+                    cPointer.bandwidth.status.total = cPointer.bandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidth.file[i]
+                    syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total + settings.assetPacks[assetType].rwDatas[assetName].bandwidth.file[i]
                 end
                 data = nil
                 thread:pause()
@@ -137,13 +137,13 @@ if localPlayer then
 
     network:create("Assetify:Downloader:syncState"):on(function(assetType, assetName)
         local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-        cPointer.bandwidthData.isDownloaded = true
+        cPointer.bandwidth.isDownloaded = true
         local isPackVoid = true
-        if cPointer.bandwidthData.status and cPointer.bandwidthData.status.isLibraryETACounted then
-            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidthData.status.eta
+        if cPointer.bandwidth.status and cPointer.bandwidth.status.isLibraryETACounted then
+            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidth.status.eta
             syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count - 1
         end
-        cPointer.bandwidthData.status = nil
+        cPointer.bandwidth.status = nil
         syncer.private.scheduledAssets[assetType][assetName] = nil
         for i, j in imports.pairs(syncer.private.scheduledAssets[assetType]) do
             if j then
@@ -199,7 +199,7 @@ else
                 else
                     for k, v in imports.pairs(j) do
                         isPackVoid = false
-                        if isModule or syncModules then syncer.private:syncData(player, packName, i, {k, "bandwidthData"}, v.synced.bandwidthData) end
+                        if isModule or syncModules then syncer.private:syncData(player, packName, i, {k, "bandwidth"}, v.synced.bandwidth) end
                         if isModule or not syncModules then syncer.private:syncHash(player, packName, k, v.synced.hash) end
                         thread:pause()
                     end
@@ -231,7 +231,7 @@ else
             thread:create(function(self)
                 local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
                 for i, j in imports.pairs(cAsset.synced) do
-                    if i ~= "bandwidthData" then syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j) end
+                    if i ~= "bandwidth" then syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j) end
                     thread:pause()
                 end
                 syncer.private:syncState(player, assetDatas.type, assetDatas.name)

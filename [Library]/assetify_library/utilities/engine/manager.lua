@@ -165,9 +165,9 @@ if localPlayer then
         if assetType and assetName then
             if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].rwDatas[assetName] then return false end
             local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cBandwidth = cPointer.bandwidthData.total
-            cDownloaded = (cPointer.bandwidthData.isDownloaded and cBandwidth) or (cPointer.bandwidthData.status and cPointer.bandwidthData.status.total) or 0
-            cETA = (not cPointer.bandwidthData.isDownloaded and cPointer.bandwidthData.status and (cPointer.bandwidthData.status.eta/math.max(1, cPointer.bandwidthData.status.eta_count))) or false
+            cBandwidth = cPointer.bandwidth.total
+            cDownloaded = (cPointer.bandwidth.isDownloaded and cBandwidth) or (cPointer.bandwidth.status and cPointer.bandwidth.status.total) or 0
+            cETA = (not cPointer.bandwidth.isDownloaded and cPointer.bandwidth.status and (cPointer.bandwidth.status.eta/math.max(1, cPointer.bandwidth.status.eta_count))) or false
         else
             cBandwidth = syncer.libraryBandwidth.total
             cDownloaded = ((syncer.libraryBandwidth.isDownloaded or syncer.isLibraryLoaded) and cBandwidth) or (syncer.libraryBandwidth.status and syncer.libraryBandwidth.status.total) or 0
