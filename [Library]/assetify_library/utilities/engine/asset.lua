@@ -146,7 +146,7 @@ if localPlayer then
 
     function asset.public:createReplacement(cAsset)
         if not cAsset or not cAsset.manifest.assetReplacements then return false end
-        for i, j in imports.pairs(cAsset.manifest.encryptOptions) do
+        for i, j in imports.pairs(cAsset.manifest.assetReplacements) do
             j.LODDistance = imports.tonumber(j.LODDistance)
             j.isTransparency = (j.isTransparency and true) or false
             for k = 1, table.length(asset.public.replacements) do
