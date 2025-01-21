@@ -202,15 +202,15 @@ function vcl.private.parseObject(parser, buffer, rw)
                 if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
                     local next = (parser.next and table.clone(parser.next, true)) or {}
-                    next.buffer = string.sub(buffer, 0, parser.ref + 1)
-                    next.ref = vcl.private.fetchBuffer(next.buffer, vcl.private.fetchLine(next.buffer) - 1)
-                    next.ref_rw = next.ref_rw + next.ref
-                    next.buffer = string.sub(buffer, next.ref + 1)
+                    next.buffer_temp = string.sub(buffer, 0, parser.ref + 1)
+                    next.ref_temp = vcl.private.fetchBuffer(next.buffer_temp, vcl.private.fetchLine(next.buffer_temp) - 1)
+                    next.ref = next.ref + next.ref_temp
+                    next.buffer_temp = string.sub(buffer, next.ref_temp + 1)
                     next.padding = linePadding
-                    local value, ref, isErrored = vcl.private.decode(next.buffer, parser.root, next, parser.ref - next.ref + 1)
+                    local value, ref, isErrored = vcl.private.decode(next.buffer_temp, parser.root, next, parser.ref - next.ref_temp + 1)
                     if not isErrored then
                         if not parser.child then parser.root[(parser.index)] = value end
-                        parser.pointer[(parser.index)], parser.ref, parser.index = value, ref + next.ref - 1, ""
+                        parser.pointer[(parser.index)], parser.ref, parser.index = value, ref + next.ref_temp - 1, ""
                     else parser.isErrored = 0 end
                 else parser.isErrored = 1 end
                 if parser.isErrored then return false end
@@ -229,7 +229,7 @@ function vcl.private.parseReturn(parser, buffer)
     else
         parser.value = false
         if not parser.isErrored or (parser.isErrored == 1) then
-            parser.error = string.format(parser.error, vcl.private.fetchLine(parser.next.buffer_rw, parser.ref + parser.next.ref_rw), (parser.type and ("Malformed "..parser.type)) or "Invalid declaration")
+            parser.error = string.format(parser.error, vcl.private.fetchLine(parser.next.buffer, parser.ref + parser.next.ref), (parser.type and ("Malformed "..parser.type)) or "Invalid declaration")
             imports.outputDebugString(parser.error)
         end
     end
@@ -298,8 +298,8 @@ function vcl.private.decode(buffer, root, next, ref)
         child = (root and true) or false,
         error = "Failed to decode vcl. [Line: %s] [Reason: %s]"
     }
-    parser.next.buffer_rw = parser.next.buffer_rw or buffer
-    parser.next.ref_rw = parser.next.ref_rw or 0
+    parser.next.buffer = parser.next.buffer or buffer
+    parser.next.ref = parser.next.ref or 0
     parser.next.padding = parser.next.padding or 0
     if not parser.child then
         buffer = string.gsub(string.detab(buffer), vcl.private.types.carriageline, "")
