@@ -94,7 +94,7 @@ function vcl.private.parseNumber(parser, buffer, rw)
             parser.ref = matchIndex - 1
             if not parser.value then return false end
             if (parser.value == math.floor(parser.value)) and (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init) then
-                parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref, string.sub(parser.value, 2), "object", parser.value < 0, ""
+                parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref + 1, string.sub(parser.value, 2), "object", parser.value < 0, ""
             else
                 parser.isTypeParsed = true
             end
@@ -108,10 +108,9 @@ function vcl.private.parseString(parser, buffer, rw)
         parser.type, parser.isValueSkipAppend = "string", true
         local matchIndex = string.find(buffer, rw, parser.ref + 1)
         if not matchIndex or (vcl.private.fetchLine(buffer, parser.ref) ~= vcl.private.fetchLine(buffer, matchIndex)) then return false end
-        parser.value = string.sub(buffer, parser.ref + 1, matchIndex - 1)
-        parser.ref = matchIndex
+        parser.ref, parser.value = matchIndex, string.sub(buffer, parser.ref + 1, matchIndex - 1)
         if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-            parser.index, parser.value, parser.type = parser.value, "", "object"
+            parser.ref, parser.index, parser.value, parser.type = parser.ref + 1, parser.value, "", "object"
         elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
         else
             parser.isTypeParsed = true
