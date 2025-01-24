@@ -86,19 +86,17 @@ end
 
 function vcl.private.parseNumber(parser, buffer, rw)
     if not parser.type or (parser.type == "number") then
-        local isNumber = imports.tonumber(rw)
-        if not parser.type then
-            if isNumber or (rw == vcl.private.types.negative) then parser.type, parser.isTypeNegative = "number", ((rw == vcl.private.types.negative) and parser.ref) or false end
-            if isNumber and ((vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.space) or (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.newline)) then parser.isTypeParsed = true end
-        else
-            if rw == vcl.private.types.decimal then
-                if not parser.isTypeFloat then parser.isTypeFloat = true
-                else return false end
-            elseif not parser.isTypeFloat and parser.isTypeNegative and (rw == vcl.private.types.init) then
-                parser.ref, parser.index, parser.value, parser.type, parser.isTypeFloat, parser.isTypeNegative, parser.isValueSkipAppend = parser.isTypeNegative - 1, "", "", "object", nil, nil, true
-            elseif not parser.isTypeParsed then
-                if not isNumber then return false
-                elseif not string.isVoid(parser.value) and ((vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.space) or (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.newline)) then parser.isTypeParsed = true end
+        if imports.tonumber(rw) or (rw == vcl.private.types.negative) then
+            parser.type, parser.isValueSkipAppend = "number", true
+            local matchIndex = string.find(buffer, "[^%d%"..vcl.private.types.decimal.."]+", parser.ref + 1)
+            if not matchIndex or (vcl.private.fetchLine(buffer, parser.ref) ~= vcl.private.fetchLine(buffer, matchIndex - 1)) then return false end
+            parser.value = tonumber(string.sub(buffer, parser.ref, matchIndex - 1))
+            parser.ref = matchIndex - 1
+            if not parser.value then return false end
+            if (parser.value == math.floor(parser.value)) and (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init) then
+                parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref, string.sub(parser.value, 2), "object", parser.value < 0, ""
+            else
+                parser.isTypeParsed = true
             end
         end
     end
@@ -113,7 +111,7 @@ function vcl.private.parseString(parser, buffer, rw)
         parser.value = string.sub(buffer, parser.ref + 1, matchIndex - 1)
         parser.ref = matchIndex
         if vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init then
-            parser.ref, parser.value, parser.type = parser.ref - string.len(parser.value) - 2, "", "object"
+            parser.index, parser.value, parser.type = parser.value, "", "object"
         elseif (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false
         else
             parser.isTypeParsed = true
@@ -209,13 +207,13 @@ function vcl.private.parseObject(parser, buffer, rw)
                     next.padding = linePadding
                     local value, ref, isErrored = vcl.private.decode(next.buffer_temp, parser.root, next, parser.ref - next.ref_temp + 1)
                     if not isErrored then
-                        if not parser.child then parser.root[(parser.index)] = value end
-                        parser.pointer[(parser.index)], parser.ref, parser.index = value, ref + next.ref_temp - 1, ""
+                        if not parser.child then parser.root[parser.index] = value end
+                        parser.pointer[parser.index], parser.ref, parser.index = value, ref + next.ref_temp - 1, ""
                     else parser.isErrored = 0 end
                 else parser.isErrored = 1 end
                 if parser.isErrored then return false end
             end
-        elseif parser.isTypeID or not string.isVoid(parser.index) then return false end 
+        elseif parser.isTypeID or not string.isVoid(parser.index) then return false end
     end
     return true
 end
