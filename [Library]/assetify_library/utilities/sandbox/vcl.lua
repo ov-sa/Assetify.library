@@ -95,13 +95,14 @@ function vcl.private.parseNumber(parser, buffer, rw)
             parser.type = "number"
             local matchIndex = string.find(buffer, "[^%d%"..vcl.private.types.decimal.."]+", parser.ref + 1)
             if not matchIndex or (vcl.private.fetchLine(buffer, parser.ref) ~= vcl.private.fetchLine(buffer, matchIndex - 1)) then return false end
-            parser.value = tonumber(string.sub(buffer, parser.ref, matchIndex - 1))
+            local matchedValue = string.sub(buffer, parser.ref, matchIndex - 1)
+            parser.value = tonumber(matchedValue)
             parser.ref = matchIndex - 1
-            if not parser.value then return false end
-            if (parser.value == math.floor(parser.value)) and (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init) then
-                parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref + 1, string.sub(parser.value, 2), "object", parser.value < 0, ""
+            if ((not parser.value and (matchedValue == vcl.private.types.list)) or (parser.value == math.floor(parser.value))) and (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init) then
+                parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref + 1, (parser.value and string.sub(parser.value, 2)) or "", "object", not parser.value or (parser.value < 0), ""
             else
                 parser.isTypeParsed = true
+                if not parser.value then return false end
                 if (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false end
             end
         end
