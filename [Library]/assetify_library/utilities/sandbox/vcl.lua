@@ -100,9 +100,9 @@ function vcl.private.parseNumber(parser, buffer, rw)
             parser.ref = matchIndex - 1
             if ((not parser.value and (matchedValue == vcl.private.types.list)) or (parser.value == math.floor(parser.value))) and (vcl.private.fetchRW(buffer, parser.ref + 1) == vcl.private.types.init) then
                 parser.ref, parser.index, parser.type, parser.isTypeID, parser.value = parser.ref + 1, (parser.value and string.sub(parser.value, 2)) or "", "object", not parser.value or (parser.value < 0), ""
+            elseif not parser.value then return false
             else
                 parser.isTypeParsed = true
-                if not parser.value then return false end
                 if (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.newline) then return false end
             end
         end
