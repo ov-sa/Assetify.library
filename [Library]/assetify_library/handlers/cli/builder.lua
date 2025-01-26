@@ -47,13 +47,11 @@ else
                     imports.outputServerLog("Assetify: Webserver ━│  Connection successfully established!")
                     if not settings.assetPacks["module"] then network:emit("Assetify:onModuleLoad", false) end
                     for i, j in imports.pairs(settings.assetPacks) do
-                        thread:create(function()
-                            asset:buildPack(i, j, function(state, assetType)
-                                if assetType == "module" then network:emit("Assetify:onModuleLoad", false) end
-                                timer:create(function() self:resume() end, 1, 1)
-                            end)
-                        end):resume({executions = settings.downloader.buildRate, frames = 1})
-                        thread:pause()
+                        asset:buildPack(i, j, function()
+                            if i == "module" then network:emit("Assetify:onModuleLoad", false) end
+                            self:resume()
+                        end)
+                        self:pause()
                     end
                     imports.outputServerLog("Assetify: Webserver ━│  Assets successfully synced!")
                     network:emit("Assetify:onLoad", false)
