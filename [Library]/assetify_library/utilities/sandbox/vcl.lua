@@ -125,28 +125,26 @@ function vcl.private.parseString(parser, buffer, rw)
         else
             parser.isTypeParsed = true
             if not vcl.private.isEOL(buffer, parser.ref + 1) then return false end
-            for i, j in pairs(vcl.private.types.string) do
-                if imports.type(j) == "table" then
-                    local parseIndex = {string.find(parser.value, j[1])}
-                    local queryValue = string.sub(parser.value, 0, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
-                    while(parseIndex[1]) do
-                        parseIndex[2] = string.find(parser.value, j[2], parseIndex[1])
-                        if not parseIndex[2] then return false end
-                        local matchIndex = parseIndex[2] + 1
-                        local templateIndex, templateValue = string.split(string.sub(parser.value, parseIndex[1] + 2, parseIndex[2] - 1), "["..vcl.private.types.index.."]"), parser.root
-                        for i = 1, #templateIndex, 1 do
-                            local j = templateIndex[i]
-                            if (imports.type(templateValue) == "table") and (templateValue[j] ~= nil) then templateValue = templateValue[j]
-                            else
-                                templateValue = nil
-                                break
-                            end
+            if imports.type(vcl.private.types.string[rw]) == "table" then
+                local parseIndex = {string.find(parser.value, vcl.private.types.string[rw][1])}
+                local queryValue = string.sub(parser.value, 0, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
+                while(parseIndex[1]) do
+                    parseIndex[2] = string.find(parser.value, vcl.private.types.string[rw][2], parseIndex[1])
+                    if not parseIndex[2] then return false end
+                    local matchIndex = parseIndex[2] + 1
+                    local templateIndex, templateValue = string.split(string.sub(parser.value, parseIndex[1] + 2, parseIndex[2] - 1), "["..vcl.private.types.index.."]"), parser.root
+                    for i = 1, #templateIndex, 1 do
+                        local j = templateIndex[i]
+                        if (imports.type(templateValue) == "table") and (templateValue[j] ~= nil) then templateValue = templateValue[j]
+                        else
+                            templateValue = nil
+                            break
                         end
-                        parseIndex[1] = string.find(parser.value, j[1], parseIndex[2])
-                        queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, matchIndex, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
                     end
-                    parser.value = queryValue
+                    parseIndex[1] = string.find(parser.value, vcl.private.types.string[rw][1], parseIndex[2])
+                    queryValue = queryValue..imports.tostring(templateValue)..string.sub(parser.value, matchIndex, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
                 end
+                parser.value = queryValue
             end
         end
     end
@@ -188,7 +186,8 @@ function vcl.private.parseObject(parser, buffer, rw)
             local matchedValue = string.sub(buffer, parser.ref + 1, matchIndex - 1)
             if vcl.private.fetchRW(buffer, matchIndex) ~= vcl.private.types.init then return false end
             parser.index, parser.isTypeID = tostring(matchedValue), parser.ref
-            parser.ref = matchIndex - 1
+            parser.ref = matchIndex
+            vcl.private.parseObject(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
         elseif (rw ~= vcl.private.types.space) and (rw ~= vcl.private.types.newline) and (rw ~= vcl.private.types.init) then
             if string.isVoid(parser.index) and vcl.private.types.string[rw] then
                 local matchIndex = string.find(buffer, rw, parser.ref + 1)
@@ -197,8 +196,10 @@ function vcl.private.parseObject(parser, buffer, rw)
                 parser.ref = matchIndex
                 parser.isTypeQuoted = true
                 if vcl.private.fetchRW(buffer, parser.ref + 1) ~= vcl.private.types.init then return false end
+                parser.ref = parser.ref + 1
+                vcl.private.parseObject(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
             else
-                if not vcl.private.types.string[rw] and not string.find(rw, "%w") then return false end
+                if not string.find(rw, "%w") then return false end
                 parser.index = parser.index..rw
             end
         elseif rw == vcl.private.types.init then
