@@ -215,6 +215,7 @@ function vcl.private.parseObject(parser, buffer, rw)
                 if parser.isTypeID then parser.index, parser.isTypeID = imports.tonumber(parser.index), false end
                 if parser.index then
                     local next = (parser.next and table.clone(parser.next, true)) or {}
+                    parser.ref = string.find(buffer, "[%S]", parser.ref + 1) - 1
                     next.buffer_temp = string.sub(buffer, 0, parser.ref + 1)
                     next.ref_temp = vcl.private.fetchBuffer(next.buffer_temp, vcl.private.fetchLine(next.buffer_temp) - 1)
                     next.ref = next.ref + next.ref_temp
