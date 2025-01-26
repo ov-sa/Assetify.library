@@ -317,12 +317,10 @@ function vcl.private.decode(buffer, root, next, ref)
                 local _, lineText = vcl.private.fetchLine(buffer, ref - 1)
                 if string.len(lineText) <= parser.next.padding then parser.type, parser.isErrored = false, 1 end
             end
-            if not parser.isErrored then
-                if parser.isTypeParsed then
-                    parser.ref = vcl.private.fetchRef(buffer, parser.ref + 1)
-                    parser.isParsed = vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.newline
-                    parser.isErrored = ((vcl.private.fetchRW(buffer, parser.ref) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref) ~= vcl.private.types.newline) and (parser.isErrored or 1)) or parser.isErrored
-                end
+            if not parser.isErrored and parser.isTypeParsed then
+                parser.ref = vcl.private.fetchRef(buffer, parser.ref + 1)
+                parser.isParsed = vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.newline
+                parser.isErrored = ((vcl.private.fetchRW(buffer, parser.ref) ~= vcl.private.types.space) and (vcl.private.fetchRW(buffer, parser.ref) ~= vcl.private.types.newline) and (parser.isErrored or 1)) or parser.isErrored
             end
         end
         parser.type = (not parser.type and not parser.isErrored and ((vcl.private.fetchRW(buffer, parser.ref) == vcl.private.types.list) or not string.isVoid(vcl.private.fetchRW(buffer, parser.ref))) and "object") or parser.type
