@@ -115,7 +115,7 @@ function vcl.private.parseString(parser, buffer, rw)
         else
             parser.isTypeParsed = true
             for i, j in pairs(vcl.private.types.string) do
-                if type(j) == "table" then
+                if imports.type(j) == "table" then
                     local parseIndex = {string.find(parser.value, j[1])}
                     local queryValue = string.sub(parser.value, 0, (parseIndex[1] and (parseIndex[1] - 1)) or string.len(parser.value))
                     while(parseIndex[1]) do
@@ -303,6 +303,7 @@ function vcl.private.decode(buffer, root, next, ref)
         buffer = ((vcl.private.fetchRW(buffer, string.len(buffer)) ~= vcl.private.types.newline) and buffer..vcl.private.types.newline) or buffer
     end
     while(parser.ref <= string.len(buffer)) do
+        parser.ref = ((not parser.type or ((parser.type == "object") and string.isVoid(parser.index))) and string.find(buffer, "%S", parser.ref)) or parser.ref
         vcl.private.parseComment(parser, buffer, vcl.private.fetchRW(buffer, parser.ref))
         local ref, type = parser.ref, parser.type
         parser.isValueSkipAppend = nil
