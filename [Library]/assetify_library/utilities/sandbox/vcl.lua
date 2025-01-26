@@ -182,7 +182,13 @@ end
 
 function vcl.private.parseObject(parser, buffer, rw)
     if parser.type == "object" then
-        if string.isVoid(parser.index) and (rw == vcl.private.types.list) then parser.isTypeID = parser.ref
+        if string.isVoid(parser.index) and (rw == vcl.private.types.list) then
+            local matchIndex = string.find(buffer, "[^%d]+", parser.ref + 1)
+            if not matchIndex or (vcl.private.fetchLine(buffer, parser.ref) ~= vcl.private.fetchLine(buffer, matchIndex - 1)) then return false end
+            local matchedValue = string.sub(buffer, parser.ref + 1, matchIndex - 1)
+            if vcl.private.fetchRW(buffer, matchIndex) ~= vcl.private.types.init then return false end
+            parser.index, parser.isTypeID = tostring(matchedValue), parser.ref
+            parser.ref = matchIndex - 1
         elseif (rw ~= vcl.private.types.space) and (rw ~= vcl.private.types.newline) and (rw ~= vcl.private.types.init) then
             if string.isVoid(parser.index) and vcl.private.types.string[rw] then
                 local matchIndex = string.find(buffer, rw, parser.ref + 1)
