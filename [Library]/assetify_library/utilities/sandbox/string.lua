@@ -43,7 +43,7 @@ for i, j in pairs(module) do
 
     function j.public.isVoid(baseString)
         if not baseString or (imports.type(baseString) ~= "string") then return false end
-        return j.public.gsub(baseString, "%s+", "") == ""
+        return (not j.public.find(baseString, "[%S]") and true) or false
     end
     
     local raw_len = j.public.len
