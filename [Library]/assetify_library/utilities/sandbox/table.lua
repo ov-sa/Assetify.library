@@ -66,10 +66,10 @@ function table.public.encode(baseTable, encoding)
     else return imports.vcl.encode(baseTable) end
 end
 
-function table.public.decode(baseString, encoding)
+function table.public.decode(baseString, encoding, ...)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
-    if encoding == "json" then return imports.fromJSON(baseString)
-    else return imports.vcl.decode(baseString) end
+    if encoding == "json" then return imports.fromJSON(baseString, ...)
+    else return imports.vcl.decode(baseString, ...) end
 end
 
 function table.public.clone(baseTable, isRecursive)
@@ -88,7 +88,7 @@ end
 function table.private.inspect(baseTable, showHidden, limit, level, buffer, skipTrim)
     local dataType = imports.type(baseTable)
     showHidden, limit, level, buffer = (showHidden and true) or false, math.max(1, imports.tonumber(limit) or 0) + 1, math.max(1, imports.tonumber(level) or 0), buffer or table.public.pack()
-    if (dataType ~= "table") then
+    if dataType ~= "table" then
         table.public.insert(buffer, ((table.private.inspectTypes.raw[dataType] and (((dataType == "string") and string.format("%q", baseTable)) or imports.tostring(baseTable))) or ("<"..imports.tostring(baseTable)..">")).."\n")
     elseif level > limit then
         table.public.insert(buffer, "{...}\n")

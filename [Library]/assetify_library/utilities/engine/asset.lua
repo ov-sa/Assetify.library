@@ -299,7 +299,7 @@ else
         localurl = localurl or rooturl
         path = localurl..path
         local result = file:read(path)
-        result = (result and table.decode(result, file:parseURL(path).extension)) or false
+        result = (result and table.decode(result)) or false
         if result then
             for i, j in imports.pairs(result) do
                 local cURL = file:parseURL(j)
@@ -422,8 +422,7 @@ else
         local cAssetPack = table.clone(assetPack, true)
         local manifestPath = asset.public.references.root..string.lower(assetType).."/"..asset.public.references.manifest..".vcl"
         cAssetPack.manifest = file:read(manifestPath)
-        cAssetPack.manifest = (cAssetPack.manifest and table.decode(cAssetPack.manifest, file:parseURL(manifestPath).extension)) or false
-        if not cAssetPack.manifest then execFunction(callback, false, assetType); return false end
+        cAssetPack.manifest = (cAssetPack.manifest and table.decode(cAssetPack.manifest)) or {}
         thread:create(function(self)
             cAssetPack.rwDatas = {}
             for i = 1, table.length(cAssetPack.manifest), 1 do
@@ -554,7 +553,7 @@ else
                 end
             end
             assetPack.assetPack = cAssetPack
-            execFunction(callback, true, assetType)
+            execFunction(callback)
         end):resume({executions = settings.downloader.buildRate, frames = 1})
         return true
     end
