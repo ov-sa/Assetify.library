@@ -89,9 +89,8 @@ for i, j in pairs(module) do
         return (baseString and clipNull and j.public.gsub(baseString, j.public.char(0), "")) or baseString
     end
     
-    function j.public.split(baseString, separator, limit)
+    function j.public.split(baseString, separator)
         if not baseString or (imports.type(baseString) ~= "string") or not separator or (imports.type(separator) ~= "string") then return false end
-        limit = imports.tonumber(limit) or false
         baseString = baseString..j.public.match(separator, separator)
         local result = {}
         for matchValue in j.public.gmatch(baseString, "(.-)"..separator) do
