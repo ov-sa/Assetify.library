@@ -91,14 +91,21 @@ for i, j in pairs(module) do
     
     function j.public.split(baseString, separator)
         if not baseString or (imports.type(baseString) ~= "string") or not separator or (imports.type(separator) ~= "string") then return false end
-        baseString = baseString..j.public.match(separator, separator)
         local result = {}
-        for matchValue in j.public.gmatch(baseString, "(.-)"..separator) do
-            table.insert(result, matchValue)
-        end
+        local index = 1
+        local length = j.public.len(separator)
+        while(true) do
+            local ref = j.public.find(baseString, separator, index, true)
+            if not ref then
+                table.insert(result, j.public.sub(baseString, index))
+                break
+            end
+            table.insert(result, j.public.sub(baseString, index, ref - 1))
+            index = ref + length
+        end 
         return result
     end
-    
+
     function j.public.kern(baseString, kerner)
         if not baseString or (imports.type(baseString) ~= "string") then return false end
         return j.public.sub(j.public.gsub(baseString, ".", (kerner or " ").."%0"), 2)
