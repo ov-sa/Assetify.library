@@ -60,15 +60,15 @@ function table.public.unpack(baseTable, length)
     return imports.unpack(baseTable, 1, length or table.public.length(baseTable))
 end
 
-function table.public.encode(baseTable, encoding)
+function table.public.encode(baseTable, format, ...)
     if not baseTable or (imports.type(baseTable) ~= "table") then return false end
-    if encoding == "json" then return imports.toJSON(baseTable)
-    else return imports.vcl.encode(baseTable) end
+    if format == "json" then return imports.toJSON(baseTable, ...)
+    else return imports.vcl.encode(baseTable, ...) end
 end
 
-function table.public.decode(baseString, encoding, ...)
+function table.public.decode(baseString, format, ...)
     if not baseString or (imports.type(baseString) ~= "string") then return false end
-    if encoding == "json" then return imports.fromJSON(baseString, ...)
+    if format == "json" then return imports.fromJSON(baseString, ...)
     else return imports.vcl.decode(baseString, ...) end
 end
 

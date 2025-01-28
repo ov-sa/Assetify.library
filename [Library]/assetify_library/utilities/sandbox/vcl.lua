@@ -250,7 +250,7 @@ function vcl.private.parseReturn(parser, buffer)
     return parser.value, parser.ref, not parser.isParsed, parser.root
 end
 
-function vcl.private.encode(buffer, root, padding)
+function vcl.private.encode(buffer, root, padding, encoder)
     if not buffer or (imports.type(buffer) ~= "table") then return false end
     padding = padding or ""
     local query, result = {static = {numeric = {}, string = {}}, numeric = {}, string = {}}, ""
@@ -278,7 +278,7 @@ function vcl.private.encode(buffer, root, padding)
         end
         for i = 1, table.length(query.numeric), 1 do
             local j = query.numeric[i]
-            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
+            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab, encoder)
             if not value then count.nested = count.nested - 1
             else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
@@ -288,18 +288,18 @@ function vcl.private.encode(buffer, root, padding)
         end
         for i = 1, table.length(query.string), 1 do
             local j = query.string[i]
-            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab)
+            local value = vcl.private.encode(j[2], true, padding..vcl.private.types.tab, encoder)
             if not value then count.nested = count.nested - 1
             else result = result..vcl.private.types.newline..padding..j[1]..vcl.private.types.init..value end
         end
     end
     if not root then
         if (count.static + count.nested) <= 0 then return result
-        else result = string.match(result, "^\n*(.*)") or result end
+        else result = encoder.match(result, "^\n*(.*)") or result end
     end
     return (((count.static + count.nested) > 0) and result) or false
 end
-function vcl.public.encode(buffer) return vcl.private.encode(buffer) end
+function vcl.public.encode(buffer, encoding) return vcl.private.encode(buffer, false, false, ((encoding == "ascii") and stringn) or string) end
 
 function vcl.private.decode(buffer, root, next, ref, encoder)
     if not buffer or (imports.type(buffer) ~= "string") then return false end
