@@ -199,7 +199,7 @@ function vcl.private.parseObject(parser, buffer, rw)
                 parser.ref = parser.ref + 1
                 vcl.private.parseObject(parser, buffer, vcl.private.fetchRW(parser, buffer, parser.ref))
             else
-                if not parser.encoder.find(rw, "%w") then return false end
+                if not parser.encoder.find(rw, "[%w_]") then return false end
                 parser.index = parser.index..rw
             end
         elseif rw == vcl.private.types.init then
