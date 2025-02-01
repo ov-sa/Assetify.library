@@ -299,7 +299,7 @@ function vcl.private.encode(buffer, root, padding, encoder)
     end
     return (((count.static + count.nested) > 0) and result) or false
 end
-function vcl.public.encode(buffer, encoding) return vcl.private.encode(buffer, false, false, ((encoding == "ascii") and stringn) or string) end
+function vcl.public.encode(buffer, encoding) return vcl.private.encode(buffer, false, false, ((encoding == "utf8") and string) or stringn) end
 
 function vcl.private.decode(buffer, root, next, ref, encoder)
     if not buffer or (imports.type(buffer) ~= "string") then return false end
@@ -346,4 +346,4 @@ function vcl.private.decode(buffer, root, next, ref, encoder)
     parser.isParsed = (not parser.isErrored and (((parser.type == "object") and not parser.isTypeID and parser.encoder.isVoid(parser.index)) or parser.isParsed) and true) or false
     return vcl.private.parseReturn(parser, buffer)
 end
-function vcl.public.decode(buffer, encoding) return vcl.private.decode(buffer, false, false, false, ((encoding == "ascii") and stringn) or string) end
+function vcl.public.decode(buffer, encoding) return vcl.private.decode(buffer, false, false, false, ((encoding == "utf8") and string) or stringn) end
