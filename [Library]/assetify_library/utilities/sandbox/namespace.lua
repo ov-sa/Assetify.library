@@ -69,7 +69,7 @@ function class:create(name, parent, nspace)
             if (self ~= cInstance) or not buffer.instance[self] then return false end
             buffer.instance[self], buffer.parent[parent][self] = nil, nil
             self = nil
-            imports.collectgarbage("collect")
+            imports.collectgarbage("step", 1)
             return true
         end
         return cInstance
@@ -99,7 +99,7 @@ function class:destroy(instance)
     end
     buffer.parent[instance], buffer.instance[instance] = nil, nil
     instance = nil
-    imports.collectgarbage("collect")
+    imports.collectgarbage("step", 1)
     return true
 end
 

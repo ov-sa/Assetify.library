@@ -55,7 +55,7 @@ updateResources = {
         updateResources.updateCache = nil
         updateResources.updateThread = nil
         cli.public.isLibraryBeingUpdated = nil
-        imports.collectgarbage("collect")
+        imports.collectgarbage("step", 1)
         return true
     end,
     {

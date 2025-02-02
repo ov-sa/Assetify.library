@@ -84,7 +84,7 @@ function thread.public:createPromise(callback, config)
                 thread.private.resolve(i, isResolver, ...)
             end
             thread.private.promises[cPromise] = nil
-            imports.collectgarbage("collect")
+            imports.collectgarbage("step", 1)
         end, 1, 1, ...)
         return true
     end

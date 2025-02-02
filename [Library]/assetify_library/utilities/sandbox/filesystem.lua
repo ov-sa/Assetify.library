@@ -64,7 +64,7 @@ function file.public:write(path, data)
     imports.fileWrite(cFile, data)
     imports.fileClose(cFile)
     data = nil
-    imports.collectgarbage("collect")
+    imports.collectgarbage("step", 1)
     return true
 end
 

@@ -55,7 +55,7 @@ function attacher.public:detachElements(element)
     end
     attacher.private.buffer.element[element].rotation.matrix:destroyInstance()
     attacher.private.buffer.element[element] = nil
-    imports.collectgarbage("collect")
+    imports.collectgarbage("step", 1)
     return true
 end
 

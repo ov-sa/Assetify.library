@@ -110,7 +110,7 @@ if localPlayer then
                     })
                 end
                 network:emit("Assetify:Downloader:syncData", true, true, localPlayer, assetType, assetName, fetchFiles)
-                imports.collectgarbage("collect")
+                imports.collectgarbage("step", 1)
                 self.cHeartbeat = nil
             end, settings.downloader.buildRate)
         end):resume({executions = settings.downloader.buildRate, frames = 1})

@@ -156,7 +156,7 @@ if localPlayer then
         asset.clearAssetBuffer(cAsset.unsynced.raw.replace)
         asset.clearAssetBuffer(cAsset.unsynced.raw.dep)
         cAsset.unsynced = nil
-        imports.collectgarbage("collect")
+        imports.collectgarbage("step", 1)
         return true
     end
 
