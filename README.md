@@ -2,7 +2,7 @@
 
 ![](https://raw.githubusercontent.com/ov-studio/.github/main/profile/banner.png)
 
-###### *» Maintainer(s): [**Aviril**](https://github.com/Aviril), **Mario**, [**Tron**](https://github.com/ov-tron), [**Anisa**](https://github.com/ov-anisa)*
+###### *» Maintainer(s): [**Aviril**](https://github.com/ov-aviril), **Mario**, [**Tron**](https://github.com/ov-tron), [**Anisa**](https://github.com/ov-anisa)*
 
 **Assetify.library** is an open-source custom asset loading library developed by **vStudio** for [Multi Theft Auto \(MTA\)](https://multitheftauto.com/). This innovative library integrates advanced asset loading and unloading techniques, tailored specifically for gamemode development, enabling efficient and rapid asset manipulation. With a strong emphasis on performance, Assetify.library empowers developers to fully customize their environments without the concern of performance issues.
 
