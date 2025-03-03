@@ -18,9 +18,6 @@
     <file src="utilities/rw/native/buffer_lod.rw"/>
     <file src="utilities/rw/mesh_void/dict.rw"/>
     <file src="utilities/rw/mesh_void/buffer.rw"/>
-    <file src="utilities/rw/mesh_plane/dict.rw"/>
-    <file src="utilities/rw/mesh_plane/buffer.rw"/>
-    <file src="utilities/rw/mesh_plane/collision.rw"/>
     <file src="utilities/rw/timecyc.rw"/>
 
     <!-- Utilities: Sandbox -->
