@@ -84,10 +84,10 @@ end
 addEventHandler("onClientRender", root, function()
     interface.public.tick = imports.getTickCount()
     for i, j in imports.pairs(interface.private.cache.key) do
-        local hold = imports.getKeyState(i)
-        hold = ((stringn.find(i, "mouse") or (not imports.isMTAWindowActive() and not imports.guiGetInputEnabled() and not imports.isChatBoxInputActive())) and hold) or false
-        j.clicked = (hold and (j.hold ~= hold) and true) or false
-        j.hold = hold
+        local state = imports.getKeyState(i)
+        state = ((stringn.find(i, "mouse") or (not imports.isMTAWindowActive() and not imports.guiGetInputEnabled() and not imports.isChatBoxInputActive())) and state) or false
+        j.clicked = (state and (j.hold ~= state) and true) or false
+        j.hold = state
     end
     if interface.private.cache.scroll.state then
         interface.private.cache.scroll.count = interface.private.cache.scroll.count - 1
