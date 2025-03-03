@@ -80,8 +80,8 @@ bundler.private:createBuffer("core", "__core", [[
             {exportIndex = "assetify.__core.setOcclusions", exportName = "setOcclusions"},
             {exportIndex = "assetify.__core.clearModel", exportName = "clearModel"},
             {exportIndex = "assetify.__core.restoreModel", exportName = "restoreModel"},
-            {exportIndex = "assetify.__core.playSound", exportName = "playSoundAsset"},
-            {exportIndex = "assetify.__core.playSound3D", exportName = "playSoundAsset3D"}
+            {exportIndex = "assetify.__core.playSound", exportName = "playSound"},
+            {exportIndex = "assetify.__core.playSound3D", exportName = "playSound3D"}
         },
         server = {}
     })..[[

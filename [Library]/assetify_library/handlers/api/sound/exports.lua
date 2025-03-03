@@ -15,8 +15,8 @@
 manager:exportAPI("Sound", {
     shared = {},
     client = {
-        {name = "playSoundAsset", API = "playSound"},
-        {name = "playSoundAsset3D", API = "playSound3D"}
+        {name = "playSound"},
+        {name = "playSound3D"}
     },
     server = {}
 })

@@ -126,8 +126,8 @@
     <export function="restoreModel" type="client"/>
     <export function="loadAnim" type="client"/>
     <export function="unloadAnim" type="client"/>
-    <export function="playSoundAsset" type="client"/>
-    <export function="playSoundAsset3D" type="client"/>
+    <export function="playSound" type="client"/>
+    <export function="playSound3D" type="client"/>
     <export function="isRendererVirtualRendering" type="client"/>
     <export function="setRendererVirtualRendering" type="client"/>
     <export function="getRendererVirtualSource" type="client"/>
