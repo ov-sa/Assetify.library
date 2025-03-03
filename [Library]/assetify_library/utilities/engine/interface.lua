@@ -32,6 +32,7 @@ local interface = class:create("interface")
 interface.private.cache = {}
 
 if localPlayer then
+    interface.public.tick = imports.getTickCount()
     interface.private.cache.font = {}
     interface.private.cache.key = {}
     interface.private.cache.scroll = {}
@@ -40,7 +41,7 @@ if localPlayer then
         if not path or not size then return false end
         interface.private.cache.font[path] = interface.private.cache.font[path] or {}
         interface.private.cache.font[path][size] = interface.private.cache.font[path][size] or {element = imports.dxCreateFont(path, size)}
-        interface.private.cache.font[path][size].tick = interface.private.cache.tick
+        interface.private.cache.font[path][size].tick = interface.public.tick
         return interface.private.cache.font[path][size].element
     end
 
@@ -49,7 +50,7 @@ if localPlayer then
         if not key then return false end
         if state then
             interface.private.cache.key[key] = interface.private.cache.key[key] or {}
-            interface.private.cache.key[key].tick = interface.private.cache.tick
+            interface.private.cache.key[key].tick = interface.public.tick
         else
             interface.private.cache.key[key] = nil
         end
@@ -83,7 +84,7 @@ if localPlayer then
     end
 
     addEventHandler("onClientRender", root, function()
-        interface.private.cache.tick = imports.getTickCount()
+        interface.public.tick = imports.getTickCount()
         for i, j in imports.pairs(interface.private.cache.key) do
             local hold = imports.getKeyState(i)
             hold = ((stringn.find(i, "mouse") or (not imports.isMTAWindowActive() and not imports.guiGetInputEnabled() and not imports.isChatBoxInputActive())) and hold) or false
@@ -107,14 +108,14 @@ if localPlayer then
     timer:create(function()
         for i, j in imports.pairs(interface.private.cache.font) do
             for k, v in imports.pairs(j) do
-                if (interface.private.cache.tick - v.tick) >= 3000 then
+                if (interface.public.tick - v.tick) >= 3000 then
                     destroyElement(v.font)
                     interface.private.cache.font[i][k] = nil
                 end
             end
         end
         for i, j in imports.pairs(interface.private.cache.key) do
-            if (interface.private.cache.tick - j.tick) >= 3000 then
+            if (interface.public.tick - j.tick) >= 3000 then
                 interface.private.setKeyRegistered(i, false)
             end
         end

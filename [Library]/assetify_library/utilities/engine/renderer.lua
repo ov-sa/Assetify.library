@@ -66,7 +66,7 @@ if localPlayer then
         end
         if renderer.public.isDynamicSkyEnabled then
             if renderer.public.isTimeSynced then
-                local currentTick = imports.getTickCount()
+                local currentTick = interface.tick
                 if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
                     renderer.private.serverTimeCycleTick = currentTick
                     renderer.private.serverNativeSkyColor, renderer.private.serverNativeTimePercent = renderer.private.serverNativeSkyColor or {}, renderer.private.serverNativeTimePercent or {}
@@ -157,7 +157,7 @@ if localPlayer then
             if renderer.public.isTimeSynced == state then return false end
             renderer.public.isTimeSynced = state
             if not renderer.public.isTimeSynced then
-                renderer.public:setServerTick((renderer.private.serverTick or 0) + (imports.getTickCount() - (renderer.private.serverTickFrame or 0)))
+                renderer.public:setServerTick((renderer.private.serverTick or 0) + (interface.tick - (renderer.private.serverTickFrame or 0)))
             end
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setTimeSync(_, i, syncer.librarySerial)
@@ -172,7 +172,7 @@ if localPlayer then
     function renderer.public:setServerTick(serverTick, syncShader, isInternal)
         if not syncShader then
             renderer.private.serverTick = imports.tonumber(serverTick) or 0
-            renderer.private.serverTickFrame = imports.getTickCount()
+            renderer.private.serverTickFrame = interface.tick
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setServerTick(_, i, syncer.librarySerial)
             end

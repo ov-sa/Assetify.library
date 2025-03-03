@@ -267,7 +267,7 @@ end
 
 streamer.private.onBoneStream = function(streamBuffer)
     if not streamBuffer then return false end
-    attacher.bone.cache.streamTick = imports.getTickCount()
+    attacher.bone.cache.streamTick = interface.tick
     for i, j in imports.pairs(streamBuffer) do
         if j and i.isStreamed then
             attacher.bone.update(attacher.bone.buffer.element[(i.streamer)])
