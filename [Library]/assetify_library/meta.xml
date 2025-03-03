@@ -53,6 +53,7 @@
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>
     <script src="utilities/engine/manager.lua" type="shared"/>
+    <script src="utilities/engine/interface.lua" type="shared"/>
     <script src="utilities/engine/renderer.lua" type="shared"/>
     <script src="utilities/engine/streamer.lua" type="client"/>
     <script src="utilities/engine/shader.lua" type="shared"/>

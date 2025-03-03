@@ -31,7 +31,7 @@ settings.assetPacks = {
         assetBase = 1337,
         assetTransparency = false
     },
-
+    
     ["character"] = {
         autoLoad = true,
         assetType = "ped",
