@@ -17,7 +17,7 @@ manager:exportAPI("World", {
     client = {
         {name = "clearWorld"},
         {name = "restoreWorld"},
-        {name = "toggleOcclusions"},
+        {name = "setOcclusions"},
         {name = "clearModel"},
         {name = "restoreModel"}
     },

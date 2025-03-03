@@ -15,7 +15,8 @@
 local imports = {
     type = type,
     tonumber = tonumber,
-    setmetatable = setmetatable
+    setmetatable = setmetatable,
+    table = table
 }
 
 
@@ -28,10 +29,10 @@ imports.setmetatable(matrix.public, matrix.public)
 
 matrix.public.__call = function(_, ...)
     local rows, order = table.pack(...), false
-    local isValid = ((table.length(rows) > 0)and true) or false
-    for i = 1, table.length(rows), 1 do
+    local isValid = ((imports.table.length(rows) > 0)and true) or false
+    for i = 1, imports.table.length(rows), 1 do
         local j = rows[i]
-        local __order = table.length(j)
+        local __order = imports.table.length(j)
         __order = (__order and (__order > 0) and __order) or false
         isValid = (isValid and __order and (not order or (order == __order)) and true) or false
         if isValid then
@@ -49,7 +50,7 @@ matrix.public.__call = function(_, ...)
     if not isValid then return false end
     local cMatrix = matrix.public:createInstance()
     imports.setmetatable(cMatrix, matrix.public)
-    cMatrix.order = {table.length(rows), order}
+    cMatrix.order = {imports.table.length(rows), order}
     cMatrix.rows = rows
     return cMatrix
 end
@@ -113,8 +114,8 @@ function matrix.public:scale(scale)
     if not matrix.public:isInstance(self) then return false end
     scale = imports.tonumber(scale)
     if not scale then return false end
-    for i = 1, table.length(self.order[1]), 1 do
-        for k = 1, table.length(self.order[2]), 1 do
+    for i = 1, imports.table.length(self.order[1]), 1 do
+        for k = 1, imports.table.length(self.order[2]), 1 do
             self.rows[i][k] = self.rows[i][k]*scale
         end
     end

@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify.library" type="Library" version="10.1.2"/>
+    <info author="vStudio" name="Assetify.library" type="Library" version="10.1.3"/>
     <min_mta_version server="1.6.0-9.22470" client="1.6.0-9.22470"/>
     <download_priority_group>1000</download_priority_group>
     <aclrequest>
@@ -120,7 +120,7 @@
     <export function="createShader" type="client"/>
     <export function="clearWorld" type="client"/>
     <export function="restoreWorld" type="client"/>
-    <export function="toggleOcclusions" type="client"/>
+    <export function="setOcclusions" type="client"/>
     <export function="clearModel" type="client"/>
     <export function="restoreModel" type="client"/>
     <export function="loadAnim" type="client"/>

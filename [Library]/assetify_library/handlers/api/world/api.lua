@@ -38,7 +38,7 @@ if localPlayer then
         if settings.GTA.waterLevel then
             streamer.waterBuffer = imports.createWater(-3000, -3000, 0, 3000, -3000, 0, -3000, 3000, 0, 3000, 3000, 0, false)
         end
-        manager.API.World.toggleOcclusions(false)
+        manager.API.World.setOcclusions(false)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", false)
         return true
     end
@@ -47,12 +47,12 @@ if localPlayer then
         imports.destroyElement(streamer.waterBuffer)
         streamer.waterBuffer = nil
         imports.restoreAllWorldModels()
-        manager.API.World.toggleOcclusions((not settings.GTA.disableOcclusions and true) or false)
+        manager.API.World.setOcclusions(true)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", true)
         return true
     end
 
-    function manager.API.World.toggleOcclusions(state)
+    function manager.API.World.setOcclusions(state)
         imports.setOcclusionsEnabled((state and true) or false)
         return true
     end
