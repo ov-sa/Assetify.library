@@ -113,23 +113,23 @@ if localPlayer then
         return self:unload(...)
     end
 
-    function scene.public:load(cAsset, sceneManifest, sceneData)
+    function scene.public:load(cAsset, manifest, data)
         if not scene.public:isInstance(self) then return false end
-        if not cAsset or (not cAsset.nativeID and not cAsset.synced) or not sceneManifest or not sceneData then return false end
-        local posX, posY, posZ, rotX, rotY, rotZ = sceneData.position.x + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.x) or 0), sceneData.position.y + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.y) or 0), sceneData.position.z + ((sceneManifest.sceneOffsets and sceneManifest.sceneOffsets.z) or 0), sceneData.rotation.x, sceneData.rotation.y, sceneData.rotation.z
-        self.cModelInstance = scene.private:createEntity(cAsset.nativeID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, false, sceneManifest.sceneBuildings)
+        if not cAsset or (not cAsset.nativeID and not cAsset.synced) or not manifest or not data then return false end
+        local posX, posY, posZ, rotX, rotY, rotZ = data.position.x + ((manifest.sceneOffsets and manifest.sceneOffsets.x) or 0), data.position.y + ((manifest.sceneOffsets and manifest.sceneOffsets.y) or 0), data.position.z + ((manifest.sceneOffsets and manifest.sceneOffsets.z) or 0), data.rotation.x, data.rotation.y, data.rotation.z
+        self.cModelInstance = scene.private:createEntity(cAsset.nativeID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, false, manifest.sceneBuildings)
         if not self.cModelInstance then return false end
-        imports.setElementDoubleSided(self.cModelInstance, sceneManifest.sceneDoublesided)
-        imports.setElementDimension(self.cModelInstance, sceneManifest.sceneDimension)
-        imports.setElementInterior(self.cModelInstance, sceneManifest.sceneInterior)
-        self.cLODInstance = sceneManifest.sceneLODs and (
+        imports.setElementDoubleSided(self.cModelInstance, manifest.sceneDoublesided)
+        imports.setElementDimension(self.cModelInstance, manifest.sceneDimension)
+        imports.setElementInterior(self.cModelInstance, manifest.sceneInterior)
+        self.cLODInstance = manifest.sceneLODs and (
             (cAsset.nativeID and scene.private:createEntity(cAsset.nativeLOD or cAsset.nativeID, posX, posY, posZ, rotX, rotY, rotZ, true, false)) or 
             (not cAsset.nativeID and scene.private:createEntity(cAsset.synced.lodID or cAsset.synced.modelID, posX, posY, posZ, rotX, rotY, rotZ, true, false))
         ) or false
         if self.cLODInstance then
-            imports.setElementDoubleSided(self.cLODInstance, sceneManifest.sceneDoublesided)
-            imports.setElementDimension(self.cLODInstance, sceneManifest.sceneDimension)
-            imports.setElementInterior(self.cLODInstance, sceneManifest.sceneInterior)
+            imports.setElementDoubleSided(self.cLODInstance, manifest.sceneDoublesided)
+            imports.setElementDimension(self.cLODInstance, manifest.sceneDimension)
+            imports.setElementInterior(self.cLODInstance, manifest.sceneInterior)
             imports.setLowLODElement(self.cModelInstance, self.cLODInstance)
             attacher:attachElements(self.cLODInstance, self.cModelInstance)
         end
