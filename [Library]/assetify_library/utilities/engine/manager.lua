@@ -58,8 +58,8 @@ end
 
 function manager.public:exportAPI(module, ref, exec)
     if not module or not ref or not exec then return false end
-    manager.public.API[ref.name] = manager.public.API[ref.name] or {}
-    module.ref.name = exec
+    manager.public.API[module] = manager.public.API[module] or {}
+    manager.public.API[module][ref.name] = exec
     if ref.name then
         _G[ref.api or ref.name] = function(...)
             return exec(...)
