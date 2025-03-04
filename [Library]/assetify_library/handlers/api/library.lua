@@ -20,6 +20,10 @@ manager:exportAPI("library", "isLoaded", function()
     return syncer.isLibraryLoaded
 end)
 
+manager:exportAPI("library", "isModuleLoaded ", function()
+    return syncer.isModuleLoaded
+end)
+
 manager:exportAPI("library", "fetchSerial", function()
     return syncer.librarySerial
 end)
