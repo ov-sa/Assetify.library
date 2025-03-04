@@ -33,7 +33,10 @@ bundler.private.schedulers = {
 
 function bundler.private:createScheduler()
     if imports.type(bundler.private.schedulers) == "table" then
-        local header, body = [[assetify.scheduler.buffer = {pending = {]], ""
+        local header, body = [[
+        assetify.scheduler = {}
+        assetify.scheduler.buffer = {pending = {
+        ]], ""
         local footer = [[
         local bootExec = function(type)
             if not assetify.scheduler.buffer.pending[type] then return false end

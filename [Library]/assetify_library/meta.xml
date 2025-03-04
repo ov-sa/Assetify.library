@@ -65,17 +65,17 @@
     <script src="handlers/cli/builder.lua" type="shared"/>
     <script src="handlers/cli/updater.lua" type="server"/>
     <script src="handlers/cli/debugger.lua" type="client"/>
-    <script src="handlers/bundler/index.lua" type="shared"/>
-    <script src="handlers/bundler/importer.lua" type="shared"/>
-    <script src="handlers/bundler/scheduler.lua" type="shared"/>
-    <script src="handlers/bundler/shared.lua" type="shared"/>
     <script src="handlers/api/library.lua" type="shared"/>
     <script src="handlers/api/syncer.lua" type="shared"/>
     <script src="handlers/api/world.lua" type="shared"/>
     <script src="handlers/api/animation.lua" type="shared"/>
     <script src="handlers/api/sound.lua" type="shared"/>
     <script src="handlers/api/renderer.lua" type="shared"/>
-
+    <script src="handlers/bundler/index.lua" type="shared"/>
+    <script src="handlers/bundler/importer.lua" type="shared"/>
+    <script src="handlers/bundler/scheduler.lua" type="shared"/>
+    <script src="handlers/bundler/shared.lua" type="shared"/>
+    
     <!-- Exports -->
     <export function="import" type="shared"/>
     <export function="library_isBooted" type="shared"/>

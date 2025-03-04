@@ -111,20 +111,15 @@ for i, j in imports.pairs(bundler.private.modules) do
     end
 end
 
-function bundler.private:createAPIs(exports)
-    if not exports or (imports.type(exports) ~= "table") then return false end
-    local rw = ""
-    for i, j in imports.pairs(exports) do
-        if (i == bundler.private.platform) or (i == "shared") then
-            for k = 1, table.length(j), 1 do
-                local v = j[k]
-                rw = rw..[[
-                ]]..v.index..[[ = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "]]..v.api[1].."_"..v.api[2]..[[", ...)
-                end
-                ]]
+function bundler.private:createAPIs(base, module)
+    if not base or not module or not manager.API[module] then return false end
+    local rw = base..[[ = {}]]
+    for i, j in pairs(manager.API[module]) do
+        rw = rw..[[
+            ]]..base..[[.]]..i..[[ = function(...)
+                return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "]]..module.."_"..i..[[", ...)
             end
-        end
+        ]]
     end
     return rw
 end
