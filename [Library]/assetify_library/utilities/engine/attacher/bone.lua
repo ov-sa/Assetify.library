@@ -58,7 +58,7 @@ function bone.private:validateOffset(instance, boneData)
     boneData.position, boneData.rotation = boneData.position or {}, boneData.rotation or {}
     boneData.position.x, boneData.position.y, boneData.position.z = imports.tonumber(boneData.position.x) or 0, imports.tonumber(boneData.position.y) or 0, imports.tonumber(boneData.position.z) or 0
     boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = imports.tonumber(boneData.rotation.x) or 0, imports.tonumber(boneData.rotation.y) or 0, imports.tonumber(boneData.rotation.z) or 0
-    if boneData.rotation.isRelative then
+    if boneData.rotation.relative then
         local rotationData = (instance.boneData and instance.boneData.rotation) or false
         if not rotationData then
             local rotX, rotY, rotZ = {imports.getElementRotation(instance.element, "ZYX")}
@@ -70,7 +70,7 @@ function bone.private:validateOffset(instance, boneData)
         rotQuat = __rotQuat*rotQuat
         boneData.rotation.x, boneData.rotation.y, boneData.rotation.z = rotQuat:toEuler()
         rotQuat:destroy(); xQuat:destroy(); yQuat:destroy(); zQuat:destroy()
-        boneData.rotation.isRelative = false
+        boneData.rotation.relative = false
     end
     local cMatrix = math.matrix:fromRotation(boneData.rotation.x, boneData.rotation.y, boneData.rotation.z)
     boneData.rotationMatrix = cMatrix.rows
