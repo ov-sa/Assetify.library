@@ -40,8 +40,11 @@
     * [World](https://github.com/ov-sa/Assetify-Library/wiki/API:-World)
     * [Animation](https://github.com/ov-sa/Assetify-Library/wiki/API:-Animation)
     * [Sound](https://github.com/ov-sa/Assetify-Library/wiki/API:-Sound)
+    * [Syncer](https://github.com/ov-sa/Assetify-Library/wiki/API:-Syncer)
     * [Interface](https://github.com/ov-sa/Assetify-Library/wiki/API:-Interface)
     * [Renderer](https://github.com/ov-sa/Assetify-Library/wiki/API:-Renderer)
+    * [Attacher](https://github.com/ov-sa/Assetify-Library/wiki/API:-Attacher)
+      * [Bone](https://github.com/ov-sa/Assetify-Library/wiki/API:-Attacher:-Bone)
   * Libraries:
     * [Table](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Table)
     * [Math](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Math)
@@ -55,7 +58,6 @@
     * [Networker](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Networker)
     * [Rest](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Rest)
     * [Scheduler](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Scheduler)
-    * [Syncer](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Syncer)
 * Integrated Asset Clumper (Supports only `character`, `vehicle`, `weapon` and `object` asset-packs apparently)
 * Integrated Asset Shader-Map support
 * Integrated Asset Dependency
