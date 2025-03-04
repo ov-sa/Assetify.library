@@ -24,9 +24,9 @@ local imports = {
 }
 
 
-----------------------
---[[ Class: Scene ]]--
-----------------------
+--------------------------
+--[[ Class: Interface ]]--
+--------------------------
 
 local interface = class:create("interface")
 interface.public.tick = imports.getTickCount()
