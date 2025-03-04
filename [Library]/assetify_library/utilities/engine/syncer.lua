@@ -42,8 +42,7 @@ local syncer = class:create("syncer", {
     isLibraryBooted = false,
     isLibraryLoaded = false,
     isModuleLoaded = false,
-    syncedElements = {},
-    syncedElementTones = {}
+    syncedElements = {}
 })
 function syncer.public:import() return syncer end
 syncer.public.libraryName = imports.getResourceName(syncer.public.libraryResource)
@@ -104,40 +103,9 @@ if localPlayer then
                             shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifest.shaderMaps[asset.references.clump][i][j].clump, clumpTex_bump = cAsset.manifest.shaderMaps[asset.references.clump][i][j].bump}, {}, cAsset.unsynced.raw.map, cAsset.manifest.shaderMaps[asset.references.clump][i][j], _, _, _, syncer.public.librarySerial)
                         end
                     end
-                    if syncer.public.syncedElementTones[element] and syncer.public.syncedElementTones[element][assetType] and syncer.public.syncedElementTones[element][assetType][assetName] then
-                        for i, j in imports.pairs(syncer.public.syncedElementTones[element][assetType][assetName]) do
-                            if j.bump then syncer.private:setElementTone(element, assetType, assetName, i, j.bump, true) end
-                            syncer.private:setElementTone(element, assetType, assetName, i, j, false)
-                        end
-                    end
                 end
             end
             imports.setElementModel(element, modelID)
-        end, settings.downloader.buildRate)
-        return true
-    end
-
-    function syncer.private:setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature)
-        if not element or (not remoteSignature and not imports.isElement(element)) then return false end
-        if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
-        local cAsset = manager:getAssetData(assetType, assetName)
-        if not cAsset or not cAsset.manifest.assetClumps or not cAsset.manifest.shaderMaps or not cAsset.manifest.shaderMaps[asset.references.clump] or not cAsset.manifest.shaderMaps[asset.references.clump][textureName] then return false end
-        isBumpTone = (isBumpTone and true) or false
-        tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
-        tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
-        syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {}
-        syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName] = syncer.public.syncedElementTones[element][assetType][assetName] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {}
-        if isBumpTone then syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump = syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump or {} end
-        local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
-        ref = (isBumpTone and ref.bump) or ref
-        ref[1], ref[2] = tone[1], tone[2]
-        thread:createHeartbeat(function()
-            return not imports.isElement(element)
-        end, function()
-            local cShader = shader:fetchInstance(element, asset.references.clump, textureName)
-            if cShader then cShader:setValue((isBumpTone and "clumpTone_bump") or "clumpTone", {(15 + (85*tone[1]*0.01))*0.01, (25 + (25*tone[2]*0.01))*0.01}) end
         end, settings.downloader.buildRate)
         return true
     end
@@ -183,21 +151,6 @@ else
             if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
             thread:pause()
         end
-        for i, j in imports.pairs(syncer.public.syncedElementTones) do
-            if j then
-                for k, v in imports.pairs(j) do
-                    if k ~= "remoteSignature" then
-                        for m, n in imports.pairs(v) do
-                            for x, y in imports.pairs(n) do
-                                if y.bump then syncer.private:setElementTone(i, k, m, x, y.bump, true, j.remoteSignature, source) end
-                                syncer.private:setElementTone(i, k, m, x, y, false, j.remoteSignature, source)
-                            end
-                        end
-                    end
-                end
-            end
-            thread:pause()
-        end
     end, {isAsync = true})
 
     function syncer.private:loadClient(player)
@@ -232,33 +185,6 @@ else
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, i)
-                thread:pause()
-            end
-        end):resume({executions = settings.downloader.syncRate, frames = 1})
-        return true
-    end
-
-    function syncer.private:setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature, targetPlayer)
-        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementTone", true, false, targetPlayer, element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature) end
-        if not element or not imports.isElement(element) then return false end
-        if not textureName or not tone or (imports.type(tone) ~= "table") then return false end
-        local cAsset = manager:getAssetData(assetType, assetName)
-        if not cAsset or not cAsset.manifest.assetClumps or not cAsset.manifest.shaderMaps or not cAsset.manifest.shaderMaps[asset.references.clump] or not cAsset.manifest.shaderMaps[asset.references.clump][textureName] then return false end
-        isBumpTone = (isBumpTone and true) or false
-        tone[1] = math.max(0, math.min(100, imports.tonumber(tone[1]) or 0))
-        tone[2] = math.max(0, math.min(100, imports.tonumber(tone[2]) or 0))
-        remoteSignature = imports.getElementType(element)
-        syncer.public.syncedElementTones[element] = syncer.public.syncedElementTones[element] or {remoteSignature = remoteSignature}
-        syncer.public.syncedElementTones[element][assetType] = syncer.public.syncedElementTones[element][assetType] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName] = syncer.public.syncedElementTones[element][assetType][assetName] or {}
-        syncer.public.syncedElementTones[element][assetType][assetName][textureName] = syncer.public.syncedElementTones[element][assetType][assetName][textureName] or {}
-        if isBumpTone then syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump = syncer.public.syncedElementTones[element][assetType][assetName][textureName].bump or {} end
-        local ref = syncer.public.syncedElementTones[element][assetType][assetName][textureName]
-        ref = (isBumpTone and ref.bump) or ref
-        ref[1], ref[2] = tone[1], tone[2]
-        thread:create(function(self)
-            for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                syncer.private:setElementTone(element, assetType, assetName, textureName, tone, isBumpTone, remoteSignature, i)
                 thread:pause()
             end
         end):resume({executions = settings.downloader.syncRate, frames = 1})
