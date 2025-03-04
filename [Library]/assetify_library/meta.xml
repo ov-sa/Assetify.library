@@ -87,8 +87,6 @@
     <export function="library_getAssetDep" type="shared"/>
     <export function="library_setElementAsset" type="shared"/>
     <export function="library_getElementAsset" type="shared"/>
-    <export function="library_setElementAssetTone" type="shared"/>
-    <export function="library_getElementAssetTone" type="shared"/>
     <export function="library_setGlobalData" type="shared"/>
     <export function="library_getGlobalData" type="shared"/>
     <export function="library_getAllGlobalDatas" type="shared"/>

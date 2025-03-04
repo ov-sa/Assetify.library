@@ -62,8 +62,6 @@ bundler.private:createBuffer("core", "__core", [[
             {index = "assetify.__core.getAssetDep", api = {"library", "getAssetDep"}},
             {index = "assetify.__core.setElementAsset", api = {"library", "setElementAsset"}},
             {index = "assetify.__core.getElementAsset", api = {"library", "getElementAsset"}},
-            {index = "assetify.__core.setElementAssetTone", api = {"library", "setElementAssetTone"}},
-            {index = "assetify.__core.getElementAssetTone", api = {"library", "getElementAssetTone"}},
             {index = "assetify.__core.createDummy", api = {"library", "createAssetDummy"}}
         },
         client = {
