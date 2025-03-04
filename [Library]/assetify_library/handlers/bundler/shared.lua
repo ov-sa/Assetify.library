@@ -51,13 +51,13 @@ bundler.private:createBuffer("core", "__core", [[
     assetify.imports.setmetatable(assetify, {__index = assetify.__core})
     ]]..bundler.private:createAPIs({
         shared = {
-            {index = "assetify.__core.isBooted", api = {"library", "isLibraryBooted"}},
-            {index = "assetify.__core.isLoaded", api = {"library", "isLibraryLoaded"}},
+            {index = "assetify.__core.isBooted", api = {"library", "isBooted"}},
+            {index = "assetify.__core.isLoaded", api = {"library", "isLoaded"}},
             {index = "assetify.__core.isModuleLoaded", api = {"library", "isModuleLoaded"}},
-            {index = "assetify.__core.getSerial", api = {"library", "getLibrarySerial"}},
-            {index = "assetify.__core.getVersion", api = {"library", "getLibraryVersion"}},
-            {index = "assetify.__core.getWebserver", api = {"library", "getLibraryWebserver"}},
-            {index = "assetify.__core.getAssets", api = {"library", "getLibraryAssets"}},
+            {index = "assetify.__core.getSerial", api = {"library", "fetchSerial"}},
+            {index = "assetify.__core.getVersion", api = {"library", "fetchVersion"}},
+            {index = "assetify.__core.getWebserver", api = {"library", "fetchWebserver"}},
+            {index = "assetify.__core.getAssets", api = {"library", "fetchAssets"}},
             {index = "assetify.__core.getAsset", api = {"library", "getAssetData"}},
             {index = "assetify.__core.getAssetDep", api = {"library", "getAssetDep"}},
             {index = "assetify.__core.setElementAsset", api = {"library", "setElementAsset"}},

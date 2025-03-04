@@ -76,13 +76,13 @@
 
     <!-- Exports -->
     <export function="import" type="shared"/>
-    <export function="library_isLibraryBooted" type="shared"/>
-    <export function="library_isLibraryLoaded" type="shared"/>
+    <export function="library_isBooted" type="shared"/>
+    <export function="library_isLoaded" type="shared"/>
     <export function="library_isModuleLoaded" type="shared"/>
-    <export function="library_getLibrarySerial" type="shared"/>
-    <export function="library_getLibraryVersion" type="shared"/>
-    <export function="library_getLibraryWebserver" type="shared"/>
-    <export function="library_getLibraryAssets" type="shared"/>
+    <export function="library_fetchSerial" type="shared"/>
+    <export function="library_fetchVersion" type="shared"/>
+    <export function="library_fetchWebserver" type="shared"/>
+    <export function="library_fetchAssets" type="shared"/>
     <export function="library_getAssetData" type="shared"/>
     <export function="library_getAssetDep" type="shared"/>
     <export function="library_setElementAsset" type="shared"/>
