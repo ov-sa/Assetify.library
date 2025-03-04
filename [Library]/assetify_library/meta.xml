@@ -90,27 +90,27 @@
     <export function="library_getAssetDep" type="shared"/>
     <export function="library_setElementAsset" type="shared"/>
     <export function="library_getElementAsset" type="shared"/>
+    <export function="library_createDummy" type="shared"/>
+    <export function="library_getDownloadProgress" type="client"/>
+    <export function="library_isAssetLoaded" type="client"/>
+    <export function="library_getAssetID" type="client"/>
+    <export function="library_loadAsset" type="client"/>
+    <export function="library_unloadAsset" type="client"/>
+    <export function="library_loadModule" type="client"/>
+    <export function="library_createShader" type="client"/>
     <export function="syncer_setGlobalData" type="shared"/>
     <export function="syncer_getGlobalData" type="shared"/>
     <export function="syncer_getAllGlobalDatas" type="shared"/>
     <export function="syncer_setEntityData" type="shared"/>
     <export function="syncer_getEntityData" type="shared"/>
     <export function="syncer_getAllEntityDatas" type="shared"/>
-    <export function="library_setAttachment" type="shared"/>
-    <export function="library_setDetachment" type="shared"/>
-    <export function="library_clearAttachment" type="shared"/>
-    <export function="library_createAssetDummy" type="shared"/>
-    <export function="library_setBoneAttachment" type="shared"/>
-    <export function="library_setBoneDetachment" type="shared"/>
-    <export function="library_setBoneRefreshment" type="shared"/>
-    <export function="library_clearBoneAttachment" type="shared"/>
-    <export function="library_getLibraryProgress" type="client"/>
-    <export function="library_getDownloadProgress" type="client"/>
-    <export function="library_isAssetLoaded" type="client"/>
-    <export function="library_getAssetID" type="client"/>
-    <export function="library_loadAsset" type="client"/>
-    <export function="library_unloadAsset" type="client"/>
-    <export function="library_createShader" type="client"/>
+    <export function="attacher_setAttachment" type="shared"/>
+    <export function="attacher_setDetachment" type="shared"/>
+    <export function="attacher_clearAttachment" type="shared"/>
+    <export function="attacher_setBoneAttachment" type="shared"/>
+    <export function="attacher_setBoneDetachment" type="shared"/>
+    <export function="attacher_setBoneRefreshment" type="shared"/>
+    <export function="attacher_clearBoneAttachment" type="shared"/>
     <export function="world_clear" type="client"/>
     <export function="world_restore" type="client"/>
     <export function="world_setOcclusions" type="client"/>

@@ -57,7 +57,7 @@ manager:exportAPI("library", "getElementAsset", function(element)
     return syncer.syncedElements[element].assetType, syncer.syncedElements[element].assetName, syncer.syncedElements[element].assetClump, syncer.syncedElements[element].clumpMaps
 end)
 
-manager:exportAPI("library", "createAssetDummy", function(...)
+manager:exportAPI("library", "createDummy", function(...)
     local cDummy = syncer.syncDummySpawn(_, ...)
     return (cDummy and cDummy.cDummy) or false
 end)
@@ -81,10 +81,6 @@ if localPlayer then
 
     manager:exportAPI("library", "unloadAsset", function(...)
         return manager:unloadAsset(...)
-    end)
-
-    manager:exportAPI("library", "loadModule", function(...)
-        return manager:loadModule(...)
     end)
     
     manager:exportAPI("library", "createShader", function(...)
