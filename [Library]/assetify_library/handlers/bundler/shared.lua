@@ -116,34 +116,34 @@ bundler.private:createBuffer("renderer", _, [[
     assetify.renderer = {}
     ]]..bundler.private:createAPIs({
         client = {
-            {index = "assetify.renderer.isVirtualRendering", api = {"library", "isRendererVirtualRendering"}},
-            {index = "assetify.renderer.setVirtualRendering", api = {"library", "setRendererVirtualRendering"}},
-            {index = "assetify.renderer.getVirtualSource", api = {"library", "getRendererVirtualSource"}},
-            {index = "assetify.renderer.getVirtualRTs", api = {"library", "getRendererVirtualRTs"}},
-            {index = "assetify.renderer.isTimeSynced", api = {"library", "isRendererTimeSynced"}},
-            {index = "assetify.renderer.setTimeSync", api = {"library", "setRendererTimeSync"}},
-            {index = "assetify.renderer.setServerTick", api = {"library", "setRendererServerTick"}},
-            {index = "assetify.renderer.setMinuteDuration", api = {"library", "setRendererMinuteDuration"}},
-            {index = "assetify.renderer.getAntiAliasing", api = {"library", "getRendererAntiAliasing"}},
-            {index = "assetify.renderer.setAntiAliasing", api = {"library", "setRendererAntiAliasing"}},
-            {index = "assetify.renderer.isEmissiveMode", api = {"library", "isRendererEmissiveMode"}},
-            {index = "assetify.renderer.setEmissiveMode", api = {"library", "setRendererEmissiveMode"}},
-            {index = "assetify.renderer.isDynamicSky", api = {"library", "isRendererDynamicSky"}},
-            {index = "assetify.renderer.setDynamicSky", api = {"library", "setRendererDynamicSky"}},
-            {index = "assetify.renderer.isDynamicPrelights", api = {"library", "isRendererDynamicPrelights"}},
-            {index = "assetify.renderer.setDynamicPrelights", api = {"library", "setRendererDynamicPrelights"}},
-            {index = "assetify.renderer.getDynamicSunColor", api = {"library", "getRendererDynamicSunColor"}},
-            {index = "assetify.renderer.setDynamicSunColor", api = {"library", "setRendererDynamicSunColor"}},
-            {index = "assetify.renderer.isDynamicStars", api = {"library", "isRendererDynamicStars"}},
-            {index = "assetify.renderer.setDynamicStars", api = {"library", "setRendererDynamicStars"}},
-            {index = "assetify.renderer.getDynamicCloudDensity", api = {"library", "getRendererDynamicCloudDensity"}},
-            {index = "assetify.renderer.setDynamicCloudDensity", api = {"library", "setRendererDynamicCloudDensity"}},
-            {index = "assetify.renderer.getDynamicCloudScale", api = {"library", "getRendererDynamicCloudScale"}},
-            {index = "assetify.renderer.setDynamicCloudScale", api = {"library", "setRendererDynamicCloudScale"}},
-            {index = "assetify.renderer.getDynamicCloudColor", api = {"library", "getRendererDynamicCloudColor"}},
-            {index = "assetify.renderer.setDynamicCloudColor", api = {"library", "setRendererDynamicCloudColor"}},
-            {index = "assetify.renderer.getTimeCycle", api = {"library", "getRendererTimeCycle"}},
-            {index = "assetify.renderer.setTimeCycle", api = {"library", "setRendererTimeCycle"}}
+            {index = "assetify.renderer.isVirtualRendering", api = {"renderer", "isRendererVirtualRendering"}},
+            {index = "assetify.renderer.setVirtualRendering", api = {"renderer", "setRendererVirtualRendering"}},
+            {index = "assetify.renderer.getVirtualSource", api = {"renderer", "getRendererVirtualSource"}},
+            {index = "assetify.renderer.getVirtualRTs", api = {"renderer", "getRendererVirtualRTs"}},
+            {index = "assetify.renderer.isTimeSynced", api = {"renderer", "isRendererTimeSynced"}},
+            {index = "assetify.renderer.setTimeSync", api = {"renderer", "setRendererTimeSync"}},
+            {index = "assetify.renderer.setServerTick", api = {"renderer", "setRendererServerTick"}},
+            {index = "assetify.renderer.setMinuteDuration", api = {"renderer", "setRendererMinuteDuration"}},
+            {index = "assetify.renderer.getAntiAliasing", api = {"renderer", "getRendererAntiAliasing"}},
+            {index = "assetify.renderer.setAntiAliasing", api = {"renderer", "setRendererAntiAliasing"}},
+            {index = "assetify.renderer.isEmissiveMode", api = {"renderer", "isRendererEmissiveMode"}},
+            {index = "assetify.renderer.setEmissiveMode", api = {"renderer", "setRendererEmissiveMode"}},
+            {index = "assetify.renderer.isDynamicSky", api = {"renderer", "isRendererDynamicSky"}},
+            {index = "assetify.renderer.setDynamicSky", api = {"renderer", "setRendererDynamicSky"}},
+            {index = "assetify.renderer.isDynamicPrelights", api = {"renderer", "isRendererDynamicPrelights"}},
+            {index = "assetify.renderer.setDynamicPrelights", api = {"renderer", "setRendererDynamicPrelights"}},
+            {index = "assetify.renderer.getDynamicSunColor", api = {"renderer", "getRendererDynamicSunColor"}},
+            {index = "assetify.renderer.setDynamicSunColor", api = {"renderer", "setRendererDynamicSunColor"}},
+            {index = "assetify.renderer.isDynamicStars", api = {"renderer", "isRendererDynamicStars"}},
+            {index = "assetify.renderer.setDynamicStars", api = {"renderer", "setRendererDynamicStars"}},
+            {index = "assetify.renderer.getDynamicCloudDensity", api = {"renderer", "getRendererDynamicCloudDensity"}},
+            {index = "assetify.renderer.setDynamicCloudDensity", api = {"renderer", "setRendererDynamicCloudDensity"}},
+            {index = "assetify.renderer.getDynamicCloudScale", api = {"renderer", "getRendererDynamicCloudScale"}},
+            {index = "assetify.renderer.setDynamicCloudScale", api = {"renderer", "setRendererDynamicCloudScale"}},
+            {index = "assetify.renderer.getDynamicCloudColor", api = {"renderer", "getRendererDynamicCloudColor"}},
+            {index = "assetify.renderer.setDynamicCloudColor", api = {"renderer", "setRendererDynamicCloudColor"}},
+            {index = "assetify.renderer.getTimeCycle", api = {"renderer", "getRendererTimeCycle"}},
+            {index = "assetify.renderer.setTimeCycle", api = {"renderer", "setRendererTimeCycle"}}
         }
     })..[[
 ]])
@@ -152,12 +152,12 @@ bundler.private:createBuffer("syncer", _, [[
     assetify.syncer = {}
     ]]..bundler.private:createAPIs({
         shared = {
-            {index = "assetify.syncer.setGlobalData", api = {"library", "setGlobalData"}},
-            {index = "assetify.syncer.getGlobalData", api = {"library", "getGlobalData"}},
-            {index = "assetify.syncer.getAllGlobalDatas", api = {"library", "getAllGlobalDatas"}},
-            {index = "assetify.syncer.setEntityData", api = {"library", "setEntityData"}},
-            {index = "assetify.syncer.getEntityData", api = {"library", "getEntityData"}},
-            {index = "assetify.syncer.getAllEntityDatas", api = {"library", "getAllEntityDatas"}}
+            {index = "assetify.syncer.setGlobalData", api = {"syncer", "setGlobalData"}},
+            {index = "assetify.syncer.getGlobalData", api = {"syncer", "getGlobalData"}},
+            {index = "assetify.syncer.getAllGlobalDatas", api = {"syncer", "getAllGlobalDatas"}},
+            {index = "assetify.syncer.setEntityData", api = {"syncer", "setEntityData"}},
+            {index = "assetify.syncer.getEntityData", api = {"syncer", "getEntityData"}},
+            {index = "assetify.syncer.getAllEntityDatas", api = {"syncer", "getAllEntityDatas"}}
         }
     })..[[
 ]])

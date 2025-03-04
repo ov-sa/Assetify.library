@@ -70,9 +70,11 @@
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
     <script src="handlers/bundler/shared.lua" type="shared"/>
     <script src="handlers/api/library.lua" type="shared"/>
+    <script src="handlers/api/syncer.lua" type="shared"/>
     <script src="handlers/api/world.lua" type="shared"/>
     <script src="handlers/api/animation.lua" type="shared"/>
     <script src="handlers/api/sound.lua" type="shared"/>
+    <script src="handlers/api/renderer.lua" type="shared"/>
 
     <!-- Exports -->
     <export function="import" type="shared"/>
@@ -87,12 +89,12 @@
     <export function="library_getAssetDep" type="shared"/>
     <export function="library_setElementAsset" type="shared"/>
     <export function="library_getElementAsset" type="shared"/>
-    <export function="library_setGlobalData" type="shared"/>
-    <export function="library_getGlobalData" type="shared"/>
-    <export function="library_getAllGlobalDatas" type="shared"/>
-    <export function="library_setEntityData" type="shared"/>
-    <export function="library_getEntityData" type="shared"/>
-    <export function="library_getAllEntityDatas" type="shared"/>
+    <export function="syncer_setGlobalData" type="shared"/>
+    <export function="syncer_getGlobalData" type="shared"/>
+    <export function="syncer_getAllGlobalDatas" type="shared"/>
+    <export function="syncer_setEntityData" type="shared"/>
+    <export function="syncer_getEntityData" type="shared"/>
+    <export function="syncer_getAllEntityDatas" type="shared"/>
     <export function="library_setAttachment" type="shared"/>
     <export function="library_setDetachment" type="shared"/>
     <export function="library_clearAttachment" type="shared"/>
@@ -117,33 +119,33 @@
     <export function="animation_unloadAnim" type="client"/>
     <export function="sound_playSound" type="client"/>
     <export function="sound_playSound3D" type="client"/>
-    <export function="library_isRendererVirtualRendering" type="client"/>
-    <export function="library_setRendererVirtualRendering" type="client"/>
-    <export function="library_getRendererVirtualSource" type="client"/>
-    <export function="library_getRendererVirtualRTs" type="client"/>
-    <export function="library_isRendererTimeSynced" type="client"/>
-    <export function="library_setRendererTimeSync" type="client"/>
-    <export function="library_setRendererServerTick" type="client"/>
-    <export function="library_setRendererMinuteDuration" type="client"/>
-    <export function="library_getRendererAntiAliasing" type="client"/>
-    <export function="library_setRendererAntiAliasing" type="client"/>
-    <export function="library_isRendererEmissiveMode" type="client"/>
-    <export function="library_setRendererEmissiveMode" type="client"/>
-    <export function="library_isRendererDynamicSky" type="client"/>
-    <export function="library_setRendererDynamicSky" type="client"/>
-    <export function="library_isRendererDynamicPrelights" type="client"/>
-    <export function="library_setRendererDynamicPrelights" type="client"/>
-    <export function="library_getRendererDynamicSunColor" type="client"/>
-    <export function="library_setRendererDynamicSunColor" type="client"/>
-    <export function="library_isRendererDynamicStars" type="client"/>
-    <export function="library_setRendererDynamicStars" type="client"/>
-    <export function="library_getRendererDynamicCloudDensity" type="client"/>
-    <export function="library_setRendererDynamicCloudDensity" type="client"/>
-    <export function="library_getRendererDynamicCloudScale" type="client"/>
-    <export function="library_setRendererDynamicCloudScale" type="client"/>
-    <export function="library_getRendererDynamicCloudColor" type="client"/>
-    <export function="library_setRendererDynamicCloudColor" type="client"/>
-    <export function="library_getRendererTimeCycle" type="client"/>
-    <export function="library_setRendererTimeCycle" type="client"/>
+    <export function="renderer_isRendererVirtualRendering" type="client"/>
+    <export function="renderer_setRendererVirtualRendering" type="client"/>
+    <export function="renderer_getRendererVirtualSource" type="client"/>
+    <export function="renderer_getRendererVirtualRTs" type="client"/>
+    <export function="renderer_isRendererTimeSynced" type="client"/>
+    <export function="renderer_setRendererTimeSync" type="client"/>
+    <export function="renderer_setRendererServerTick" type="client"/>
+    <export function="renderer_setRendererMinuteDuration" type="client"/>
+    <export function="renderer_getRendererAntiAliasing" type="client"/>
+    <export function="renderer_setRendererAntiAliasing" type="client"/>
+    <export function="renderer_isRendererEmissiveMode" type="client"/>
+    <export function="renderer_setRendererEmissiveMode" type="client"/>
+    <export function="renderer_isRendererDynamicSky" type="client"/>
+    <export function="renderer_setRendererDynamicSky" type="client"/>
+    <export function="renderer_isRendererDynamicPrelights" type="client"/>
+    <export function="renderer_setRendererDynamicPrelights" type="client"/>
+    <export function="renderer_getRendererDynamicSunColor" type="client"/>
+    <export function="renderer_setRendererDynamicSunColor" type="client"/>
+    <export function="renderer_isRendererDynamicStars" type="client"/>
+    <export function="renderer_setRendererDynamicStars" type="client"/>
+    <export function="renderer_getRendererDynamicCloudDensity" type="client"/>
+    <export function="renderer_setRendererDynamicCloudDensity" type="client"/>
+    <export function="renderer_getRendererDynamicCloudScale" type="client"/>
+    <export function="renderer_setRendererDynamicCloudScale" type="client"/>
+    <export function="renderer_getRendererDynamicCloudColor" type="client"/>
+    <export function="renderer_setRendererDynamicCloudColor" type="client"/>
+    <export function="renderer_getRendererTimeCycle" type="client"/>
+    <export function="renderer_setRendererTimeCycle" type="client"/>
 
 </meta>
