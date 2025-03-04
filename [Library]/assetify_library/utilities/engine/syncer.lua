@@ -198,10 +198,8 @@ end
 ---------------------
 
 function syncer.public.syncElementModel(length, ...) return syncer.private:setElementModel(table.unpack(table.pack(...), length or 5)) end
-function syncer.public.syncElementTone(length, ...) return syncer.private:setElementTone(table.unpack(table.pack(...), length or 6)) end
 if localPlayer then
     network:create("Assetify:Syncer:onSyncElementModel"):on(function(...) syncer.public.syncElementModel(6, ...) end)
-    network:create("Assetify:Syncer:onSyncElementTone"):on(function(...) syncer.public.syncElementTone(7, ...) end)
     imports.addEventHandler("onClientElementDestroy", root, function() network:emit("Assetify:onElementDestroy", false, source) end)
 else
     imports.addEventHandler("onPlayerResourceStart", root, function(resourceElement)
@@ -216,7 +214,6 @@ else
         thread:create(function(self)
             local source = __source
             syncer.public.syncedElements[source] = nil
-            syncer.public.syncedElementTones[source] = nil
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
                 network:emit("Assetify:onElementDestroy", true, false, i, source)
                 thread:pause()
