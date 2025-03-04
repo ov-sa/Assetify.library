@@ -12,6 +12,7 @@
 --[[ Exports ]]--
 -----------------
 
+--[[
 manager:exportAPI("Library", {
     shared = {
         {name = "isLibraryBooted", API = "isBooted"},
@@ -83,3 +84,4 @@ manager:exportAPI("Library", {
         {name = "setPlanarLightColor"}
     }
 })
+]]
