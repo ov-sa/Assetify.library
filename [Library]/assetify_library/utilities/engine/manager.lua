@@ -17,7 +17,6 @@ local imports = {
     pairs = pairs,
     tonumber = tonumber,
     tostring = tostring,
-    loadstring = loadstring,
     collectgarbage = collectgarbage,
     isElement = isElement,
     getElementType = getElementType,
