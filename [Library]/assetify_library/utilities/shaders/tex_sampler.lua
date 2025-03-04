@@ -37,8 +37,6 @@ shaderRW.buffer[identity] = {
         -->> Variables <<--
         -------------------*/
 
-        float sampleOffset = 0.001;
-        float sampleIntensity = 0;
         float3 sunColor = false;
         bool isStarsEnabled = false;
         float cloudDensity = false;
@@ -128,16 +126,6 @@ shaderRW.buffer[identity] = {
             float4 baseTexel = tex2Dlod(vSource0Sampler, float4(uv, 0, 0));
             float4 depthTexel = tex2Dlod(vDepth0Sampler, float4(uv, 0, 0));
             float4 weatherTexel = ((depthTexel.r + depthTexel.g + depthTexel.b)/3) >= 1 ? 1 : 0;
-            if ((sampleOffset > 0) && (weatherTexel.a <= 0)) {
-                float4 sampledTexel = tex2Dlod(vSource0Sampler, float4(uv + float2(sampleOffset, sampleOffset), 0, 0));
-                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(-sampleOffset, -sampleOffset), 0, 0));
-                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(-sampleOffset, sampleOffset), 0, 0));
-                sampledTexel += tex2Dlod(vSource0Sampler, float4(uv + float2(sampleOffset, -sampleOffset), 0, 0));
-                sampledTexel *= 0.25;
-                float edgeIntensity = length(sampledTexel.rgb);
-                edgeIntensity = pow(length(float2(ddx(edgeIntensity), ddy(edgeIntensity))), 0.5)*sampleIntensity;
-                baseTexel = lerp(baseTexel, sampledTexel, edgeIntensity);
-            }
             return float2x4(baseTexel, weatherTexel);
         }
     
@@ -196,20 +184,6 @@ shaderRW.buffer[identity] = {
             result = lerp(result, cloudColor, length(skyBase)*smoothstep(cloudID, cloudID + 0.1, CreatePerlinNoise(viewCoord*cloudScale, cloudDensity)));
             return float2x4(float4(result, 1), float4(skyBase, 1));
         }
-
-        float4 SampleEmissive(float2 uv) {
-            float viewPI = PI*2;
-            float2 viewRadius = 20/vResolution;
-            float viewIterations = 26, viewQuality = 4, viewBrightness = 1.5;
-            float4 result = tex2Dlod(vSource2Sampler, float4(uv, 0, 0))*viewBrightness;
-            for(float i = 0; i < viewPI; i += viewPI/viewIterations) {
-                for(float j = 1/viewQuality; j <= 1; j += 1/viewQuality) {
-                    result += tex2Dlod(vSource2Sampler, float4(uv + (float2(cos(i), sin(i))*viewRadius*j), 0, 0))*viewBrightness;
-                }
-            }
-            result /= (viewQuality*viewIterations) - 15;
-            return result;
-        }
     
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
@@ -238,7 +212,6 @@ shaderRW.buffer[identity] = {
                 sampledTexel = isSkyVisible ? skyTexel[0] : sampledTexel;
                 output.Sky = skyTexel[1];
             }
-            if (vSource2Enabled) sampledTexel += SampleEmissive(PS.TexCoord);
             // Sample Gamma & Vignette
             sampledTexel.rgb *= lerp(1, float3(0.8, 0.9, 1.3), sin(gTime + 3)*0.5 + 0.5);
             sampledTexel.rgb *= (1 - dot(PS.TexCoord -= 0.5, PS.TexCoord))*pow(smoothstep(0, 10, gTime), 2);

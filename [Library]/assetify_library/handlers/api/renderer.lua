@@ -45,14 +45,6 @@ if localPlayer then
         return renderer:setMinuteDuration(...)
     end)
 
-    manager:exportAPI("renderer", "getAntiAliasing", function()
-        return renderer.isAntiAliased or 0
-    end)
-
-    manager:exportAPI("renderer", "setAntiAliasing", function(...)
-        return renderer:setAntiAliasing(...)
-    end)
-
     manager:exportAPI("renderer", "isEmissiveMode", function()
         return renderer.isEmissiveModeEnabled
     end)

@@ -46,7 +46,6 @@ local imports = {
 local renderer = class:create("renderer", {
     isVirtualRendering = false,
     isTimeSynced = false,
-    isEmissiveModeEnabled = false,
     isDynamicSkyEnabled = false
 })
 renderer.private.serverTick = 60*60*12*1000
@@ -60,9 +59,11 @@ if localPlayer then
         imports.dxUpdateScreenSource(renderer.public.virtualSource)
         imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
         if renderer.public.isEmissiveModeEnabled then
+            --[[
             outputChatBox("RENDERING EMISSIVE SHADER...")
             imports.dxDrawImage(0, 0, 0, 0, renderer.private.emissiveBuffer.shader) --TODO: IS THIS NEEDED?
             imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.emissiveBuffer.rt)
+            ]]
         end
         if renderer.public.isDynamicSkyEnabled then
             if renderer.public.isTimeSynced then
@@ -145,8 +146,6 @@ if localPlayer then
             syncShader:setValue("vSource0", vSource0)
             syncShader:setValue("vSource1", vSource1)
             syncShader:setValue("vSource1Enabled", (vSource1 and true) or false)
-            syncShader:setValue("vSource2", vSource2)
-            syncShader:setValue("vSource2Enabled", (vSource2 and true) or false)
         end
         return true
     end
@@ -196,17 +195,6 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:setAntiAliasing(intensity, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            intensity = imports.tonumber(intensity) or 0
-            if renderer.public.isAntiAliased == intensity then return false end
-            renderer.public.isAntiAliased = intensity
-        end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("sampleIntensity", renderer.public.isAntiAliased or false) end
-        return true
-    end
-
     --[[
     function renderer.public:setEmissiveMode(state)
         state = (state and true) or false
@@ -252,7 +240,6 @@ if localPlayer then
             if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"] == syncShader) then
                 shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
                 if not shader.preLoaded["Assetify_TextureSampler"].isTexSamplerLoaded then
-                    renderer.public:setAntiAliasing(_, syncer.librarySerial)
                     renderer.public:setDynamicSunColor(_, _, _, syncer.librarySerial)
                     renderer.public:setDynamicStars(_, syncer.librarySerial)
                     renderer.public:setDynamicCloudDensity(_, syncer.librarySerial)

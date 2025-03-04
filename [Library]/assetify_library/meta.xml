@@ -134,8 +134,6 @@
     <export function="renderer_setTimeSync" type="client"/>
     <export function="renderer_setServerTick" type="client"/>
     <export function="renderer_setMinuteDuration" type="client"/>
-    <export function="renderer_getAntiAliasing" type="client"/>
-    <export function="renderer_setAntiAliasing" type="client"/>
     <export function="renderer_isEmissiveMode" type="client"/>
     <export function="renderer_setEmissiveMode" type="client"/>
     <export function="renderer_isDynamicSky" type="client"/>
