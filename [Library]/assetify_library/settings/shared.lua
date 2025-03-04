@@ -20,7 +20,7 @@ settings = {
     },
 
     library = {
-        autoUpdate = false,
+        autoUpdate = true,
         webserverURL = false
     },
 
