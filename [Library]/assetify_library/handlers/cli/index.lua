@@ -38,17 +38,17 @@ cli.private.validActions = {
 -----------------------
 
 function cli.public:serial(isAction)
-    imports.outputServerLog("Assetify: Serial ━│  "..(manager.API.Library.fetchSerial() or "N/A"))
+    imports.outputServerLog("Assetify: Serial ━│  "..(manager.API.library.fetchSerial() or "N/A"))
     return true
 end
 
 function cli.public:version(isAction)
-    imports.outputServerLog("Assetify: Version ━│  "..(manager.API.Library.fetchVersion() or "N/A"))
+    imports.outputServerLog("Assetify: Version ━│  "..(manager.API.library.fetchVersion() or "N/A"))
     return true
 end
 
 function cli.public:webserver(isAction)
-    imports.outputServerLog("Assetify: Webserver ━│  "..(manager.API.Library.fetchWebserver() or "N/A"))
+    imports.outputServerLog("Assetify: Webserver ━│  "..(manager.API.library.fetchWebserver() or "N/A"))
     return true
 end
 

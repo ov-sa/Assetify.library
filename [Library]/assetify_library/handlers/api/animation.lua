@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: api: anim.lua
+     Script: handlers: api: animation.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Anim APIs ]]--
+     Desc: Animation APIs ]]--
 ----------------------------------------------------------------
 
 
@@ -19,12 +19,12 @@ local imports = {
 }
 
 
---------------------
---[[ APIs: Anim ]]--
---------------------
+-------------------------
+--[[ APIs: Animation ]]--
+-------------------------
 
 if localPlayer then
-    manager:exportAPI(manager.API.Anim, {name = "loadAnim"}, function(element, assetName)
+    manager:exportAPI("animation", {name = "loadAnim"}, function(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)
@@ -38,7 +38,7 @@ if localPlayer then
         return true
     end)
 
-    manager:exportAPI(manager.API.Anim, {name = "unloadAnim"}, function(element, assetName)
+    manager:exportAPI("animation", {name = "unloadAnim"}, function(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)

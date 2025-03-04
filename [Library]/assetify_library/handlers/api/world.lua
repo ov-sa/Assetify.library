@@ -31,33 +31,33 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    manager:exportAPI(manager.API.World, {name = "clearWorld"}, function()
+    manager:exportAPI("world", {name = "clearWorld"}, function()
         for i = 550, 19999, 1 do
             imports.removeWorldModel(i, 100000, 0, 0, 0)
         end
         if settings.GTA.waterLevel then
             streamer.waterBuffer = imports.createWater(-3000, -3000, 0, 3000, -3000, 0, -3000, 3000, 0, 3000, 3000, 0, false)
         end
-        manager.API.World.setOcclusions(false)
+        manager.API.world.setOcclusions(false)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", false)
         return true
     end)
 
-    manager:exportAPI(manager.API.World, {name = "restoreWorld"}, function()
+    manager:exportAPI("world", {name = "restoreWorld"}, function()
         imports.destroyElement(streamer.waterBuffer)
         streamer.waterBuffer = nil
         imports.restoreAllWorldModels()
-        manager.API.World.setOcclusions(true)
+        manager.API.world.setOcclusions(true)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", true)
         return true
     end)
 
-    manager:exportAPI(manager.API.World, {name = "setOcclusions"}, function(state)
+    manager:exportAPI("world", {name = "setOcclusions"}, function(state)
         imports.setOcclusionsEnabled((state and true) or false)
         return true
     end)
 
-    manager:exportAPI(manager.API.World, {name = "clearModel"}, function(modelID)
+    manager:exportAPI("world", {name = "clearModel"}, function(modelID)
         modelID = imports.tonumber(modelID)
         if modelID then
             imports.engineImportTXD(asset.rwAssets.txd, modelID)
@@ -67,7 +67,7 @@ if localPlayer then
         return false
     end)
 
-    manager:exportAPI(manager.API.World, {name = "restoreModel"}, function(modelID)
+    manager:exportAPI("world", {name = "restoreModel"}, function(modelID)
         modelID = imports.tonumber(modelID)
         if not modelID then return false end
         return imports.engineRestoreModel(modelID)
