@@ -73,9 +73,8 @@
     <script src="handlers/api/attacher.lua" type="shared"/>
     <script src="handlers/api/renderer.lua" type="shared"/>
     <script src="handlers/bundler/index.lua" type="shared"/>
-    <script src="handlers/bundler/importer.lua" type="shared"/>
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
-    <script src="handlers/bundler/shared.lua" type="shared"/>
+    <script src="handlers/bundler/importer.lua" type="shared"/>
     
     <!-- Exports -->
     <export function="import" type="shared"/>
