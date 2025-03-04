@@ -83,6 +83,10 @@ if localPlayer then
         return manager:unloadAsset(...)
     end)
 
+    manager:exportAPI("library", "loadModule", function(...)
+        return manager:loadModule(...)
+    end)
+    
     manager:exportAPI("library", "createShader", function(...)
         local cShader = shader:create(...)
         return (cShader and cShader.cShader) or false
