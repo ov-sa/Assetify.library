@@ -35,7 +35,7 @@
   * `object`
   * `inventory`
 * Comprehensive Built-In Features ft:
-  * APIs:
+  * **APIs:**
     * [Library](https://github.com/ov-sa/Assetify-Library/wiki/API:-Library)
     * [World](https://github.com/ov-sa/Assetify-Library/wiki/API:-World)
     * [Animation](https://github.com/ov-sa/Assetify-Library/wiki/API:-Animation)
@@ -45,7 +45,7 @@
     * [Renderer](https://github.com/ov-sa/Assetify-Library/wiki/API:-Renderer)
     * [Attacher](https://github.com/ov-sa/Assetify-Library/wiki/API:-Attacher)
       * [Bone](https://github.com/ov-sa/Assetify-Library/wiki/API:-Attacher:-Bone)
-  * Libraries:
+  * **Libraries:**
     * [Table](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Table)
     * [Math](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Math)
       * [Quat](https://github.com/ov-sa/Assetify-Library/wiki/Library:-Math:-Quat)
