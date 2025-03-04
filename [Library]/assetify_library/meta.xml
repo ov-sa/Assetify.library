@@ -73,12 +73,9 @@
     <script src="handlers/bundler/shared.lua" type="shared"/>
     <script src="handlers/api/library/exports.lua" type="shared"/>
     <script src="handlers/api/library/api.lua" type="shared"/>
-    <script src="handlers/api/world/exports.lua" type="shared"/>
-    <script src="handlers/api/world/api.lua" type="shared"/>
-    <script src="handlers/api/anim/exports.lua" type="shared"/>
-    <script src="handlers/api/anim/api.lua" type="shared"/>
-    <script src="handlers/api/sound/exports.lua" type="shared"/>
-    <script src="handlers/api/sound/api.lua" type="shared"/>
+    <script src="handlers/api/world.lua" type="shared"/>
+    <script src="handlers/api/anim.lua" type="shared"/>
+    <script src="handlers/api/sound.lua" type="shared"/>
 
     <!-- Exports -->
     <export function="import" type="shared"/>

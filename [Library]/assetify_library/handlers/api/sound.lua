@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: api: sound: api.lua
+     Script: handlers: api: sound.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -24,7 +24,7 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    function manager.API.Sound.playSound(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    manager:exportAPI(manager.API.Sound, {name = "playSound"}, function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
@@ -35,9 +35,9 @@ if localPlayer then
             if isScoped then manager:setElementScoped(cSound) end
         end
         return cSound
-    end
+    end)
 
-    function manager.API.Sound.playSound3D(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    manager:exportAPI(manager.API.Sound, {name = "playSound3D"}, function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
@@ -48,7 +48,7 @@ if localPlayer then
             if isScoped then manager:setElementScoped(cSound) end
         end
         return cSound
-    end
+    end)
 else
 
 end

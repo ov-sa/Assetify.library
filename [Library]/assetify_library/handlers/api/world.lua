@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: handlers: api: world: api.lua
+     Script: handlers: api: world.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
@@ -31,7 +31,7 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    function manager.API.World.clearWorld()
+    manager:exportAPI(manager.API.World, {name = "clearWorld"}, function()
         for i = 550, 19999, 1 do
             imports.removeWorldModel(i, 100000, 0, 0, 0)
         end
@@ -41,23 +41,23 @@ if localPlayer then
         manager.API.World.setOcclusions(false)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", false)
         return true
-    end
+    end)
 
-    function manager.API.World.restoreWorld()
+    manager:exportAPI(manager.API.World, {name = "restoreWorld"}, function()
         imports.destroyElement(streamer.waterBuffer)
         streamer.waterBuffer = nil
         imports.restoreAllWorldModels()
         manager.API.World.setOcclusions(true)
         imports.setWorldSpecialPropertyEnabled("randomfoliage", true)
         return true
-    end
+    end)
 
-    function manager.API.World.setOcclusions(state)
+    manager:exportAPI(manager.API.World, {name = "setOcclusions"}, function(state)
         imports.setOcclusionsEnabled((state and true) or false)
         return true
-    end
+    end)
 
-    function manager.API.World.clearModel(modelID)
+    manager:exportAPI(manager.API.World, {name = "clearModel"}, function(modelID)
         modelID = imports.tonumber(modelID)
         if modelID then
             imports.engineImportTXD(asset.rwAssets.txd, modelID)
@@ -65,14 +65,13 @@ if localPlayer then
             return true
         end
         return false
-    end
+    end)
 
-    function manager.API.World.restoreModel(modelID)
+    manager:exportAPI(manager.API.World, {name = "restoreModel"}, function(modelID)
         modelID = imports.tonumber(modelID)
         if not modelID then return false end
         return imports.engineRestoreModel(modelID)
-    end
+    end)
 else
-
 
 end

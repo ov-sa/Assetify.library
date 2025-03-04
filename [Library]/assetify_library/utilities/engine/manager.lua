@@ -57,21 +57,12 @@ function manager.public:isInternal(serial)
     return (not isExternal and not serial and true) or (serial and (serial == syncer.librarySerial)) or false
 end
 
-function manager.public:exportAPI(moduleName, moduleAPIs)
-    if not moduleName or (imports.type(moduleName) ~= "string") or not moduleAPIs or (imports.type(moduleAPIs) ~= "table") then return false end
-    manager.public.API[moduleName] = {}
-    for i, j in imports.pairs(moduleAPIs) do
-        if (i  == "shared") or (i == ((localPlayer and "client") or "server")) then
-            for k = 1, table.length(j), 1 do
-                local v = j[k]
-                imports.loadstring([[
-                    local ref = false
-                    function ]]..v.name..[[(...)
-                        ref = ref or manager.API.]]..moduleName..[[.]]..(v.API or v.name)..[[
-                        return ref(...)
-                    end
-                ]])()
-            end
+function manager.public:exportAPI(module, ref, exec)
+    if not module or not ref or not exec then return false end
+    module.ref.name = exec
+    if ref.name then
+        _G[ref.api or ref.name] = function(...)
+            return exec(...)
         end
     end
     return true
