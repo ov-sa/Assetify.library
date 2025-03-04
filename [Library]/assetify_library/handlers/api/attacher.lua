@@ -24,11 +24,6 @@ manager:exportAPI("attacher", "clearAttachment", function(...)
     return attacher:clearAttachment(...)
 end)
 
-manager:exportAPI("attacher", "createAssetDummy", function(...)
-    local cDummy = syncer.syncDummySpawn(_, ...)
-    return (cDummy and cDummy.cDummy) or false
-end)
-
 manager:exportAPI("attacher", "setBoneAttachment", function(...)
     return syncer.syncBoneAttachment(_, ...)
 end)

@@ -66,6 +66,11 @@ manager:exportAPI("library", "getElementAsset", function(element, assetType, ass
     return {syncer.syncedElementTones[element][assetType][assetName][textureName][1], syncer.syncedElementTones[element][assetType][assetName][textureName][2]}
 end)
 
+manager:exportAPI("library", "createAssetDummy", function(...)
+    local cDummy = syncer.syncDummySpawn(_, ...)
+    return (cDummy and cDummy.cDummy) or false
+end)
+
 if localPlayer then
     manager:exportAPI("library", "getDownloadProgress", function(...)
         return manager:getDownloadProgress(...)
