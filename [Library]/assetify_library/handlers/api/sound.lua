@@ -24,7 +24,7 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    manager:exportAPI("sound", "playSound", function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    manager:exportAPI("sound", "play", function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end
@@ -37,7 +37,7 @@ if localPlayer then
         return cSound
     end)
 
-    manager:exportAPI("sound", "playSound3D", function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
+    manager:exportAPI("sound", "play", function(assetName, soundCategory, soundIndex, soundVolume, isScoped, ...)
         if not syncer.isLibraryLoaded then return false end
         local cAsset, isLoaded = manager:getAssetData("sound", assetName, syncer.librarySerial)
         if not cAsset or not isLoaded then return false end

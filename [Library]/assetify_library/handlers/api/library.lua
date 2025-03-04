@@ -66,39 +66,6 @@ manager:exportAPI("library", "getElementAsset", function(element, assetType, ass
     return {syncer.syncedElementTones[element][assetType][assetName][textureName][1], syncer.syncedElementTones[element][assetType][assetName][textureName][2]}
 end)
 
-manager:exportAPI("library", "setAttachment", function(...)
-    return attacher:attachElements(...)
-end)
-
-manager:exportAPI("library", "setDetachment", function(...)
-    return attacher:detachElements(...)
-end)
-
-manager:exportAPI("library", "clearAttachment", function(...)
-    return attacher:clearAttachment(...)
-end)
-
-manager:exportAPI("library", "createAssetDummy", function(...)
-    local cDummy = syncer.syncDummySpawn(_, ...)
-    return (cDummy and cDummy.cDummy) or false
-end)
-
-manager:exportAPI("library", "setBoneAttachment", function(...)
-    return syncer.syncBoneAttachment(_, ...)
-end)
-
-manager:exportAPI("library", "setBoneDetachment", function(...)
-    return syncer.syncBoneDetachment(_, ...)
-end)
-
-manager:exportAPI("library", "setBoneRefreshment", function(...)
-    return syncer.syncBoneRefreshment(_, ...)
-end)
-
-manager:exportAPI("library", "clearBoneAttachment", function(...)
-    return syncer.syncClearBoneAttachment(_, ...)
-end)
-
 if localPlayer then
     manager:exportAPI("library", "getDownloadProgress", function(...)
         return manager:getDownloadProgress(...)

@@ -31,7 +31,7 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    manager:exportAPI("world", "clearWorld", function()
+    manager:exportAPI("world", "clear", function()
         for i = 550, 19999, 1 do
             imports.removeWorldModel(i, 100000, 0, 0, 0)
         end
@@ -43,7 +43,7 @@ if localPlayer then
         return true
     end)
 
-    manager:exportAPI("world", "restoreWorld", function()
+    manager:exportAPI("world", "restore", function()
         imports.destroyElement(streamer.waterBuffer)
         streamer.waterBuffer = nil
         imports.restoreAllWorldModels()

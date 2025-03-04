@@ -111,42 +111,42 @@
     <export function="library_loadAsset" type="client"/>
     <export function="library_unloadAsset" type="client"/>
     <export function="library_createShader" type="client"/>
-    <export function="world_clearWorld" type="client"/>
-    <export function="world_restoreWorld" type="client"/>
+    <export function="world_clear" type="client"/>
+    <export function="world_restore" type="client"/>
     <export function="world_setOcclusions" type="client"/>
     <export function="world_clearModel" type="client"/>
     <export function="world_restoreModel" type="client"/>
-    <export function="animation_loadAnim" type="client"/>
-    <export function="animation_unloadAnim" type="client"/>
-    <export function="sound_playSound" type="client"/>
-    <export function="sound_playSound3D" type="client"/>
-    <export function="renderer_isRendererVirtualRendering" type="client"/>
-    <export function="renderer_setRendererVirtualRendering" type="client"/>
-    <export function="renderer_getRendererVirtualSource" type="client"/>
-    <export function="renderer_getRendererVirtualRTs" type="client"/>
-    <export function="renderer_isRendererTimeSynced" type="client"/>
-    <export function="renderer_setRendererTimeSync" type="client"/>
-    <export function="renderer_setRendererServerTick" type="client"/>
-    <export function="renderer_setRendererMinuteDuration" type="client"/>
-    <export function="renderer_getRendererAntiAliasing" type="client"/>
-    <export function="renderer_setRendererAntiAliasing" type="client"/>
-    <export function="renderer_isRendererEmissiveMode" type="client"/>
-    <export function="renderer_setRendererEmissiveMode" type="client"/>
-    <export function="renderer_isRendererDynamicSky" type="client"/>
-    <export function="renderer_setRendererDynamicSky" type="client"/>
-    <export function="renderer_isRendererDynamicPrelights" type="client"/>
-    <export function="renderer_setRendererDynamicPrelights" type="client"/>
-    <export function="renderer_getRendererDynamicSunColor" type="client"/>
-    <export function="renderer_setRendererDynamicSunColor" type="client"/>
-    <export function="renderer_isRendererDynamicStars" type="client"/>
-    <export function="renderer_setRendererDynamicStars" type="client"/>
-    <export function="renderer_getRendererDynamicCloudDensity" type="client"/>
-    <export function="renderer_setRendererDynamicCloudDensity" type="client"/>
-    <export function="renderer_getRendererDynamicCloudScale" type="client"/>
-    <export function="renderer_setRendererDynamicCloudScale" type="client"/>
-    <export function="renderer_getRendererDynamicCloudColor" type="client"/>
-    <export function="renderer_setRendererDynamicCloudColor" type="client"/>
-    <export function="renderer_getRendererTimeCycle" type="client"/>
-    <export function="renderer_setRendererTimeCycle" type="client"/>
+    <export function="animation_load" type="client"/>
+    <export function="animation_unload" type="client"/>
+    <export function="sound_play" type="client"/>
+    <export function="sound_play3D" type="client"/>
+    <export function="renderer_isVirtualRendering" type="client"/>
+    <export function="renderer_setVirtualRendering" type="client"/>
+    <export function="renderer_getVirtualSource" type="client"/>
+    <export function="renderer_getVirtualRTs" type="client"/>
+    <export function="renderer_isTimeSynced" type="client"/>
+    <export function="renderer_setTimeSync" type="client"/>
+    <export function="renderer_setServerTick" type="client"/>
+    <export function="renderer_setMinuteDuration" type="client"/>
+    <export function="renderer_getAntiAliasing" type="client"/>
+    <export function="renderer_setAntiAliasing" type="client"/>
+    <export function="renderer_isEmissiveMode" type="client"/>
+    <export function="renderer_setEmissiveMode" type="client"/>
+    <export function="renderer_isDynamicSky" type="client"/>
+    <export function="renderer_setDynamicSky" type="client"/>
+    <export function="renderer_isDynamicPrelights" type="client"/>
+    <export function="renderer_setDynamicPrelights" type="client"/>
+    <export function="renderer_getDynamicSunColor" type="client"/>
+    <export function="renderer_setDynamicSunColor" type="client"/>
+    <export function="renderer_isDynamicStars" type="client"/>
+    <export function="renderer_setDynamicStars" type="client"/>
+    <export function="renderer_getDynamicCloudDensity" type="client"/>
+    <export function="renderer_setDynamicCloudDensity" type="client"/>
+    <export function="renderer_getDynamicCloudScale" type="client"/>
+    <export function="renderer_setDynamicCloudScale" type="client"/>
+    <export function="renderer_getDynamicCloudColor" type="client"/>
+    <export function="renderer_setDynamicCloudColor" type="client"/>
+    <export function="renderer_getTimeCycle" type="client"/>
+    <export function="renderer_setTimeCycle" type="client"/>
 
 </meta>
