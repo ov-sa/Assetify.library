@@ -40,8 +40,7 @@ local streamer = class:create("streamer")
 streamer.private.allocator = {
     validStreams = {
         ["dummy"] = {desyncOccclusionsOnPause = true},
-        ["bone"] = {skipAttachment = true, dynamicStreamAllocation = true},
-        ["light"] = {desyncOccclusionsOnPause = true}
+        ["bone"] = {skipAttachment = true, dynamicStreamAllocation = true}
     }
 }
 streamer.private.ref = {}

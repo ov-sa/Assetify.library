@@ -59,8 +59,6 @@
     <script src="utilities/engine/dummy.lua" type="shared"/>
     <script src="utilities/engine/attacher/index.lua" type="shared"/>
     <script src="utilities/engine/attacher/bone.lua" type="shared"/>
-    <script src="utilities/engine/light/index.lua" type="client"/>
-    <script src="utilities/engine/light/planar.lua" type="client"/>
 
     <!-- Handlers -->
     <script src="handlers/cli/index.lua" type="server"/>
@@ -71,8 +69,7 @@
     <script src="handlers/bundler/importer.lua" type="shared"/>
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
     <script src="handlers/bundler/shared.lua" type="shared"/>
-    <script src="handlers/api/library/exports.lua" type="shared"/>
-    <script src="handlers/api/library/api.lua" type="shared"/>
+    <script src="handlers/api/library.lua" type="shared"/>
     <script src="handlers/api/world.lua" type="shared"/>
     <script src="handlers/api/animation.lua" type="shared"/>
     <script src="handlers/api/sound.lua" type="shared"/>
@@ -150,9 +147,5 @@
     <export function="setRendererDynamicCloudColor" type="client"/>
     <export function="getRendererTimeCycle" type="client"/>
     <export function="setRendererTimeCycle" type="client"/>
-    <export function="createPlanarLight" type="client"/>
-    <export function="setPlanarLightResolution" type="client"/>
-    <export function="setPlanarLightTexture" type="client"/>
-    <export function="setPlanarLightColor" type="client"/>
 
 </meta>

@@ -12,7 +12,6 @@
 --[[ Exports ]]--
 -----------------
 
---[[
 manager:exportAPI("Library", {
     shared = {
         {name = "isLibraryBooted", API = "isBooted"},
@@ -77,11 +76,6 @@ manager:exportAPI("Library", {
         {name = "getRendererDynamicCloudColor"},
         {name = "setRendererDynamicCloudColor"},
         {name = "getRendererTimeCycle"},
-        {name = "setRendererTimeCycle"},
-        {name = "createPlanarLight"},
-        {name = "setPlanarLightResolution"},
-        {name = "setPlanarLightTexture"},
-        {name = "setPlanarLightColor"}
+        {name = "setRendererTimeCycle"}
     }
 })
-]]

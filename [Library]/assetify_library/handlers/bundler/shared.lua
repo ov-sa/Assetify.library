@@ -178,18 +178,3 @@ bundler.private:createBuffer("attacher", _, [[
         }
     })..[[
 ]])
-
-
-bundler.private:createBuffer("lights", "light", [[
-    assetify.light = {
-        planar = {}
-    }
-    ]]..bundler.private:createAPIs({
-        client = {
-            {exportIndex = "assetify.light.planar.create", exportName = "createPlanarLight"},
-            {exportIndex = "assetify.light.planar.setResolution", exportName = "setPlanarLightResolution"},
-            {exportIndex = "assetify.light.planar.setTexture", exportName = "setPlanarLightTexture"},
-            {exportIndex = "assetify.light.planar.setColor", exportName = "setPlanarLightColor"}
-        }
-    })..[[
-]])
