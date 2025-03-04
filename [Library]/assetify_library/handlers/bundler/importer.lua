@@ -82,6 +82,7 @@ bundler.private:createBuffer("animation", false, bundler.private:createAPIs("ass
 bundler.private:createBuffer("sound", false, bundler.private:createAPIs("assetify.sound", "sound"))
 bundler.private:createBuffer("syncer", false, bundler.private:createAPIs("assetify.syncer", "syncer"))
 bundler.private:createBuffer("attacher", false, bundler.private:createAPIs("assetify.attacher", "attacher"))
+bundler.private:createBuffer("interface", false, bundler.private:createAPIs("assetify.interface", "interface"))
 bundler.private:createBuffer("renderer", false, bundler.private:createAPIs("assetify.renderer", "renderer"))
 
 

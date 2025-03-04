@@ -71,6 +71,7 @@
     <script src="handlers/api/sound.lua" type="shared"/>
     <script src="handlers/api/syncer.lua" type="shared"/>
     <script src="handlers/api/attacher.lua" type="shared"/>
+    <script src="handlers/api/interface.lua" type="shared"/>
     <script src="handlers/api/renderer.lua" type="shared"/>
     <script src="handlers/bundler/index.lua" type="shared"/>
     <script src="handlers/bundler/scheduler.lua" type="shared"/>
@@ -119,6 +120,12 @@
     <export function="animation_unload" type="client"/>
     <export function="sound_play" type="client"/>
     <export function="sound_play3D" type="client"/>
+    <export function="interface_createFont" type="client"/>
+    <export function="interface_isKeyOnHold" type="client"/>
+    <export function="interface_isKeyClicked" type="client"/>
+    <export function="interface_isMouseScrolled" type="client"/>
+    <export function="interface_registerKeyClick" type="client"/>
+    <export function="interface_registerMouseScroll" type="client"/>
     <export function="renderer_isVirtualRendering" type="client"/>
     <export function="renderer_setVirtualRendering" type="client"/>
     <export function="renderer_getVirtualSource" type="client"/>
