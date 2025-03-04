@@ -119,8 +119,8 @@ function bundler.private:createAPIs(exports)
             for k = 1, table.length(j), 1 do
                 local v = j[k]
                 rw = rw..[[
-                ]]..v.exportIndex..[[ = function(...)
-                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "]]..v.exportName..[[", ...)
+                ]]..v.index..[[ = function(...)
+                    return assetify.imports.call(assetify.imports.getResourceFromName(assetify.imports.resourceName), "]]..v.api[1].."_"..v.api[2]..[[", ...)
                 end
                 ]]
             end

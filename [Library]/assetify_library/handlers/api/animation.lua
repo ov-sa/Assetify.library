@@ -24,7 +24,7 @@ local imports = {
 -------------------------
 
 if localPlayer then
-    manager:exportAPI("animation", {name = "loadAnim"}, function(element, assetName)
+    manager:exportAPI("animation", "loadAnim", function(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)
@@ -38,7 +38,7 @@ if localPlayer then
         return true
     end)
 
-    manager:exportAPI("animation", {name = "unloadAnim"}, function(element, assetName)
+    manager:exportAPI("animation", "unloadAnim", function(element, assetName)
         if not syncer.isLibraryLoaded then return false end
         if not element or not imports.isElement(element) then return false end
         local cAsset, isLoaded = manager:getAssetData("animation", assetName)

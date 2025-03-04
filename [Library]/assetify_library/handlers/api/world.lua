@@ -31,7 +31,7 @@ local imports = {
 ---------------------
 
 if localPlayer then
-    manager:exportAPI("world", {name = "clearWorld"}, function()
+    manager:exportAPI("world", "clearWorld", function()
         for i = 550, 19999, 1 do
             imports.removeWorldModel(i, 100000, 0, 0, 0)
         end
@@ -43,7 +43,7 @@ if localPlayer then
         return true
     end)
 
-    manager:exportAPI("world", {name = "restoreWorld"}, function()
+    manager:exportAPI("world", "restoreWorld", function()
         imports.destroyElement(streamer.waterBuffer)
         streamer.waterBuffer = nil
         imports.restoreAllWorldModels()
@@ -52,12 +52,12 @@ if localPlayer then
         return true
     end)
 
-    manager:exportAPI("world", {name = "setOcclusions"}, function(state)
+    manager:exportAPI("world", "setOcclusions", function(state)
         imports.setOcclusionsEnabled((state and true) or false)
         return true
     end)
 
-    manager:exportAPI("world", {name = "clearModel"}, function(modelID)
+    manager:exportAPI("world", "clearModel", function(modelID)
         modelID = imports.tonumber(modelID)
         if modelID then
             imports.engineImportTXD(asset.rwAssets.txd, modelID)
@@ -67,7 +67,7 @@ if localPlayer then
         return false
     end)
 
-    manager:exportAPI("world", {name = "restoreModel"}, function(modelID)
+    manager:exportAPI("world", "restoreModel", function(modelID)
         modelID = imports.tonumber(modelID)
         if not modelID then return false end
         return imports.engineRestoreModel(modelID)

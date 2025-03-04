@@ -56,14 +56,12 @@ function manager.public:isInternal(serial)
     return (not isExternal and not serial and true) or (serial and (serial == syncer.librarySerial)) or false
 end
 
-function manager.public:exportAPI(module, ref, exec)
-    if not module or not ref or not exec then return false end
+function manager.public:exportAPI(module, name, exec)
+    if not module or not name or not exec then return false end
     manager.public.API[module] = manager.public.API[module] or {}
-    manager.public.API[module][ref.name] = exec
-    if ref.name then
-        _G[ref.api or ref.name] = function(...)
-            return exec(...)
-        end
+    manager.public.API[module][name] = exec
+    _G[module.."_"..name] = function(...)
+        return exec(...)
     end
     return true
 end
