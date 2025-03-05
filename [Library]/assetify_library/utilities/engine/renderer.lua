@@ -47,12 +47,15 @@ local imports = {
 local renderer = class:create("renderer", {
     state = false,
     isTimeSynced = false,
-    sky = {
-        state = false
-    }
+    sky = {state = false}
 })
 renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
+renderer.private.sky = {
+    depth = {
+        value = 300
+    }
+}
 
 if localPlayer then
     renderer.public.camera = imports.getCamera()
@@ -61,7 +64,7 @@ if localPlayer then
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.vsource)
-        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_Tex_Sky"].cShader)
+        --imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_Tex_Sky"].cShader)
         if renderer.public.isEmissiveModeEnabled then
             --[[
             outputChatBox("RENDERING EMISSIVE SHADER...")
@@ -70,13 +73,35 @@ if localPlayer then
             ]]
         end
         if renderer.public.sky.state then
+            --local dayPercent, dayTransitionPercent = CBuffer.cloud.getDayPercent()
+            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
+            local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
+            --local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, sX)
+            --if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, CBuffer.depth.depth)
+            --else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
+            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
+            --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, sX)
+            --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, CBuffer.depth.depth)
+            --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
+            --setElementPosition(CBuffer.depth.object, cameraX, cameraY, cameraZ)
+            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "entityPosition", depthX, depthY, depthZ)
+            --setElementPosition(CBuffer.cloud.object, cameraX, cameraY, math.max(cameraZ + CBuffer.cloud.height, CBuffer.cloud.height))
+            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
+            --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
+            --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
+            --for i, j in pairs(CBuffer.emissive.rt) do
+              --  dxSetRenderTarget(j, true)
+            --end
+            --dxSetRenderTarget()
+
+            dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.sky.depth.shader.cShader)
             --[[
             if renderer.public.isTimeSynced then
                 local currentTick = interface.tick
                 if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
                     renderer.private.serverTimeCycleTick = currentTick
                     renderer.private.serverNativeSkyColor, renderer.private.serverNativeTimePercent = renderer.private.serverNativeSkyColor or {}, renderer.private.serverNativeTimePercent or {}
-                    local r, g, b = imports.dxGetPixelColor(imports.dxGetTexturePixels(renderer.private.skyRT, renderer.public.resolution[1]*0.5, renderer.public.resolution[2]*0.5, 1, 1), 0, 0)
+                    local r, g, b = imports.dxGetPixelColor(imports.dxGetTexturePixels(renderer.private.sky.depth.rt, renderer.public.resolution[1]*0.5, renderer.public.resolution[2]*0.5, 1, 1), 0, 0)
                     renderer.private.serverNativeTimePercent[1] = ((renderer.private.serverNativeSkyColor[1] or r) + (renderer.private.serverNativeSkyColor[2] or g) + (renderer.private.serverNativeSkyColor[3] or b))/(3*255)
                     renderer.private.serverNativeSkyColor[1], renderer.private.serverNativeSkyColor[2], renderer.private.serverNativeSkyColor[3] = r, g, b
                     renderer.private.serverNativeTimePercent[2] = (renderer.private.serverNativeSkyColor[1] + renderer.private.serverNativeSkyColor[2] + renderer.private.serverNativeSkyColor[3])/(3*255)
@@ -94,7 +119,7 @@ if localPlayer then
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
             local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
             local isSunInView = (sunX and sunY and true) or false
-            if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
+            --if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
             renderer.private.isSunInView = isSunInView
         end
         return true
@@ -128,12 +153,10 @@ if localPlayer then
                         renderer.public.vrt.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end
-                shader:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Sky", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 renderer.public:setEmissiveMode(false)
-                shader.preLoaded["Assetify_Tex_Sky"]:destroy(true, syncer.librarySerial)
                 imports.destroyElement(renderer.public.vsource)
                 renderer.public.vsource = nil
                 for i, j in imports.pairs(renderer.public.vrt) do
@@ -230,10 +253,12 @@ if localPlayer then
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.prevNativeClouds = imports.getCloudsEnabled()
-                renderer.private.skyRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
+                renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
+                renderer.private.sky.depth.shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_Sky_Tex_Depth", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
             else
-                imports.destroyElement(renderer.private.skyRT)
-                renderer.private.skyRT = nil
+                imports.destroyElement(renderer.private.sky.depth.rt)
+                renderer.private.sky.depth.rt = nil
+                renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
@@ -244,7 +269,7 @@ if localPlayer then
             if not manager:isInternal(isInternal) then return false end
             syncShader:setValue("vDynamicSkyEnabled", renderer.public.sky.state or false)
             if shader.preLoaded["Assetify_Tex_Sky"] and (shader.preLoaded["Assetify_Tex_Sky"] == syncShader) then
-                shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSky0", renderer.private.skyRT)
+                shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSky0", renderer.private.sky.depth.rt)
                 if not shader.preLoaded["Assetify_Tex_Sky"].isTexSamplerLoaded then
                     renderer.public:setDynamicSunColor(_, _, _, syncer.librarySerial)
                     renderer.public:setDynamicStars(_, syncer.librarySerial)
