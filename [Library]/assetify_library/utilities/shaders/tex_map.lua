@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_mapper.lua
+     Script: utilities: shaders: tex_map.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Changer ]]--
+     Desc: Texture Map ]]--
 ----------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_TextureMapper"
+local identity = "Assetify_Tex_Map"
 local iteration = 3
 shaderRW.buffer[identity] = {
     prepare = function(shaderMaps, shaderModel)

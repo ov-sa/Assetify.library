@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_changer.lua
+     Script: utilities: shaders: tex_export.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Changer ]]--
+     Desc: Texture Export ]]--
 ----------------------------------------------------------------
 
 
@@ -12,15 +12,15 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_TextureChanger"
+local identity = "Assetify_Tex_Export"
 shaderRW.buffer[identity] = {
     exec = function()
-        return shaderRW.create({diffuse = true, emissive = true})..[[
+        return shaderRW.create()..[[
         /*-----------------
         -->> Variables <<--
         -------------------*/
 
-        texture baseTexture;
+        texture vRender0 <string renderTarget = "yes";>;
         struct PSInput {
             float4 Position : POSITION0;
             float4 Diffuse : COLOR0;
@@ -28,11 +28,10 @@ shaderRW.buffer[identity] = {
         };
         struct Export {
             float4 World : COLOR0;
-            float4 Diffuse : COLOR1;
-            float4 Emissive : COLOR2;
+            float4 Render : COLOR1;
         };
         sampler baseSampler = sampler_state {
-            Texture = baseTexture;
+            Texture = gTexture0;
         };
 
 
@@ -40,17 +39,10 @@ shaderRW.buffer[identity] = {
         -->> Handlers <<--
         ------------------*/
 
-        Export PSHandler(PSInput PS) : COLOR0 {
+        Export PSHandler(PSInput PS) {
             Export output;
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
-            if (vRenderingEnabled) {
-                output.Diffuse = vEmissiveSource ? 0 : sampledTexel;
-                output.Emissive = vEmissiveSource ? sampledTexel : 0;
-            }
-            else {
-                output.Diffuse = 0;
-                output.Emissive = 0;
-            }
+            output.Render = sampledTexel;
             sampledTexel.rgb *= MTAGetWeatherValue();
             output.World = saturate(sampledTexel);
             return output;
@@ -63,6 +55,7 @@ shaderRW.buffer[identity] = {
 
         technique ]]..identity..[[ {
             pass P0 {
+                AlphaBlendEnable = true;
                 PixelShader = compile ps_2_0 PSHandler();
             }
         }

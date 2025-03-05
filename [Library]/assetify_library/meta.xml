@@ -36,12 +36,13 @@
 
     <!-- Utilities: Shaders -->
     <script src="utilities/shaders/index.lua" type="client"/>
-    <script src="utilities/shaders/tex_clearer.lua" type="client"/>
-    <script src="utilities/shaders/tex_changer.lua" type="client"/>
-    <script src="utilities/shaders/tex_clumper.lua" type="client"/>
-    <script src="utilities/shaders/tex_mapper.lua" type="client"/>
-    <script src="utilities/shaders/tex_sampler.lua" type="client"/>
-    <script src="utilities/shaders/tex_exporter.lua" type="client"/>
+    <script src="utilities/shaders/tex_clear.lua" type="client"/>
+    <script src="utilities/shaders/tex_change.lua" type="client"/>
+    <script src="utilities/shaders/tex_clump.lua" type="client"/>
+    <script src="utilities/shaders/tex_map.lua" type="client"/>
+    <script src="utilities/shaders/tex_export.lua" type="client"/>
+    <script src="utilities/shaders/sky/tex_depth.lua" type="client"/>
+    <script src="utilities/shaders/sky/tex_sky.lua" type="client"/>
 
     <!-- Utilities: Engine -->
     <script src="utilities/engine/asset.lua" type="shared"/>

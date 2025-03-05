@@ -46,7 +46,7 @@ streamer.private.allocator = {
 streamer.private.ref = {}
 streamer.private.buffer = {}
 streamer.private.cache = {
-    camera = getCamera()
+    camera = imports.getCamera()
 }
 
 function streamer.public:create(...)

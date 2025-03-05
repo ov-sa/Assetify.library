@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_clearer.lua
+     Script: utilities: shaders: tex_clear.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Clearer ]]--
+     Desc: Texture Clear ]]--
 ----------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_TextureClearer"
+local identity = "Assetify_Tex_Clearer"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[

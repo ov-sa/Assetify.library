@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_sampler.lua
+     Script: utilities: shaders: tex_sky.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Sampler ]]--
+     Desc: Texture Sky ]]--
 ----------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_TextureSampler"
+local identity = "Assetify_Tex_Sky"
 shaderRW.buffer[identity] = {
     exec = function()
         local controlVars, controlHandlers = "", [[

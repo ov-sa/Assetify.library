@@ -133,7 +133,7 @@ if localPlayer then
                         end
                     end
                 end
-                shader:create(nil, "Assetify | Control", "Assetify_TextureMapper", i, shaderTextures, shaderInputs, cAsset.unsynced.raw.map, j, _, _, _, syncer.librarySerial)
+                shader:create(nil, "Assetify | Control", "Assetify_Tex_Map", i, shaderTextures, shaderInputs, cAsset.unsynced.raw.map, j, _, _, _, syncer.librarySerial)
             end
         end
         return true

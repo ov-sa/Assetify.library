@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_clumper.lua
+     Script: utilities: shaders: tex_clump.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Clumper ]]--
+     Desc: Texture Clump ]]--
 ----------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_TextureClumper"
+local identity = "Assetify_Tex_Clump"
 shaderRW.buffer[identity] = {
     exec = function(shaderMaps)
         if not shaderMaps or not shaderMaps[asset.reference.clump] then return false end

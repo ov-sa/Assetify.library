@@ -17,6 +17,7 @@ local imports = {
     pairs = pairs,
     tostring = tostring,
     tonumber = tonumber,
+    getCamera = getCamera,
     getTickCount = getTickCount,
     destroyElement = destroyElement,
     guiGetScreenSize = guiGetScreenSize,
@@ -50,17 +51,17 @@ local renderer = class:create("renderer", {
         state = false
     }
 })
-renderer.private.camera = getCamera()
 renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
 
 if localPlayer then
+    renderer.private.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.vsource)
-        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
+        imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_Tex_Sky"].cShader)
         if renderer.public.isEmissiveModeEnabled then
             --[[
             outputChatBox("RENDERING EMISSIVE SHADER...")
@@ -93,7 +94,7 @@ if localPlayer then
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
             local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
             local isSunInView = (sunX and sunY and true) or false
-            if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_TextureSampler"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
+            if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
             renderer.private.isSunInView = isSunInView
         end
         return true
@@ -101,8 +102,8 @@ if localPlayer then
 
     function renderer.public:syncShader(syncShader)
         if not syncShader then return false end
-        local isTexSampler = syncShader.shaderData.shaderName == "Assetify_TextureSampler"
-        if isTexSampler then shader.preLoaded["Assetify_TextureSampler"] = syncShader end
+        local isTexSampler = syncShader.shaderData.shaderName == "Assetify_Tex_Sky"
+        if isTexSampler then shader.preLoaded["Assetify_Tex_Sky"] = syncShader end
         renderer.public:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
         renderer.public:setTimeSync(_, syncShader, syncer.librarySerial)
         renderer.public:setServerTick(_, syncShader, syncer.librarySerial)
@@ -127,12 +128,12 @@ if localPlayer then
                         renderer.public.vrt.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end
-                shader:create(_, "Assetify ━ PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
+                shader:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Sky", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
             else
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 renderer.public:setEmissiveMode(false)
-                shader.preLoaded["Assetify_TextureSampler"]:destroy(true, syncer.librarySerial)
+                shader.preLoaded["Assetify_Tex_Sky"]:destroy(true, syncer.librarySerial)
                 imports.destroyElement(renderer.public.vsource)
                 renderer.public.vsource = nil
                 for i, j in imports.pairs(renderer.public.vrt) do
@@ -211,7 +212,7 @@ if localPlayer then
             local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
             renderer.private.emissiveBuffer = {
                 rt = resultRT,
-                shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_TextureBloomer", _, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, _, shader.shaderPriority + 1, _, true)
+                shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Bloomer", _, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, _, shader.shaderPriority + 1, _, true)
             }
         else
             renderer.private.emissiveBuffer.shader:destroy()
@@ -242,9 +243,9 @@ if localPlayer then
         else
             if not manager:isInternal(isInternal) then return false end
             syncShader:setValue("vDynamicSkyEnabled", renderer.public.sky.state or false)
-            if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"] == syncShader) then
-                shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
-                if not shader.preLoaded["Assetify_TextureSampler"].isTexSamplerLoaded then
+            if shader.preLoaded["Assetify_Tex_Sky"] and (shader.preLoaded["Assetify_Tex_Sky"] == syncShader) then
+                shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSky0", renderer.private.skyRT)
+                if not shader.preLoaded["Assetify_Tex_Sky"].isTexSamplerLoaded then
                     renderer.public:setDynamicSunColor(_, _, _, syncer.librarySerial)
                     renderer.public:setDynamicStars(_, syncer.librarySerial)
                     renderer.public:setDynamicCloudDensity(_, syncer.librarySerial)
@@ -272,7 +273,7 @@ if localPlayer then
             if ((renderer.public.isDynamicSunColor[1] == r) and (renderer.public.isDynamicSunColor[2] == g) and (renderer.public.isDynamicSunColor[3] == b)) then return false end
             renderer.public.isDynamicSunColor[1], renderer.public.isDynamicSunColor[2], renderer.public.isDynamicSunColor[3] = r, g, b
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("sunColor", renderer.public.isDynamicSunColor) end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("sunColor", renderer.public.isDynamicSunColor) end
         return true
     end
 
@@ -283,7 +284,7 @@ if localPlayer then
             if renderer.public.isDynamicStarsEnabled == state then return false end
             renderer.public.isDynamicStarsEnabled = state
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled) end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled) end
         return true
     end
 
@@ -294,7 +295,7 @@ if localPlayer then
             if renderer.public.isDynamicCloudDensity == density then return false end
             renderer.public.isDynamicCloudDensity = density
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudDensity", renderer.public.isDynamicCloudDensity) end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudDensity", renderer.public.isDynamicCloudDensity) end
         return true
     end
 
@@ -305,7 +306,7 @@ if localPlayer then
             if renderer.public.isDynamicCloudScale == scale then return false end
             renderer.public.isDynamicCloudScale = scale
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudScale", renderer.public.isDynamicCloudScale) end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudScale", renderer.public.isDynamicCloudScale) end
         return true
     end
 
@@ -317,7 +318,7 @@ if localPlayer then
             if ((renderer.public.isDynamicCloudColor[1] == r) and (renderer.public.isDynamicCloudColor[2] == g) and (renderer.public.isDynamicCloudColor[3] == b)) then return false end
             renderer.public.isDynamicCloudColor[1], renderer.public.isDynamicCloudColor[2], renderer.public.isDynamicCloudColor[3] = r, g, b
         end
-        if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("cloudColor", renderer.public.isDynamicCloudColor) end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudColor", renderer.public.isDynamicCloudColor) end
         return true
     end
 
@@ -364,7 +365,7 @@ if localPlayer then
                 table.insert(bCycle, (color and color[3]/255) or -1)
                 table.insert(bCycle, (position and position/100) or -1)
             end
-            if shader.preLoaded["Assetify_TextureSampler"] then shader.preLoaded["Assetify_TextureSampler"]:setValue("timecycle_"..i, bCycle) end
+            if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("timecycle_"..i, bCycle) end
         end
         return true
     end
