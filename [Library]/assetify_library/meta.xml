@@ -128,10 +128,6 @@
     <export function="renderer_setVirtualRendering" type="client"/>
     <export function="renderer_getVirtualSource" type="client"/>
     <export function="renderer_getVirtualRTs" type="client"/>
-    <export function="renderer_isTimeSynced" type="client"/>
-    <export function="renderer_setTimeSync" type="client"/>
-    <export function="renderer_setServerTick" type="client"/>
-    <export function="renderer_setMinuteDuration" type="client"/>
     <export function="renderer_isEmissiveMode" type="client"/>
     <export function="renderer_setEmissiveMode" type="client"/>
     <export function="renderer_isDynamicSkyEnabled" type="client"/>

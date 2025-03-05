@@ -38,7 +38,6 @@ shaderRW.buffer[identity] = {
             Export output;
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
             output.Render = sampledTexel;
-            sampledTexel.rgb *= MTAGetTimeCycleValue();
             output.World = saturate(sampledTexel);
             return output;
         }

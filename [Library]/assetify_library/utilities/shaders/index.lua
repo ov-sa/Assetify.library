@@ -73,9 +73,6 @@ function shaderRW.create(rtModes, isDepthMode)
         bool vSource2Enabled = false;
         bool vSkyEnabled = false;
         bool vWaterEnabled = false;
-        bool vTimeSync = false;
-        float vServerTick = false;
-        float vMinuteDuration = false;
         float vWeatherBlend = false;
         float3 vSunOffset = 1;
         float2 vSunViewOffset = 1;
@@ -284,22 +281,6 @@ function shaderRW.create(rtModes, isDepthMode)
                 float4((cRoll*sPitch) + (cPitch*sRoll*sYaw), (sRoll*sPitch) - (cRoll*cPitch*sYaw), cYaw*cPitch, 0),
                 float4(position.x, position.y, position.z, 1)
             );
-        }
-
-        float MTAGetTimeCycleTick() {
-            return vTimeSync ? vServerTick + gTime : vServerTick;
-        }
-
-        float MTAGetTimeCycle() {
-            return (MTAGetTimeCycleTick()/(60*vMinuteDuration))%24;
-        }
-
-        float MTAGetTimeCycleValue() {
-            float cycle = MTAGetTimeCycle();
-            float weatherClamp = 0.25;
-            float weatherValue = cycle/12;
-            weatherValue = (cycle >= 12) ? 2 - weatherValue : weatherValue;
-            return weatherClamp + ((1 - weatherClamp)*weatherValue);
         }
     ]]
 end

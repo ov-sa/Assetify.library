@@ -46,7 +46,6 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
-            sampledTexel.rgb *= MTAGetTimeCycleValue();
             output.World = saturate(sampledTexel);
             return output;
         }

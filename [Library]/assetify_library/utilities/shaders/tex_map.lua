@@ -183,7 +183,6 @@ shaderRW.buffer[identity] = {
                 output.Emissive = 0;
             }
             ]]..shaderRW.prelight(shaderMaps)..[[
-            sampledTexel.rgb *= MTAGetTimeCycleValue();
             output.World = saturate(sampledTexel);
             return output;
         }

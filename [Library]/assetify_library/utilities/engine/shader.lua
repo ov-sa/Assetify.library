@@ -240,7 +240,6 @@ if localPlayer then
     renderer:setTimeCycle(table.unpack(table.pack(table.decode(file:read("utilities/rw/timecycle.vcl"))), 1))
 
 
-    renderer:setTimeSync(true)
     renderer:setVirtualRendering(true)
     renderer:setDynamicSkyState(true)
 end

@@ -43,10 +43,8 @@ local imports = {
 
 local renderer = class:create("renderer", {
     state = false,
-    isTimeSynced = false,
     sky = {state = false}
 })
-renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
 renderer.private.sky = {
     depth = {
@@ -151,7 +149,7 @@ if localPlayer then
             renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.percent)
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
             renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
-            renderer.private.sky.moon.shader:setValue("nightMoonTransitionPercent", time.night.moon)
+            renderer.private.sky.moon.shader:setValue("moonVisibility", time.night.moon)
             --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
@@ -164,9 +162,6 @@ if localPlayer then
         local isTexSampler = syncShader.shaderData.shaderName == "Assetify_Tex_Sky"
         if isTexSampler then shader.preLoaded["Assetify_Tex_Sky"] = syncShader end
         renderer.public:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
-        renderer.public:setTimeSync(_, syncShader, syncer.librarySerial)
-        renderer.public:setServerTick(_, syncShader, syncer.librarySerial)
-        renderer.public:setMinuteDuration(_, syncShader, syncer.librarySerial)
         renderer.public:setDynamicSkyState(_, syncShader, syncer.librarySerial)
         if isTexSampler then syncShader.isTexSamplerLoaded = true end
         return true
@@ -211,51 +206,6 @@ if localPlayer then
             syncShader:setValue("vSource0", vSource0)
             syncShader:setValue("vSource1", vSource1)
             syncShader:setValue("vSource1Enabled", (vSource1 and true) or false)
-        end
-        return true
-    end
-
-    function renderer.public:setTimeSync(state, syncShader, isInternal)
-        if not syncShader then
-            state = (state and true) or false
-            if renderer.public.isTimeSynced == state then return false end
-            renderer.public.isTimeSynced = state
-            if not renderer.public.isTimeSynced then
-                renderer.public:setServerTick((renderer.private.serverTick or 0) + (interface.tick - (renderer.private.serverTickFrame or 0)))
-            end
-            for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setTimeSync(_, i, syncer.librarySerial)
-            end
-        else
-            if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vTimeSync", renderer.public.isTimeSynced)
-        end
-        return true
-    end
-
-    function renderer.public:setServerTick(serverTick, syncShader, isInternal)
-        if not syncShader then
-            renderer.private.serverTick = imports.tonumber(serverTick) or 0
-            renderer.private.serverTickFrame = interface.tick
-            for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setServerTick(_, i, syncer.librarySerial)
-            end
-        else
-            if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vServerTick", renderer.private.serverTick*0.001)
-        end
-        return true
-    end
-
-    function renderer.public:setMinuteDuration(minuteDuration, syncShader, isInternal)
-        if not syncShader then
-            renderer.private.minuteDuration = imports.tonumber(minuteDuration) or 0
-            for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setMinuteDuration(_, i, syncer.librarySerial)
-            end
-        else
-            if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vMinuteDuration", renderer.private.minuteDuration*0.001)
         end
         return true
     end
