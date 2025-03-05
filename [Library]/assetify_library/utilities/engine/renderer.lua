@@ -26,7 +26,6 @@ local imports = {
     setTime = setTime,
     setSkyGradient = setSkyGradient,
     getSkyGradient = getSkyGradient,
-    getCloudsEnabled = getCloudsEnabled,
     getCameraMatrix = getCameraMatrix,
     getScreenFromWorldPosition = getScreenFromWorldPosition,
     addEventHandler = addEventHandler,
@@ -117,38 +116,40 @@ if localPlayer then
                     imports.setSkyGradient(r, g, b, r, g, b)
                 end
             end
-            ]]
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
             local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
             local isSunInView = (sunX and sunY and true) or false
             --if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
             renderer.private.isSunInView = isSunInView
+            ]]
         end
         return true
     end
 
     renderer.private.prerender = function()
-        --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
-        local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
-        local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
-        local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
-        if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
-        else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
-        --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
-        --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
-        --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
-        --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
-        setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
-        renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
-        dxSetRenderTarget(renderer.private.sky.depth.rt, true)
-        dxSetRenderTarget()
-        setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
-        renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
-        renderer.private.sky.moon.shader:setValue("moonNativeScale", getMoonSize())
+        if renderer.public.sky.state then
+            --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
+            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
+            local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
+            local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
+            if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
+            else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
+            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
+            --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
+            --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
+            --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
+            setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
+            renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
+            dxSetRenderTarget(renderer.private.sky.depth.rt, true)
+            dxSetRenderTarget()
+            setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
+            renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
+            renderer.private.sky.moon.shader:setValue("moonNativeScale", getMoonSize())
 
-        --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
-        --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
-        --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
+            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
+            --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
+            --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
+        end
         return true
     end
 
@@ -281,7 +282,6 @@ if localPlayer then
             renderer.public.sky.state = state
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
-                renderer.private.prevNativeClouds = imports.getCloudsEnabled()
                 renderer.private.sky.depth.object = createObject(asset.rw.plane.modelID, 0, 0, 0, 0, 0, 0, true)
                 setElementCollisionsEnabled(renderer.private.sky.depth.object, false)
                 setElementStreamable(renderer.private.sky.depth.object, false)
@@ -307,6 +307,7 @@ if localPlayer then
                 imports.destroyElement(renderer.private.sky.cloud.object)
                 imports.destroyElement(renderer.private.sky.cloud.rt)
                 renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
+                renderer.private.sky.moon.shader:destroy(true, syncer.librarySerial)
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             for i, j in imports.pairs(shader.buffer.shader) do
