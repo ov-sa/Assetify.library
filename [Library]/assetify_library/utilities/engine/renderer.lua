@@ -50,6 +50,7 @@ local renderer = class:create("renderer", {
         state = false
     }
 })
+renderer.private.camera = getCamera()
 renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
 
