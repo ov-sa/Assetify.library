@@ -16,17 +16,10 @@ local identity = "Assetify_Tex_Clearer"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         texture baseTexture;
 
-
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 AlphaBlendEnable = true;

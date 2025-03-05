@@ -16,11 +16,10 @@ local identity = "Assetify_Tex_Export"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         texture vRender0 <string renderTarget = "yes";>;
+
+        // Inputs //
         struct PSInput {
             float4 Position : POSITION0;
             float4 Diffuse : COLOR0;
@@ -34,11 +33,7 @@ shaderRW.buffer[identity] = {
             Texture = gTexture0;
         };
 
-
-        /*----------------
-        -->> Handlers <<--
-        ------------------*/
-
+        // Handlers //
         Export PSHandler(PSInput PS) {
             Export output;
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
@@ -48,11 +43,7 @@ shaderRW.buffer[identity] = {
             return output;
         }
 
-
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 AlphaBlendEnable = true;

@@ -33,10 +33,7 @@ shaderRW.buffer[identity] = {
             }
         ]]
         return shaderRW.create({}, true)..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         float3 sunColor = false;
         bool isStarsEnabled = false;
         float cloudDensity = false;
@@ -44,6 +41,8 @@ shaderRW.buffer[identity] = {
         float3 cloudColor = false;
         texture vSky0 <string renderTarget = "yes";>;
         ]]..controlVars..[[
+
+        // Inputs //
         struct VSInput {
             float3 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
@@ -66,11 +65,7 @@ shaderRW.buffer[identity] = {
             Texture = vDepth0;
         };
     
-
-        /*----------------
-        -->> Handlers <<--
-        ------------------*/
-
+        // Handlers //
         ]]..controlHandlers..[[
         float4x4 GetViewMatrix(float4x4 viewMatrix) {
             #define minor(a, b, c) determinant(float3x3(viewMatrix.a, viewMatrix.b, viewMatrix.c))
@@ -219,11 +214,7 @@ shaderRW.buffer[identity] = {
             return output;
         }
 
-
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 AlphaBlendEnable = true;

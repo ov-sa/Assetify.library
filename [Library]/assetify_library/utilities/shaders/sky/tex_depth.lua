@@ -34,7 +34,6 @@ shaderRW.buffer[identity] = {
             float4 Color : COLOR1;
         };
 
-
         // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
@@ -52,7 +51,6 @@ shaderRW.buffer[identity] = {
             return Output;
         }
 
-        
         // Techniques //
         technique ]]..identity..[[ {
             pass P0 {

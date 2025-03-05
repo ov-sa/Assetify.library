@@ -48,12 +48,11 @@ shaderRW.buffer[identity] = {
             ]]
         end
         return shaderRW.create({diffuse = true, emissive = true})..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         float anisotropy = 1;
         ]]..controlVars..[[
+
+        // Inputs //
         struct VSInput {
             float3 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
@@ -70,11 +69,7 @@ shaderRW.buffer[identity] = {
             float4 Emissive : COLOR2;
         };
 
-
-        /*----------------
-        -->> Handlers <<--
-        ------------------*/
-
+        // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
             PS.Position = MTACalcScreenPosition(VS.Position);
@@ -100,11 +95,7 @@ shaderRW.buffer[identity] = {
             return output;
         }
 
-
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 AlphaBlendEnable = true;

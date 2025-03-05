@@ -17,8 +17,6 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        texture cloudRT <string renderTarget = "yes";>;
-        texture cloudTex;
         float nightTransitionPercent = 1;
         float3 skyColorTop = 1;
         float3 skyColorBottom = 1;
@@ -33,6 +31,8 @@ shaderRW.buffer[identity] = {
         float4 starColor1 = float4(1, 0.94, 0.72, 0.7);
         float4 starColor2 = float4(0.18, 0.03, 0.41, 0.7);
         float4 starColor3 = float4(0.63, 0.50, 0.81, 0.7);
+        texture cloudRT <string renderTarget = "yes";>;
+        texture cloudTex;
 
         // Inputs //
         struct VSInput {
@@ -51,7 +51,6 @@ shaderRW.buffer[identity] = {
             Texture = cloudTex;
         };
 
-
         // Utils //
         #define mod(x, y) (x - (y*floor(x/y)))
         float3 GetSkyGradient(float2 uv) { return lerp(skyColorBottom*0.5, skyColorTop*0.5, saturate(uv.y*(1/0.4))); }
@@ -65,7 +64,6 @@ shaderRW.buffer[identity] = {
             }
         }
     
-
         // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
@@ -103,7 +101,6 @@ shaderRW.buffer[identity] = {
             Output.Color = float4(cloudMask, cloudMask, cloudMask, 1);
             return Output;
         }
-
 
         // Techniques //
         technique ]]..identity..[[ {

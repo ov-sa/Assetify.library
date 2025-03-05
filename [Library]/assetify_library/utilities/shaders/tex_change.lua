@@ -16,11 +16,10 @@ local identity = "Assetify_Tex_Change"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create({diffuse = true, emissive = true})..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         texture baseTexture;
+
+        // Inputs //
         struct PSInput {
             float4 Position : POSITION0;
             float4 Diffuse : COLOR0;
@@ -35,11 +34,7 @@ shaderRW.buffer[identity] = {
             Texture = baseTexture;
         };
 
-
-        /*----------------
-        -->> Handlers <<--
-        ------------------*/
-
+        // Handlers //
         Export PSHandler(PSInput PS) : COLOR0 {
             Export output;
             float4 sampledTexel = tex2D(baseSampler, PS.TexCoord);
@@ -56,11 +51,7 @@ shaderRW.buffer[identity] = {
             return output;
         }
 
-
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 PixelShader = compile ps_2_0 PSHandler();
