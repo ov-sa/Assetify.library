@@ -96,11 +96,11 @@ if localPlayer then
             if clumpMaps then
                 shader.clearElementBuffer(element, "Assetify | Clump")
                 local cAsset = manager:getAssetData(assetType, assetName, syncer.public.librarySerial)
-                if cAsset and cAsset.manifest.shaderMaps and cAsset.manifest.shaderMaps[asset.references.clump] then
+                if cAsset and cAsset.manifest.shaderMaps and cAsset.manifest.shaderMaps[asset.reference.clump] then
                     for i, j in imports.pairs(clumpMaps) do
-                        if cAsset.manifest.shaderMaps[asset.references.clump][i] and cAsset.manifest.shaderMaps[asset.references.clump][i][j] then
-                            cAsset.manifest.shaderMaps[asset.references.clump][i][j].prelight = cAsset.manifest.shaderMaps[asset.references.clump][i].prelight
-                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifest.shaderMaps[asset.references.clump][i][j].clump, clumpTex_bump = cAsset.manifest.shaderMaps[asset.references.clump][i][j].bump}, {}, cAsset.unsynced.raw.map, cAsset.manifest.shaderMaps[asset.references.clump][i][j], _, _, _, syncer.public.librarySerial)
+                        if cAsset.manifest.shaderMaps[asset.reference.clump][i] and cAsset.manifest.shaderMaps[asset.reference.clump][i][j] then
+                            cAsset.manifest.shaderMaps[asset.reference.clump][i][j].prelight = cAsset.manifest.shaderMaps[asset.reference.clump][i].prelight
+                            shader:create(element, "Assetify | Clump", "Assetify_TextureClumper", i, {clumpTex = cAsset.manifest.shaderMaps[asset.reference.clump][i][j].clump, clumpTex_bump = cAsset.manifest.shaderMaps[asset.reference.clump][i][j].bump}, {}, cAsset.unsynced.raw.map, cAsset.manifest.shaderMaps[asset.reference.clump][i][j], _, _, _, syncer.public.librarySerial)
                         end
                     end
                 end

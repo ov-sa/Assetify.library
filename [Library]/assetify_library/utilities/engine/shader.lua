@@ -33,8 +33,8 @@ local shader = class:create("shader", {
     shaderPriority = 10000,
     shaderDistance = 0,
     validTypes = {
-        [asset.references.clump] = true,
-        [asset.references.control] = true
+        [asset.reference.clump] = true,
+        [asset.reference.control] = true
     },
     validChannels = {
         {index = "red", channel = "r"},
@@ -235,7 +235,12 @@ if localPlayer then
     renderer:setDynamicCloudDensity(18)
     renderer:setDynamicCloudScale(13)
     renderer:setDynamicCloudColor(0.75*255, 0.75*255, 0.75*255)
-    renderer:setTimeCycle(table.decode(file:read("utilities/rw/timecycle.rw")))
+    renderer:setTimeCycle(table.unpack(table.pack(table.decode(file:read("utilities/rw/timecycle.rw"))), 1))
+
+
+    renderer:setTimeSync(true)
+    renderer:setVirtualRendering(true)
+    renderer:setDynamicSky(true)
 end
 
 
