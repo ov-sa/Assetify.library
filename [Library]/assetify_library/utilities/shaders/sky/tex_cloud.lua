@@ -17,17 +17,17 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float nightTransitionPercent = 1;
         float3 skyColorTop = 1;
         float3 skyColorBottom = 1;
         float cloudSpeed = 1;
         float cloudScale = 1;
         float2 cloudDirection = 1;
         float4 cloudColor = 1;
-        float2 starSpeed = float2(0, 3);
+        float2 starSpeed = float2(0, 5);
         float starScale = 0.085;
         float starIntensity = 0.6;
         float starGrid = 40.0;
+        float nightTransitionPercent = 1;
         texture cloudTex;
         texture cloudRT <string renderTarget = "yes";>;
 
@@ -50,9 +50,15 @@ shaderRW.buffer[identity] = {
 
         // Utils //
         #define mod(x, y) (x - (y*floor(x/y)))
-        float3 GetSkyGradient(float2 uv) { return lerp(skyColorBottom*0.5, skyColorTop*0.5, saturate(uv.y*(1/0.4))); }
-        float2 RandVector(in float2 vec, in float seed) { return float2(frac(sin(vec.x*999.9 + vec.y)*seed), frac(sin(vec.y*999.9 + vec.x)*seed)); }
-        void DrawStars(inout float4 fragColor, in float4 color, in float2 uv, in float grid, in float2 size, in float2 speed, in float seed) {
+        float3 GetSkyGradient(float2 uv) {
+            return lerp(skyColorBottom*0.5, skyColorTop*0.5, saturate(uv.y*(1/0.4)));
+        }
+
+        float2 RandVector(in float2 vec, in float seed) {
+            return float2(frac(sin(vec.x*999.9 + vec.y)*seed), frac(sin(vec.y*999.9 + vec.x)*seed));
+        }
+
+        void RenderStars(inout float4 fragColor, in float4 color, in float2 uv, in float grid, in float2 size, in float2 speed, in float seed) {
             float2 randv = RandVector(floor(uv/grid), seed) - 0.5;
             float len = length(randv);
             if (len < 0.5) {
@@ -60,7 +66,16 @@ shaderRW.buffer[identity] = {
                 if (radius > 0.0) fragColor += color*radius*abs(sin(gTime*max(randv.x, randv.y)*max(speed.x, speed.y)*7));
             }
         }
-    
+
+        void RenderClouds(sampler2D tex, inout float4 fragColor, float2 offset, float2 uv) {
+            uv = offset + uv + gTime*cloudSpeed*cloudDirection*0.012*0;
+            float4 cloudTexel = tex2DStochastic(cloudSampler, uv)*0.5;
+            float difference = uv.x - offset.x;
+            float blendwidth = 0.005;
+            cloudTexel *= min(difference/blendwidth, 1)*min((1 - difference)/blendwidth, 1);
+            fragColor += cloudTexel;
+        }
+
         // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
@@ -69,24 +84,6 @@ shaderRW.buffer[identity] = {
             return PS;
         }
 
-        float FetchNoise(float2 uv) {
-            return frac(sin((uv.x*83.876) + (uv.y*76.123))*3853.875);
-        }
-      
-        float CreatePerlinNoise(float2 uv, float iteration) {
-            float c = 1;
-            for (float i = 0; i < iteration; i++) {
-                float power = pow(2, i + 1);
-                float2 luv = uv * float2(power, power) + (gTime*0.2);
-                float2 gv = smoothstep(0, 1, frac(luv));
-                float2 id = floor(luv);
-                float b = lerp(FetchNoise(id + float2(0, 0)), FetchNoise(id + float2(1, 0)), gv.x);
-                float t = lerp(FetchNoise(id + float2(0, 1)), FetchNoise(id + float2(1, 1)), gv.x);
-                c += 1/power*lerp(b, t, gv.y);
-            }
-            return c*0.5;
-        }
-            
         Export PSHandler(PSInput PS) : COLOR0 {
             Export Output;
             float3 skyGradient = GetSkyGradient(PS.TexCoord);
@@ -94,13 +91,13 @@ shaderRW.buffer[identity] = {
             float cloudDepth = lerp(0, 1, 0.9 - cloudUV.y);
             cloudUV.y /= cloudDepth*1.25;
             float4 cloudTexel = 0;
-            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01) * tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5);
-            cloudTexel += tex2D(cloudSampler, 0.75 + cloudUV*14*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.012)*0.5;
+            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01)*tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5);
+            RenderClouds(cloudSampler, cloudTexel, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.02, cloudUV);
             float2 starUV = PS.TexCoord*vResolution*float2(1, 1.1)*3;
             float4 starTexel = 0;
-            DrawStars(starTexel, float4(1.0, 1.0, 0.0, 1.0), starUV, starGrid, starScale, starSpeed, 123456.789);
-            DrawStars(starTexel, float4(0.5, 0.7, 1.0, 1.0), starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
-            DrawStars(starTexel, float4(1.0, 0.5, 0.5, 1.0), starUV, starGrid/2.0, starScale, starSpeed/1.6, 567891.234);
+            RenderStars(starTexel, float4(1.0, 1.0, 0.0, 1.0), starUV, starGrid, starScale, starSpeed/1.1, 123456.789);
+            RenderStars(starTexel, float4(0.5, 0.7, 1.0, 1.0), starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
+            RenderStars(starTexel, float4(1.0, 0.5, 0.5, 1.0), starUV, starGrid/2.0, starScale, starSpeed/1.6, 567891.234);
             starTexel *= starIntensity*nightTransitionPercent;
             cloudTexel.a *= cloudColor.a*0.15*cloudDepth;
             float cloudMask = cloudTexel.a;

@@ -159,7 +159,7 @@ shaderRW.buffer[identity] = {
             float2 viewCoord = GetViewCoord(-viewDirection.xzy, float2(1, 1));
             float2 screenCoord = float2(uv.x*(vResolution.x/vResolution.y), uv.y);
             // Sample Base
-            float cycle = MTAGetWeatherCycle();
+            float cycle = MTAGetTimeCycle();
             float hour = floor(cycle);
             float3 skyBase = lerp(SampleCycle(viewCoord, FetchTimeCycle(hour > 0 ? hour - 1 : 23)), SampleCycle(viewCoord, FetchTimeCycle(hour)), cycle - hour);
             float3 result = skyBase;

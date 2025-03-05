@@ -286,33 +286,20 @@ function shaderRW.create(rtModes, isDepthMode)
             );
         }
 
-        float4x4 MTACreatePositionMatrix(float3 position) {
-            return float4x4(
-                float4(1, 0, 0, 0),
-                float4(0, 1, 0, 0),
-                float4(0, 0, 1, 0),
-                float4(position.x, position.y, position.z, 1)
-            );
-        }
-
-        float MTAGetWeatherTick() {
+        float MTAGetTimeCycleTick() {
             return vTimeSync ? vServerTick + gTime : vServerTick;
         }
 
-        float MTAGetWeatherCycle() {
-            return (MTAGetWeatherTick()/(60*vMinuteDuration))%24;
+        float MTAGetTimeCycle() {
+            return (MTAGetTimeCycleTick()/(60*vMinuteDuration))%24;
         }
 
-        float MTAGetWeatherValue() {
-            float cycle = MTAGetWeatherCycle();
+        float MTAGetTimeCycleValue() {
+            float cycle = MTAGetTimeCycle();
             float weatherClamp = 0.25;
             float weatherValue = cycle/12;
             weatherValue = (cycle >= 12) ? 2 - weatherValue : weatherValue;
             return weatherClamp + ((1 - weatherClamp)*weatherValue);
-        }
-
-        float3 MTAGetWeatherColor() {
-            return float3(1, 1, 1);
         }
     ]]
 end
