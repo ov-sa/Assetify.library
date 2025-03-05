@@ -138,13 +138,13 @@ if localPlayer then
                 j[v] = "utilities/rw/"..j[v]
                 if v == "txd" then
                     j[v] = imports.engineLoadTXD(j[v])
-                    imports.engineImportTXD(j[v], j.modelID)
+                    if j.modelID then imports.engineImportTXD(j[v], j.modelID) end
                 elseif v == "dff" then
                     j[v] = imports.engineLoadDFF(j[v])
-                    imports.engineReplaceModel(j[v], j.modelID, true)
+                    if j.modelID then imports.engineReplaceModel(j[v], j.modelID, true) end
                 elseif v == "col" then
                     j[v] = imports.engineLoadCOL(j[v])
-                    imports.engineReplaceCOL(j[v], j.modelID)
+                    if j.modelID then imports.engineReplaceCOL(j[v], j.modelID) end
                 end
             end
         end
