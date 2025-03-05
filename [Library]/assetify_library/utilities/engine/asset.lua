@@ -127,8 +127,15 @@ end
 
 if localPlayer then
     asset.public.rwAssets = {
-        txd = imports.engineLoadTXD("utilities/rw/mesh_void/dict.rw"),
-        dff = imports.engineLoadDFF("utilities/rw/mesh_void/buffer.rw")
+        void = {
+            txd = imports.engineLoadTXD("utilities/rw/mesh_void/dict.rw"),
+            dff = imports.engineLoadDFF("utilities/rw/mesh_void/buffer.rw")
+        },
+        dome = {
+            txd = imports.engineLoadTXD("utilities/rw/mesh_dome/dict.rw"),
+            dff = imports.engineLoadDFF("utilities/rw/mesh_dome/buffer.rw"),
+            col = imports.engineLoadCOL("utilities/rw/mesh_dome/physics.rw")
+        }
     }
 
     function asset.public:create(...)
