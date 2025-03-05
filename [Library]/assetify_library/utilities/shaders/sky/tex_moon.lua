@@ -17,10 +17,10 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float nightMoonTransitionPercent = 1;
         float2 moonScale = 0.5;
         float moonNativeScale = 1;
         float moonBrightness = 1;
+        float moonVisibility = 1;
         texture moonTex;
         texture moonRT <string renderTarget = "yes";>;
 
@@ -54,8 +54,8 @@ shaderRW.buffer[identity] = {
             float sampleScale = moonScale*max(4, moonNativeScale);
             float emissiveScale = 2;
             float4 sampledTexel = tex2D(moonSampler, (PS.TexCoord*sampleScale) + ((1 - sampleScale)*0.5))*PS.Diffuse;
-            float emissiveTexel = (1 - distance((PS.TexCoord*emissiveScale) + ((1 - emissiveScale)*0.5), float2(0.5, 0.5)))*nightMoonTransitionPercent;
-            sampledTexel.rgb *= moonBrightness*nightMoonTransitionPercent;
+            float emissiveTexel = (1 - distance((PS.TexCoord*emissiveScale) + ((1 - emissiveScale)*0.5), float2(0.5, 0.5)))*moonVisibility;
+            sampledTexel.rgb *= moonBrightness*moonVisibility;
             Output.World = float4(sampledTexel.rgb, 1);
             Output.Color = float4(emissiveTexel, emissiveTexel, emissiveTexel, 1);
             return Output;

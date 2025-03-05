@@ -27,7 +27,7 @@ shaderRW.buffer[identity] = {
         float starScale = 0.085;
         float starIntensity = 0.6;
         float starGrid = 40.0;
-        float nightTransitionPercent = 1;
+        float starsVisibility = 1;
         texture cloudTex;
         texture cloudRT <string renderTarget = "yes";>;
 
@@ -98,7 +98,7 @@ shaderRW.buffer[identity] = {
             RenderStars(starTexel, float4(1.0, 1.0, 0.0, 1.0), starUV, starGrid, starScale, starSpeed/1.1, 123456.789);
             RenderStars(starTexel, float4(0.5, 0.7, 1.0, 1.0), starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
             RenderStars(starTexel, float4(1.0, 0.5, 0.5, 1.0), starUV, starGrid/2.0, starScale, starSpeed/1.6, 567891.234);
-            starTexel *= starIntensity*nightTransitionPercent;
+            starTexel *= starIntensity*starsVisibility;
             cloudTexel.a *= cloudColor.a*0.15*cloudDepth;
             float cloudMask = cloudTexel.a;
             skyGradient += lerp(0, starTexel, 1 + pow(length(starTexel.rgb), 2));

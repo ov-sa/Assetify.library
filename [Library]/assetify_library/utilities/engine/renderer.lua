@@ -17,6 +17,7 @@ local imports = {
     pairs = pairs,
     tostring = tostring,
     tonumber = tonumber,
+    getTime = getTime,
     getCamera = getCamera,
     getMoonSize = getMoonSize,
     getRealTime = getRealTime,
@@ -92,7 +93,7 @@ if localPlayer then
     end
 
     renderer.private.getTime = function()
-        local hours, minutes = getTime()
+        local hours, minutes = imports.getTime()
         local time = {
             day = {
                 percent = 0,
@@ -104,27 +105,20 @@ if localPlayer then
                 moon = 0
             }
         }
-        if true then
-            local totalMinutes = hours*60 + minutes
-            if (totalMinutes >= 5*60) and (totalMinutes <= 22*60) then
-                time.day.percent = (totalMinutes - (5*60))/((22 -  5)*60)
-                if time.day.percent <= 0.5 then time.day.transition = time.day.percent*2
-                else time.day.transition = 1 - (time.day.percent - 0.5)*2 end
-            end
+        local totalMinutes = hours*60 + minutes
+        if (totalMinutes >= 5*60) and (totalMinutes <= 22*60) then
+            time.day.percent = (totalMinutes - (5*60))/((22 -  5)*60)
+            time.day.transition = ((time.day.percent <= 0.5) and (time.day.percent*2)) or (1 - (time.day.percent - 0.5)*2)
         end
-        if true then
-            if hours <= 5 then hours = hours + 24 end
-            local totalMinutes = hours*60 + minutes
-            if (totalMinutes >= 22*60) and (totalMinutes <= (24 + 5)*60) then
-                time.night.percent = (totalMinutes - (22*60))/((24 + 5 - 22)*60)
-                if time.night.percent <= 0.5 then time.night.transition = time.night.percent*2
-                else time.night.transition = 1 - (time.night.percent - 0.5)*2 end
-            end
-            if (totalMinutes >= 24*60) and (totalMinutes <= (24 + 5)*60) then
-                time.night.moon = (totalMinutes - (24*60))/((24 + 5 - 24)*60)
-                if time.night.moon <= 0.5 then time.night.moon = time.night.moon*2
-                else time.night.moon = 1 - (time.night.moon - 0.5)*2 end
-            end
+        if hours <= 5 then hours = hours + 24 end
+        totalMinutes = hours*60 + minutes
+        if (totalMinutes >= 22*60) and (totalMinutes <= (24 + 5)*60) then
+            time.night.percent = (totalMinutes - (22*60))/((24 + 5 - 22)*60)
+            time.night.transition = ((time.night.percent <= 0.5) and (time.night.percent*2)) or (1 - (time.night.percent - 0.5)*2)
+        end
+        if (totalMinutes >= 24*60) and (totalMinutes <= (24 + 5)*60) then
+            time.night.moon = (totalMinutes - (24*60))/((24 + 5)*60)
+            time.night.moon = ((time.night.moon <= 0.5) and (time.night.moon*2)) or (1 - (time.night.moon - 0.5)*2)
         end
         return time
     end
@@ -167,7 +161,6 @@ if localPlayer then
     renderer.private.prerender = function()
         if renderer.public.sky.state then
             local time = renderer.private.getTime()
-            iprint(time)
             --local time.day.percent, time.day.transition = renderer.private.sky.cloud.getDayPercent()
             local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
             local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
@@ -183,9 +176,10 @@ if localPlayer then
             dxSetRenderTarget(renderer.private.sky.depth.rt, true)
             dxSetRenderTarget()
             setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
+            renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.percent)
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
-            renderer.private.sky.moon.shader:setValue("moonNativeScale", getMoonSize())
-
+            renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
+            renderer.private.sky.moon.shader:setValue("nightMoonTransitionPercent", time.night.moon)
             --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
