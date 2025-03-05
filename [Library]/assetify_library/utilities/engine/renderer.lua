@@ -44,9 +44,11 @@ local imports = {
 -------------------------
 
 local renderer = class:create("renderer", {
-    isVirtualRendering = false,
+    state = false,
     isTimeSynced = false,
-    isDynamicSkyEnabled = false
+    sky = {
+        state = false
+    }
 })
 renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
@@ -56,7 +58,7 @@ if localPlayer then
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
 
     renderer.private.render = function()
-        imports.dxUpdateScreenSource(renderer.public.virtualSource)
+        imports.dxUpdateScreenSource(renderer.public.vsource)
         imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_TextureSampler"].cShader)
         if renderer.public.isEmissiveModeEnabled then
             --[[
@@ -65,7 +67,7 @@ if localPlayer then
             imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.emissiveBuffer.rt)
             ]]
         end
-        if renderer.public.isDynamicSkyEnabled then
+        if renderer.public.sky.state then
             --[[
             if renderer.public.isTimeSynced then
                 local currentTick = interface.tick
@@ -113,15 +115,15 @@ if localPlayer then
         if not syncShader then
             state = (state and true) or false
             rtModes = (rtModes and (imports.type(rtModes) == "table") and rtModes) or false
-            if renderer.public.isVirtualRendering == state then return false end
-            renderer.public.isVirtualRendering = state
-            if renderer.public.isVirtualRendering then
-                renderer.public.virtualSource = imports.dxCreateScreenSource(renderer.public.resolution[1], renderer.public.resolution[2])
-                renderer.public.virtualRTs = renderer.public.virtualRTs or {}
+            if renderer.public.state == state then return false end
+            renderer.public.state = state
+            if renderer.public.state then
+                renderer.public.vsource = imports.dxCreateScreenSource(renderer.public.resolution[1], renderer.public.resolution[2])
+                renderer.public.vrt = renderer.public.vrt or {}
                 if rtModes and rtModes.diffuse then
-                    renderer.public.virtualRTs.diffuse = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
+                    renderer.public.vrt.diffuse = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
                     if rtModes.emissive then
-                        renderer.public.virtualRTs.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
+                        renderer.public.vrt.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end
                 shader:create(_, "Assetify ━ PreLoaded", "Assetify_TextureSampler", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
@@ -130,11 +132,11 @@ if localPlayer then
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
                 renderer.public:setEmissiveMode(false)
                 shader.preLoaded["Assetify_TextureSampler"]:destroy(true, syncer.librarySerial)
-                imports.destroyElement(renderer.public.virtualSource)
-                renderer.public.virtualSource = nil
-                for i, j in imports.pairs(renderer.public.virtualRTs) do
+                imports.destroyElement(renderer.public.vsource)
+                renderer.public.vsource = nil
+                for i, j in imports.pairs(renderer.public.vrt) do
                     imports.destroyElement(j)
-                    renderer.public.virtualRTs[i] = nil
+                    renderer.public.vrt[i] = nil
                 end
             end
             for i, j in imports.pairs(shader.buffer.shader) do
@@ -142,9 +144,9 @@ if localPlayer then
             end
         else
             if not manager:isInternal(isInternal) then return false end
-            local vSource0, vSource1, vSource2 = (renderer.public.isVirtualRendering and renderer.public.virtualSource) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.diffuse) or false, (renderer.public.isVirtualRendering and renderer.public.virtualRTs.emissive) or false
-            syncShader:setValue("vResolution", (renderer.public.isVirtualRendering and renderer.public.resolution) or false)
-            syncShader:setValue("vRenderingEnabled", (renderer.public.isVirtualRendering and true) or false)
+            local vSource0, vSource1, vSource2 = (renderer.public.state and renderer.public.vsource) or false, (renderer.public.state and renderer.public.vrt.diffuse) or false, (renderer.public.state and renderer.public.vrt.emissive) or false
+            syncShader:setValue("vResolution", (renderer.public.state and renderer.public.resolution) or false)
+            syncShader:setValue("vRenderingEnabled", (renderer.public.state and true) or false)
             syncShader:setValue("vSource0", vSource0)
             syncShader:setValue("vSource1", vSource1)
             syncShader:setValue("vSource1Enabled", (vSource1 and true) or false)
@@ -200,7 +202,7 @@ if localPlayer then
     --[[
     function renderer.public:setEmissiveMode(state)
         state = (state and true) or false
-        if not renderer.public.isVirtualRendering or not renderer.public.virtualRTs.emissive then return false end
+        if not renderer.public.state or not renderer.public.vrt.emissive then return false end
         if renderer.public.isEmissiveModeEnabled == state then return false end
         renderer.public.isEmissiveModeEnabled = state
         if state then
@@ -221,8 +223,8 @@ if localPlayer then
     function renderer.public:setDynamicSky(state, syncShader, isInternal)
         if not syncShader then
             state = (state and true) or false
-            if renderer.public.isDynamicSkyEnabled == state then return false end
-            renderer.public.isDynamicSkyEnabled = state
+            if renderer.public.sky.state == state then return false end
+            renderer.public.sky.state = state
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.prevNativeClouds = imports.getCloudsEnabled()
@@ -238,7 +240,7 @@ if localPlayer then
             end
         else
             if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vDynamicSkyEnabled", renderer.public.isDynamicSkyEnabled or false)
+            syncShader:setValue("vDynamicSkyEnabled", renderer.public.sky.state or false)
             if shader.preLoaded["Assetify_TextureSampler"] and (shader.preLoaded["Assetify_TextureSampler"] == syncShader) then
                 shader.preLoaded["Assetify_TextureSampler"]:setValue("vSky0", renderer.private.skyRT)
                 if not shader.preLoaded["Assetify_TextureSampler"].isTexSamplerLoaded then
