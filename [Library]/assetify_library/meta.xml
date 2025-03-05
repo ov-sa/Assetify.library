@@ -18,10 +18,10 @@
     <file src="utilities/rw/native/buffer_lod.rw"/>
     <file src="utilities/rw/mesh_void/dict.rw"/>
     <file src="utilities/rw/mesh_void/buffer.rw"/>
-    <file src="utilities/rw/mesh_dome/dict.rw"/>
-    <file src="utilities/rw/mesh_dome/buffer.rw"/>
-    <file src="utilities/rw/mesh_dome/physics.rw"/>
-    <file src="utilities/rw/timecycle.rw"/>
+    <file src="utilities/rw/mesh_sky/dict.rw"/>
+    <file src="utilities/rw/mesh_sky/buffer.rw"/>
+    <file src="utilities/rw/mesh_sky/physics.rw"/>
+    <file src="utilities/rw/timecycle.vcl"/>
 
     <!-- Utilities: Sandbox -->
     <script src="utilities/sandbox/index.lua" type="shared"/>

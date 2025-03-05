@@ -53,7 +53,7 @@ local asset = class:create("asset", {
     },
     rw = {
         void = {txd = "mesh_void/dict.rw", dff = "mesh_void/buffer.rw"},
-        dome = {modelID = true, txd = "mesh_dome/dict.rw", dff = "mesh_dome/buffer.rw", col = "mesh_dome/physics.rw"}
+        sky = {modelID = true, txd = "mesh_sky/dict.rw", dff = "mesh_sky/buffer.rw", col = "mesh_sky/physics.rw"}
     },
     replacement = {"txd", "dff", "col"},
     range = {

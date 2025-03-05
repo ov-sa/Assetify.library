@@ -235,7 +235,7 @@ if localPlayer then
     renderer:setDynamicCloudDensity(18)
     renderer:setDynamicCloudScale(13)
     renderer:setDynamicCloudColor(0.75*255, 0.75*255, 0.75*255)
-    renderer:setTimeCycle(table.unpack(table.pack(table.decode(file:read("utilities/rw/timecycle.rw"))), 1))
+    renderer:setTimeCycle(table.unpack(table.pack(table.decode(file:read("utilities/rw/timecycle.vcl"))), 1))
 
 
     renderer:setTimeSync(true)
