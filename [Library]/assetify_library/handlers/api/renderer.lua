@@ -23,7 +23,7 @@ if localPlayer then
     manager:exportAPI("renderer", "setMinuteDuration", function(...) return renderer:setMinuteDuration(...) end)
     manager:exportAPI("renderer", "isEmissiveMode", function() return renderer.isEmissiveModeEnabled end)
     manager:exportAPI("renderer", "setEmissiveMode", function(...) return renderer:setEmissiveMode(...) end)
-    manager:exportAPI("renderer", "isDynamicSkyEnabled", function() return renderer:isDynamicSkyEnabled(...) end)
+    manager:exportAPI("renderer", "isDynamicSkyEnabled", function(...) return renderer:isDynamicSkyEnabled(...) end)
     manager:exportAPI("renderer", "setDynamicSkyState", function(...) return renderer:setDynamicSkyState(...) end)
     manager:exportAPI("renderer", "getDynamicSunColor", function() return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255 end)
     manager:exportAPI("renderer", "setDynamicSunColor", function(...) return renderer:setDynamicSunColor(...) end)

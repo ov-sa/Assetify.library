@@ -91,6 +91,44 @@ if localPlayer then
         return math.floor(phase*table.length(renderer.private.sky.moon.texture))
     end
 
+    renderer.private.getTime = function()
+        local hours, minutes = getTime()
+        local time = {
+            day = {
+                percent = 0,
+                transition = 0
+            },
+            night = {
+                percent = 0,
+                transition = 0,
+                moon = 0
+            }
+        }
+        if true then
+            local totalMinutes = hours*60 + minutes
+            if (totalMinutes >= 5*60) and (totalMinutes <= 22*60) then
+                time.day.percent = (totalMinutes - (5*60))/((22 -  5)*60)
+                if time.day.percent <= 0.5 then time.day.transition = time.day.percent*2
+                else time.day.transition = 1 - (time.day.percent - 0.5)*2 end
+            end
+        end
+        if true then
+            if hours <= 5 then hours = hours + 24 end
+            local totalMinutes = hours*60 + minutes
+            if (totalMinutes >= 22*60) and (totalMinutes <= (24 + 5)*60) then
+                time.night.percent = (totalMinutes - (22*60))/((24 + 5 - 22)*60)
+                if time.night.percent <= 0.5 then time.night.transition = time.night.percent*2
+                else time.night.transition = 1 - (time.night.percent - 0.5)*2 end
+            end
+            if (totalMinutes >= 24*60) and (totalMinutes <= (24 + 5)*60) then
+                time.night.moon = (totalMinutes - (24*60))/((24 + 5 - 24)*60)
+                if time.night.moon <= 0.5 then time.night.moon = time.night.moon*2
+                else time.night.moon = 1 - (time.night.moon - 0.5)*2 end
+            end
+        end
+        return time
+    end
+
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.vsource)
         --imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], shader.preLoaded["Assetify_Tex_Sky"].cShader)
@@ -128,13 +166,15 @@ if localPlayer then
 
     renderer.private.prerender = function()
         if renderer.public.sky.state then
-            --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
+            local time = renderer.private.getTime()
+            iprint(time)
+            --local time.day.percent, time.day.transition = renderer.private.sky.cloud.getDayPercent()
             local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
             local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
             local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
             if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
             else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
-            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
+            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, time.day.percent, time.day.transition)
             --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
             --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
