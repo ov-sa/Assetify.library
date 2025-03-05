@@ -153,7 +153,7 @@ if localPlayer then
         return false
     end
 
-    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, raw, shaderMaps, shaderPriority, shaderDistance, isStandalone, isInternal)
+    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, raw, shaderMaps, shaderPriority, shaderDistance, isStandalone, isOverlay, isInternal)
         if not shader.public:isInstance(self) then return false end
         if not shaderCategory or not shaderName or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not raw then return false end
         element = ((element and imports.isElement(element)) and element) or false
@@ -161,8 +161,9 @@ if localPlayer then
         shaderPriority = imports.tonumber(shaderPriority) or shader.public.shaderPriority
         shaderDistance = imports.tonumber(shaderDistance) or shader.public.shaderDistance
         isStandalone = (isStandalone and true) or false
+        isOverlay = (isOverlay and true) or false
         self.isPreLoaded = (shader.public.preLoaded[shaderName] and true) or false
-        self.cShader = (self.isPreLoaded and shader.public.preLoaded[shaderName]) or imports.dxCreateShader(shaderRW.buffer[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, false, "all")
+        self.cShader = (self.isPreLoaded and shader.public.preLoaded[shaderName]) or imports.dxCreateShader(shaderRW.buffer[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, isOverlay, "all")
         shader.public.buffer.shader[self] = true
         self.shaderData = {
             element = element,

@@ -30,6 +30,7 @@ local imports = {
     getScreenFromWorldPosition = getScreenFromWorldPosition,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
+    dxCreateTexture = dxCreateTexture,
     dxCreateScreenSource = dxCreateScreenSource,
     dxCreateRenderTarget = dxCreateRenderTarget,
     dxUpdateScreenSource = dxUpdateScreenSource,
@@ -54,6 +55,9 @@ renderer.private.minuteDuration = 60*1000
 renderer.private.sky = {
     depth = {
         value = 300
+    },
+    cloud = {
+        height = 300
     }
 }
 
@@ -61,6 +65,7 @@ if localPlayer then
     renderer.public.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
+    renderer.private.sky.cloud.texture = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/cloud.rw", "dxt3")
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.vsource)
@@ -73,7 +78,7 @@ if localPlayer then
             ]]
         end
         if renderer.public.sky.state then
-            --setElementPosition(CBuffer.cloud.object, cameraX, cameraY, math.max(cameraZ + CBuffer.cloud.height, CBuffer.cloud.height))
+            --setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
             --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
@@ -113,7 +118,7 @@ if localPlayer then
 
     renderer.private.prerender = function()
         if renderer.public.sky.state then
-            --local dayPercent, dayTransitionPercent = CBuffer.cloud.getDayPercent()
+            --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
             local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
             local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
             local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
@@ -125,10 +130,9 @@ if localPlayer then
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
             setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
             dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "renderPosition", depthX, depthY, depthZ)
-            imports.dxDrawImage(0, 0, renderer.public.resolution[1]*0.25, renderer.public.resolution[2]*0.25, renderer.private.sky.depth.rt)
             dxSetRenderTarget(renderer.private.sky.depth.rt, true)
             dxSetRenderTarget()
-            --setElementPosition(CBuffer.cloud.object, cameraX, cameraY, math.max(cameraZ + CBuffer.cloud.height, CBuffer.cloud.height))
+            setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
             --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
@@ -271,12 +275,25 @@ if localPlayer then
                 setElementStreamable(renderer.private.sky.depth.object, false)
                 setElementDoubleSided(renderer.private.sky.depth.object, true)
                 renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
-                renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {["vDepth0"] = renderer.private.sky.depth.rt}, {}, _, shader.shaderPriority + 1, _, false, syncer.librarySerial)
-                renderer.private.sky.depth.shader:setValue("vDepth0", renderer.private.sky.depth.rt)
+                renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {
+                    ["vDepth0"] = renderer.private.sky.depth.rt
+                }, {}, false, shader.shaderPriority + 1, false, false, syncer.librarySerial)
+                renderer.private.sky.cloud.object = createObject(asset.rw.sky.modelID, 0, 0, 0, 0, 0, 0, true)
+                renderer.private.sky.cloud.shader = shader:create(renderer.private.sky.cloud.object, "Assetify:Sky", "Assetify_Sky_Tex_Cloud", "*", {}, {
+                    ["vResolution"] = renderer.public.resolution,
+                    ["cloudTex"] = renderer.private.sky.cloud.texture
+                }, {}, false, shader.shaderPriority + 1, false, false, true, syncer.librarySerial)
+                setObjectScale(renderer.private.sky.cloud.object, 30)
+                setElementCollisionsEnabled(renderer.private.sky.cloud.object, false)
+                setElementStreamable(renderer.private.sky.cloud.object, false)
+                setElementDoubleSided(renderer.private.sky.cloud.object, true)
             else
+                imports.destroyElement(renderer.private.sky.depth.object)
                 imports.destroyElement(renderer.private.sky.depth.rt)
-                imports.destroyElement(renderer.private.sky.depth)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
+                imports.destroyElement(renderer.private.sky.cloud.object)
+                imports.destroyElement(renderer.private.sky.cloud.rt)
+                renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             --imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)

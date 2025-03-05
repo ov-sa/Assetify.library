@@ -1,10 +1,10 @@
 ----------------------------------------------------------------
 --[[ Resource: Assetify Library
-     Script: utilities: shaders: tex_depth.lua
+     Script: utilities: shaders: sky: tex_depth.lua
      Author: vStudio
      Developer(s): Aviril, Tron, Mario, Аниса
      DOC: 19/10/2021
-     Desc: Texture Depth ]]--
+     Desc: Sky Texture Depth ]]--
 ----------------------------------------------------------------
 
 
@@ -16,12 +16,11 @@ local identity = "Assetify_Sky_Tex_Depth"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
-        /*-----------------
-        -->> Variables <<--
-        -------------------*/
-
+        // Variables //
         float3 renderPosition = 0;
         texture vDepth0 <string renderTarget = "yes";>;
+
+        // Inputs //
         struct VSInput {
             float3 Position : POSITION0;
             float2 TexCoord : TEXCOORD0;
@@ -36,10 +35,7 @@ shaderRW.buffer[identity] = {
         };
 
 
-        /*----------------
-        -->> Handlers <<--
-        ------------------*/
-
+        // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
             float4x4 worldViewMatrix = mul(MTACreatePositionMatrix(renderPosition.xyz), gView);
@@ -56,10 +52,8 @@ shaderRW.buffer[identity] = {
             return Output;
         }
 
-        /*------------------
-        -->> Techniques <<--
-        --------------------*/
-
+        
+        // Techniques //
         technique ]]..identity..[[ {
             pass P0 {
                 CullMode = None;
