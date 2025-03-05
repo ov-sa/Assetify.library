@@ -14,14 +14,7 @@
     <script src="settings/server.lua" type="server"/>
 
     <!-- Utilities: RW -->
-    <file src="utilities/rw/native/buffer.rw"/>
-    <file src="utilities/rw/native/buffer_lod.rw"/>
-    <file src="utilities/rw/mesh_void/dict.rw"/>
-    <file src="utilities/rw/mesh_void/buffer.rw"/>
-    <file src="utilities/rw/mesh_sky/dict.rw"/>
-    <file src="utilities/rw/mesh_sky/buffer.rw"/>
-    <file src="utilities/rw/mesh_sky/physics.rw"/>
-    <file src="utilities/rw/timecycle.vcl"/>
+    <file src="utilities/rw/**"/>
 
     <!-- Utilities: Sandbox -->
     <script src="utilities/sandbox/index.lua" type="shared"/>
