@@ -241,7 +241,7 @@ if localPlayer then
 
 
     renderer:setVirtualRendering(true)
-    renderer:setDynamicSkyState(true)
+    renderer:setDynamicSky(true)
 end
 
 

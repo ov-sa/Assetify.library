@@ -130,8 +130,8 @@
     <export function="renderer_getVirtualRTs" type="client"/>
     <export function="renderer_isEmissiveMode" type="client"/>
     <export function="renderer_setEmissiveMode" type="client"/>
-    <export function="renderer_isDynamicSkyEnabled" type="client"/>
-    <export function="renderer_setDynamicSkyState" type="client"/>
+    <export function="renderer_isDynamicSky" type="client"/>
+    <export function="renderer_setDynamicSky" type="client"/>
     <export function="renderer_getDynamicSunColor" type="client"/>
     <export function="renderer_setDynamicSunColor" type="client"/>
     <export function="renderer_isDynamicStars" type="client"/>

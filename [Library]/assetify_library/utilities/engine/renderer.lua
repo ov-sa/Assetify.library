@@ -162,7 +162,7 @@ if localPlayer then
         local isTexSampler = syncShader.shaderData.shaderName == "Assetify_Tex_Sky"
         if isTexSampler then shader.preLoaded["Assetify_Tex_Sky"] = syncShader end
         renderer.public:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
-        renderer.public:setDynamicSkyState(_, syncShader, syncer.librarySerial)
+        renderer.public:setDynamicSky(_, syncShader, syncer.librarySerial)
         if isTexSampler then syncShader.isTexSamplerLoaded = true end
         return true
     end
@@ -231,11 +231,11 @@ if localPlayer then
     end
     ]]
     
-    function renderer.public:isDynamicSkyEnabled()
+    function renderer.public:isDynamicSky()
         return (renderer.public.sky.state and true) or falsee
     end
 
-    function renderer.public:setDynamicSkyState(state, syncShader, isInternal)
+    function renderer.public:setDynamicSky(state, syncShader, isInternal)
         if not syncShader then
             state = (state and true) or false
             if renderer.public.sky.state == state then return false end
@@ -271,7 +271,7 @@ if localPlayer then
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setDynamicSkyState(_, i, syncer.librarySerial)
+                renderer.public:setDynamicSky(_, i, syncer.librarySerial)
             end
         else
             if not manager:isInternal(isInternal) then return false end
