@@ -253,18 +253,19 @@ if localPlayer then
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.prevNativeClouds = imports.getCloudsEnabled()
+                renderer.private.sky.depth.object = createObject(CBuffer.depth.modelID, 0, 0, 0, 0, 0, 0, true)
                 renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
                 renderer.private.sky.depth.shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_Sky_Tex_Depth", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
             else
                 imports.destroyElement(renderer.private.sky.depth.rt)
-                renderer.private.sky.depth.rt = nil
+                imports.destroyElement(renderer.private.sky.depth)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
-                imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
+                --imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
-            imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
-            for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setDynamicSky(_, i, syncer.librarySerial)
-            end
+            --imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
+            --for i, j in imports.pairs(shader.buffer.shader) do
+                --renderer.public:setDynamicSky(_, i, syncer.librarySerial)
+            --end
         else
             if not manager:isInternal(isInternal) then return false end
             syncShader:setValue("vDynamicSkyEnabled", renderer.public.sky.state or false)
