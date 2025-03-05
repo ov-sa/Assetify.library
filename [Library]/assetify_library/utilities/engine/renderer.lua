@@ -103,14 +103,16 @@ if localPlayer then
             time.day.percent = (totalMinutes - (5*60))/((22 -  5)*60)
             time.day.transition = ((time.day.percent <= 0.5) and (time.day.percent*2)) or (1 - (time.day.percent - 0.5)*2)
         end
-        if hours <= 5 then hours = hours + 24 end
-        totalMinutes = hours*60 + minutes
+        if hours <= 5 then
+            hours = hours + 24
+            totalMinutes = hours*60 + minutes
+        end
         if (totalMinutes >= 22*60) and (totalMinutes <= (24 + 5)*60) then
             time.night.percent = (totalMinutes - (22*60))/((24 + 5 - 22)*60)
             time.night.transition = ((time.night.percent <= 0.5) and (time.night.percent*2)) or (1 - (time.night.percent - 0.5)*2)
         end
         if (totalMinutes >= 24*60) and (totalMinutes <= (24 + 5)*60) then
-            time.night.moon = (totalMinutes - (24*60))/((24 + 5)*60)
+            time.night.moon = (totalMinutes - (24*60))/((24 + 5 - 24)*60)
             time.night.moon = ((time.night.moon <= 0.5) and (time.night.moon*2)) or (1 - (time.night.moon - 0.5)*2)
         end
         return time
@@ -146,7 +148,7 @@ if localPlayer then
             dxSetRenderTarget(renderer.private.sky.depth.rt, true)
             dxSetRenderTarget()
             setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
-            renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.percent)
+            renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.transition)
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
             renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
             renderer.private.sky.moon.shader:setValue("moonVisibility", time.night.moon)
