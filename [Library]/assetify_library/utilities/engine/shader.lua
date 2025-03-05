@@ -242,7 +242,7 @@ if localPlayer then
 
     renderer:setTimeSync(true)
     renderer:setVirtualRendering(true)
-    renderer:setDynamicSky(true)
+    renderer:setDynamicSkyState(true)
 end
 
 
