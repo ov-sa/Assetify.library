@@ -15,16 +15,14 @@
 local imports = {
     type = type,
     pairs = pairs,
-    tostring = tostring,
     tonumber = tonumber,
+    setTime = setTime,
     getTime = getTime,
     getCamera = getCamera,
     getMoonSize = getMoonSize,
     getRealTime = getRealTime,
-    getTickCount = getTickCount,
     destroyElement = destroyElement,
     guiGetScreenSize = guiGetScreenSize,
-    setTime = setTime,
     setSkyGradient = setSkyGradient,
     getSkyGradient = getSkyGradient,
     getCameraMatrix = getCameraMatrix,
@@ -35,10 +33,7 @@ local imports = {
     dxCreateScreenSource = dxCreateScreenSource,
     dxCreateRenderTarget = dxCreateRenderTarget,
     dxUpdateScreenSource = dxUpdateScreenSource,
-    dxGetTexturePixels = dxGetTexturePixels,
-    dxGetPixelColor = dxGetPixelColor,
-    dxDrawImage = dxDrawImage,
-    interpolateBetween = interpolateBetween
+    dxDrawImage = dxDrawImage
 }
 
 
@@ -133,35 +128,12 @@ if localPlayer then
             imports.dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.emissiveBuffer.rt)
             ]]
         end
-        if renderer.public.sky.state then
-            --[[
-            if renderer.public.isTimeSynced then
-                local currentTick = interface.tick
-                if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
-                    renderer.private.serverTimeCycleTick = currentTick
-                    renderer.private.serverNativeSkyColor, renderer.private.serverNativeTimePercent = renderer.private.serverNativeSkyColor or {}, renderer.private.serverNativeTimePercent or {}
-                    local r, g, b = imports.dxGetPixelColor(imports.dxGetTexturePixels(renderer.private.sky.depth.rt, renderer.public.resolution[1]*0.5, renderer.public.resolution[2]*0.5, 1, 1), 0, 0)
-                    renderer.private.serverNativeTimePercent[1] = ((renderer.private.serverNativeSkyColor[1] or r) + (renderer.private.serverNativeSkyColor[2] or g) + (renderer.private.serverNativeSkyColor[3] or b))/(3*255)
-                    renderer.private.serverNativeSkyColor[1], renderer.private.serverNativeSkyColor[2], renderer.private.serverNativeSkyColor[3] = r, g, b
-                    renderer.private.serverNativeTimePercent[2] = (renderer.private.serverNativeSkyColor[1] + renderer.private.serverNativeSkyColor[2] + renderer.private.serverNativeSkyColor[3])/(3*255)
-                    r, g, b = r*0.5, g*0.5, b*0.5
-                    imports.setSkyGradient(r, g, b, r, g, b)
-                end
-            end
-            local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
-            local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
-            local isSunInView = (sunX and sunY and true) or false
-            --if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
-            renderer.private.isSunInView = isSunInView
-            ]]
-        end
         return true
     end
 
     renderer.private.prerender = function()
         if renderer.public.sky.state then
             local time = renderer.private.getTime()
-            --local time.day.percent, time.day.transition = renderer.private.sky.cloud.getDayPercent()
             local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
             local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
             local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
