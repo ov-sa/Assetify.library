@@ -66,6 +66,7 @@ if localPlayer then
             ]]
         end
         if renderer.public.isDynamicSkyEnabled then
+            --[[
             if renderer.public.isTimeSynced then
                 local currentTick = interface.tick
                 if not renderer.private.serverTimeCycleTick or ((currentTick - renderer.private.serverTimeCycleTick) >= renderer.private.minuteDuration*30) then
@@ -85,6 +86,7 @@ if localPlayer then
                     imports.setTime(currentHour, currentMinute)
                 end
             end
+            ]]
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
             local sunX, sunY = imports.getScreenFromWorldPosition(0, 0, cameraLookZ + 200, 1, true)
             local isSunInView = (sunX and sunY and true) or false
