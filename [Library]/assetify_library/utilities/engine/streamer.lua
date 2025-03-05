@@ -15,7 +15,6 @@
 local imports = {
     pairs = pairs,
     tonumber = tonumber,
-    getCamera = getCamera,
     isElement = isElement,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
@@ -45,9 +44,7 @@ streamer.private.allocator = {
 }
 streamer.private.ref = {}
 streamer.private.buffer = {}
-streamer.private.cache = {
-    camera = imports.getCamera()
-}
+streamer.private.cache = {}
 
 function streamer.public:create(...)
     local cStreamer = self:createInstance()
@@ -289,7 +286,7 @@ network:fetch("Assetify:onLoad"):on(function()
     streamer.private:update()
     thread:createHeartbeat(function()
         if not streamer.private.cache.cameraTranslated then
-            local velX, velY, velZ = imports.getElementVelocity(streamer.private.cache.camera)
+            local velX, velY, velZ = imports.getElementVelocity(renderer.camera)
             streamer.private.cache.cameraTranslated = ((velX ~= 0) and true) or ((velY ~= 0) and true) or ((velZ ~= 0) and true) or false
         end
         return true

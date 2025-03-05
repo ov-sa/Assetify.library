@@ -55,7 +55,7 @@ renderer.private.serverTick = 60*60*12*1000
 renderer.private.minuteDuration = 60*1000
 
 if localPlayer then
-    renderer.private.camera = imports.getCamera()
+    renderer.public.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
 
