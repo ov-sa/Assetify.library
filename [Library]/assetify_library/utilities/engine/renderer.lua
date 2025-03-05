@@ -24,7 +24,6 @@ local imports = {
     setTime = setTime,
     setSkyGradient = setSkyGradient,
     getSkyGradient = getSkyGradient,
-    setCloudsEnabled = setCloudsEnabled,
     getCloudsEnabled = getCloudsEnabled,
     getCameraMatrix = getCameraMatrix,
     getScreenFromWorldPosition = getScreenFromWorldPosition,
@@ -296,7 +295,6 @@ if localPlayer then
                 renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
-            --imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
             --for i, j in imports.pairs(shader.buffer.shader) do
                 --renderer.public:setDynamicSky(_, i, syncer.librarySerial)
             --end
