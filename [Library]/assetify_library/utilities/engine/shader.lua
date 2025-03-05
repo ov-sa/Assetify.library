@@ -176,7 +176,9 @@ if localPlayer then
             isStandalone = isStandalone
         }
         if not self.isPreLoaded then
-            if not isStandalone then raw.shader[textureName] = self.cShader end
+            if not isStandalone and raw.shader then
+                raw.shader[textureName] = self.cShader
+            end
             renderer:syncShader(self)
         end
         for i, j in imports.pairs(shaderTextures) do

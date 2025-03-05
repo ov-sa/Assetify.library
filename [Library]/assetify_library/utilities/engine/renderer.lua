@@ -73,18 +73,6 @@ if localPlayer then
             ]]
         end
         if renderer.public.sky.state then
-            --local dayPercent, dayTransitionPercent = CBuffer.cloud.getDayPercent()
-            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
-            local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
-            --local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, sX)
-            --if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, CBuffer.depth.depth)
-            --else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
-            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
-            --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, sX)
-            --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, CBuffer.depth.depth)
-            --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
-            --setElementPosition(CBuffer.depth.object, cameraX, cameraY, cameraZ)
-            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "entityPosition", depthX, depthY, depthZ)
             --setElementPosition(CBuffer.cloud.object, cameraX, cameraY, math.max(cameraZ + CBuffer.cloud.height, CBuffer.cloud.height))
             --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
@@ -93,8 +81,6 @@ if localPlayer then
               --  dxSetRenderTarget(j, true)
             --end
             --dxSetRenderTarget()
-
-            dxDrawImage(0, 0, renderer.public.resolution[1], renderer.public.resolution[2], renderer.private.sky.depth.shader.cShader)
             --[[
             if renderer.public.isTimeSynced then
                 local currentTick = interface.tick
@@ -121,6 +107,31 @@ if localPlayer then
             local isSunInView = (sunX and sunY and true) or false
             --if (renderer.private.isSunInView and not isSunInView) or isSunInView then shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSunViewOffset", {(isSunInView and sunX) or -renderer.public.resolution[1], (isSunInView and sunY) or -renderer.public.resolution[2]}) end
             renderer.private.isSunInView = isSunInView
+        end
+        return true
+    end
+
+    renderer.private.prerender = function()
+        if renderer.public.sky.state then
+            --local dayPercent, dayTransitionPercent = CBuffer.cloud.getDayPercent()
+            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
+            local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
+            local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
+            if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
+            else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
+            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
+            --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
+            --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
+            --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
+            setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
+            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "renderPosition", depthX, depthY, depthZ)
+            imports.dxDrawImage(0, 0, renderer.public.resolution[1]*0.25, renderer.public.resolution[2]*0.25, renderer.private.sky.depth.rt)
+            dxSetRenderTarget(renderer.private.sky.depth.rt, true)
+            dxSetRenderTarget()
+            --setElementPosition(CBuffer.cloud.object, cameraX, cameraY, math.max(cameraZ + CBuffer.cloud.height, CBuffer.cloud.height))
+            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
+            --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
+            --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
         end
         return true
     end
@@ -154,8 +165,10 @@ if localPlayer then
                     end
                 end
                 imports.addEventHandler("onClientHUDRender", root, renderer.private.render)
+                imports.addEventHandler("onClientPreRender", root, renderer.private.prerender)
             else
                 imports.removeEventHandler("onClientHUDRender", root, renderer.private.render)
+                imports.addEventHandler("onClientPreRender", root, renderer.private.prerender)
                 renderer.public:setEmissiveMode(false)
                 imports.destroyElement(renderer.public.vsource)
                 renderer.public.vsource = nil
@@ -253,14 +266,18 @@ if localPlayer then
             if state then
                 renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.prevNativeClouds = imports.getCloudsEnabled()
-                renderer.private.sky.depth.object = createObject(CBuffer.depth.modelID, 0, 0, 0, 0, 0, 0, true)
-                renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2])
-                renderer.private.sky.depth.shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_Sky_Tex_Depth", _, {}, {}, {}, _, shader.shaderPriority + 1, _, true, syncer.librarySerial)
+                renderer.private.sky.depth.object = createObject(asset.rw.plane.modelID, 0, 0, 0, 0, 0, 0, true)
+                setElementCollisionsEnabled(renderer.private.sky.depth.object, false)
+                setElementStreamable(renderer.private.sky.depth.object, false)
+                setElementDoubleSided(renderer.private.sky.depth.object, true)
+                renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
+                renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {["vDepth0"] = renderer.private.sky.depth.rt}, {}, _, shader.shaderPriority + 1, _, false, syncer.librarySerial)
+                renderer.private.sky.depth.shader:setValue("vDepth0", renderer.private.sky.depth.rt)
             else
                 imports.destroyElement(renderer.private.sky.depth.rt)
                 imports.destroyElement(renderer.private.sky.depth)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
-                --imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
+                imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             --imports.setCloudsEnabled((not state and renderer.private.prevNativeClouds) or false)
             --for i, j in imports.pairs(shader.buffer.shader) do
