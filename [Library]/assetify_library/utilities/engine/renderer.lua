@@ -18,6 +18,8 @@ local imports = {
     tostring = tostring,
     tonumber = tonumber,
     getCamera = getCamera,
+    getMoonSize = getMoonSize,
+    getRealTime = getRealTime,
     getTickCount = getTickCount,
     destroyElement = destroyElement,
     guiGetScreenSize = guiGetScreenSize,
@@ -57,14 +59,38 @@ renderer.private.sky = {
     },
     cloud = {
         height = 300
-    }
+    },
+    moon = {}
 }
 
 if localPlayer then
     renderer.public.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
-    renderer.private.sky.cloud.texture = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/cloud.rw", "dxt3")
+    renderer.private.sky.cloud.texture = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/cloud.rw", "dxt5")
+    renderer.private.sky.moon.texture = {}
+    for i = 0, 20, 1 do
+        renderer.private.sky.moon.texture[i] = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/moon/"..i..".rw", "dxt1")
+    end
+
+    renderer.private.getMoonPhase = function()
+        local time = imports.getRealTime()
+        local year = time.year + 1900
+        local month = time.month + 1
+        local day = time.monthday
+        local hour = time.hour
+        local minute = time.minute
+        local second = time.second
+        local phase = 0
+        if month < 3 then
+            year = year - 1
+            month = month + 12
+        end
+        local k = math.floor(365.25*(year + 4716)) + math.floor(30.6*(month + 1)) + day - 152.25
+        phase = 67*k/4000
+        phase = phase - math.floor(phase)
+        return math.floor(phase*table.length(renderer.private.sky.moon.texture))
+    end
 
     renderer.private.render = function()
         imports.dxUpdateScreenSource(renderer.public.vsource)
@@ -77,14 +103,6 @@ if localPlayer then
             ]]
         end
         if renderer.public.sky.state then
-            --setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
-            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
-            --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
-            --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
-            --for i, j in pairs(CBuffer.emissive.rt) do
-              --  dxSetRenderTarget(j, true)
-            --end
-            --dxSetRenderTarget()
             --[[
             if renderer.public.isTimeSynced then
                 local currentTick = interface.tick
@@ -116,26 +134,27 @@ if localPlayer then
     end
 
     renderer.private.prerender = function()
-        if renderer.public.sky.state then
-            --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
-            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
-            local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
-            local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
-            if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
-            else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
-            --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
-            --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
-            --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
-            --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
-            setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
-            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "position", depthX, depthY, depthZ)
-            dxSetRenderTarget(renderer.private.sky.depth.rt, true)
-            dxSetRenderTarget()
-            setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
-            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
-            --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
-            --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
-        end
+        --local dayPercent, dayTransitionPercent = renderer.private.sky.cloud.getDayPercent()
+        local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
+        local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
+        local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
+        if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
+        else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
+        --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, dayPercent, dayTransitionPercent)
+        --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
+        --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
+        --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
+        setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
+        renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
+        dxSetRenderTarget(renderer.private.sky.depth.rt, true)
+        dxSetRenderTarget()
+        setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
+        renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
+        renderer.private.sky.moon.shader:setValue("moonNativeScale", getMoonSize())
+
+        --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
+        --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
+        --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
         return true
     end
 
@@ -286,6 +305,7 @@ if localPlayer then
                 setElementCollisionsEnabled(renderer.private.sky.cloud.object, false)
                 setElementStreamable(renderer.private.sky.cloud.object, false)
                 setElementDoubleSided(renderer.private.sky.cloud.object, true)
+                renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.shaderPriority + 1, false, false, false, syncer.librarySerial)
             else
                 imports.destroyElement(renderer.private.sky.depth.object)
                 imports.destroyElement(renderer.private.sky.depth.rt)
@@ -295,12 +315,12 @@ if localPlayer then
                 renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
                 imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
-            --for i, j in imports.pairs(shader.buffer.shader) do
-                --renderer.public:setDynamicSky(_, i, syncer.librarySerial)
-            --end
+            for i, j in imports.pairs(shader.buffer.shader) do
+                renderer.public:setDynamicSky(_, i, syncer.librarySerial)
+            end
         else
             if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vDynamicSkyEnabled", renderer.public.sky.state or false)
+            syncShader:setValue("vSkyEnabled", renderer.public.sky.state or false)
             if shader.preLoaded["Assetify_Tex_Sky"] and (shader.preLoaded["Assetify_Tex_Sky"] == syncShader) then
                 shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSky0", renderer.private.sky.depth.rt)
                 if not shader.preLoaded["Assetify_Tex_Sky"].isTexSamplerLoaded then

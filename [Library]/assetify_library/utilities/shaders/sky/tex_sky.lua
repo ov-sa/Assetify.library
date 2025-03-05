@@ -12,6 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
+--TODO: NOT USED ANYMORE, REMOVE LATER
 local identity = "Assetify_Tex_Sky"
 shaderRW.buffer[identity] = {
     exec = function()
@@ -201,8 +202,8 @@ shaderRW.buffer[identity] = {
             output.Sky = 1;
             bool isViewCenter = (PS.TexCoord.x >= 0.5) && (PS.TexCoord.x <= (0.5 + (1/vResolution.x))) && (PS.TexCoord.y >= 0.5) && (PS.TexCoord.y <= (0.5 + (1/vResolution.y)));
             bool isSkyVisible = rawTexel[1].a > 0;
-            if (!vDynamicSkyEnabled && isSkyVisible) sampledTexel = rawTexel[1];
-            else if (vDynamicSkyEnabled && (isViewCenter || isSkyVisible)) {
+            if (!vSkyEnabled && isSkyVisible) sampledTexel = rawTexel[1];
+            else if (vSkyEnabled && (isViewCenter || isSkyVisible)) {
                 float2x4 skyTexel = SampleSky(PS.TexCoord, !isSkyVisible);
                 sampledTexel = isSkyVisible ? skyTexel[0] : sampledTexel;
                 output.Sky = skyTexel[1];

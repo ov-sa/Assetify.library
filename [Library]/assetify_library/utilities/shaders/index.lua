@@ -71,8 +71,8 @@ function shaderRW.create(rtModes, isDepthMode)
         bool vRenderingEnabled = false;
         bool vSource1Enabled = false;
         bool vSource2Enabled = false;
-        bool vDynamicSkyEnabled = false;
-        bool vDynamicWaterEnabled = false;
+        bool vSkyEnabled = false;
+        bool vWaterEnabled = false;
         bool vTimeSync = false;
         float vServerTick = false;
         float vMinuteDuration = false;
