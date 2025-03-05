@@ -18,6 +18,9 @@
     <file src="utilities/rw/native/buffer_lod.rw"/>
     <file src="utilities/rw/mesh_void/dict.rw"/>
     <file src="utilities/rw/mesh_void/buffer.rw"/>
+    <file src="utilities/rw/mesh_dome/dict.rw"/>
+    <file src="utilities/rw/mesh_dome/buffer.rw"/>
+    <file src="utilities/rw/mesh_dome/physics.rw"/>
     <file src="utilities/rw/timecycle.rw"/>
 
     <!-- Utilities: Sandbox -->
