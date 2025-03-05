@@ -17,7 +17,7 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float3 renderPosition = 0;
+        float3 position = 0;
         texture vDepth0 <string renderTarget = "yes";>;
 
         // Inputs //
@@ -37,7 +37,7 @@ shaderRW.buffer[identity] = {
         // Handlers //
         PSInput VSHandler(VSInput VS) {
             PSInput PS = (PSInput)0;
-            float4x4 worldViewMatrix = mul(MTACreatePositionMatrix(renderPosition.xyz), gView);
+            float4x4 worldViewMatrix = mul(MTACreatePositionMatrix(position), gView);
             float4 worldViewPosition = float4(worldViewMatrix[3].xyz + (VS.Position.xzy*500000), 1);
             PS.Position = mul(worldViewPosition, gProjection);
             PS.TexCoord = VS.TexCoord;

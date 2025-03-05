@@ -76,7 +76,7 @@ shaderRW.buffer[identity] = {
             Export Output;
             float3 skyGradient = GetSkyGradient(PS.TexCoord);
             float2 cloudUV = PS.TexCoord;
-            float cloudDepth = lerp(0, 1, 0.9 - cloudUV.y);
+            float cloudDepth = lerp(0, 1, 1 - cloudUV.y);
             cloudUV.y /= cloudDepth*1.25;
             float4 cloudTexel = tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01) + tex2D(cloudSampler, cloudUV*8*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011);
             float2 starUV = PS.TexCoord*vResolution*float2(1, 1.1)*3;
@@ -85,7 +85,7 @@ shaderRW.buffer[identity] = {
             DrawStars(starTexel, starColor2, starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
             DrawStars(starTexel, starColor3, starUV, starGrid/2.0, starScale*3.0/4.0, starSpeed/1.6, 567891.234);
             starTexel *= starIntensity*nightTransitionPercent;
-            cloudTexel.a *= cloudColor.a*0.15*pow(cloudDepth, 1.2);
+            cloudTexel.a *= cloudColor.a*0.15;
             float cloudMask = cloudTexel.a;
             cloudTexel.rgb = lerp(skyGradient + starTexel, 0.1 + (length(skyGradient)*cloudColor), cloudTexel.a);
             cloudTexel.a = 1 - PS.TexCoord.y*(1/0.4);

@@ -129,7 +129,7 @@ if localPlayer then
             --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
             setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
-            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "renderPosition", depthX, depthY, depthZ)
+            dxSetShaderValue(renderer.private.sky.depth.shader.cShader, "position", depthX, depthY, depthZ)
             dxSetRenderTarget(renderer.private.sky.depth.rt, true)
             dxSetRenderTarget()
             setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
