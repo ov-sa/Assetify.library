@@ -116,12 +116,6 @@ if localPlayer then
                     r, g, b = r*0.5, g*0.5, b*0.5
                     imports.setSkyGradient(r, g, b, r, g, b)
                 end
-                if renderer.public.isDynamicPrelightsEnabled then
-                    local currentTime = 12*imports.interpolateBetween(renderer.private.serverNativeTimePercent[1], 0, 0, renderer.private.serverNativeTimePercent[2], 0, 0, 0.25, "OutQuad")
-                    local currentHour = math.floor(currentTime)
-                    local currentMinute = (currentTime - currentHour)*30
-                    imports.setTime(currentHour, currentMinute)
-                end
             end
             ]]
             local _, _, _, _, _, cameraLookZ = imports.getCameraMatrix()
@@ -333,13 +327,6 @@ if localPlayer then
                 end
             end
         end
-        return true
-    end
-
-    function renderer.public:setDynamicPrelights(state)
-        state = (state and true) or false
-        if renderer.public.isDynamicPrelightsEnabled == state then return false end
-        renderer.public.isDynamicPrelightsEnabled = state
         return true
     end
 

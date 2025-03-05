@@ -232,7 +232,6 @@ if localPlayer then
     end
 
     shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Clearer", _, {baseTexture = 1}, {}, {texture = {[1] = shader.public.preLoadedTex.invisibleMap}}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
-    renderer:setDynamicPrelights(true)
     renderer:setDynamicSunColor(1*255, 0.7*255, 0.4*255)
     renderer:setDynamicStars(true)
     renderer:setDynamicCloudDensity(18)

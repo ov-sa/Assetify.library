@@ -136,8 +136,6 @@
     <export function="renderer_setEmissiveMode" type="client"/>
     <export function="renderer_isDynamicSky" type="client"/>
     <export function="renderer_setDynamicSky" type="client"/>
-    <export function="renderer_isDynamicPrelights" type="client"/>
-    <export function="renderer_setDynamicPrelights" type="client"/>
     <export function="renderer_getDynamicSunColor" type="client"/>
     <export function="renderer_setDynamicSunColor" type="client"/>
     <export function="renderer_isDynamicStars" type="client"/>
