@@ -130,8 +130,10 @@
     <export function="renderer_isEmissiveMode" type="client"/>
     <export function="renderer_setEmissiveMode" type="client"/>
     <export function="renderer_setDynamicSky" type="client"/>
-    <export function="renderer_getDynamicStarsIntensity" type="client"/>
-    <export function="renderer_setDynamicStarsIntensity" type="client"/>
+    <export function="renderer_getDynamicCloudSpeed" type="client"/>
+    <export function="renderer_setDynamicCloudSpeed" type="client"/>
+    <export function="renderer_getDynamicStarIntensity" type="client"/>
+    <export function="renderer_setDynamicStarIntensity" type="client"/>
 
     <export function="renderer_getDynamicSunColor" type="client"/>
     <export function="renderer_setDynamicSunColor" type="client"/>

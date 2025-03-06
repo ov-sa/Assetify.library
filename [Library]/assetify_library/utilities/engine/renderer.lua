@@ -304,7 +304,8 @@ if localPlayer then
         else
             if not manager:isInternal(isInternal) or (sync.shaderData.shaderCategory == "Assetify:Sky") then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
-            renderer.public:setDynamicStarsIntensity(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
+            renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
             renderer.public:setDynamicCloudDensity(false, syncer.librarySerial)
@@ -314,7 +315,21 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:setDynamicStarsIntensity(intensity, isInternal)
+    function renderer.public:setDynamicCloudSpeed(speed, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            speed = imports.tonumber(speed) or settings.renderer.sky.cloud.speed or 0
+            if renderer.public.sky.cloud.speed == speed then return false end
+            renderer.public.sky.cloud.speed = speed
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("cloudSpeed", renderer.public.sky.cloud.speed)
+        end
+        return true
+    end
+    renderer.public:setDynamicCloudSpeed(settings.renderer.sky.cloud.speed)
+
+    function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
             intensity = imports.tonumber(intensity) or settings.renderer.sky.star.intensity or 0
@@ -326,7 +341,7 @@ if localPlayer then
         end
         return true
     end
-    renderer.public:setDynamicStarsIntensity(settings.renderer.sky.star.intensity)
+    renderer.public:setDynamicStarIntensity(settings.renderer.sky.star.intensity)
 
 
 

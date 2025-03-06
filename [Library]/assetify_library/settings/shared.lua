@@ -61,8 +61,11 @@ settings = {
         resolution = 1,
         sky = {
             state = true,
+            cloud = {
+                speed = 100
+            },
             star = {
-                intensity = 0.3
+                intensity = 1
             }
         }
     }

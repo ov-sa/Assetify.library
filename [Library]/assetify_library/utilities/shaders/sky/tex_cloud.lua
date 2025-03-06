@@ -97,7 +97,7 @@ shaderRW.buffer[identity] = {
             RenderStars(starTexel, float4(1.0, 1.0, 0.0, 1.0), starUV, starGrid, starScale, starSpeed/1.1, 123456.789);
             RenderStars(starTexel, float4(0.5, 0.7, 1.0, 1.0), starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
             RenderStars(starTexel, float4(1.0, 0.5, 0.5, 1.0), starUV, starGrid/2.0, starScale, starSpeed/1.6, 567891.234);
-            starTexel *= starIntensity*starsVisibility;
+            starTexel *= 0.3*starIntensity*starsVisibility;
             cloudTexel.a *= cloudColor.a*0.15*cloudDepth;
             float cloudMask = cloudTexel.a;
             skyGradient += lerp(0, starTexel, 1 + pow(length(starTexel.rgb), 2));

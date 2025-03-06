@@ -21,9 +21,10 @@ if localPlayer then
     manager:exportAPI("renderer", "setEmissiveMode", function(...) return renderer:setEmissiveMode(...) end)
     manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer.sky.state end)
     manager:exportAPI("renderer", "setDynamicSky", function(...) return renderer:setDynamicSky(...) end)
-
-    manager:exportAPI("renderer", "getDynamicStarsIntensity", function() return renderer.sky.star.intensity end)
-    manager:exportAPI("renderer", "setDynamicStarsIntensity", function(...) return renderer:setDynamicStarsIntensity(...) end)
+    manager:exportAPI("renderer", "getDynamicCloudSpeed", function() return renderer.sky.cloud.speed end)
+    manager:exportAPI("renderer", "setDynamicCloudSpeed", function(...) return renderer:setDynamicCloudSpeed(...) end)
+    manager:exportAPI("renderer", "getDynamicStarIntensity", function() return renderer.sky.star.intensity end)
+    manager:exportAPI("renderer", "setDynamicStarIntensity", function(...) return renderer:setDynamicStarIntensity(...) end)
 
 
 
