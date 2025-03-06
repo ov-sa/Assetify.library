@@ -19,6 +19,8 @@ if localPlayer then
     manager:exportAPI("renderer", "getVirtualRTs", function() return (renderer.state and renderer.vrt) or false end)
     manager:exportAPI("renderer", "isEmissiveMode", function() return renderer.isEmissiveModeEnabled end)
     manager:exportAPI("renderer", "setEmissiveMode", function(...) return renderer:setEmissiveMode(...) end)
+    manager:exportAPI("renderer", "getTimeCycle", function() return renderer.timecycle end)
+    manager:exportAPI("renderer", "setTimeCycle", function(...) return renderer:setTimeCycle(...) end)
     manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer.sky.state end)
     manager:exportAPI("renderer", "setDynamicSky", function(...) return renderer:setDynamicSky(...) end)
     manager:exportAPI("renderer", "getDynamicCloudSpeed", function() return renderer.sky.cloud.speed end)
@@ -35,13 +37,6 @@ if localPlayer then
     manager:exportAPI("renderer", "setDynamicStarScale", function(...) return renderer:setDynamicStarScale(...) end)
     manager:exportAPI("renderer", "getDynamicStarIntensity", function() return renderer.sky.star.intensity end)
     manager:exportAPI("renderer", "setDynamicStarIntensity", function(...) return renderer:setDynamicStarIntensity(...) end)
-
-
-
-    manager:exportAPI("renderer", "getDynamicSunColor", function() return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255 end)
-    manager:exportAPI("renderer", "setDynamicSunColor", function(...) return renderer:setDynamicSunColor(...) end)
-    manager:exportAPI("renderer", "getTimeCycle", function() return renderer.isDynamicTimeCycle end)
-    manager:exportAPI("renderer", "setTimeCycle", function(...) return renderer:setTimeCycle(...) end)
 else
 
 end

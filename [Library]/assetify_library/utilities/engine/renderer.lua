@@ -144,10 +144,10 @@ if localPlayer then
     end
 
     renderer.private.prerender = function()
-        if renderer.public.isDynamicTimeCycle then
+        if renderer.public.timecycle then
             local hours, minutes = imports.getTime()
-            local current = renderer.public.isDynamicTimeCycle[hours]
-            local next = renderer.public.isDynamicTimeCycle[((hours < 23) and (hours + 1)) or 0]
+            local current = renderer.public.timecycle[hours]
+            local next = renderer.public.timecycle[((hours < 23) and (hours + 1)) or 0]
             local percent = minutes/60
             renderer.public.timecyclegrad = renderer.public.timecyclegrad or {}
             renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3] = interpolateBetween(current[1][1], current[1][2], current[1][3], next[1][1], next[1][2], next[1][3], percent, "InQuad")
@@ -258,6 +258,17 @@ if localPlayer then
     end
     ]]
 
+    function renderer.public:setTimeCycle(timecycle)
+        renderer.public.timecycle = timecycle or nil
+        for i = 0, 23, 1 do
+            renderer.public.timecycle[i] = renderer.public.timecycle[i] or {}
+            for k = 1, 2, 1 do
+                renderer.public.timecycle[i][k] = {string.parseHex(renderer.public.timecycle[i][k] or "#ffffff")}
+            end
+        end
+        return true
+    end
+
     function renderer.public:setDynamicSky(state, sync, isInternal)
         if not sync then
             state = (state and true) or false
@@ -311,10 +322,6 @@ if localPlayer then
             renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicStarScale(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
-
-            renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
-            renderer.public:setDynamicCloudDensity(false, syncer.librarySerial)
-            renderer.public:setDynamicCloudColor(false, false, false, syncer.librarySerial)
         end
         return true
     end
@@ -416,48 +423,6 @@ if localPlayer then
         return true
     end
     renderer.public:setDynamicStarIntensity(settings.renderer.sky.star.intensity)
-
-
-
-
-
-    function renderer.public:setDynamicSunColor(r, g, b, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            r, g, b = (imports.tonumber(r) or 0)/255, (imports.tonumber(g) or 0)/255, (imports.tonumber(b) or 0)/255
-            renderer.public.isDynamicSunColor = renderer.public.isDynamicSunColor or {}
-            if ((renderer.public.isDynamicSunColor[1] == r) and (renderer.public.isDynamicSunColor[2] == g) and (renderer.public.isDynamicSunColor[3] == b)) then return false end
-            renderer.public.isDynamicSunColor[1], renderer.public.isDynamicSunColor[2], renderer.public.isDynamicSunColor[3] = r, g, b
-        end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("sunColor", renderer.public.isDynamicSunColor) end
-        return true
-    end
-
-    function renderer.public:setDynamicCloudDensity(density, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            density = imports.tonumber(density) or 0
-            if renderer.public.isDynamicCloudDensity == density then return false end
-            renderer.public.isDynamicCloudDensity = density
-        end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudDensity", renderer.public.isDynamicCloudDensity) end
-        return true
-    end
-
-    function renderer.public:setTimeCycle(cycle, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            renderer.public.isDynamicTimeCycle = cycle
-        end
-        for i = 0, 23, 1 do
-            renderer.public.isDynamicTimeCycle[i] = renderer.public.isDynamicTimeCycle[i] or {}
-            for k = 1, 2, 1 do
-                renderer.public.isDynamicTimeCycle[i][k] = {string.parseHex(renderer.public.isDynamicTimeCycle[i][k] or "#ffffff")}
-            end
-        end
-        return true
-    end
-
 
     --[[
     function setMoonScale(scale)
