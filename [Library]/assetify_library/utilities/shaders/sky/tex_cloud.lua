@@ -25,7 +25,7 @@ shaderRW.buffer[identity] = {
         float starGrid = 40.0;
         float2 starSpeed = float2(0, 5);
         float starScale = 0.085;
-        float starIntensity = 0.3;
+        float starIntensity = 1;
         float starsVisibility = 1;
         texture cloudTex;
         texture vCloud0 <string renderTarget = "yes";>;

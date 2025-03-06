@@ -62,7 +62,7 @@ settings = {
         sky = {
             state = true,
             star = {
-                intensity = 1
+                intensity = 0.3
             }
         }
     }
