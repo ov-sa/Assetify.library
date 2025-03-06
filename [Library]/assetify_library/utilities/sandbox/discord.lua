@@ -57,7 +57,7 @@ if localPlayer then
                 imports.setDiscordRichPresenceDetails(settings.discord.details)
                 if not syncer.isLibraryLoaded then imports.setDiscordRichPresenceState((syncer.isLibraryLoaded and "Downloading") or "Playing") end
                 local info = thread:getThread():await(network:emitCallback("Assetify:Discord:onFetchUserInfo", true, false, "780426807739678740"))
-                if (imports.os.time() - info.createdAt) < (settings.discord.minAge*30*24*60*60) then
+                if info and ((imports.os.time() - info.createdAt) < (settings.discord.minAge*30*24*60*60)) then
                     network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, string.format("Discord account must be at least %s month(s) old", settings.discord.minAge))
                 end
             else
