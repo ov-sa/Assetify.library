@@ -58,8 +58,6 @@ settings = {
 
     renderer = {
         state = true,
-        resolution = 1,
-
         sky = {
             state = true,
             cloud = {
@@ -71,10 +69,6 @@ settings = {
             star = {
                 intensity = 1
             }
-        },
-
-        water = {
-            
         }
     }
 }

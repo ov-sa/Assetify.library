@@ -60,7 +60,7 @@ local renderer = class:create("renderer", {
 if localPlayer then
     renderer.public.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
-    renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
+    renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1], renderer.public.resolution[2]
     renderer.private.sky = {
         farclip = 1000,
         depth = {
