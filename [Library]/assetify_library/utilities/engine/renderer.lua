@@ -384,7 +384,6 @@ if localPlayer then
         end
         if renderer.public.sky.state then
             renderer.private.sky.cloud.shader:setValue("starSpeed", renderer.public.sky.star.speed)
-            --dxSetShaderValue(CBuffer.cloud.shader, "starSpeed", {0, (tonumber(speed) or 1)*3})
         end
         return true
     end

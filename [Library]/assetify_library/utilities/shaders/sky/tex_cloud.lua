@@ -23,7 +23,7 @@ shaderRW.buffer[identity] = {
         float2 cloudDirection = 1;
         float4 cloudColor = 1;
         float starGrid = 40.0;
-        float2 starSpeed = float2(0, 5);
+        float starSpeed = 5;
         float starScale = 0.085;
         float starIntensity = 1;
         float starsVisibility = 1;
@@ -57,12 +57,12 @@ shaderRW.buffer[identity] = {
             return float2(frac(sin(vec.x*999.9 + vec.y)*seed), frac(sin(vec.y*999.9 + vec.x)*seed));
         }
 
-        void RenderStars(inout float4 result, in float4 color, in float2 uv, in float grid, in float2 size, in float2 speed, in float seed) {
+        void RenderStars(inout float4 result, in float4 color, in float2 uv, in float grid, in float2 size, in float speed, in float seed) {
             float2 randv = RandFloat2(floor(uv/grid), seed) - 0.5;
             float len = length(randv);
             if (len < 0.5) {
                 float radius = 1.0 - distance(mod(uv, grid)/grid, 0.5 + randv)/(size*(0.5 - len));
-                if (radius > 0.0) result += color*radius*abs(sin(gTime*max(randv.x, randv.y)*max(speed.x, speed.y)*7));
+                if (radius > 0.0) result += color*radius*abs(sin(gTime*max(randv.x, randv.y)*speed*7));
             }
         }
 
