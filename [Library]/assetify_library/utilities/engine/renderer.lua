@@ -28,6 +28,7 @@ local imports = {
     setFarClipDistance = setFarClipDistance,
     getFarClipDistance = getFarClipDistance,
     getCameraMatrix = getCameraMatrix,
+    setElementPosition = setElementPosition,
     getScreenFromWorldPosition = getScreenFromWorldPosition,
     getWorldFromScreenPosition = getWorldFromScreenPosition,
     addEventHandler = addEventHandler,
@@ -163,11 +164,11 @@ if localPlayer then
             --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
             imports.setFarClipDistance(math.max(farclip, renderer.private.sky.farclip))
-            setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
+            imports.setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
             renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
             imports.dxSetRenderTarget(renderer.private.sky.depth.rt, true)
             imports.dxSetRenderTarget()
-            setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
+            imports.setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
             renderer.private.sky.cloud.shader:setValue("skyColorTop", {skyGradient[1]/255, skyGradient[2]/255, skyGradient[3]/255})
             renderer.private.sky.cloud.shader:setValue("skyColorBottom", {skyGradient[4]/255, skyGradient[5]/255, skyGradient[6]/255})
 
@@ -175,7 +176,7 @@ if localPlayer then
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
             renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
             renderer.private.sky.moon.shader:setValue("moonVisibility", time.night.moon)
-            --setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
+            --imports.setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
         end
