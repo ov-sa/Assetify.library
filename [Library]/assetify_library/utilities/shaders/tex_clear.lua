@@ -12,7 +12,7 @@
 --[[ Shader ]]--
 ----------------
 
-local identity = "Assetify_Tex_Clearer"
+local identity = "Assetify_Tex_Clear"
 shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[

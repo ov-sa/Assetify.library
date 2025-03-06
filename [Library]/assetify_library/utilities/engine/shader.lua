@@ -46,7 +46,7 @@ local shader = class:create("shader", {
         {index = "emissive", alpha = false}
     },
     remoteWhitelist = {
-        "Assetify_Tex_Clearer",
+        "Assetify_Tex_Clear",
         "Assetify_Tex_Change",
         "Assetify_Tex_Export"
     }
@@ -232,7 +232,7 @@ if localPlayer then
         return imports.dxSetShaderValue(self.cShader, i, j or false)
     end
 
-    shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clearer", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.priority + 1, shader.public.distance, true)
+    shader.public.preLoaded["Assetify_Tex_Clear"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clear", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.priority + 1, shader.public.distance, true)
 end
 
 
