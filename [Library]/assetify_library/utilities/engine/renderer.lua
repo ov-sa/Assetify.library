@@ -284,17 +284,15 @@ if localPlayer then
                 setElementDoubleSided(renderer.private.sky.cloud.object, true)
                 renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.shaderPriority + 1, false, false, false, syncer.librarySerial)
             else
-                for i, j in imports.pairs(renderer.private.sky.rt) do
-                    destroyElement(i)
-                end
-                renderer.private.sky.rt = nil
                 imports.destroyElement(renderer.private.sky.depth.object)
-                imports.destroyElement(renderer.private.sky.depth.rt)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
                 imports.destroyElement(renderer.private.sky.cloud.object)
-                imports.destroyElement(renderer.private.sky.cloud.rt)
                 renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
                 renderer.private.sky.moon.shader:destroy(true, syncer.librarySerial)
+                for i, j in imports.pairs(renderer.private.sky.rt) do
+                    imports.destroyElement(i)
+                end
+                renderer.private.sky.rt = nil
             end
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setDynamicSky(false, i, syncer.librarySerial)
