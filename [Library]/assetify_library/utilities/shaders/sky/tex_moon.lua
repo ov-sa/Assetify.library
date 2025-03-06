@@ -17,7 +17,7 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float2 moonScale = 0.5;
+        float2 moonScale = 1;
         float moonNativeScale = 1;
         float moonBrightness = 1;
         float moonVisibility = 1;

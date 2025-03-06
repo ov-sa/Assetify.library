@@ -146,4 +146,6 @@
     <export function="renderer_setDynamicStarScale" type="client"/>
     <export function="renderer_getDynamicStarIntensity" type="client"/>
     <export function="renderer_setDynamicStarIntensity" type="client"/>
+    <export function="renderer_getDynamicMoonScale" type="client"/>
+    <export function="renderer_setDynamicMoonScale" type="client"/>
 </meta>

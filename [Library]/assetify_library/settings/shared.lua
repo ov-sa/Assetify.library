@@ -76,6 +76,12 @@ settings = {
                 speed = 5,
                 scale = 0.085,
                 intensity = 1
+            },
+            moon = {
+                scale = 0.5,
+                emissive = {
+                    scale = 1
+                }
             }
         }
     }

@@ -19,6 +19,7 @@ local imports = {
     setTime = setTime,
     getTime = getTime,
     getCamera = getCamera,
+    setMoonSize = setMoonSize,
     getMoonSize = getMoonSize,
     getRealTime = getRealTime,
     destroyElement = destroyElement,
@@ -52,8 +53,12 @@ local renderer = class:create("renderer", {
         state = false,
         cloud = {},
         star = {},
-        moon = {},
-        sun = {}
+        moon = {
+            emissive = {}
+        },
+        sun = {
+            emissive = {}
+        }
     }
 })
 
@@ -329,6 +334,8 @@ if localPlayer then
             renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicStarScale(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
+            renderer.public:setDynamicMoonScale(false, syncer.librarySerial)
+            renderer.public:setDynamicMoonEmissiveScale(false, syncer.librarySerial)
         end
         return true
     end
@@ -431,19 +438,35 @@ if localPlayer then
     end
     renderer.public:setDynamicStarIntensity(settings.renderer.sky.star.intensity)
 
+    function renderer.public:setDynamicMoonScale(scale, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            scale = imports.tonumber(scale) or settings.renderer.sky.moon.scale or 0
+            if renderer.public.sky.moon.scale == scale then return false end
+            renderer.public.sky.moon.scale = scale
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.moon.shader:setValue("moonScale", renderer.public.sky.moon.scale)
+        end
+        return true
+    end
+    renderer.public:setDynamicMoonScale(settings.renderer.sky.moon.scale)
+
+    function renderer.public:setDynamicMoonEmissiveScale(scale, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            scale = imports.tonumber(scale) or settings.renderer.sky.moon.emissive.scale or 1
+            if renderer.public.sky.moon.emissive.scale == scale then return false end
+            renderer.public.sky.moon.emissive.scale = scale
+        end
+        if renderer.public.sky.state then
+            imports.setMoonSize(renderer.public.sky.moon.emissive.scale*10)
+        end
+        return true
+    end
+    renderer.public:setDynamicMoonEmissiveScale(settings.renderer.sky.moon.emissive.scale)
+
     --[[
-    function setMoonScale(scale)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.moon.shader, "moonScale", (tonumber(scale) or 1)*0.5)
-        return true
-    end
-    
-    function setMoonEmissiveScale(scale)
-        if not CBuffer.state then return false end
-        setMoonSize((tonumber(scale) or 1)*10)
-        return true
-    end
-    
     function setMoonEmissiveIntensity(intensity)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.emissive.shader, "moonEmissiveIntensity", tonumber(intensity) or 1)
