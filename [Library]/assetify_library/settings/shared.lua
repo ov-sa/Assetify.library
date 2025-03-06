@@ -67,6 +67,7 @@ settings = {
                 color = {255, 255, 255, 255}
             },
             star = {
+                speed = 5,
                 intensity = 1
             }
         }

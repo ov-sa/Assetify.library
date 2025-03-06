@@ -308,7 +308,7 @@ if localPlayer then
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicCloudDirection(false, syncer.librarySerial)
             renderer.public:setDynamicCloudColor(false, syncer.librarySerial)
-            --renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
+            renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
@@ -368,7 +368,6 @@ if localPlayer then
             renderer.public.sky.cloud.color = color
         end
         if renderer.public.sky.state then
-            iprint(renderer.public.sky.cloud.color)
             renderer.private.sky.cloud.shader:setValue("cloudColor", {renderer.public.sky.cloud.color[1]/255, renderer.public.sky.cloud.color[2]/255, renderer.public.sky.cloud.color[3]/255, renderer.public.sky.cloud.color[4]/255})
         end
         return true
