@@ -166,12 +166,9 @@ if localPlayer then
             imports.setFarClipDistance(math.max(farclip, renderer.private.sky.farclip))
             imports.setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
             renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
-            imports.dxSetRenderTarget(renderer.private.sky.depth.rt, true)
-            imports.dxSetRenderTarget()
             imports.setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
             renderer.private.sky.cloud.shader:setValue("skyColorTop", {skyGradient[1]/255, skyGradient[2]/255, skyGradient[3]/255})
             renderer.private.sky.cloud.shader:setValue("skyColorBottom", {skyGradient[4]/255, skyGradient[5]/255, skyGradient[6]/255})
-
             renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.transition)
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
             renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
@@ -179,6 +176,10 @@ if localPlayer then
             --imports.setElementPosition(CBuffer.sun.object, cameraX, cameraY, cameraZ)
             --dxSetShaderValue(CBuffer.sun.shader, "entityPosition", sunX, sunY, sunZ)
             --dxDrawLine3D(cameraLookX, cameraLookY, cameraLookZ, sunX, sunY, sunZ, tocolor(255, 255, 0, 255), 4, true)
+            for i, j in imports.pairs(renderer.private.sky.rt) do
+                imports.dxSetRenderTarget(i, true)
+                imports.dxSetRenderTarget()
+            end
         end
         return true
     end
@@ -267,18 +268,23 @@ if localPlayer then
             if renderer.public.sky.state == state then return false end
             renderer.public.sky.state = state
             if state then
+                renderer.private.sky.rt = {}
                 renderer.private.sky.depth.object = createObject(asset.rw.plane.modelID, 0, 0, 0, 0, 0, 0, true)
                 setElementCollisionsEnabled(renderer.private.sky.depth.object, false)
                 setElementStreamable(renderer.private.sky.depth.object, false)
                 setElementDoubleSided(renderer.private.sky.depth.object, true)
                 renderer.private.sky.depth.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
+                renderer.private.sky.rt[renderer.private.sky.depth.rt] = true
                 renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {
                     ["vDepth0"] = renderer.private.sky.depth.rt
                 }, {}, false, shader.shaderPriority + 1, false, false, syncer.librarySerial)
+                renderer.private.sky.cloud.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
+                renderer.private.sky.rt[renderer.private.sky.cloud.rt] = true
                 renderer.private.sky.cloud.object = createObject(asset.rw.sky.modelID, 0, 0, 0, 0, 0, 0, true)
                 renderer.private.sky.cloud.shader = shader:create(renderer.private.sky.cloud.object, "Assetify:Sky", "Assetify_Sky_Tex_Cloud", "*", {}, {
                     ["vResolution"] = renderer.public.resolution,
-                    ["cloudTex"] = renderer.private.sky.cloud.texture
+                    ["cloudTex"] = renderer.private.sky.cloud.texture,
+                    ["vCloud0"] = renderer.private.sky.cloud.rt
                 }, {}, false, shader.shaderPriority + 1, false, false, true, syncer.librarySerial)
                 setObjectScale(renderer.private.sky.cloud.object, 30)
                 setElementCollisionsEnabled(renderer.private.sky.cloud.object, false)
@@ -286,6 +292,10 @@ if localPlayer then
                 setElementDoubleSided(renderer.private.sky.cloud.object, true)
                 renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.shaderPriority + 1, false, false, false, syncer.librarySerial)
             else
+                for i, j in imports.pairs(renderer.private.sky.rt) do
+                    destroyElement(i)
+                end
+                renderer.private.sky.rt = nil
                 imports.destroyElement(renderer.private.sky.depth.object)
                 imports.destroyElement(renderer.private.sky.depth.rt)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)

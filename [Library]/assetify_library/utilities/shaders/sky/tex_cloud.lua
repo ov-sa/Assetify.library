@@ -29,7 +29,7 @@ shaderRW.buffer[identity] = {
         float starGrid = 40.0;
         float starsVisibility = 1;
         texture cloudTex;
-        texture cloudRT <string renderTarget = "yes";>;
+        texture vCloud0 <string renderTarget = "yes";>;
 
         // Inputs //
         struct VSInput {
