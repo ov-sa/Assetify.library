@@ -300,7 +300,11 @@ if localPlayer then
                 setElementCollisionsEnabled(renderer.private.sky.cloud.object, false)
                 setElementStreamable(renderer.private.sky.cloud.object, false)
                 setElementDoubleSided(renderer.private.sky.cloud.object, true)
-                renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.priority + 1, false, false, false, syncer.librarySerial)
+                renderer.private.sky.moon.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
+                renderer.private.sky.rt[renderer.private.sky.moon.rt] = true
+                renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {
+                    ["vMoon0"] = renderer.private.sky.moon.rt
+                }, {}, false, shader.priority + 1, false, false, false, syncer.librarySerial)
             else
                 imports.destroyElement(renderer.private.sky.depth.object)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)

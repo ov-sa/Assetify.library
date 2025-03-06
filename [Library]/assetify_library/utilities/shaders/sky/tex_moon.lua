@@ -22,7 +22,7 @@ shaderRW.buffer[identity] = {
         float moonBrightness = 1;
         float moonVisibility = 1;
         texture moonTex;
-        texture moonRT <string renderTarget = "yes";>;
+        texture vMoon0 <string renderTarget = "yes";>;
 
         // Inputs //
         struct PSInput {
