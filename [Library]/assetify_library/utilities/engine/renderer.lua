@@ -431,12 +431,6 @@ if localPlayer then
 
 
     --[[
-    function setCloudColor(color)
-        if not CBuffer.state or not color or (type(color) ~= "table") then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "cloudColor", {(tonumber(color[1]) or 255)/255, (tonumber(color[2]) or 255)/255, (tonumber(color[3]) or 255)/255, (tonumber(color[4]) or 255)/255})
-        return true
-    end
-    
     function setStarSpeed(speed)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.cloud.shader, "starSpeed", {0, (tonumber(speed) or 1)*3})
