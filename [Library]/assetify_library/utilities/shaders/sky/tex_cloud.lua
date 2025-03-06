@@ -51,7 +51,7 @@ shaderRW.buffer[identity] = {
         // Utils //
         #define mod(x, y) (x - (y*floor(x/y)))
         float3 GetSkyGradient(float2 uv) {
-            return lerp(skyColorBottom*0.5, skyColorTop*0.5, saturate(uv.y*(1/0.4)));
+            return lerp(skyColorBottom, skyColorTop, saturate(uv.y*(1/0.4)));
         }
 
         float2 RandVector(in float2 vec, in float seed) {
@@ -102,7 +102,7 @@ shaderRW.buffer[identity] = {
             cloudTexel.a *= cloudColor.a*0.15*cloudDepth;
             float cloudMask = cloudTexel.a;
             skyGradient += lerp(0, starTexel, 1 + pow(length(starTexel.rgb), 2));
-            cloudTexel.rgb = lerp(skyGradient, lerp(cloudColor, skyColorBottom, (1 - cloudDepth)), cloudTexel.a);
+            cloudTexel.rgb = lerp(skyGradient, cloudColor*lerp(skyGradient, 1, (1 - cloudDepth)), cloudTexel.a);
             cloudTexel.a = 1 - PS.TexCoord.y*(1/0.4);
             cloudMask *= cloudTexel.a;
             float maskTop = PS.TexCoord.y/0.07;

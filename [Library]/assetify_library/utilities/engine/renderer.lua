@@ -25,6 +25,8 @@ local imports = {
     guiGetScreenSize = guiGetScreenSize,
     setSkyGradient = setSkyGradient,
     getSkyGradient = getSkyGradient,
+    setFarClipDistance = setFarClipDistance,
+    getFarClipDistance = getFarClipDistance,
     getCameraMatrix = getCameraMatrix,
     getScreenFromWorldPosition = getScreenFromWorldPosition,
     addEventHandler = addEventHandler,
@@ -33,6 +35,7 @@ local imports = {
     dxCreateScreenSource = dxCreateScreenSource,
     dxCreateRenderTarget = dxCreateRenderTarget,
     dxUpdateScreenSource = dxUpdateScreenSource,
+    dxSetRenderTarget = dxSetRenderTarget,
     dxDrawImage = dxDrawImage
 }
 
@@ -132,22 +135,48 @@ if localPlayer then
     end
 
     renderer.private.prerender = function()
+        if renderer.public.isDynamicTimeCycle then
+            local hours, minutes = imports.getTime()
+            local currentCycle = renderer.public.isDynamicTimeCycle[hours]
+            local nextCycle = renderer.public.isDynamicTimeCycle[((hours < 23) and (hours + 1)) or 0]
+            local percent = minutes/60
+            renderer.public.timecyclegrad = renderer.public.timecyclegrad or {}
+            renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3] = interpolateBetween(
+                nextCycle[1][1], nextCycle[1][2], nextCycle[1][3],
+                currentCycle[1][1], currentCycle[1][2], currentCycle[1][3],
+                percent,
+                "Linear"
+            )
+            renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6] = interpolateBetween(
+                nextCycle[2][1], nextCycle[2][2], nextCycle[2][3],
+                currentCycle[2][1], currentCycle[2][2], currentCycle[2][3],
+                percent,
+                "Linear"
+            )
+            imports.setSkyGradient(renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3], renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6])
+        end
         if renderer.public.sky.state then
             local time = renderer.private.getTime()
-            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = getCameraMatrix()
+            local farclip = imports.getFarClipDistance()
+            local cameraX, cameraY, cameraZ, cameraLookX, cameraLookY, cameraLookZ = imports.getCameraMatrix()
             local depthX, depthY, depthZ = cameraLookX, cameraLookY, cameraLookZ
-            local depthScreenX, depthScreenY = getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
-            if depthScreenX and depthScreenY then depthX, depthY, depthZ = getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
+            local depthScreenX, depthScreenY = imports.getScreenFromWorldPosition(depthX, depthY, depthZ, renderer.public.resolution[1])
+            local skyGradient = {imports.getSkyGradient()}
+            if depthScreenX and depthScreenY then depthX, depthY, depthZ = imports.getWorldFromScreenPosition(depthScreenX, depthScreenY, renderer.private.sky.depth.value)
             else depthX, depthY, depthZ = cameraX, cameraY, cameraZ - 10000 end
             --local sunX, sunY, sunZ = CBuffer.sun.getPosition(cameraLookX, cameraLookY, cameraLookZ, time.day.percent, time.day.transition)
             --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
             --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
+            imports.setFarClipDistance(math.max(farclip, renderer.public.sky.farclip))
             setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
             renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
-            dxSetRenderTarget(renderer.private.sky.depth.rt, true)
-            dxSetRenderTarget()
+            imports.dxSetRenderTarget(renderer.private.sky.depth.rt, true)
+            imports.dxSetRenderTarget()
             setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
+            renderer.private.sky.cloud.shader:setValue("skyColorTop", {skyGradient[1]/255, skyGradient[2]/255, skyGradient[3]/255})
+            renderer.private.sky.cloud.shader:setValue("skyColorBottom", {skyGradient[4]/255, skyGradient[5]/255, skyGradient[6]/255})
+
             renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.transition)
             renderer.private.sky.moon.shader:setValue("moonTex", renderer.private.sky.moon.texture[renderer.private.getMoonPhase()])
             renderer.private.sky.moon.shader:setValue("moonNativeScale", imports.getMoonSize())
@@ -243,7 +272,6 @@ if localPlayer then
             if renderer.public.sky.state == state then return false end
             renderer.public.sky.state = state
             if state then
-                renderer.private.prevNativeSkyGradient = table.pack(imports.getSkyGradient())
                 renderer.private.sky.depth.object = createObject(asset.rw.plane.modelID, 0, 0, 0, 0, 0, 0, true)
                 setElementCollisionsEnabled(renderer.private.sky.depth.object, false)
                 setElementStreamable(renderer.private.sky.depth.object, false)
@@ -270,7 +298,6 @@ if localPlayer then
                 imports.destroyElement(renderer.private.sky.cloud.rt)
                 renderer.private.sky.cloud.shader:destroy(true, syncer.librarySerial)
                 renderer.private.sky.moon.shader:destroy(true, syncer.librarySerial)
-                imports.setSkyGradient(table.unpack(renderer.private.prevNativeSkyGradient))
             end
             for i, j in imports.pairs(shader.buffer.shader) do
                 renderer.public:setDynamicSky(_, i, syncer.librarySerial)
@@ -286,7 +313,6 @@ if localPlayer then
                     renderer.public:setDynamicCloudDensity(_, syncer.librarySerial)
                     renderer.public:setDynamicCloudScale(_, syncer.librarySerial)
                     renderer.public:setDynamicCloudColor(_, _, _, syncer.librarySerial)
-                    renderer.public:setTimeCycle(_, syncer.librarySerial)
                 end
             end
         end
@@ -350,50 +376,17 @@ if localPlayer then
         return true
     end
 
-    function renderer.private.isTimeCycleValid(cycle)
-        cycle = (cycle and (imports.type(cycle) == "table") and cycle) or false
-        if not cycle then return false end
-        local isValid = false
-        for i = 1, 24, 1 do
-            cycle[i] = (cycle[i] and (imports.type(cycle[i]) == "table") and cycle[i]) or false
-            if cycle[i] then
-                for k = 1, 3, 1 do
-                    cycle[i][k] = (cycle[i][k] and (imports.type(cycle[i][k]) == "table") and (imports.type(cycle[i][k].color) == "string") and (imports.type(cycle[i][k].position) == "number") and cycle[i][k]) or false
-                    isValid = (cycle[i][k] and true) or isValid
-                end
-            end
-        end
-        return isValid
-    end
-
     function renderer.public:setTimeCycle(cycle, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
-            if not renderer.private.isTimeCycleValid(cycle) then return false end
+            --if not renderer.private.isTimeCycleValid(cycle) then return false end
             renderer.public.isDynamicTimeCycle = cycle
         end
         for i = 1, 24, 1 do
-            local vCycle, bCycle = renderer.public.isDynamicTimeCycle[i], {}
-            if not vCycle then
-                for k = i - 1, i - 23, -1 do
-                    local v = ((k > 0) and k) or (24 + k)
-                    local __vCycle = renderer.public.isDynamicTimeCycle[v]
-                    if __vCycle then
-                        vCycle = __vCycle
-                        break
-                    end
-                end
+            renderer.public.isDynamicTimeCycle[i] = renderer.public.isDynamicTimeCycle[i] or {}
+            for k = 1, 2, 1 do
+                renderer.public.isDynamicTimeCycle[i][k] = {string.parseHex(renderer.public.isDynamicTimeCycle[i][k] or "#ffffff")}
             end
-            for k = 1, 3, 1 do
-                local v = vCycle[k]
-                local color = (v and {string.parseHex(v.color)}) or false
-                local position = (v and v.position) or false
-                table.insert(bCycle, (color and color[1]/255) or -1)
-                table.insert(bCycle, (color and color[2]/255) or -1)
-                table.insert(bCycle, (color and color[3]/255) or -1)
-                table.insert(bCycle, (position and position/100) or -1)
-            end
-            if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("timecycle_"..i, bCycle) end
         end
         return true
     end

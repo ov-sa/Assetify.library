@@ -1,213 +1,72 @@
+-0:
+    -1: "#000000"
+    -2: "#1a1a1a"
 -1:
-	-1:
-		color: "#020111"
-		position: 25
-	-2:
-		color: "#191621"
-		position: 100
+    -1: "#000000"
+    -2: "#1a1a1a"
 -2:
-	-1:
-		color: "#020111"
-		position: 45
-	-2:
-		color: "#191621"
-		position: 100
+    -1: "#000000"
+    -2: "#2b2b3d"
 -3:
-	-1:
-		color: "#020111"
-		position: 60
-	-2:
-		color: "#20202c"
-		position: 100
+    -1: "#000000"
+    -2: "#44445c"
 -4:
-	-1:
-		color: "#020111"
-		position: 10
-	-2:
-		color: "#3a3a52"
-		position: 100
+    -1: "#2b2b3d"
+    -2: "#6a6a8f"
 -5:
-	-1:
-		color: "#20202c"
-		position: 10
-	-2:
-		color: "#515175"
-		position: 100
+    -1: "#4d4d6f"
+    -2: "#8f91c2"
 -6:
-	-1:
-		color: "#40405c"
-		position: 10
-	-2:
-		color: "#6f71aa"
-		position: 80
-	-3:
-		color: "#8a76ab"
-		position: 100
+    -1: "#62627b"
+    -2: "#9b9dc4"
 -7:
-	-1:
-		color: "#4a4969"
-		position: 10
-	-2:
-		color: "#7072ab"
-		position: 50
-	-3:
-		color: "#cd82a0"
-		position: 100
+    -1: "#7a8cba"
+    -2: "#8a8eae"
 -8:
-	-1:
-		color: "#757abf"
-		position: 10
-	-2:
-		color: "#8583be"
-		position: 60
-	-3:
-		color: "#eab0d1"
-		position: 100
+    -1: "#2e4a6b"
+    -2: "#b77a6f"
 -9:
-	-1:
-		color: "#82addb"
-		position: 10
-	-2:
-		color: "#ebb2b1"
-		position: 100
+    -1: "#6493b7"
+    -2: "#8bb0bd"
 -10:
-	-1:
-		color: "#94c5f8"
-		position: 1
-	-2:
-		color: "#a6e6ff"
-		position: 70
-	-3:
-		color: "#b1b5ea"
-		position: 100
+    -1: "#8aa6b9"
+    -2: "#6ba3b4"
 -11:
-	-1:
-		color: "#b7eaff"
-		position: 10
-	-2:
-		color: "#94dfff"
-		position: 100
+    -1: "#75c2e1"
+    -2: "#4da9c3"
 -12:
-	-1:
-		color: "#9be2fe"
-		position: 10
-	-2:
-		color: "#67d1fb"
-		position: 100
+    -1: "#68b3c6"
+    -2: "#2d6b8f"
 -13:
-	-1:
-		color: "#90dffe"
-		position: 10
-	-2:
-		color: "#38a3d1"
-		position: 100
+    -1: "#3db4e6"
+    -2: "#1c6f9b"
 -14:
-	-1:
-		color: "#57c1eb"
-		position: 10
-	-2:
-		color: "#246fa8"
-		position: 100
+    -1: "#0076b1"
+    -2: "#0e487b"
 -15:
-	-1:
-		color: "#2d91c2"
-		position: 10
-	-2:
-		color: "#1e528e"
-		position: 100
+    -1: "#008cb5"
+    -2: "#1e528e"
 -16:
-	-1:
-		color: "#2473ab"
-		position: 10
-	-2:
-		color: "#1e528e"
-		position: 70
-	-3:
-		color: "#5b7983"
-		position: 100
+    -1: "#2c6e94"
+    -2: "#2c5a79"
 -17:
-	-1:
-		color: "#1e528e"
-		position: 10
-	-2:
-		color: "#265889"
-		position: 50
-	-3:
-		color: "#9da671"
-		position: 100
+    -1: "#2c4a60"
+    -2: "#7a8d80"
 -18:
-	-1:
-		color: "#1e528e"
-		position: 10
-	-2:
-		color: "#728a7c"
-		position: 50
-	-3:
-		color: "#e9ce5d"
-		position: 100
+    -1: "#3a618b"
+    -2: "#5c7572"
 -19:
-	-1:
-		color: "#154277"
-		position: 10
-	-2:
-		color: "#576e71"
-		position: 30
-	-3:
-		color: "#e1c45e"
-		position: 70
-	-4:
-		color: "#b26339"
-		position: 100
+    -1: "#00242c"
+    -2: "#5a5a55"
 -20:
-	-1:
-		color: "#163C52"
-		position: 10
-	-2:
-		color: "#4F4F47"
-		position: 30
-	-3:
-		color: "#C5752D"
-		position: 60
-	-4:
-		color: "#B7490F"
-		position: 80
-	-5:
-		color: "#2F1107"
-		position: 100
+    -1: "#1c2a36"
+    -2: "#1c2a36"
 -21:
-	-1:
-		color: "#071B26"
-		position: 10
-	-2:
-		color: "#071B26"
-		position: 30
-	-3:
-		color: "#8A3B12"
-		position: 80
-	-4:
-		color: "#240E03"
-		position: 100
+    -1: "#000000"
+    -2: "#6e2b0c"
 -22:
-	-1:
-		color: "#010A10"
-		position: 30
-	-2:
-		color: "#59230B"
-		position: 80
-	-3:
-		color: "#2F1107"
-		position: 100
+    -1: "#1e1e1e"
+    -2: "#4a2e24"
 -23:
-	-1:
-		color: "#090401"
-		position: 50
-	-2:
-		color: "#4B1D06"
-		position: 100
--24:
-	-1:
-		color: "#00000c"
-		position: 80
-	-2:
-		color: "#150800"
-		position: 100
+    -1: "#0a0a1e"
+    -2: "#1e0a00"
