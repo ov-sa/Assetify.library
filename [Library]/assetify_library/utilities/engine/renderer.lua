@@ -309,6 +309,7 @@ if localPlayer then
             renderer.public:setDynamicCloudDirection(false, syncer.librarySerial)
             renderer.public:setDynamicCloudColor(false, syncer.librarySerial)
             renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
+            renderer.public:setDynamicStarScale(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
@@ -388,7 +389,19 @@ if localPlayer then
     end
     renderer.public:setDynamicStarSpeed(settings.renderer.sky.star.speed)
 
-    --star's scale setter here
+    function renderer.public:setDynamicStarScale(scale, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            scale = imports.tonumber(scale) or settings.renderer.sky.star.scale or 0
+            if renderer.public.sky.star.scale == scale then return false end
+            renderer.public.sky.star.scale = scale
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("starScale", renderer.public.sky.star.scale)
+        end
+        return true
+    end
+    renderer.public:setDynamicStarScale(settings.renderer.sky.star.scale)
 
     function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
@@ -447,18 +460,6 @@ if localPlayer then
 
 
     --[[
-    function setStarScale(scale)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "starScale", tonumber(scale) or 1)
-        return true
-    end
-    
-    function setStarIntensity(intensity)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "starIntensity", (tonumber(intensity) or 1)*0.6)
-        return true
-    end
-    
     function setMoonScale(scale)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.moon.shader, "moonScale", (tonumber(scale) or 1)*0.5)

@@ -68,6 +68,7 @@ settings = {
             },
             star = {
                 speed = 5,
+                scale = 0.085,
                 intensity = 1
             }
         }
