@@ -134,6 +134,8 @@
     <export function="renderer_setDynamicCloudSpeed" type="client"/>
     <export function="renderer_getDynamicCloudScale" type="client"/>
     <export function="renderer_setDynamicCloudScale" type="client"/>
+    <export function="renderer_getDynamicCloudDirection" type="client"/>
+    <export function="renderer_setDynamicCloudDirection" type="client"/>
     <export function="renderer_getDynamicStarIntensity" type="client"/>
     <export function="renderer_setDynamicStarIntensity" type="client"/>
 

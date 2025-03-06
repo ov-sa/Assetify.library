@@ -63,7 +63,8 @@ settings = {
             state = true,
             cloud = {
                 speed = 1,
-                scale = 1
+                scale = 1,
+                direction = {1, -1}
             },
             star = {
                 intensity = 1

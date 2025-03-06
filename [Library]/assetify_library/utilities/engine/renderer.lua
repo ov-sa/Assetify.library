@@ -306,6 +306,7 @@ if localPlayer then
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
             renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudDirection(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
@@ -342,6 +343,20 @@ if localPlayer then
         return true
     end
     renderer.public:setDynamicCloudScale(settings.renderer.sky.cloud.scale)
+
+    function renderer.public:setDynamicCloudDirection(direction, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            direction = (direction and (imports.type(direction) ~= "table") and direction) or settings.renderer.sky.cloud.direction or {1, 1}
+            if table.encode(renderer.public.sky.cloud.direction) == table.encode(direction) then return false end
+            renderer.public.sky.cloud.direction = direction
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("cloudDirection", renderer.public.sky.cloud.direction)
+        end
+        return true
+    end
+    renderer.public:setDynamicCloudDirection(settings.renderer.sky.cloud.direction)
 
     function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
@@ -412,18 +427,6 @@ if localPlayer then
 
 
     --[[
-    function setCloudScale(scale)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "cloudScale", tonumber(scale) or 1)
-        return true
-    end
-    
-    function setCloudDirection(direction)
-        if not CBuffer.state or not direction or (type(direction) ~= "table") then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "cloudDirection", {tonumber(direction[1]) or 1, tonumber(direction[2]) or 1})
-        return true
-    end
-    
     function setCloudColor(color)
         if not CBuffer.state or not color or (type(color) ~= "table") then return false end
         dxSetShaderValue(CBuffer.cloud.shader, "cloudColor", {(tonumber(color[1]) or 255)/255, (tonumber(color[2]) or 255)/255, (tonumber(color[3]) or 255)/255, (tonumber(color[4]) or 255)/255})

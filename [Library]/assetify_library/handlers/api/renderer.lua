@@ -25,6 +25,8 @@ if localPlayer then
     manager:exportAPI("renderer", "setDynamicCloudSpeed", function(...) return renderer:setDynamicCloudSpeed(...) end)
     manager:exportAPI("renderer", "getDynamicCloudScale", function() return renderer.sky.cloud.scale end)
     manager:exportAPI("renderer", "setDynamicCloudScale", function(...) return renderer:setDynamicCloudScale(...) end)
+    manager:exportAPI("renderer", "getDynamicCloudDirection", function() return renderer.sky.cloud.direction end)
+    manager:exportAPI("renderer", "setDynamicCloudDirection", function(...) return renderer:setDynamicCloudDirection(...) end)
     manager:exportAPI("renderer", "getDynamicStarIntensity", function() return renderer.sky.star.intensity end)
     manager:exportAPI("renderer", "setDynamicStarIntensity", function(...) return renderer:setDynamicStarIntensity(...) end)
 
