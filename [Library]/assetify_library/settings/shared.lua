@@ -60,7 +60,10 @@ settings = {
         state = true,
         resolution = 1,
         sky = {
-            state = true
+            state = true,
+            star = {
+                intensity = 1
+            }
         }
     }
 }

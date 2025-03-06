@@ -49,7 +49,11 @@ local imports = {
 local renderer = class:create("renderer", {
     state = false,
     sky = {
-        state = false
+        state = false,
+        cloud = {},
+        star = {},
+        moon = {},
+        sun = {}
     }
 })
 
@@ -300,14 +304,32 @@ if localPlayer then
         else
             if not manager:isInternal(isInternal) then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
+            renderer.public:setDynamicStarsIntensity(false, syncer.librarySerial)
+
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
-            renderer.public:setDynamicStars(false, syncer.librarySerial)
             renderer.public:setDynamicCloudDensity(false, syncer.librarySerial)
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicCloudColor(false, false, false, syncer.librarySerial)
         end
         return true
     end
+
+    function renderer.public:setDynamicStarsIntensity(intensity, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            intensity = imports.tonumber(intensity) or settings.renderer.sky.star.intensity or 0
+            if renderer.public.sky.star.intensity == intensity then return false end
+            renderer.public.sky.star.intensity = intensity
+        end
+        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled) end
+        return true
+    end
+
+
+
+
+
+
 
     function renderer.public:setDynamicSunColor(r, g, b, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
@@ -318,17 +340,6 @@ if localPlayer then
             renderer.public.isDynamicSunColor[1], renderer.public.isDynamicSunColor[2], renderer.public.isDynamicSunColor[3] = r, g, b
         end
         if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("sunColor", renderer.public.isDynamicSunColor) end
-        return true
-    end
-
-    function renderer.public:setDynamicStars(state, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            state = (state and true) or false
-            if renderer.public.isDynamicStarsEnabled == state then return false end
-            renderer.public.isDynamicStarsEnabled = state
-        end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled) end
         return true
     end
 

@@ -22,13 +22,13 @@ if localPlayer then
     manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer.sky.state end)
     manager:exportAPI("renderer", "setDynamicSky", function(...) return renderer:setDynamicSky(...) end)
 
+    manager:exportAPI("renderer", "getDynamicStarsIntensity", function() return renderer.sky.star.intensity end)
+    manager:exportAPI("renderer", "setDynamicStarsIntensity", function(...) return renderer:setDynamicStarsIntensity(...) end)
 
 
 
     manager:exportAPI("renderer", "getDynamicSunColor", function() return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255 end)
     manager:exportAPI("renderer", "setDynamicSunColor", function(...) return renderer:setDynamicSunColor(...) end)
-    manager:exportAPI("renderer", "isDynamicStars", function() return renderer.isDynamicStarsEnabled end)
-    manager:exportAPI("renderer", "setDynamicStars", function(...) return renderer:setDynamicStars(...) end)
     manager:exportAPI("renderer", "getDynamicCloudDensity", function() return renderer.isDynamicCloudDensity end)
     manager:exportAPI("renderer", "setDynamicCloudDensity", function(...) return renderer:setDynamicCloudDensity(...) end)
     manager:exportAPI("renderer", "getDynamicCloudScale", function() return renderer.isDynamicCloudScale end)
