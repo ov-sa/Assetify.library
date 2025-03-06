@@ -15,7 +15,7 @@
 local identity = "Assetify_Tex_Map"
 local iteration = 3
 shaderRW.buffer[identity] = {
-    prepare = function(maps, shaderModel)
+    prepare = function(maps, model)
         local sampled = false
         local result = {
             config = [[
@@ -75,7 +75,7 @@ shaderRW.buffer[identity] = {
                             MinFilter = Anisotropic;
                         };
                     ]]
-                    if (shaderModel < 3) or not j[v].stochastic then
+                    if (model < 3) or not j[v].stochastic then
                         result.body = result.body..[[
                             float4 controlTexel_]]..i..[[_]]..v..[[ = tex2D(controlSampler_]]..i..[[_]]..v..[[, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
                         ]]
@@ -94,7 +94,7 @@ shaderRW.buffer[identity] = {
                                 MipFilter = Linear;
                             };
                         ]]
-                        if (shaderModel < 3) or not j[v].stochastic then
+                        if (model < 3) or not j[v].stochastic then
                             result.body = result.body..[[
                                 float4 controlTexel_]]..i..[[_]]..v..[[_bump = tex2D(controlSampler_]]..i..[[_]]..v..[[_bump, PS.TexCoord*controlScale_]]..i..[[_]]..v..[[);
                             ]]
