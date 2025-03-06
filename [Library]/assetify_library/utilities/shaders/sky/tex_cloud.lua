@@ -53,26 +53,26 @@ shaderRW.buffer[identity] = {
             return lerp(skyColor[1], skyColor[0], saturate(uv.y*(1/0.4)));
         }
 
-        float2 RandVector(in float2 vec, in float seed) {
+        float2 RandFloat2(in float2 vec, in float seed) {
             return float2(frac(sin(vec.x*999.9 + vec.y)*seed), frac(sin(vec.y*999.9 + vec.x)*seed));
         }
 
-        void RenderStars(inout float4 fragColor, in float4 color, in float2 uv, in float grid, in float2 size, in float2 speed, in float seed) {
-            float2 randv = RandVector(floor(uv/grid), seed) - 0.5;
+        void RenderStars(inout float4 result, in float4 color, in float2 uv, in float grid, in float2 size, in float2 speed, in float seed) {
+            float2 randv = RandFloat2(floor(uv/grid), seed) - 0.5;
             float len = length(randv);
             if (len < 0.5) {
                 float radius = 1.0 - distance(mod(uv, grid)/grid, 0.5 + randv)/(size*(0.5 - len));
-                if (radius > 0.0) fragColor += color*radius*abs(sin(gTime*max(randv.x, randv.y)*max(speed.x, speed.y)*7));
+                if (radius > 0.0) result += color*radius*abs(sin(gTime*max(randv.x, randv.y)*max(speed.x, speed.y)*7));
             }
         }
 
-        void RenderClouds(sampler2D tex, inout float4 fragColor, float2 offset, float2 uv) {
+        void RenderClouds(sampler2D tex, inout float4 result, float2 offset, float2 uv) {
             uv = offset + uv + gTime*cloudSpeed*cloudDirection*0.012*0;
             float4 cloudTexel = tex2DStochastic(cloudSampler, uv)*0.5;
             float difference = uv.x - offset.x;
             float blendwidth = 0.005;
             cloudTexel *= min(difference/blendwidth, 1)*min((1 - difference)/blendwidth, 1);
-            fragColor += cloudTexel;
+            result += cloudTexel;
         }
 
         // Handlers //
