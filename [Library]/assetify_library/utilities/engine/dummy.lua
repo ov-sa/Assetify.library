@@ -74,7 +74,7 @@ function dummy.public.clearElementBuffer(element)
 end
 
 if localPlayer then
-    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, remoteSignature)
+    function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, remotesign)
         if not dummy.public:isInstance(self) then return false end
         local cAsset, cData = manager:getAssetData(assetType, assetName, syncer.librarySerial)
         if not cAsset or not dummyData or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
@@ -85,7 +85,7 @@ if localPlayer then
         dummy.private:validateOffset(self, dummyData)
         self.assetType, self.assetName, self.assetClump, self.clumpMaps = assetType, assetName, assetClump, clumpMaps
         self.dummyData = dummyData
-        if remoteSignature then self.cModelInstance = remoteSignature.element end
+        if remotesign then self.cModelInstance = remotesign.element end
         if dummyType == "object" then
             self.cModelInstance = self.cModelInstance or imports.createObject(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z) or false
         elseif dummyType == "ped" then
@@ -94,7 +94,7 @@ if localPlayer then
             self.cModelInstance = self.cModelInstance or imports.createVehicle(cData.modelID, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z) or false
         end
         if not self.cModelInstance then return false end
-        self.cDummy = (remoteSignature and remoteSignature.element) or self.cModelInstance
+        self.cDummy = (remotesign and remotesign.element) or self.cModelInstance
         dummy.public.buffer[self.cDummy] = self
         if isScoped then manager:setElementScoped(self.cDummy) end
         self.cHeartbeat = thread:createHeartbeat(function()
@@ -105,7 +105,7 @@ if localPlayer then
             end
         end, function()
             if dummyType == "object" then imports.setElementDoubleSided(self.cModelInstance, true) end
-            network:emit("Assetify:Syncer:onSyncElementModel", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remoteSignature)
+            network:emit("Assetify:Syncer:onSyncElementModel", false, self.cModelInstance, assetType, assetName, assetClump, clumpMaps, remotesign)
             imports.setElementAlpha(self.cModelInstance, 255)
             imports.setElementDimension(self.cModelInstance, dummyData.dimension)
             imports.setElementInterior(self.cModelInstance, dummyData.interior)
@@ -125,7 +125,7 @@ if localPlayer then
 else
     function dummy.public:load(assetType, assetName, assetClump, clumpMaps, dummyData, isScoped, targetPlayer)
         if not dummy.public:isInstance(self) or self.isUnloading then return false end
-        if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, _, self.remoteSignature) end
+        if targetPlayer then return network:emit("Assetify:Dummy:onSpawn", true, false, targetPlayer, self.assetType, self.assetName, self.assetClump, self.clumpMaps, self.dummyData, _, self.remotesign) end
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or not dummyData or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
         local dummyType = settings.assetPacks[assetType].assetType
@@ -141,7 +141,7 @@ else
             self.cModelInstance = imports.createVehicle(settings.assetPacks[assetType].assetBase, dummyData.position.x, dummyData.position.y, dummyData.position.z, dummyData.rotation.x, dummyData.rotation.y, dummyData.rotation.z)
         end
         if not self.cModelInstance then return false end
-        self.remoteSignature = {
+        self.remotesign = {
             element = self.cModelInstance,
             elementType = dummyType
         }
@@ -192,7 +192,7 @@ else
     network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(dummy.public.buffer) do
-            if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.dummyData, _, j.remoteSignature) end
+            if j and not j.isUnloading then network:emit("Assetify:Dummy:onSpawn", true, false, source, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.dummyData, _, j.remotesign) end
             thread:pause()
         end
     end, {isAsync = true})

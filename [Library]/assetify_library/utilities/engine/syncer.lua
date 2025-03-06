@@ -82,8 +82,8 @@ if localPlayer then
     network:create("Assetify:onAssetUnload")
     syncer.private.execOnLoad(function() network:emit("Assetify:Syncer:onLoadClient", true, false, localPlayer) end)
 
-    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature)
-        if not element or (not remoteSignature and not imports.isElement(element)) then return false end
+    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remotesign)
+        if not element or (not remotesign and not imports.isElement(element)) then return false end
         local elementType = imports.getElementType(element)
         elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
         if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
@@ -148,7 +148,7 @@ else
     network:create("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(syncer.public.syncedElements) do
-            if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remoteSignature, source) end
+            if j then syncer.private:setElementModel(i, j.assetType, j.assetName, j.assetClump, j.clumpMaps, j.remotesign, source) end
             thread:pause()
         end
     end, {isAsync = true})
@@ -172,19 +172,19 @@ else
         return true
     end
 
-    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, targetPlayer)
-        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementModel", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps, remoteSignature) end
+    function syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remotesign, targetPlayer)
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncElementModel", true, false, targetPlayer, element, assetType, assetName, assetClump, clumpMaps, remotesign) end
         if not element or not imports.isElement(element) then return false end
         local elementType = imports.getElementType(element)
         elementType = (((elementType == "ped") or (elementType == "player")) and "ped") or elementType
         if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].assetType or (settings.assetPacks[assetType].assetType ~= elementType) then return false end
         local cAsset = manager:getAssetData(assetType, assetName)
         if not cAsset or (cAsset.manifest.assetClumps and (not assetClump or not cAsset.manifest.assetClumps[assetClump])) then return false end
-        remoteSignature = imports.getElementType(element)
-        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, remoteSignature = remoteSignature}
+        remotesign = imports.getElementType(element)
+        syncer.public.syncedElements[element] = {assetType = assetType, assetName = assetName, assetClump = assetClump, clumpMaps = clumpMaps, remotesign = remotesign}
         thread:create(function(self)
             for i, j in imports.pairs(syncer.public.libraryClients.loaded) do
-                syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remoteSignature, i)
+                syncer.private:setElementModel(element, assetType, assetName, assetClump, clumpMaps, remotesign, i)
                 thread:pause()
             end
         end):resume({executions = settings.downloader.syncRate, frames = 1})

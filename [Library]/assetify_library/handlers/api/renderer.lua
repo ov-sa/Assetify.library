@@ -13,10 +13,10 @@
 ------------------------
 
 if localPlayer then
-    manager:exportAPI("renderer", "state", function() return renderer.state end)
-    manager:exportAPI("renderer", "setVirtualRendering", function(...) return renderer:setVirtualRendering(...) end)
-    manager:exportAPI("renderer", "getVirtualSource", function() return (renderer.state and renderer.vsource) or false end)
-    manager:exportAPI("renderer", "getVirtualRTs", function() return (renderer.state and renderer.vrt) or false end)
+    manager:exportAPI("renderer", "isRendering", function() return renderer:isRendering(...) end)
+    manager:exportAPI("renderer", "setRendering", function(...) return renderer:setRendering(...) end)
+    manager:exportAPI("renderer", "getVirtualSource", function() return (renderer:setRendering() and renderer.vsource) or false end)
+    manager:exportAPI("renderer", "getVirtualRTs", function() return (renderer:setRendering() and renderer.vrt) or false end)
     manager:exportAPI("renderer", "isEmissiveMode", function() return renderer.isEmissiveModeEnabled end)
     manager:exportAPI("renderer", "setEmissiveMode", function(...) return renderer:setEmissiveMode(...) end)
     manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer:isDynamicSky(...) end)

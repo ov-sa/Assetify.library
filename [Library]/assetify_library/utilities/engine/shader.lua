@@ -239,7 +239,7 @@ if localPlayer then
     renderer:setDynamicCloudColor(0.75*255, 0.75*255, 0.75*255)
     renderer:setTimeCycle(table.unpack(table.pack(table.decode(file:read("utilities/rw/timecycle.vcl"))), 1))
 
-    renderer:setVirtualRendering(settings.renderer.state)
+    renderer:setRendering(settings.renderer.state)
     renderer:setDynamicSky(settings.renderer.sky.state)
 end
 

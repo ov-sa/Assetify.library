@@ -124,8 +124,8 @@
     <export function="interface_isMouseScrolled" type="client"/>
     <export function="interface_registerKeyClick" type="client"/>
     <export function="interface_registerMouseScroll" type="client"/>
-    <export function="renderer_isVirtualRendering" type="client"/>
-    <export function="renderer_setVirtualRendering" type="client"/>
+    <export function="renderer_isRendering" type="client"/>
+    <export function="renderer_setRendering" type="client"/>
     <export function="renderer_getVirtualSource" type="client"/>
     <export function="renderer_getVirtualRTs" type="client"/>
     <export function="renderer_isEmissiveMode" type="client"/>

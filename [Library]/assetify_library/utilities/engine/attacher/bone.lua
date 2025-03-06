@@ -110,11 +110,11 @@ if localPlayer then
         element = {}
     }
 
-    function bone.public:load(element, parent, boneData, remoteSignature)
+    function bone.public:load(element, parent, boneData, remotesign)
         if not bone.public:isInstance(self) then return false end
-        if not element or not parent or (not remoteSignature and (not imports.isElement(element) or not imports.isElement(parent))) or not boneData or (element == parent) or bone.public.buffer.element[element] then return false end
+        if not element or not parent or (not remotesign and (not imports.isElement(element) or not imports.isElement(parent))) or not boneData or (element == parent) or bone.public.buffer.element[element] then return false end
         self.element, self.parent = element, parent
-        if not self:refresh(boneData, remoteSignature) then return false end
+        if not self:refresh(boneData, remotesign) then return false end
         self.cHeartbeat = thread:createHeartbeat(function()
             return not imports.isElement(element)
         end, function()
@@ -151,9 +151,9 @@ if localPlayer then
         return true
     end
 
-    function bone.public:refresh(boneData, remoteSignature)
+    function bone.public:refresh(boneData, remotesign)
         if not bone.public:isInstance(self) then return false end
-        self.parentType = self.parentType or (remoteSignature and remoteSignature.parentType) or imports.getElementType(self.parent)
+        self.parentType = self.parentType or (remotesign and remotesign.parentType) or imports.getElementType(self.parent)
         self.parentType = ((self.parentType == "player") and "ped") or self.parentType
         if not self.parentType or not bone.public.ids[(self.parentType)] then return false end
         boneData.id = imports.tonumber(boneData.id)
@@ -200,11 +200,11 @@ if localPlayer then
 else
     function bone.public:load(element, parent, boneData, targetPlayer)
         if not bone.public:isInstance(self) or self.isUnloading then return false end
-        if targetPlayer then return network:emit("Assetify:Bone:onAttachment", true, false, targetPlayer, self.element, self.parent, self.boneData, self.remoteSignature) end
+        if targetPlayer then return network:emit("Assetify:Bone:onAttachment", true, false, targetPlayer, self.element, self.parent, self.boneData, self.remotesign) end
         if not element or not parent or not imports.isElement(element) or not imports.isElement(parent) or not boneData or (element == parent) or bone.public.buffer.element[element] then return false end
         self.element, self.parent = element, parent
         if not self:refresh(boneData, _, true) then return false end
-        self.remoteSignature = {
+        self.remotesign = {
             parentType = imports.getElementType(parent),
             elementType = imports.getElementType(element)
         }
@@ -238,7 +238,7 @@ else
 
     function bone.public:refresh(boneData, targetPlayer, skipSync)
         if not bone.public:isInstance(self) or self.isUnloading then return false end
-        if targetPlayer and not skipSync then return network:emit("Assetify:Bone:onRefreshment", true, false, targetPlayer, self.element, self.boneData, self.remoteSignature) end
+        if targetPlayer and not skipSync then return network:emit("Assetify:Bone:onRefreshment", true, false, targetPlayer, self.element, self.boneData, self.remotesign) end
         self.parentType = self.parentType or imports.getElementType(self.parent)
         self.parentType = ((self.parentType == "player") and "ped") or self.parentType
         if not self.parentType or not bone.public.ids[(self.parentType)] then return false end
@@ -276,7 +276,7 @@ else
     network:fetch("Assetify:Syncer:onSyncPostPool"):on(function(self, source)
         self:resume({executions = settings.downloader.syncRate, frames = 1})
         for i, j in imports.pairs(bone.public.buffer.element) do
-            if j and not j.isUnloading then network:emit("Assetify:Bone:onAttachment", true, false, source, j.element, j.parent, j.boneData, j.remoteSignature) end
+            if j and not j.isUnloading then network:emit("Assetify:Bone:onAttachment", true, false, source, j.element, j.parent, j.boneData, j.remotesign) end
             thread:pause()
         end
     end, {isAsync = true})

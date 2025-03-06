@@ -38,8 +38,8 @@ if localPlayer then
         return true
     end
 
-    function syncer.syncEntityData(element, data, value, remoteSignature)
-        if not element or (not remoteSignature and not imports.isElement(element)) or not data or (imports.type(data) ~= "string") then return false end
+    function syncer.syncEntityData(element, data, value, remotesign)
+        if not element or (not remotesign and not imports.isElement(element)) or not data or (imports.type(data) ~= "string") then return false end
         syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
         local __value = syncer.syncedEntityDatas[element][data]
         syncer.syncedEntityDatas[element][data] = value
@@ -71,10 +71,10 @@ else
         return true
     end
 
-    function syncer.syncEntityData(element, data, value, isSync, targetPlayer, remoteSignature)
-        if targetPlayer then return network:emit("Assetify:Syncer:onSyncEntityData", true, false, targetPlayer, element, data, value, remoteSignature) end
+    function syncer.syncEntityData(element, data, value, isSync, targetPlayer, remotesign)
+        if targetPlayer then return network:emit("Assetify:Syncer:onSyncEntityData", true, false, targetPlayer, element, data, value, remotesign) end
         if not element or not imports.isElement(element) or not data or (imports.type(data) ~= "string") then return false end
-        remoteSignature = {
+        remotesign = {
             elementType = imports.getElementType(element)
         }
         syncer.syncedEntityDatas[element] = syncer.syncedEntityDatas[element] or {}
@@ -84,7 +84,7 @@ else
         local execWrapper = nil
         execWrapper = function()
             for i, j in imports.pairs(syncer.libraryClients.loaded) do
-                syncer.syncEntityData(element, data, value, _, i, remoteSignature)
+                syncer.syncEntityData(element, data, value, _, i, remotesign)
                 if not isSync then thread:pause() end
             end
             execWrapper = nil

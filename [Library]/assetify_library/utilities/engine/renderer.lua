@@ -185,12 +185,16 @@ if localPlayer then
 
     function renderer.public:sync(sync)
         if not sync then return false end
-        renderer.public:setVirtualRendering(false, false, sync, syncer.librarySerial)
+        renderer.public:setRendering(false, false, sync, syncer.librarySerial)
         renderer.public:setDynamicSky(false, sync, syncer.librarySerial)
         return true
     end
 
-    function renderer.public:setVirtualRendering(state, modes, sync, isInternal)
+    function renderer.public:isRendering()
+        return (renderer.public.state and true) or false
+    end
+
+    function renderer.public:setRendering(state, modes, sync, isInternal)
         if not sync then
             state = (state and true) or false
             modes = (modes and (imports.type(modes) == "table") and modes) or false
@@ -219,7 +223,7 @@ if localPlayer then
                 end
             end
             for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setVirtualRendering(false, false, i, syncer.librarySerial)
+                renderer.public:setRendering(false, false, i, syncer.librarySerial)
             end
         else
             if not manager:isInternal(isInternal) then return false end
@@ -255,7 +259,7 @@ if localPlayer then
     ]]
     
     function renderer.public:isDynamicSky()
-        return (renderer.public.sky.state and true) or falsee
+        return (renderer.public.sky.state and true) or false
     end
 
     function renderer.public:setDynamicSky(state, sync, isInternal)
