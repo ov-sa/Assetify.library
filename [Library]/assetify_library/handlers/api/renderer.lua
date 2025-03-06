@@ -41,6 +41,8 @@ if localPlayer then
     manager:exportAPI("renderer", "setDynamicMoonScale", function(...) return renderer:setDynamicMoonScale(...) end)
     manager:exportAPI("renderer", "getDynamicMoonEmissiveScale", function() return renderer.sky.moon.emissive.scale end)
     manager:exportAPI("renderer", "setDynamicMoonEmissiveScale", function(...) return renderer:setDynamicMoonEmissiveScale(...) end)
+    manager:exportAPI("renderer", "getDynamicMoonEmissiveIntensity", function() return renderer.sky.moon.emissive.intensity end)
+    manager:exportAPI("renderer", "setDynamicMoonEmissiveIntensity", function(...) return renderer:setDynamicMoonEmissiveIntensity(...) end)
 else
 
 end

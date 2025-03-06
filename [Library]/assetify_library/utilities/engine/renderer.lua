@@ -475,7 +475,6 @@ if localPlayer then
             renderer.public.sky.moon.emissive.intensity = intensity
         end
         if renderer.public.sky.state then
-            print("emissive intensity", renderer.public.sky.moon.emissive.intensity)
             --TODO: To be connected w emissive shader later
             --renderer.private.sky.emissive.shader:setValue("moonEmissiveIntensity", renderer.public.sky.moon.emissive.intensity)
         end
