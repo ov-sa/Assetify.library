@@ -302,7 +302,7 @@ if localPlayer then
                 renderer.public:setDynamicSky(false, i, syncer.librarySerial)
             end
         else
-            if not manager:isInternal(isInternal) then return false end
+            if not manager:isInternal(isInternal) or (sync.shaderData.shaderCategory == "Assetify:Sky") then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
             renderer.public:setDynamicStarsIntensity(false, syncer.librarySerial)
 
@@ -321,11 +321,12 @@ if localPlayer then
             if renderer.public.sky.star.intensity == intensity then return false end
             renderer.public.sky.star.intensity = intensity
         end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("isStarsEnabled", renderer.public.isDynamicStarsEnabled) end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("starIntensity", renderer.public.sky.star.intensity)
+        end
         return true
     end
-
-
+    renderer.public:setDynamicStarsIntensity(settings.renderer.sky.star.intensity)
 
 
 
