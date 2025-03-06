@@ -141,23 +141,12 @@ if localPlayer then
     renderer.private.prerender = function()
         if renderer.public.isDynamicTimeCycle then
             local hours, minutes = imports.getTime()
-            local currentCycle = renderer.public.isDynamicTimeCycle[hours]
-            local nextHour = ((hours < 23) and (hours + 1)) or 0
-            local nextCycle = renderer.public.isDynamicTimeCycle[nextHour]
+            local current = renderer.public.isDynamicTimeCycle[hours]
+            local next = renderer.public.isDynamicTimeCycle[((hours < 23) and (hours + 1)) or 0]
             local percent = minutes/60
             renderer.public.timecyclegrad = renderer.public.timecyclegrad or {}
-            renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3] = interpolateBetween(
-                currentCycle[1][1], currentCycle[1][2], currentCycle[1][3],
-                nextCycle[1][1], nextCycle[1][2], nextCycle[1][3],
-                percent,
-                "Linear"
-            )
-            renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6] = interpolateBetween(
-                currentCycle[2][1], currentCycle[2][2], currentCycle[2][3],
-                nextCycle[2][1], nextCycle[2][2], nextCycle[2][3],
-                percent,
-                "Linear"
-            )
+            renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3] = interpolateBetween(current[1][1], current[1][2], current[1][3], next[1][1], next[1][2], next[1][3], percent, "InQuad")
+            renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6] = interpolateBetween(current[2][1], current[2][2], current[2][3], next[2][1], next[2][2], next[2][3], percent, "InQuad")
             imports.setSkyGradient(renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3], renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6])
         end
         if renderer.public.sky.state then
