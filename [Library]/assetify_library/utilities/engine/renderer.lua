@@ -248,7 +248,7 @@ if localPlayer then
             local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
             renderer.private.emissiveBuffer = {
                 rt = resultRT,
-                shader = shader:create(false, "Assetify:PreLoad", "Assetify_Tex_Bloomer", false, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, false, shader.shaderPriority + 1, false, true)
+                shader = shader:create(false, "Assetify:PreLoad", "Assetify_Tex_Bloomer", false, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, false, shader.priority + 1, false, true)
             }
         else
             renderer.private.emissiveBuffer.shader:destroy()
@@ -287,7 +287,7 @@ if localPlayer then
                 renderer.private.sky.rt[renderer.private.sky.depth.rt] = true
                 renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {
                     ["vDepth0"] = renderer.private.sky.depth.rt
-                }, {}, false, shader.shaderPriority + 1, false, false, syncer.librarySerial)
+                }, {}, false, shader.priority + 1, false, false, syncer.librarySerial)
                 renderer.private.sky.cloud.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                 renderer.private.sky.rt[renderer.private.sky.cloud.rt] = true
                 renderer.private.sky.cloud.object = createObject(asset.rw.sky.modelID, 0, 0, 0, 0, 0, 0, true)
@@ -295,12 +295,12 @@ if localPlayer then
                     ["vResolution"] = renderer.public.resolution,
                     ["cloudTex"] = renderer.private.sky.cloud.texture,
                     ["vCloud0"] = renderer.private.sky.cloud.rt
-                }, {}, false, shader.shaderPriority + 1, false, false, true, syncer.librarySerial)
+                }, {}, false, shader.priority + 1, false, false, true, syncer.librarySerial)
                 setObjectScale(renderer.private.sky.cloud.object, 30)
                 setElementCollisionsEnabled(renderer.private.sky.cloud.object, false)
                 setElementStreamable(renderer.private.sky.cloud.object, false)
                 setElementDoubleSided(renderer.private.sky.cloud.object, true)
-                renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.shaderPriority + 1, false, false, false, syncer.librarySerial)
+                renderer.private.sky.moon.shader = shader:create(false, "Assetify:Sky", "Assetify_Sky_Tex_Moon", "coronamoon", {}, {}, {}, false, shader.priority + 1, false, false, false, syncer.librarySerial)
             else
                 imports.destroyElement(renderer.private.sky.depth.object)
                 renderer.private.sky.depth.shader:destroy(true, syncer.librarySerial)
@@ -316,7 +316,7 @@ if localPlayer then
                 renderer.public:setDynamicSky(false, i, syncer.librarySerial)
             end
         else
-            if not manager:isInternal(isInternal) or (sync.shaderData.shaderCategory == "Assetify:Sky") then return false end
+            if not manager:isInternal(isInternal) or (sync.shaderData.category == "Assetify:Sky") then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
             renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)

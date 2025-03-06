@@ -30,8 +30,8 @@ local imports = {
 -----------------------
 
 local shader = class:create("shader", {
-    shaderPriority = 10000,
-    shaderDistance = 0,
+    priority = 10000,
+    distance = 0,
     validTypes = {
         [asset.reference.clump] = true,
         [asset.reference.control] = true
@@ -110,30 +110,30 @@ if localPlayer then
         return true
     end
 
-    function shader.public:fetchInstance(element, shaderCategory, textureName)
-        if element and shaderCategory and textureName then
-            if shader.public.buffer.element[element] and shader.public.buffer.element[element][shaderCategory] and shader.public.buffer.element[element][shaderCategory].textured[textureName] then
-                return shader.public.buffer.element[element][shaderCategory].textured[textureName]
+    function shader.public:fetchInstance(element, category, textureName)
+        if element and category and textureName then
+            if shader.public.buffer.element[element] and shader.public.buffer.element[element][category] and shader.public.buffer.element[element][category].textured[textureName] then
+                return shader.public.buffer.element[element][category].textured[textureName]
             end
         end
         return false
     end
 
-    function shader.public.clearElementBuffer(element, shaderCategory)
-        if not element or not shader.public.buffer.element[element] or (shaderCategory and not shader.public.buffer.element[element][shaderCategory]) then return false end
-        if not shaderCategory then
+    function shader.public.clearElementBuffer(element, category)
+        if not element or not shader.public.buffer.element[element] or (category and not shader.public.buffer.element[element][category]) then return false end
+        if not category then
             for i, j in imports.pairs(shader.public.buffer.element[element]) do
                 shader.public.clearElementBuffer(element, i)
             end
             shader.public.buffer.element[element] = nil
         else
-            for i, j in imports.pairs(shader.public.buffer.element[element][shaderCategory].textured) do
+            for i, j in imports.pairs(shader.public.buffer.element[element][category].textured) do
                 if j then j:destroy() end
             end
-            for i, j in imports.pairs(shader.public.buffer.element[element][shaderCategory].untextured) do
+            for i, j in imports.pairs(shader.public.buffer.element[element][category].untextured) do
                 if i then i:destroy() end
             end
-            shader.public.buffer.element[element][shaderCategory] = nil
+            shader.public.buffer.element[element][category] = nil
         end
         return true
     end
@@ -153,31 +153,32 @@ if localPlayer then
         return false
     end
 
-    function shader.public:load(element, shaderCategory, shaderName, textureName, shaderTextures, shaderInputs, raw, shaderMaps, shaderPriority, shaderDistance, isStandalone, isOverlay, isInternal)
+    function shader.public:load(element, category, name, textureName, shaderTextures, shaderInputs, raw, shaderMaps, priority, distance, standalone, overlay, isInternal)
         if not shader.public:isInstance(self) then return false end
-        if not shaderCategory or not shaderName or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[shaderName]) or (not shader.public.preLoaded[shaderName] and not shaderRW.buffer[shaderName]) or (not isStandalone and not textureName) or not shaderTextures or not shaderInputs or not raw then return false end
+        if not category or not name or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[name]) or (not shader.public.preLoaded[name] and not shaderRW.buffer[name]) or (not standalone and not textureName) or not shaderTextures or not shaderInputs or not raw then return false end
         element = ((element and imports.isElement(element)) and element) or false
         textureName = textureName or false
-        shaderPriority = imports.tonumber(shaderPriority) or shader.public.shaderPriority
-        shaderDistance = imports.tonumber(shaderDistance) or shader.public.shaderDistance
-        isStandalone = (isStandalone and true) or false
-        isOverlay = (isOverlay and true) or false
-        self.isPreLoaded = (shader.public.preLoaded[shaderName] and true) or false
-        self.cShader = (self.isPreLoaded and shader.public.preLoaded[shaderName]) or imports.dxCreateShader(shaderRW.buffer[shaderName].exec(shaderMaps), shaderPriority, shaderDistance, isOverlay, "all")
+        priority = imports.tonumber(priority) or shader.public.priority
+        distance = imports.tonumber(distance) or shader.public.distance
+        standalone = (standalone and true) or false
+        overlay = (overlay and true) or false
+        self.isPreLoaded = (shader.public.preLoaded[name] and true) or false
+        self.cShader = (self.isPreLoaded and shader.public.preLoaded[name]) or imports.dxCreateShader(shaderRW.buffer[name].exec(shaderMaps), priority, distance, overlay, "all")
         shader.public.buffer.shader[self] = true
         self.shaderData = {
             element = element,
-            shaderCategory = shaderCategory,
-            shaderName = shaderName,
+            category = category,
+            name = name,
             textureName = textureName,
             shaderTextures = shaderTextures,
             shaderInputs = shaderInputs,
-            shaderPriority = shaderPriority,
-            shaderDistance = shaderDistance,
-            isStandalone = isStandalone
+            priority = priority,
+            distance = distance,
+            standalone = standalone,
+            overlay = overlay
         }
         if not self.isPreLoaded then
-            if not isStandalone and raw.shader then
+            if not standalone and raw.shader then
                 raw.shader[textureName] = self.cShader
             end
             renderer:sync(self)
@@ -195,28 +196,28 @@ if localPlayer then
         if self.shaderData.element then
             shader.public.buffer.element[(self.shaderData.element)] = shader.public.buffer.element[(self.shaderData.element)] or {}
             local bufferCache = shader.public.buffer.element[(self.shaderData.element)]
-            bufferCache[shaderCategory] = bufferCache[shaderCategory] or {textured = {}, untextured = {}}
-            if not isStandalone then 
-                bufferCache[shaderCategory].textured[textureName] = self
+            bufferCache[category] = bufferCache[category] or {textured = {}, untextured = {}}
+            if not standalone then 
+                bufferCache[category].textured[textureName] = self
             else
-                bufferCache[shaderCategory].untextured[self] = true
+                bufferCache[category].untextured[self] = true
             end
         end
-        if not isStandalone then imports.engineApplyShaderToWorldTexture(self.cShader, textureName, element) end
+        if not standalone then imports.engineApplyShaderToWorldTexture(self.cShader, textureName, element) end
         return true
     end
 
     function shader.public:unload(isForced, isInternal)
         if not shader.public:isInstance(self) then return false end
         local isToBeUnloaded = (isForced and isInternal and manager:isInternal(isInternal) and true) or not self.preLoaded
-        if not self.shaderData.isStandalone then imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element) end
+        if not self.shaderData.standalone then imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element) end
         if isToBeUnloaded then
-            shader.public.preLoaded[(self.shaderData.shaderName)] = nil
+            shader.public.preLoaded[(self.shaderData.name)] = nil
             if self.shaderData.element then
-                if not self.shaderData.isStandalone then 
-                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)].textured[(self.shaderData.textureName)] = nil
+                if not self.shaderData.standalone then 
+                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.category)].textured[(self.shaderData.textureName)] = nil
                 else
-                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.shaderCategory)].untextured[self] = nil
+                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.category)].untextured[self] = nil
                 end
             end
             shader.public.buffer.shader[self] = nil
@@ -231,7 +232,7 @@ if localPlayer then
         return imports.dxSetShaderValue(self.cShader, i, j or false)
     end
 
-    shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clearer", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+    shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clearer", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.priority + 1, shader.public.distance, true)
     renderer:setRendering(settings.renderer.state)
     renderer:setDynamicSky(settings.renderer.sky.state)
 end
