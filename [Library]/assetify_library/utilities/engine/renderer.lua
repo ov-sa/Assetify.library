@@ -335,6 +335,7 @@ if localPlayer then
             renderer.public:setDynamicStarScale(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
             renderer.public:setDynamicMoonScale(false, syncer.librarySerial)
+            renderer.public:setDynamicMoonBrightness(false, syncer.librarySerial)
             renderer.public:setDynamicMoonEmissiveScale(false, syncer.librarySerial)
             renderer.public:setDynamicMoonEmissiveIntensity(false, syncer.librarySerial)
         end
@@ -453,6 +454,20 @@ if localPlayer then
     end
     renderer.public:setDynamicMoonScale(settings.renderer.sky.moon.scale)
 
+    function renderer.public:setDynamicMoonBrightness(brightness, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            brightness = imports.tonumber(brightness) or settings.renderer.sky.moon.brightness or 0
+            if renderer.public.sky.moon.brightness == brightness then return false end
+            renderer.public.sky.moon.brightness = brightness
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.moon.shader:setValue("moonBrightness", renderer.public.sky.moon.brightness)
+        end
+        return true
+    end
+    renderer.public:setDynamicMoonBrightness(settings.renderer.sky.moon.brightness)
+
     function renderer.public:setDynamicMoonEmissiveScale(scale, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
@@ -481,18 +496,4 @@ if localPlayer then
         return true
     end
     renderer.public:setDynamicMoonEmissiveIntensity(settings.renderer.sky.moon.emissive.intensity)
-
-    --[[
-    function setMoonEmissiveIntensity(intensity)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.emissive.shader, "moonEmissiveIntensity", tonumber(intensity) or 1)
-        return true
-    end
-    
-    function setMoonBrightness(brightness)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.moon.shader, "moonBrightness", (tonumber(brightness) or 1)*1.6)
-        return true
-    end
-    ]]
 end

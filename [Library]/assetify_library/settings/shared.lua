@@ -75,10 +75,11 @@ settings = {
             star = {
                 speed = 5,
                 scale = 0.085,
-                intensity = 1
+                intensity = 1,
             },
             moon = {
                 scale = 0.5,
+                brightness = 1,
                 emissive = {
                     scale = 1,
                     intensity = 1
