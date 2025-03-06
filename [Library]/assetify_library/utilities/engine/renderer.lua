@@ -29,6 +29,7 @@ local imports = {
     getFarClipDistance = getFarClipDistance,
     getCameraMatrix = getCameraMatrix,
     getScreenFromWorldPosition = getScreenFromWorldPosition,
+    getWorldFromScreenPosition = getWorldFromScreenPosition,
     addEventHandler = addEventHandler,
     removeEventHandler = removeEventHandler,
     dxCreateTexture = dxCreateTexture,
@@ -138,18 +139,19 @@ if localPlayer then
         if renderer.public.isDynamicTimeCycle then
             local hours, minutes = imports.getTime()
             local currentCycle = renderer.public.isDynamicTimeCycle[hours]
-            local nextCycle = renderer.public.isDynamicTimeCycle[((hours < 23) and (hours + 1)) or 0]
+            local nextHour = ((hours < 23) and (hours + 1)) or 0
+            local nextCycle = renderer.public.isDynamicTimeCycle[nextHour]
             local percent = minutes/60
             renderer.public.timecyclegrad = renderer.public.timecyclegrad or {}
             renderer.public.timecyclegrad[1], renderer.public.timecyclegrad[2], renderer.public.timecyclegrad[3] = interpolateBetween(
-                nextCycle[1][1], nextCycle[1][2], nextCycle[1][3],
                 currentCycle[1][1], currentCycle[1][2], currentCycle[1][3],
+                nextCycle[1][1], nextCycle[1][2], nextCycle[1][3],
                 percent,
                 "Linear"
             )
             renderer.public.timecyclegrad[4], renderer.public.timecyclegrad[5], renderer.public.timecyclegrad[6] = interpolateBetween(
-                nextCycle[2][1], nextCycle[2][2], nextCycle[2][3],
                 currentCycle[2][1], currentCycle[2][2], currentCycle[2][3],
+                nextCycle[2][1], nextCycle[2][2], nextCycle[2][3],
                 percent,
                 "Linear"
             )
@@ -382,7 +384,7 @@ if localPlayer then
             --if not renderer.private.isTimeCycleValid(cycle) then return false end
             renderer.public.isDynamicTimeCycle = cycle
         end
-        for i = 1, 24, 1 do
+        for i = 0, 23, 1 do
             renderer.public.isDynamicTimeCycle[i] = renderer.public.isDynamicTimeCycle[i] or {}
             for k = 1, 2, 1 do
                 renderer.public.isDynamicTimeCycle[i][k] = {string.parseHex(renderer.public.isDynamicTimeCycle[i][k] or "#ffffff")}
