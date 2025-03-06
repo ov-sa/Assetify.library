@@ -14,8 +14,8 @@
 
 local identity = "Assetify_Tex_Clump"
 shaderRW.buffer[identity] = {
-    exec = function(shaderMaps)
-        if not shaderMaps or not shaderMaps[asset.reference.clump] then return false end
+    exec = function(maps)
+        if not maps or not maps[asset.reference.clump] then return false end
         local controlVars, handlerBody, handlerFooter = [[
             texture clumpTex;
             sampler clumpSampler = sampler_state {
@@ -25,7 +25,7 @@ shaderRW.buffer[identity] = {
                 MinFilter = Anisotropic;
             };    
         ]], "", ""
-        if shaderMaps.bump then
+        if maps.bump then
             controlVars = controlVars..[[
                 texture clumpTex_bump;
                 sampler clumpSampler_bump = sampler_state { 
@@ -42,7 +42,7 @@ shaderRW.buffer[identity] = {
         handlerBody = handlerBody..[[
             float4 sampledTexel = tex2D(clumpSampler, PS.TexCoord);
         ]]
-        if shaderMaps.bump then
+        if maps.bump then
             handlerBody = handlerBody..[[
                 sampledTexel.rgb *= clumpTexel_bump.rgb;
             ]]
@@ -89,7 +89,7 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
-            ]]..shaderRW.prelight(shaderMaps)..[[
+            ]]..shaderRW.prelight(maps)..[[
             output.World = saturate(sampledTexel);
             return output;
         }

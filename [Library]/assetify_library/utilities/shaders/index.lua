@@ -285,9 +285,9 @@ function shaderRW.create(modes, isDepthMode)
     ]]
 end
 
-function shaderRW.prelight(shaderMaps)
-    return ((shaderMaps.prelight and shaderMaps.prelight.vertexshading and [[sampledTexel.rgb *= PS.Diffuse.rgb;]]) or [[]])..[[
-    ]]..((shaderMaps.prelight and shaderMaps.prelight.brightness and [[sampledTexel.rgb += ]]..shaderMaps.prelight.brightness..[[;]]) or [[]])..[[
-    ]]..((shaderMaps.prelight and shaderMaps.prelight.contrast and [[sampledTexel.rgb *= ]]..shaderMaps.prelight.contrast..[[;]]) or [[]])..[[
-    ]]..((shaderMaps.prelight and shaderMaps.prelight.filter and [[sampledTexel.rgb *= float3(]]..((imports.tonumber(shaderMaps.prelight.filter.red) or 255)/255)..[[, ]]..((imports.tonumber(shaderMaps.prelight.filter.green) or 255)/255)..[[, ]]..((imports.tonumber(shaderMaps.prelight.filter.blue) or 255)/255)..[[);]]) or [[]])
+function shaderRW.prelight(maps)
+    return ((maps.prelight and maps.prelight.vertexshading and [[sampledTexel.rgb *= PS.Diffuse.rgb;]]) or [[]])..[[
+    ]]..((maps.prelight and maps.prelight.brightness and [[sampledTexel.rgb += ]]..maps.prelight.brightness..[[;]]) or [[]])..[[
+    ]]..((maps.prelight and maps.prelight.contrast and [[sampledTexel.rgb *= ]]..maps.prelight.contrast..[[;]]) or [[]])..[[
+    ]]..((maps.prelight and maps.prelight.filter and [[sampledTexel.rgb *= float3(]]..((imports.tonumber(maps.prelight.filter.red) or 255)/255)..[[, ]]..((imports.tonumber(maps.prelight.filter.green) or 255)/255)..[[, ]]..((imports.tonumber(maps.prelight.filter.blue) or 255)/255)..[[);]]) or [[]])
 end

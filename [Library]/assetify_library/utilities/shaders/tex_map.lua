@@ -15,7 +15,7 @@
 local identity = "Assetify_Tex_Map"
 local iteration = 3
 shaderRW.buffer[identity] = {
-    prepare = function(shaderMaps, shaderModel)
+    prepare = function(maps, shaderModel)
         local sampled = false
         local result = {
             config = [[
@@ -31,8 +31,8 @@ shaderRW.buffer[identity] = {
             ]],
             footer = [[]]
         }
-        for i = table.length(shaderMaps), 1, -1 do
-            local j = shaderMaps[i]
+        for i = table.length(maps), 1, -1 do
+            local j = maps[i]
             if j.control then
                 result.config = result.config..[[
                     texture controlTex_]]..i..[[;
@@ -137,9 +137,9 @@ shaderRW.buffer[identity] = {
         return result
     end,
 
-    exec = function(shaderMaps)
-        if not shaderMaps or (table.length(shaderMaps) <= 0) then return false end
-        local query = shaderRW.buffer[identity].prepare(shaderMaps, 3)
+    exec = function(maps)
+        if not maps or (table.length(maps) <= 0) then return false end
+        local query = shaderRW.buffer[identity].prepare(maps, 3)
         return shaderRW.create({diffuse = true, emissive = true})..[[
         // Variables //
         float anisotropy = 1;
@@ -182,7 +182,7 @@ shaderRW.buffer[identity] = {
                 output.Diffuse = 0;
                 output.Emissive = 0;
             }
-            ]]..shaderRW.prelight(shaderMaps)..[[
+            ]]..shaderRW.prelight(maps)..[[
             output.World = saturate(sampledTexel);
             return output;
         }
