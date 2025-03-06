@@ -62,7 +62,7 @@ settings = {
         sky = {
             state = true,
             cloud = {
-                speed = 100
+                speed = 1
             },
             star = {
                 intensity = 1
