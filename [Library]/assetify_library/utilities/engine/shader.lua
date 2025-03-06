@@ -231,7 +231,7 @@ if localPlayer then
         return imports.dxSetShaderValue(self.cShader, i, j or false)
     end
 
-    shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Clearer", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
+    shader.public.preLoaded["Assetify_Tex_Clearer"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clearer", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.shaderPriority + 1, shader.public.shaderDistance, true)
     renderer:setRendering(settings.renderer.state)
     renderer:setDynamicSky(settings.renderer.sky.state)
 end
