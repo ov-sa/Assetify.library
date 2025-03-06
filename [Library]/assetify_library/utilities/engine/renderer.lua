@@ -165,7 +165,7 @@ if localPlayer then
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
             imports.setFarClipDistance(math.max(farclip, renderer.private.sky.farclip))
             imports.setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
-            renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
+            renderer.private.sky.depth.shader:setValue("depthLocation", depthX, depthY, depthZ)
             imports.setElementPosition(renderer.private.sky.cloud.object, cameraX, cameraY, math.max(cameraZ + renderer.private.sky.cloud.height, renderer.private.sky.cloud.height))
             renderer.private.sky.cloud.shader:setValue("skyColor", {skyGradient[1]/255, skyGradient[2]/255, skyGradient[3]/255, skyGradient[4]/255, skyGradient[5]/255, skyGradient[6]/255})
             renderer.private.sky.cloud.shader:setValue("starsVisibility", time.night.transition)
