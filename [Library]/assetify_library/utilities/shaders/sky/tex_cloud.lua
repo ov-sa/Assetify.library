@@ -25,7 +25,7 @@ shaderRW.buffer[identity] = {
         float4 cloudColor = 1;
         float2 starSpeed = float2(0, 5);
         float starScale = 0.085;
-        float starIntensity = 0.6;
+        float starIntensity = 0.3;
         float starGrid = 40.0;
         float starsVisibility = 1;
         texture cloudTex;
