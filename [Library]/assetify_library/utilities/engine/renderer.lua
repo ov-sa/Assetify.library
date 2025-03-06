@@ -190,18 +190,18 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:setVirtualRendering(state, rtModes, sync, isInternal)
+    function renderer.public:setVirtualRendering(state, modes, sync, isInternal)
         if not sync then
             state = (state and true) or false
-            rtModes = (rtModes and (imports.type(rtModes) == "table") and rtModes) or false
+            modes = (modes and (imports.type(modes) == "table") and modes) or false
             if renderer.public.state == state then return false end
             renderer.public.state = state
             if renderer.public.state then
                 renderer.public.vsource = imports.dxCreateScreenSource(renderer.public.resolution[1], renderer.public.resolution[2])
                 renderer.public.vrt = renderer.public.vrt or {}
-                if rtModes and rtModes.diffuse then
+                if modes and modes.diffuse then
                     renderer.public.vrt.diffuse = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
-                    if rtModes.emissive then
+                    if modes.emissive then
                         renderer.public.vrt.emissive = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                     end
                 end

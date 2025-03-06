@@ -25,7 +25,7 @@ shaderRW = {
     buffer = {}
 }
 
-function shaderRW.create(rtModes, isDepthMode)
+function shaderRW.create(modes, isDepthMode)
     return [[
         static const float PI = 3.141592653589793f;
         float4x4 gWorld : WORLD;
@@ -77,8 +77,8 @@ function shaderRW.create(rtModes, isDepthMode)
         float3 vSunOffset = 1;
         float2 vSunViewOffset = 1;
         texture vSource0;
-        texture vSource1 ]]..((rtModes and rtModes.diffuse and [[<string renderTarget = "yes";>]]) or [[]])..[[;
-        texture vSource2 ]]..((rtModes and rtModes.emissive and [[<string renderTarget = "yes";>]]) or [[]])..[[;
+        texture vSource1 ]]..((modes and modes.diffuse and [[<string renderTarget = "yes";>]]) or [[]])..[[;
+        texture vSource2 ]]..((modes and modes.emissive and [[<string renderTarget = "yes";>]]) or [[]])..[[;
         ]]..((isDepthMode and [[texture vDepth0 : DEPTHBUFFER;]]) or [[]])..[[
         int gMaxAnisotropy <string deviceCaps="MaxAnisotropy";>;
         int gDeclNormal <string vertexDeclState="Normal";>;
