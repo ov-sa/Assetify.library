@@ -190,10 +190,6 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:isRendering()
-        return (renderer.public.state and true) or false
-    end
-
     function renderer.public:setRendering(state, modes, sync, isInternal)
         if not sync then
             state = (state and true) or false
@@ -257,10 +253,6 @@ if localPlayer then
         return true
     end
     ]]
-    
-    function renderer.public:isDynamicSky()
-        return (renderer.public.sky.state and true) or false
-    end
 
     function renderer.public:setDynamicSky(state, sync, isInternal)
         if not sync then
@@ -389,4 +381,91 @@ if localPlayer then
         end
         return true
     end
+
+
+    --[[
+    function setCloudSpeed(speed)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "cloudSpeed", tonumber(speed) or 1)
+        return true
+    end
+    
+    function setCloudScale(scale)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "cloudScale", tonumber(scale) or 1)
+        return true
+    end
+    
+    function setCloudDirection(direction)
+        if not CBuffer.state or not direction or (type(direction) ~= "table") then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "cloudDirection", {tonumber(direction[1]) or 1, tonumber(direction[2]) or 1})
+        return true
+    end
+    
+    function setCloudColor(color)
+        if not CBuffer.state or not color or (type(color) ~= "table") then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "cloudColor", {(tonumber(color[1]) or 255)/255, (tonumber(color[2]) or 255)/255, (tonumber(color[3]) or 255)/255, (tonumber(color[4]) or 255)/255})
+        return true
+    end
+    
+    function setStarSpeed(speed)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "starSpeed", {0, (tonumber(speed) or 1)*3})
+        return true
+    end
+    
+    function setStarScale(scale)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "starScale", tonumber(scale) or 1)
+        return true
+    end
+    
+    function setStarIntensity(intensity)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.cloud.shader, "starIntensity", (tonumber(intensity) or 1)*0.6)
+        return true
+    end
+    
+    function setMoonScale(scale)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.moon.shader, "moonScale", (tonumber(scale) or 1)*0.5)
+        return true
+    end
+    
+    function setMoonEmissiveScale(scale)
+        if not CBuffer.state then return false end
+        setMoonSize((tonumber(scale) or 1)*10)
+        return true
+    end
+    
+    function setMoonEmissiveIntensity(intensity)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.emissive.shader, "moonEmissiveIntensity", tonumber(intensity) or 1)
+        return true
+    end
+    
+    function setMoonBrightness(brightness)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.moon.shader, "moonBrightness", (tonumber(brightness) or 1)*1.6)
+        return true
+    end
+    
+    function setSunScale(scale)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.sun.shader, "sunScale", tonumber(scale) or 1)
+        return true
+    end
+    
+    function setSunEmissiveScale(scale)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.sun.shader, "sunNativeScale", (tonumber(scale) or 1)*10000)
+        return true
+    end
+    
+    function setSunEmissiveIntensity(intensity)
+        if not CBuffer.state then return false end
+        dxSetShaderValue(CBuffer.emissive.shader, "sunEmissiveIntensity", tonumber(intensity) or 1)
+        return true
+    end
+    ]]
 end

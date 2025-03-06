@@ -13,14 +13,18 @@
 ------------------------
 
 if localPlayer then
-    manager:exportAPI("renderer", "isRendering", function() return renderer:isRendering() end)
+    manager:exportAPI("renderer", "isRendering", function() return renderer.state end)
     manager:exportAPI("renderer", "setRendering", function(...) return renderer:setRendering(...) end)
-    manager:exportAPI("renderer", "getVirtualSource", function() return (renderer:setRendering() and renderer.vsource) or false end)
-    manager:exportAPI("renderer", "getVirtualRTs", function() return (renderer:setRendering() and renderer.vrt) or false end)
+    manager:exportAPI("renderer", "getVirtualSource", function() return (renderer.state and renderer.vsource) or false end)
+    manager:exportAPI("renderer", "getVirtualRTs", function() return (renderer.state and renderer.vrt) or false end)
     manager:exportAPI("renderer", "isEmissiveMode", function() return renderer.isEmissiveModeEnabled end)
     manager:exportAPI("renderer", "setEmissiveMode", function(...) return renderer:setEmissiveMode(...) end)
-    manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer:isDynamicSky(...) end)
+    manager:exportAPI("renderer", "isDynamicSky", function(...) return renderer.sky.state end)
     manager:exportAPI("renderer", "setDynamicSky", function(...) return renderer:setDynamicSky(...) end)
+
+
+
+
     manager:exportAPI("renderer", "getDynamicSunColor", function() return renderer.isDynamicSunColor[1]*255, renderer.isDynamicSunColor[2]*255, renderer.isDynamicSunColor[3]*255 end)
     manager:exportAPI("renderer", "setDynamicSunColor", function(...) return renderer:setDynamicSunColor(...) end)
     manager:exportAPI("renderer", "isDynamicStars", function() return renderer.isDynamicStarsEnabled end)

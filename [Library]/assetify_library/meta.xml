@@ -124,13 +124,11 @@
     <export function="interface_isMouseScrolled" type="client"/>
     <export function="interface_registerKeyClick" type="client"/>
     <export function="interface_registerMouseScroll" type="client"/>
-    <export function="renderer_isRendering" type="client"/>
     <export function="renderer_setRendering" type="client"/>
     <export function="renderer_getVirtualSource" type="client"/>
     <export function="renderer_getVirtualRTs" type="client"/>
     <export function="renderer_isEmissiveMode" type="client"/>
     <export function="renderer_setEmissiveMode" type="client"/>
-    <export function="renderer_isDynamicSky" type="client"/>
     <export function="renderer_setDynamicSky" type="client"/>
     <export function="renderer_getDynamicSunColor" type="client"/>
     <export function="renderer_setDynamicSunColor" type="client"/>
