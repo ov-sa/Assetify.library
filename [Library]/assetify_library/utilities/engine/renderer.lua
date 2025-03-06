@@ -308,6 +308,7 @@ if localPlayer then
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicCloudDirection(false, syncer.librarySerial)
             renderer.public:setDynamicCloudColor(false, syncer.librarySerial)
+            --renderer.public:setDynamicStarSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
@@ -374,6 +375,23 @@ if localPlayer then
     end
     renderer.public:setDynamicCloudColor(settings.renderer.sky.cloud.color)
 
+    function renderer.public:setDynamicStarSpeed(speed, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            speed = imports.tonumber(speed) or settings.renderer.sky.star.speed or 0
+            if renderer.public.sky.star.speed == speed then return false end
+            renderer.public.sky.star.speed = speed
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("starSpeed", renderer.public.sky.star.speed)
+            --dxSetShaderValue(CBuffer.cloud.shader, "starSpeed", {0, (tonumber(speed) or 1)*3})
+        end
+        return true
+    end
+    renderer.public:setDynamicStarSpeed(settings.renderer.sky.star.speed)
+
+    --star's scale setter here
+
     function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
@@ -431,12 +449,6 @@ if localPlayer then
 
 
     --[[
-    function setStarSpeed(speed)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "starSpeed", {0, (tonumber(speed) or 1)*3})
-        return true
-    end
-    
     function setStarScale(scale)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.cloud.shader, "starScale", tonumber(scale) or 1)

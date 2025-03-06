@@ -138,6 +138,8 @@
     <export function="renderer_setDynamicCloudDirection" type="client"/>
     <export function="renderer_getDynamicCloudColor" type="client"/>
     <export function="renderer_setDynamicCloudColor" type="client"/>
+    <export function="renderer_getDynamicStarSpeed" type="client"/>
+    <export function="renderer_setDynamicStarSpeed" type="client"/>
     <export function="renderer_getDynamicStarIntensity" type="client"/>
     <export function="renderer_setDynamicStarIntensity" type="client"/>
 
