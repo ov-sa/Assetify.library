@@ -165,7 +165,7 @@ if localPlayer then
         self.isPreLoaded = (shader.public.preLoaded[name] and true) or false
         self.cShader = (self.isPreLoaded and shader.public.preLoaded[name]) or imports.dxCreateShader(shaderRW.buffer[name].exec(shaderMaps), priority, distance, overlay, "all")
         shader.public.buffer.shader[self] = true
-        self.shaderData = {
+        self.data = {
             element = element,
             category = category,
             name = name,
@@ -193,9 +193,9 @@ if localPlayer then
         for i, j in imports.pairs(shaderInputs) do
             self:setValue(i, j)
         end
-        if self.shaderData.element then
-            shader.public.buffer.element[(self.shaderData.element)] = shader.public.buffer.element[(self.shaderData.element)] or {}
-            local bufferCache = shader.public.buffer.element[(self.shaderData.element)]
+        if self.data.element then
+            shader.public.buffer.element[(self.data.element)] = shader.public.buffer.element[(self.data.element)] or {}
+            local bufferCache = shader.public.buffer.element[(self.data.element)]
             bufferCache[category] = bufferCache[category] or {textured = {}, untextured = {}}
             if not standalone then 
                 bufferCache[category].textured[textureName] = self
@@ -210,14 +210,14 @@ if localPlayer then
     function shader.public:unload(isForced, isInternal)
         if not shader.public:isInstance(self) then return false end
         local isToBeUnloaded = (isForced and isInternal and manager:isInternal(isInternal) and true) or not self.preLoaded
-        if not self.shaderData.standalone then imports.engineRemoveShaderFromWorldTexture(self.cShader, self.shaderData.textureName, self.shaderData.element) end
+        if not self.data.standalone then imports.engineRemoveShaderFromWorldTexture(self.cShader, self.data.textureName, self.data.element) end
         if isToBeUnloaded then
-            shader.public.preLoaded[(self.shaderData.name)] = nil
-            if self.shaderData.element then
-                if not self.shaderData.standalone then 
-                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.category)].textured[(self.shaderData.textureName)] = nil
+            shader.public.preLoaded[(self.data.name)] = nil
+            if self.data.element then
+                if not self.data.standalone then 
+                    shader.public.buffer.element[(self.data.element)][(self.data.category)].textured[(self.data.textureName)] = nil
                 else
-                    shader.public.buffer.element[(self.shaderData.element)][(self.shaderData.category)].untextured[self] = nil
+                    shader.public.buffer.element[(self.data.element)][(self.data.category)].untextured[self] = nil
                 end
             end
             shader.public.buffer.shader[self] = nil

@@ -316,7 +316,7 @@ if localPlayer then
                 renderer.public:setDynamicSky(false, i, syncer.librarySerial)
             end
         else
-            if not manager:isInternal(isInternal) or (sync.shaderData.category == "Assetify:Sky") then return false end
+            if not manager:isInternal(isInternal) or (sync.data.category == "Assetify:Sky") then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
             renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
