@@ -27,6 +27,8 @@ if localPlayer then
     manager:exportAPI("renderer", "setDynamicCloudScale", function(...) return renderer:setDynamicCloudScale(...) end)
     manager:exportAPI("renderer", "getDynamicCloudDirection", function() return renderer.sky.cloud.direction end)
     manager:exportAPI("renderer", "setDynamicCloudDirection", function(...) return renderer:setDynamicCloudDirection(...) end)
+    manager:exportAPI("renderer", "getDynamicCloudColor", function() return renderer.sky.cloud.color end)
+    manager:exportAPI("renderer", "setDynamicCloudColor", function(...) return renderer:setDynamicCloudColor(...) end)
     manager:exportAPI("renderer", "getDynamicStarIntensity", function() return renderer.sky.star.intensity end)
     manager:exportAPI("renderer", "setDynamicStarIntensity", function(...) return renderer:setDynamicStarIntensity(...) end)
 
@@ -37,8 +39,6 @@ if localPlayer then
     manager:exportAPI("renderer", "getDynamicCloudDensity", function() return renderer.isDynamicCloudDensity end)
     manager:exportAPI("renderer", "setDynamicCloudDensity", function(...) return renderer:setDynamicCloudDensity(...) end)
     manager:exportAPI("renderer", "getDynamicCloudScale", function() return renderer.isDynamicCloudScale end)
-    manager:exportAPI("renderer", "getDynamicCloudColor", function() return renderer.isDynamicCloudColor[1]*255, renderer.isDynamicCloudColor[2]*255, renderer.isDynamicCloudColor[3]*255 end)
-    manager:exportAPI("renderer", "setDynamicCloudColor", function(...) return renderer:setDynamicCloudColor(...) end)
     manager:exportAPI("renderer", "getTimeCycle", function() return renderer.isDynamicTimeCycle end)
     manager:exportAPI("renderer", "setTimeCycle", function(...) return renderer:setTimeCycle(...) end)
 else

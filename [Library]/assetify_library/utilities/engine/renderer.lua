@@ -307,6 +307,7 @@ if localPlayer then
             renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
             renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicCloudDirection(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudColor(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
@@ -358,6 +359,21 @@ if localPlayer then
     end
     renderer.public:setDynamicCloudDirection(settings.renderer.sky.cloud.direction)
 
+    function renderer.public:setDynamicCloudColor(color, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            color = (color and (imports.type(color) ~= "table") and color) or settings.renderer.sky.cloud.color or {255, 255, 255, 255}
+            if table.encode(renderer.public.sky.cloud.color) == table.encode(color) then return false end
+            renderer.public.sky.cloud.color = color
+        end
+        if renderer.public.sky.state then
+            iprint(renderer.public.sky.cloud.color)
+            renderer.private.sky.cloud.shader:setValue("cloudColor", {renderer.public.sky.cloud.color[1]/255, renderer.public.sky.cloud.color[2]/255, renderer.public.sky.cloud.color[3]/255, renderer.public.sky.cloud.color[4]/255})
+        end
+        return true
+    end
+    renderer.public:setDynamicCloudColor(settings.renderer.sky.cloud.color)
+
     function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
@@ -396,18 +412,6 @@ if localPlayer then
             renderer.public.isDynamicCloudDensity = density
         end
         if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudDensity", renderer.public.isDynamicCloudDensity) end
-        return true
-    end
-
-    function renderer.public:setDynamicCloudColor(r, g, b, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            r, g, b = (imports.tonumber(r) or 0)/255, (imports.tonumber(g) or 0)/255, (imports.tonumber(b) or 0)/255
-            renderer.public.isDynamicCloudColor = renderer.public.isDynamicCloudColor or {}
-            if ((renderer.public.isDynamicCloudColor[1] == r) and (renderer.public.isDynamicCloudColor[2] == g) and (renderer.public.isDynamicCloudColor[3] == b)) then return false end
-            renderer.public.isDynamicCloudColor[1], renderer.public.isDynamicCloudColor[2], renderer.public.isDynamicCloudColor[3] = r, g, b
-        end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudColor", renderer.public.isDynamicCloudColor) end
         return true
     end
 
