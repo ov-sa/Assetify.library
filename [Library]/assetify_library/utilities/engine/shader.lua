@@ -153,9 +153,9 @@ if localPlayer then
         return false
     end
 
-    function shader.public:load(element, category, name, textureName, shaderTextures, shaderInputs, raw, shaderMaps, priority, distance, standalone, overlay, isInternal)
+    function shader.public:load(element, category, name, textureName, textures, inputs, raw, shaderMaps, priority, distance, standalone, overlay, isInternal)
         if not shader.public:isInstance(self) then return false end
-        if not category or not name or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[name]) or (not shader.public.preLoaded[name] and not shaderRW.buffer[name]) or (not standalone and not textureName) or not shaderTextures or not shaderInputs or not raw then return false end
+        if not category or not name or (not manager:isInternal(isInternal) and not shader.public.remoteWhitelist[name]) or (not shader.public.preLoaded[name] and not shaderRW.buffer[name]) or (not standalone and not textureName) or not textures or not inputs or not raw then return false end
         element = ((element and imports.isElement(element)) and element) or false
         textureName = textureName or false
         priority = imports.tonumber(priority) or shader.public.priority
@@ -170,8 +170,8 @@ if localPlayer then
             category = category,
             name = name,
             textureName = textureName,
-            shaderTextures = shaderTextures,
-            shaderInputs = shaderInputs,
+            textures = textures,
+            inputs = inputs,
             priority = priority,
             distance = distance,
             standalone = standalone,
@@ -183,14 +183,14 @@ if localPlayer then
             end
             renderer:sync(self)
         end
-        for i, j in imports.pairs(shaderTextures) do
+        for i, j in imports.pairs(textures) do
             if raw.texture then
                 if j and imports.isElement(raw.texture[j]) then
                     self:setValue(i, raw.texture[j])
                 end
             end
         end
-        for i, j in imports.pairs(shaderInputs) do
+        for i, j in imports.pairs(inputs) do
             self:setValue(i, j)
         end
         if self.data.element then

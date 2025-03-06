@@ -119,21 +119,21 @@ if localPlayer then
         asset:createDep(cAsset)
         if cAsset.manifest.shaderMaps and cAsset.manifest.shaderMaps.control then
             for i, j in imports.pairs(cAsset.manifest.shaderMaps.control) do
-                local shaderTextures, shaderInputs = {}, {}
+                local textures, inputs = {}, {}
                 for k = 1, table.length(j), 1 do
                     local v = j[k]
-                    if v.control then shaderTextures[("controlTex_"..k)] = v.control end
-                    if v.bump then shaderTextures[("controlTex_"..k.."_bump")] = v.bump end
+                    if v.control then textures[("controlTex_"..k)] = v.control end
+                    if v.bump then textures[("controlTex_"..k.."_bump")] = v.bump end
                     for x = 1, table.length(shader.validChannels), 1 do
                         local y = shader.validChannels[x]
                         if v[y.index] then
-                            shaderTextures[("controlTex_"..k.."_"..y.index)] = v[y.index].map
-                            shaderInputs[("controlScale_"..k.."_"..y.index)] = v[y.index].scale
-                            if v[y.index].bump then shaderTextures[("controlTex_"..k.."_"..y.index.."_bump")] = v[y.index].bump end
+                            textures[("controlTex_"..k.."_"..y.index)] = v[y.index].map
+                            inputs[("controlScale_"..k.."_"..y.index)] = v[y.index].scale
+                            if v[y.index].bump then textures[("controlTex_"..k.."_"..y.index.."_bump")] = v[y.index].bump end
                         end
                     end
                 end
-                shader:create(nil, "Assetify | Control", "Assetify_Tex_Map", i, shaderTextures, shaderInputs, cAsset.unsynced.raw.map, j, false, false, false, false, syncer.librarySerial)
+                shader:create(nil, "Assetify | Control", "Assetify_Tex_Map", i, textures, inputs, cAsset.unsynced.raw.map, j, false, false, false, false, syncer.librarySerial)
             end
         end
         return true
