@@ -409,12 +409,6 @@ if localPlayer then
 
 
     --[[
-    function setCloudSpeed(speed)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.cloud.shader, "cloudSpeed", tonumber(speed) or 1)
-        return true
-    end
-    
     function setCloudScale(scale)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.cloud.shader, "cloudScale", tonumber(scale) or 1)
