@@ -80,7 +80,8 @@ settings = {
             moon = {
                 scale = 0.5,
                 emissive = {
-                    scale = 1
+                    scale = 1,
+                    intensity = 1
                 }
             }
         }

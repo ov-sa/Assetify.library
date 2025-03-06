@@ -336,6 +336,7 @@ if localPlayer then
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
             renderer.public:setDynamicMoonScale(false, syncer.librarySerial)
             renderer.public:setDynamicMoonEmissiveScale(false, syncer.librarySerial)
+            renderer.public:setDynamicMoonEmissiveIntensity(false, syncer.librarySerial)
         end
         return true
     end
@@ -466,6 +467,22 @@ if localPlayer then
     end
     renderer.public:setDynamicMoonEmissiveScale(settings.renderer.sky.moon.emissive.scale)
 
+    function renderer.public:setDynamicMoonEmissiveIntensity(intensity, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            intensity = imports.tonumber(intensity) or settings.renderer.sky.moon.emissive.intensity or 1
+            if renderer.public.sky.moon.emissive.intensity == intensity then return false end
+            renderer.public.sky.moon.emissive.intensity = intensity
+        end
+        if renderer.public.sky.state then
+            print("emissive intensity", renderer.public.sky.moon.emissive.intensity)
+            --TODO: To be connected w emissive shader later
+            --renderer.private.sky.emissive.shader:setValue("moonEmissiveIntensity", renderer.public.sky.moon.emissive.intensity)
+        end
+        return true
+    end
+    renderer.public:setDynamicMoonEmissiveIntensity(settings.renderer.sky.moon.emissive.intensity)
+
     --[[
     function setMoonEmissiveIntensity(intensity)
         if not CBuffer.state then return false end
@@ -476,24 +493,6 @@ if localPlayer then
     function setMoonBrightness(brightness)
         if not CBuffer.state then return false end
         dxSetShaderValue(CBuffer.moon.shader, "moonBrightness", (tonumber(brightness) or 1)*1.6)
-        return true
-    end
-    
-    function setSunScale(scale)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.sun.shader, "sunScale", tonumber(scale) or 1)
-        return true
-    end
-    
-    function setSunEmissiveScale(scale)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.sun.shader, "sunNativeScale", (tonumber(scale) or 1)*10000)
-        return true
-    end
-    
-    function setSunEmissiveIntensity(intensity)
-        if not CBuffer.state then return false end
-        dxSetShaderValue(CBuffer.emissive.shader, "sunEmissiveIntensity", tonumber(intensity) or 1)
         return true
     end
     ]]
