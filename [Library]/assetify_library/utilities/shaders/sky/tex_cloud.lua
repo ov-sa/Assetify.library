@@ -17,7 +17,7 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float2x3 skyColor = {float3(1, 1, 1), float3(1, 1, 1)};
+        float2x3 skyColor = 1;
         float cloudSpeed = 1;
         float cloudScale = 1;
         float2 cloudDirection = 1;
