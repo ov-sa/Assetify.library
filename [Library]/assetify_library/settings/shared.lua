@@ -65,7 +65,7 @@ settings = {
                 speed = 1,
                 scale = 1,
                 direction = {1, -1},
-                color = {255, 0, 0, 255}
+                color = {255, 255, 255, 255}
             },
             star = {
                 intensity = 1
