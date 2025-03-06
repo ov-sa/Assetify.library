@@ -88,9 +88,9 @@ shaderRW.buffer[identity] = {
             float3 skyGradient = GetSkyGradient(PS.TexCoord);
             float2 cloudUV = PS.TexCoord;
             float cloudDepth = lerp(0, 1, 0.9 - cloudUV.y);
-            cloudUV.y /= cloudDepth*1.25;
+            cloudUV.y /= cloudDepth*1.35;
             float4 cloudTexel = 0;
-            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01)*tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5)*0.35;
+            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01)*tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5)*lerp(0, 2.5, length(skyGradient));
             RenderClouds(cloudSampler, cloudTexel, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.02, cloudUV, lerp(0.125, 1, length(skyGradient)));
             float2 starUV = PS.TexCoord*vResolution*float2(1, 1.1)*3;
             float4 starTexel = 0;
