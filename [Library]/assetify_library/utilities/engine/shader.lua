@@ -180,7 +180,7 @@ if localPlayer then
             if not isStandalone and raw.shader then
                 raw.shader[textureName] = self.cShader
             end
-            renderer:syncShader(self)
+            renderer:sync(self)
         end
         for i, j in imports.pairs(shaderTextures) do
             if raw.texture then

@@ -183,18 +183,15 @@ if localPlayer then
         return true
     end
 
-    function renderer.public:syncShader(syncShader)
-        if not syncShader then return false end
-        local isTexSampler = syncShader.shaderData.shaderName == "Assetify_Tex_Sky"
-        if isTexSampler then shader.preLoaded["Assetify_Tex_Sky"] = syncShader end
-        renderer.public:setVirtualRendering(_, _, syncShader, syncer.librarySerial)
-        renderer.public:setDynamicSky(_, syncShader, syncer.librarySerial)
-        if isTexSampler then syncShader.isTexSamplerLoaded = true end
+    function renderer.public:sync(sync)
+        if not sync then return false end
+        renderer.public:setVirtualRendering(_, _, sync, syncer.librarySerial)
+        renderer.public:setDynamicSky(_, sync, syncer.librarySerial)
         return true
     end
 
-    function renderer.public:setVirtualRendering(state, rtModes, syncShader, isInternal)
-        if not syncShader then
+    function renderer.public:setVirtualRendering(state, rtModes, sync, isInternal)
+        if not sync then
             state = (state and true) or false
             rtModes = (rtModes and (imports.type(rtModes) == "table") and rtModes) or false
             if renderer.public.state == state then return false end
@@ -227,11 +224,11 @@ if localPlayer then
         else
             if not manager:isInternal(isInternal) then return false end
             local vSource0, vSource1, vSource2 = (renderer.public.state and renderer.public.vsource) or false, (renderer.public.state and renderer.public.vrt.diffuse) or false, (renderer.public.state and renderer.public.vrt.emissive) or false
-            syncShader:setValue("vResolution", (renderer.public.state and renderer.public.resolution) or false)
-            syncShader:setValue("vRenderingEnabled", (renderer.public.state and true) or false)
-            syncShader:setValue("vSource0", vSource0)
-            syncShader:setValue("vSource1", vSource1)
-            syncShader:setValue("vSource1Enabled", (vSource1 and true) or false)
+            sync:setValue("vResolution", (renderer.public.state and renderer.public.resolution) or false)
+            sync:setValue("vRenderingEnabled", (renderer.public.state and true) or false)
+            sync:setValue("vSource0", vSource0)
+            sync:setValue("vSource1", vSource1)
+            sync:setValue("vSource1Enabled", (vSource1 and true) or false)
         end
         return true
     end
@@ -261,8 +258,8 @@ if localPlayer then
         return (renderer.public.sky.state and true) or falsee
     end
 
-    function renderer.public:setDynamicSky(state, syncShader, isInternal)
-        if not syncShader then
+    function renderer.public:setDynamicSky(state, sync, isInternal)
+        if not sync then
             state = (state and true) or false
             if renderer.public.sky.state == state then return false end
             renderer.public.sky.state = state
@@ -308,17 +305,7 @@ if localPlayer then
             end
         else
             if not manager:isInternal(isInternal) then return false end
-            syncShader:setValue("vSkyEnabled", renderer.public.sky.state or false)
-            if shader.preLoaded["Assetify_Tex_Sky"] and (shader.preLoaded["Assetify_Tex_Sky"] == syncShader) then
-                shader.preLoaded["Assetify_Tex_Sky"]:setValue("vSky0", renderer.private.sky.depth.rt)
-                if not shader.preLoaded["Assetify_Tex_Sky"].isTexSamplerLoaded then
-                    renderer.public:setDynamicSunColor(_, _, _, syncer.librarySerial)
-                    renderer.public:setDynamicStars(_, syncer.librarySerial)
-                    renderer.public:setDynamicCloudDensity(_, syncer.librarySerial)
-                    renderer.public:setDynamicCloudScale(_, syncer.librarySerial)
-                    renderer.public:setDynamicCloudColor(_, _, _, syncer.librarySerial)
-                end
-            end
+            sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
         end
         return true
     end
