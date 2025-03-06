@@ -342,7 +342,7 @@ if localPlayer then
         end
         return true
     end
-    addEventHandler("onClientResourceStart", resourceRoot, function() renderer:setDynamicSky(settings.renderer.sky.state) end)
+    addEventHandler("onClientResourceStart", resourceRoot, function() renderer.public:setDynamicSky(settings.renderer.sky.state) end)
 
     function renderer.public:setDynamicCloudSpeed(speed, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
