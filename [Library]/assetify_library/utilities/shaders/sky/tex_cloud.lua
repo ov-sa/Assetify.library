@@ -17,16 +17,15 @@ shaderRW.buffer[identity] = {
     exec = function()
         return shaderRW.create()..[[
         // Variables //
-        float3 skyColorTop = 1;
-        float3 skyColorBottom = 1;
+        float2x3 skyColor = {float3(1, 1, 1), float3(1, 1, 1)};
         float cloudSpeed = 1;
         float cloudScale = 1;
         float2 cloudDirection = 1;
         float4 cloudColor = 1;
+        float starGrid = 40.0;
         float2 starSpeed = float2(0, 5);
         float starScale = 0.085;
         float starIntensity = 0.3;
-        float starGrid = 40.0;
         float starsVisibility = 1;
         texture cloudTex;
         texture vCloud0 <string renderTarget = "yes";>;
@@ -51,7 +50,7 @@ shaderRW.buffer[identity] = {
         // Utils //
         #define mod(x, y) (x - (y*floor(x/y)))
         float3 GetSkyGradient(float2 uv) {
-            return lerp(skyColorBottom, skyColorTop, saturate(uv.y*(1/0.4)));
+            return lerp(skyColor[1], skyColor[0], saturate(uv.y*(1/0.4)));
         }
 
         float2 RandVector(in float2 vec, in float seed) {
