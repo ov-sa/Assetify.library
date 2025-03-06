@@ -268,6 +268,9 @@ if localPlayer then
         end
         return true
     end
+    if settings.renderer.timecycle.state then
+        renderer.public:setTimeCycle(table.unpack(table.pack(table.decode(file:read(settings.renderer.timecycle.source))), 1))
+    end
 
     function renderer.public:setDynamicSky(state, sync, isInternal)
         if not sync then

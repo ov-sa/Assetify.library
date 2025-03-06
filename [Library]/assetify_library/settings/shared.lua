@@ -58,6 +58,12 @@ settings = {
 
     renderer = {
         state = true,
+        
+        timecycle = {
+            state = true,
+            source = ":assetify_library/utilities/rw/timecycle.vcl"
+        },
+
         sky = {
             state = true,
             cloud = {
