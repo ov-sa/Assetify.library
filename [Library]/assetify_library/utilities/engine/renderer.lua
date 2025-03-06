@@ -185,8 +185,8 @@ if localPlayer then
 
     function renderer.public:sync(sync)
         if not sync then return false end
-        renderer.public:setVirtualRendering(_, _, sync, syncer.librarySerial)
-        renderer.public:setDynamicSky(_, sync, syncer.librarySerial)
+        renderer.public:setVirtualRendering(false, false, sync, syncer.librarySerial)
+        renderer.public:setDynamicSky(false, sync, syncer.librarySerial)
         return true
     end
 
@@ -219,7 +219,7 @@ if localPlayer then
                 end
             end
             for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setVirtualRendering(_, _, i, syncer.librarySerial)
+                renderer.public:setVirtualRendering(false, false, i, syncer.librarySerial)
             end
         else
             if not manager:isInternal(isInternal) then return false end
@@ -244,7 +244,7 @@ if localPlayer then
             local resultRT = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], true)
             renderer.private.emissiveBuffer = {
                 rt = resultRT,
-                shader = shader:create(_, "Assetify ━ PreLoaded", "Assetify_Tex_Bloomer", _, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, _, shader.shaderPriority + 1, _, true)
+                shader = shader:create(false, "Assetify ━ PreLoaded", "Assetify_Tex_Bloomer", false, {["vEmissive0"] = 1, ["vEmissive1"] = 2}, {}, {texture = {[1] = intermediateRT, [2] = resultRT}}, false, shader.shaderPriority + 1, false, true)
             }
         else
             renderer.private.emissiveBuffer.shader:destroy()
@@ -301,11 +301,16 @@ if localPlayer then
                 renderer.private.sky.moon.shader:destroy(true, syncer.librarySerial)
             end
             for i, j in imports.pairs(shader.buffer.shader) do
-                renderer.public:setDynamicSky(_, i, syncer.librarySerial)
+                renderer.public:setDynamicSky(false, i, syncer.librarySerial)
             end
         else
             if not manager:isInternal(isInternal) then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
+            renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
+            renderer.public:setDynamicStars(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudDensity(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudColor(false, false, false, syncer.librarySerial)
         end
         return true
     end
