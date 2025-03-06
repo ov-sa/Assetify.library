@@ -57,6 +57,10 @@ settings = {
     },
 
     renderer = {
-        resolution = 1
+        state = true,
+        resolution = 1,
+        sky = {
+            state = true
+        }
     }
 }
