@@ -374,7 +374,6 @@ if localPlayer then
     function renderer.public:setTimeCycle(cycle, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
         if not isInternal then
-            --if not renderer.private.isTimeCycleValid(cycle) then return false end
             renderer.public.isDynamicTimeCycle = cycle
         end
         for i = 0, 23, 1 do
