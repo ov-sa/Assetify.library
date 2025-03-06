@@ -47,25 +47,28 @@ local imports = {
 
 local renderer = class:create("renderer", {
     state = false,
-    sky = {state = false}
+    sky = {
+        state = false
+    }
 })
-renderer.private.minuteDuration = 60*1000
-renderer.private.sky = {
-    depth = {
-        value = 300
-    },
-    cloud = {
-        height = 300
-    },
-    moon = {}
-}
 
 if localPlayer then
     renderer.public.camera = imports.getCamera()
     renderer.public.resolution = {imports.guiGetScreenSize()}
     renderer.public.resolution[1], renderer.public.resolution[2] = renderer.public.resolution[1]*settings.renderer.resolution, renderer.public.resolution[2]*settings.renderer.resolution
-    renderer.private.sky.cloud.texture = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/cloud.rw", "dxt5")
-    renderer.private.sky.moon.texture = {}
+    renderer.private.sky = {
+        farclip = 1000,
+        depth = {
+            value = 300
+        },
+        cloud = {
+            height = 300,
+            texture = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/cloud.rw", "dxt5")
+        },
+        moon = {
+            texture = {}
+        }
+    }    
     for i = 0, 20, 1 do
         renderer.private.sky.moon.texture[i] = imports.dxCreateTexture("utilities/rw/mesh_sky/textures/moon/"..i..".rw", "dxt1")
     end
@@ -170,7 +173,7 @@ if localPlayer then
             --local sunScreenX, sunScreenY = getScreenFromWorldPosition(sunX, sunY, sunZ, renderer.public.resolution[1])
             --if sunScreenX and sunScreenY then sunX, sunY, sunZ = getWorldFromScreenPosition(sunScreenX, sunScreenY, renderer.private.sky.depth.value)
             --else sunX, sunY, sunZ = cameraX, cameraY, cameraZ - 10000 end
-            imports.setFarClipDistance(math.max(farclip, renderer.public.sky.farclip))
+            imports.setFarClipDistance(math.max(farclip, renderer.private.sky.farclip))
             setElementPosition(renderer.private.sky.depth.object, cameraX, cameraY, cameraZ)
             renderer.private.sky.depth.shader:setValue("position", depthX, depthY, depthZ)
             imports.dxSetRenderTarget(renderer.private.sky.depth.rt, true)
