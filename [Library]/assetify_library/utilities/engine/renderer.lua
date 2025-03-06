@@ -305,11 +305,11 @@ if localPlayer then
             if not manager:isInternal(isInternal) or (sync.shaderData.shaderCategory == "Assetify:Sky") then return false end
             sync:setValue("vSkyEnabled", renderer.public.sky.state or false)
             renderer.public:setDynamicCloudSpeed(false, syncer.librarySerial)
+            renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicStarIntensity(false, syncer.librarySerial)
 
             renderer.public:setDynamicSunColor(false, false, false, syncer.librarySerial)
             renderer.public:setDynamicCloudDensity(false, syncer.librarySerial)
-            renderer.public:setDynamicCloudScale(false, syncer.librarySerial)
             renderer.public:setDynamicCloudColor(false, false, false, syncer.librarySerial)
         end
         return true
@@ -328,6 +328,20 @@ if localPlayer then
         return true
     end
     renderer.public:setDynamicCloudSpeed(settings.renderer.sky.cloud.speed)
+
+    function renderer.public:setDynamicCloudScale(scale, isInternal)
+        if isInternal and not manager:isInternal(isInternal) then return false end
+        if not isInternal then
+            scale = imports.tonumber(scale) or settings.renderer.sky.cloud.scale or 0
+            if renderer.public.sky.cloud.scale == scale then return false end
+            renderer.public.sky.cloud.scale = scale
+        end
+        if renderer.public.sky.state then
+            renderer.private.sky.cloud.shader:setValue("cloudScale", renderer.public.sky.cloud.scale)
+        end
+        return true
+    end
+    renderer.public:setDynamicCloudScale(settings.renderer.sky.cloud.scale)
 
     function renderer.public:setDynamicStarIntensity(intensity, isInternal)
         if isInternal and not manager:isInternal(isInternal) then return false end
@@ -367,17 +381,6 @@ if localPlayer then
             renderer.public.isDynamicCloudDensity = density
         end
         if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudDensity", renderer.public.isDynamicCloudDensity) end
-        return true
-    end
-
-    function renderer.public:setDynamicCloudScale(scale, isInternal)
-        if isInternal and not manager:isInternal(isInternal) then return false end
-        if not isInternal then
-            density = imports.tonumber(scale) or 0
-            if renderer.public.isDynamicCloudScale == scale then return false end
-            renderer.public.isDynamicCloudScale = scale
-        end
-        if shader.preLoaded["Assetify_Tex_Sky"] then shader.preLoaded["Assetify_Tex_Sky"]:setValue("cloudScale", renderer.public.isDynamicCloudScale) end
         return true
     end
 

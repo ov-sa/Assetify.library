@@ -132,6 +132,8 @@
     <export function="renderer_setDynamicSky" type="client"/>
     <export function="renderer_getDynamicCloudSpeed" type="client"/>
     <export function="renderer_setDynamicCloudSpeed" type="client"/>
+    <export function="renderer_getDynamicCloudScale" type="client"/>
+    <export function="renderer_setDynamicCloudScale" type="client"/>
     <export function="renderer_getDynamicStarIntensity" type="client"/>
     <export function="renderer_setDynamicStarIntensity" type="client"/>
 
@@ -139,8 +141,6 @@
     <export function="renderer_setDynamicSunColor" type="client"/>
     <export function="renderer_getDynamicCloudDensity" type="client"/>
     <export function="renderer_setDynamicCloudDensity" type="client"/>
-    <export function="renderer_getDynamicCloudScale" type="client"/>
-    <export function="renderer_setDynamicCloudScale" type="client"/>
     <export function="renderer_getDynamicCloudColor" type="client"/>
     <export function="renderer_setDynamicCloudColor" type="client"/>
     <export function="renderer_getTimeCycle" type="client"/>
