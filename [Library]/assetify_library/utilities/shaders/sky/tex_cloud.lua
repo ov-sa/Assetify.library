@@ -66,12 +66,12 @@ shaderRW.buffer[identity] = {
             }
         }
 
-        void RenderClouds(sampler2D tex, inout float4 result, float2 offset, float2 uv) {
+        void RenderClouds(sampler2D tex, inout float4 result, float2 offset, float2 uv, float intensity) {
             uv = offset + uv + gTime*cloudSpeed*cloudDirection*0.012*0;
-            float4 cloudTexel = tex2DStochastic(cloudSampler, uv)*0.5;
+            float4 cloudTexel = tex2DStochastic(cloudSampler, uv)*intensity;
             float difference = uv.x - offset.x;
-            float blendwidth = 0.005;
-            cloudTexel *= min(difference/blendwidth, 1)*min((1 - difference)/blendwidth, 1);
+            float blendwidth = 0.05;
+            cloudTexel.a *= min(difference/blendwidth, 1)*min((1 - difference)/blendwidth, 1);
             result += cloudTexel;
         }
 
@@ -90,18 +90,18 @@ shaderRW.buffer[identity] = {
             float cloudDepth = lerp(0, 1, 0.9 - cloudUV.y);
             cloudUV.y /= cloudDepth*1.25;
             float4 cloudTexel = 0;
-            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01)*tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5);
-            RenderClouds(cloudSampler, cloudTexel, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.02, cloudUV);
+            cloudTexel += tex2D(cloudSampler, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.01)*tex2D(cloudSampler, cloudUV*10*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.011)*lerp(-0.25, -1, cloudUV.y*2.5)*0.35;
+            RenderClouds(cloudSampler, cloudTexel, cloudUV*12*cloudScale*float2(0.5, 1) + gTime*cloudSpeed*cloudDirection*0.02, cloudUV, lerp(0.125, 1, length(skyGradient)));
             float2 starUV = PS.TexCoord*vResolution*float2(1, 1.1)*3;
             float4 starTexel = 0;
             RenderStars(starTexel, float4(1.0, 1.0, 0.0, 1.0), starUV, starGrid, starScale, starSpeed/1.1, 123456.789);
             RenderStars(starTexel, float4(0.5, 0.7, 1.0, 1.0), starUV, starGrid*2.0/3.0, starScale, starSpeed/1.2, 345678.912);
             RenderStars(starTexel, float4(1.0, 0.5, 0.5, 1.0), starUV, starGrid/2.0, starScale, starSpeed/1.6, 567891.234);
             starTexel *= 0.3*starIntensity*starsVisibility;
-            cloudTexel.a *= cloudColor.a*0.15*cloudDepth;
+            cloudTexel.a *= cloudColor.a*0.5*lerp(0, 1, cloudDepth);
             float cloudMask = cloudTexel.a;
             skyGradient += lerp(0, starTexel, 1 + pow(length(starTexel.rgb), 2));
-            cloudTexel.rgb = lerp(skyGradient, cloudColor*lerp(skyGradient, 1, (1 - cloudDepth)), cloudTexel.a);
+            cloudTexel.rgb = lerp(skyGradient, cloudColor*lerp(skyGradient, 1, 1 - cloudDepth), cloudTexel.a);
             cloudTexel.a = 1 - PS.TexCoord.y*(1/0.4);
             cloudMask *= cloudTexel.a;
             float maskTop = PS.TexCoord.y/0.07;
