@@ -44,7 +44,6 @@ function interface.public.getCursorPosition()
 end
 
 function interface.public.isCursorAtPosition(x, y, width, height)
-    print("yes")
     local cx, cy = interface.public.getCursorPosition()
     if not cx or not cy then return false end
     return ((cx >= x) and (cx <= (x + width)) and (cy >= y) and (cy <= (y + height)) and true) or false
