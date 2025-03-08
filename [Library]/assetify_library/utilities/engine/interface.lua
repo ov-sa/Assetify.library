@@ -18,6 +18,8 @@ local imports = {
     getTickCount = getTickCount,
     dxCreateFont = dxCreateFont,
     getKeyState = getKeyState,
+    getCursorPosition = getCursorPosition,
+    isCursorShowing = isCursorShowing,
     isMTAWindowActive = isMTAWindowActive,
     isChatBoxInputActive = isChatBoxInputActive,
     guiGetInputEnabled = guiGetInputEnabled
@@ -34,6 +36,18 @@ interface.private.cache = {}
 interface.private.cache.font = {}
 interface.private.cache.key = {}
 interface.private.cache.scroll = {}
+
+function interface.public.getCursorPosition()
+    if not imports.isCursorShowing() then return false end
+    local x, y, world_x, world_y, world_z = imports.getCursorPosition()
+    return x*ov_widget.resolution[1], y*ov_widget.resolution[2], world_x, world_y, world_z
+end
+
+function interface.public.isCursorAtPosition(x, y, width, height)
+    local cx, cy = interface.public.getCursorPosition()
+    if not cx or not cy then return false end
+    return ((cx >= x) and (cx <= (x + width)) and (cy >= y) and (cy <= (y + height)) and true) or false
+end
 
 function interface.public.createFont(path, size)
     if not path or not size then return false end

@@ -118,6 +118,8 @@
     <export function="animation_unload" type="client"/>
     <export function="sound_play" type="client"/>
     <export function="sound_play3D" type="client"/>
+    <export function="interface_getCursorPosition" type="client"/>
+    <export function="interface_isCursorAtPosition" type="client"/>
     <export function="interface_createFont" type="client"/>
     <export function="interface_isKeyOnHold" type="client"/>
     <export function="interface_isKeyClicked" type="client"/>

@@ -13,6 +13,8 @@
 -------------------------
 
 if localPlayer then
+    manager:exportAPI("interface", "getCursorPosition", interface.getCursorPosition)
+    manager:exportAPI("interface", "isCursorAtPosition", interface.isCursorAtPosition)
     manager:exportAPI("interface", "createFont", interface.createFont)
     manager:exportAPI("interface", "isKeyOnHold", interface.isKeyOnHold)
     manager:exportAPI("interface", "isKeyClicked", interface.isKeyClicked)
