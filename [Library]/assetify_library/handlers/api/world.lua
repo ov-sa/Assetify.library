@@ -60,8 +60,8 @@ if localPlayer then
     manager:exportAPI("world", "clearModel", function(modelID)
         modelID = imports.tonumber(modelID)
         if modelID then
-            imports.engineImportTXD(asset.rwAssets.void.txd, modelID)
-            imports.engineReplaceModel(asset.rwAssets.void.dff, modelID, false)
+            imports.engineImportTXD(asset.rw.void.txd, modelID)
+            imports.engineReplaceModel(asset.rw.void.dff, modelID, false)
             return true
         end
         return false
