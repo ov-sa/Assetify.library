@@ -57,7 +57,7 @@ settings = {
     },
 
     renderer = {
-        state = true,
+        state = false,
 
         timecycle = {
             state = true,
