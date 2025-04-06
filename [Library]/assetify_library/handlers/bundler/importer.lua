@@ -49,7 +49,7 @@ bundler.private:createBuffer("core", "__core", [[
     ]]..bundler.private:createAPIs("assetify.__core", "library")..[[
     assetify.imports.setmetatable(assetify, {__index = assetify.__core})
     assetify.__core.loadModule = function(assetName, moduleTypes)
-        local cAsset = assetify.getAsset("module", assetName)
+        local cAsset = assetify.getAssetData("module", assetName)
         if not cAsset or not moduleTypes or (table.length(moduleTypes) <= 0) then return false end
         if not cAsset.manifest.assetDeps or not cAsset.manifest.assetDeps.script then return false end
         for i = 1, table.length(moduleTypes), 1 do
