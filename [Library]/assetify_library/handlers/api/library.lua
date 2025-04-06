@@ -14,7 +14,7 @@
 
 manager:exportAPI("library", "isBooted", function() return syncer.isLibraryBooted end)
 manager:exportAPI("library", "isLoaded", function() return syncer.isLibraryLoaded end)
-manager:exportAPI("library", "isModuleLoaded ", function() return syncer.isModuleLoaded end)
+manager:exportAPI("library", "isModuleLoaded", function() return syncer.isModuleLoaded end)
 manager:exportAPI("library", "fetchSerial", function() return syncer.librarySerial end)
 manager:exportAPI("library", "fetchVersion", function() return syncer.libraryVersion end)
 manager:exportAPI("library", "fetchWebserver", function() return syncer.libraryWebserver end)
