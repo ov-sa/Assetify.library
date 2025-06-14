@@ -22,8 +22,9 @@
 * Integrated Robust Threader (Includes async/await, heartbeats, promises and much more!)
 * Integrated Robust Networking, Scheduling, Rendering, and Attachment Solutions
 * Integrated Scalable Global and Entity Data System
+* Integrated Asset Compressor
 * Integrated Asset Encrypter (Supports `tea` & `aes128` apparently)
-* Integrated Asset Downloader and Broadcaster via [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
+* Integrated Asset Downloader ft [Assetify's Webserver](https://github.com/ov-sa/Assetify.webserver) (No more tedious `meta.xml` tasks!)
 * Extensible Asset-Packs ft:
   * `module`
   * `animation`
