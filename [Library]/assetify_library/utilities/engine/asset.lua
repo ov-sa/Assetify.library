@@ -362,7 +362,7 @@ else
                         cAsset.rw.unsynced.data[path] = cAsset.rw.unsynced.data[path][1]
                     end
                     cAsset.rw.synced.hash[path] = imports.sha256(cAsset.rw.unsynced.data[path])
-                    local builtContent = string.encode(cAsset.rw.unsynced.data[path], "base64")
+                    local builtContent = string.encode(string.encode(cAsset.rw.unsynced.data[path], "zlib"), "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = path, hash = imports.sha256(builtContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = path, content = builtContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..path)
