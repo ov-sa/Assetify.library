@@ -30,8 +30,8 @@ local updateResources = nil
 updateResources = {
     updateTags = {"file", "script"},
     fetchSource = function(base, version, ...) return (base and version and string.format(base, version, ...)) or false end,
-    onUpdateCallback = function(isCompleted, isNotification)
-        if isCompleted then
+    onUpdateCallback = function(state, notify)
+        if state then
             syncer.libraryVersion = updateResources.updateCache.libraryVersion
             for i, j in imports.pairs(updateResources.updateCache.backup) do
                 imports.outputServerLog("Assetify: Updater ━│  Backed up <"..i.."> due to compatibility breaking changes; Kindly acknowledge it accordingly!")
@@ -49,7 +49,7 @@ updateResources = {
                 end
             end
         end
-        if isNotification and not isCompleted then imports.outputServerLog("Assetify: Updater ━│  Update failed due to connectivity issues; Try again later...") end
+        if not state and notify then imports.outputServerLog("Assetify: Updater ━│  Update failed due to connectivity issues; Try again later...") end
         if updateResources.updatePromise then updateResources.updatePromise.resolve() end
         if updateResources.updateThread then updateResources.updateThread:destroy() end
         updateResources.updateCache = nil
@@ -100,7 +100,9 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                             resourceResponse = self:await(rest:get(resourceMeta))
                             updateResources.updateThread:resume()
                         end,
-                        catch = function() updateResources.onUpdateCallback(false, true) end
+                        catch = function()
+                            updateResources.onUpdateCallback(false, true)
+                        end
                     })
                 end):resume()
                 updateResources.updateThread:pause()
@@ -140,7 +142,9 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                         outputPointer[(responsePointer[2])] = self:await(rest:get(responsePointer[1]))
                         updateResources.updateThread:resume()
                     end,
-                    catch = function() updateResources.onUpdateCallback(false, true) end
+                    catch = function()
+                        updateResources.onUpdateCallback(false, true)
+                    end
                 })
             end):resume()
         end
@@ -173,7 +177,9 @@ function cli.public:update(isAction)
                 }
                 self:await(cli.private:update())
             end,
-            catch = function() updateResources.onUpdateCallback(false, true) end
+            catch = function()
+                updateResources.onUpdateCallback(false, true)
+            end
         })
         cPromise.resolve()
     end):resume()

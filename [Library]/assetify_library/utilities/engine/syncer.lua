@@ -165,7 +165,9 @@ else
                         self:await(rest:post(syncer.public.libraryWebserver.."/onSyncPeer?token="..syncer.public.libraryToken, {peer = getPlayerSerial(player), state = true}))
                         syncer.private:syncPack(player, _, true)
                     end,
-                    catch = function() imports.outputDebugString("Assetify: Webserver ━│  Failed to whitelist Peer: "..getPlayerSerial(player).."...") end
+                    catch = function()
+                        imports.outputDebugString("Assetify: Webserver ━│  Failed to whitelist Peer: "..getPlayerSerial(player).."...")
+                    end
                 })
             end):resume()
         end

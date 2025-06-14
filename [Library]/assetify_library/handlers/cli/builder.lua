@@ -56,13 +56,17 @@ else
                     imports.outputServerLog("Assetify: Webserver ━│  Assets successfully synced!")
                     network:emit("Assetify:onLoad", false)
                 end,
-                catch = function() imports.outputServerLog("Assetify: Webserver ━│  Connection failed; Kindly ensure the webserver is running prior connection...") end
+                catch = function()
+                    imports.outputServerLog("Assetify: Webserver ━│  Connection failed; Kindly ensure the webserver is running prior connection...")
+                end
             })
         end):resume()
     end)
 
     imports.addEventHandler("onResourceStop", resourceRoot, function()
         network:emit("Assetify:onUnload", false)
-        if syncer.libraryToken then rest:post(syncer.libraryWebserver.."/onSetConnection", {state = false}) end
+        if syncer.libraryToken then
+            rest:post(syncer.libraryWebserver.."/onSetConnection", {state = false})
+        end
     end)
 end
