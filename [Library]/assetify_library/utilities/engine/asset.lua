@@ -322,12 +322,12 @@ else
         result = (result and table.decode(result)) or false
         if result then
             for i, j in imports.pairs(result) do
-                local cURL = file:parseURL(j)
-                if cURL and cURL.url and cURL.extension and cURL.pointer and (cURL.extension == "vcl") then
-                    local pointerPath = ((cURL.pointer == "rootDir") and rooturl) or ((cURL.pointer == "localDir") and localurl) or false
+                local url = file:parseURL(j)
+                if url and url.url and url.extension and url.pointer and (url.extension == "vcl") then
+                    local pointerPath = ((url.pointer == "rootDir") and rooturl) or ((url.pointer == "localDir") and localurl) or false
                     if pointerPath then
-                        local __cURL = file:parseURL(file:resolveURL(pointerPath..(cURL.directory or "")..cURL.file, file.validPointers["localDir"]..rooturl))
-                        result[i] = asset.public:buildManifest(rooturl, __cURL.directory or "", __cURL.file)
+                        local __url = file:parseURL(file:resolveURL(pointerPath..(url.directory or "")..url.file, file.validPointers["localDir"]..rooturl))
+                        result[i] = asset.public:buildManifest(rooturl, __url.directory or "", __url.file)
                     end
                 end
             end
