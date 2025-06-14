@@ -65,8 +65,6 @@ else
 
     imports.addEventHandler("onResourceStop", resourceRoot, function()
         network:emit("Assetify:onUnload", false)
-        if syncer.libraryToken then
-            rest:post(syncer.libraryWebserver.."/onSetConnection", {state = false})
-        end
+        if syncer.libraryToken then rest:post(syncer.libraryWebserver.."/onSetConnection", {state = false}) end
     end)
 end
