@@ -67,10 +67,10 @@
 * Integrated Bone Attachments
 * Integrated IPL & IDE support for `scene`(s) ft abilities such as instancing, customizable dimension/interior/offsets, native model support (No more cumbersome conversions — simply drag and drop!)
 * Integrated functionality to replace native models (Eliminating the need for third-party mod loaders!)
-* Integrated real-time Discord presence tracking with automated user kick provided if 'minAge' is enabled and any of the following criteria are unmet:
+* Integrated real-time Discord presence tracking with automated user kick provided if 'minAge' is enabled and any of the following criteria are met:
   * Discord presence is disabled
   * Discord account aged lower than 'minAge'
-  * Discount account switch detected
+  * Discord account switch detected
 * Comprehensive Control & Bump Mapping support
 * Essential Integration APIs
 
