@@ -106,7 +106,7 @@ if localPlayer then
                 for i, j in pairs(fetchFiles) do
                     try({
                         exec = function(self)
-                            file:write(i, string.decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)), "base64"))
+                            file:write(i, string.decode(string.decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)), "base64"), "zlib"))
                         end,
                         catch = function()
                             imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...")
