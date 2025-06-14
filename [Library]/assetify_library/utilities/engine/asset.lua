@@ -569,7 +569,9 @@ else
                     asset.public:buildShader(cAsset)
                     asset.public:buildReplacement(cAsset)
                     asset.public:buildDep(cAsset)
-                    if cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.iv then file:write(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64")) end
+                    if cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.iv then
+                        file:write(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64"))
+                    end
                 end
             end
             assetPack.assetPack = cAssetPack

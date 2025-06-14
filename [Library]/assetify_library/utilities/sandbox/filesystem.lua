@@ -23,7 +23,9 @@ local imports = {
     fileRead = fileRead,
     fileWrite = fileWrite,
     fileGetSize = fileGetSize,
-    fileClose = fileClose
+    fileClose = fileClose,
+    pathIsDirectory = pathIsDirectory,
+    pathListDir = pathListDir
 }
 
 
@@ -68,6 +70,19 @@ function file.public:write(path, data)
     return true
 end
 
+function file.public:deleteDir(path)
+    if not path or (imports.type(path) ~= "string") or not imports.pathIsDirectory(path) then return false end
+    for i, j in imports.pairs(imports.pathListDir(path)) do
+        j = path.."/"..j
+        if imports.pathIsDirectory(j) then
+            file.public:deleteDir(j)
+        else
+            file.public:delete(j)
+        end
+    end
+    return true
+end
+
 function file.public:parseURL(path)
     if not path or (imports.type(path) ~= "string") then return false end
     local extension = string.match(path, "^.+%.(.+)$")
@@ -82,45 +97,45 @@ function file.public:parseURL(path)
     end
     local url = string.sub(path, pointerEndN or 1, string.len(path) - ((extension and (string.len(extension) + 1)) or 0))
     if string.match(url, "%w") then
-        local cURL = {
+        local result = {
             pointer = pointer or false,
             url = (extension and (url.."."..extension)) or url,
             extension = extension,
             directory = string.match(url, "(.*[/\\])") or false
         }
-        cURL.file = (cURL.extension and string.sub(cURL.url, (cURL.directory and (string.len(cURL.directory) + 1)) or 1)) or false
-        return cURL
+        result.file = (result.extension and string.sub(result.url, (result.directory and (string.len(result.directory) + 1)) or 1)) or false
+        return result
     end
     return false
 end
 
 function file.public:resolveURL(path, chroot)
     if not path or (imports.type(path) ~= "string") or (chroot and (imports.type(chroot) ~= "string")) then return false end
-    local cURL = file.public:parseURL(path)
-    if not cURL then return false end
-    cURL.url = (cURL.pointer and string.gsub(cURL.url, file.public.validPointers[(cURL.pointer)], "")) or cURL.url
-    local cDirs = string.split(cURL.url, "/")
-    if table.length(cDirs) > 0 then
+    local result = file.public:parseURL(path)
+    if not result then return false end
+    result.url = (result.pointer and string.gsub(result.url, file.public.validPointers[(result.pointer)], "")) or result.url
+    local dirs = string.split(result.url, "/")
+    if table.length(dirs) > 0 then
         if chroot then
             chroot = file.public:parseURL(((string.sub(chroot, string.len(chroot)) ~= "/") and chroot.."/") or chroot)
             chroot = (chroot and chroot.pointer and string.gsub(chroot.url, file.public.validPointers[(chroot.pointer)], "")) or chroot
         end
-        cURL.url = false
-        local vDirs = {}
-        for i = 1, table.length(cDirs), 1 do
-            local j = cDirs[i]
+        result.url = false
+        local __dirs = {}
+        for i = 1, table.length(dirs), 1 do
+            local j = dirs[i]
             if j == "..." then
-                if not chroot or (chroot ~= cURL.url) then
-                    table.remove(vDirs, table.length(vDirs))
+                if not chroot or (chroot ~= result.url) then
+                    table.remove(__dirs, table.length(__dirs))
                 end
             else
-                table.insert(vDirs, j)
+                table.insert(__dirs, j)
             end
-            cURL.url = table.concat(vDirs, "/")
-            local __cURL = file.public:parseURL(cURL.url)
-            cURL.url = (__cURL and not __cURL.file and cURL.url.."/") or cURL.url
+            result.url = table.concat(__dirs, "/")
+            local __result = file.public:parseURL(result.url)
+            result.url = (__result and not __result.file and result.url.."/") or result.url
         end
-        cURL.url = ((cURL.pointer and file.public.validPointers[(cURL.pointer)]) or "")..(cURL.url or "")
+        result.url = ((result.pointer and file.public.validPointers[(result.pointer)]) or "")..(result.url or "")
     end
-    return cURL.url
+    return result.url
 end
