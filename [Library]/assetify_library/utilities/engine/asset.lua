@@ -90,7 +90,8 @@ function asset.public:readFile(cAsset, path, ...)
     if not cAsset or not path or (imports.type(path) ~= "string") or not cAsset.hash[path] or not file:exists(path) then return false end
     local rw = file:read(path)
     if not rw then return false end
-    return (not cAsset.manifest.encryptOptions and rw) or string.decode(rw, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...) or false
+    local rw = (not cAsset.manifest.encryptOptions and rw) or string.decode(rw, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...)
+    return (rw and string.decode(rw, "zlib")) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
@@ -342,6 +343,7 @@ else
             local builtData, builtSize = file:read(path)
             if builtData then
                 if not skipSync then
+                    builtData = string.encode(builtData, "zlib")
                     cAsset.rw.synced.bandwidth.file[path] = builtSize
                     cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[path]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[path]
@@ -362,7 +364,7 @@ else
                         cAsset.rw.unsynced.data[path] = cAsset.rw.unsynced.data[path][1]
                     end
                     cAsset.rw.synced.hash[path] = imports.sha256(cAsset.rw.unsynced.data[path])
-                    local builtContent = string.encode(string.encode(cAsset.rw.unsynced.data[path], "zlib"), "base64")
+                    local builtContent = string.encode(cAsset.rw.unsynced.data[path], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = path, hash = imports.sha256(builtContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = path, content = builtContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..path)

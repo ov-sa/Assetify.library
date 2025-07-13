@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.0"/>
+    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.1"/>
     <min_mta_version server="1.6.0-9.22470" client="1.6.0-9.22470"/>
     <download_priority_group>1000</download_priority_group>
     <aclrequest>
