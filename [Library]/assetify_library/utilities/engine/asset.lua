@@ -336,7 +336,7 @@ else
         return result
     end
 
-    function asset.public:buildFile(cAsset, path, skipSync, syncRaw, debugExistence)
+    function asset.public:buildFile(cAsset, path, skipSync, syncRaw, debug)
         if not cAsset or not path then return false end
         if (not skipSync and not cAsset.rw.synced.hash[path]) or (skipSync and syncRaw and not cAsset.rw.unsynced.raw[path]) then
             local builtPathHash = imports.sha256(path)
@@ -371,7 +371,7 @@ else
                     end
                 end
                 if syncRaw then cAsset.rw.unsynced.raw[path] = builtData end
-            elseif debugExistence then 
+            elseif debug then 
                 imports.outputDebugString("Assetify: Invalid File ━│  "..path)
             end
         end
