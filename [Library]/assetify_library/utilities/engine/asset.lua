@@ -88,10 +88,10 @@ end
 
 function asset.public:readFile(cAsset, path, ...)
     if not cAsset or not path or (imports.type(path) ~= "string") or not cAsset.hash[path] or not file:exists(path) then return false end
-    local rw = file:read(path)
-    if not rw then return false end
-    local rw = (not cAsset.manifest.encryptOptions and rw) or string.decode(rw, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...)
-    return (rw and string.decode(rw, "zlib")) or false
+    local result = file:read(path)
+    if not result then return false end
+    local result = (not cAsset.manifest.encryptOptions and result) or string.decode(result, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...)
+    return (result and string.decode(result, "zlib")) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
