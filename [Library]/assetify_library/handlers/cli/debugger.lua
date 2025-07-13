@@ -38,10 +38,9 @@ function debug.private.render()
         renderText = renderText..debug.private.colors[1]..debug.private.padding.."━ "..assetType.."\n"
         if settings.assetPacks[assetType].rwDatas then
             for assetName, _ in imports.pairs(settings.assetPacks[assetType].rwDatas) do
-                local _, _, progress, eta = manager:getDownloadProgress(assetType, assetName)
+                local _, _, progress = manager:getDownloadProgress(assetType, assetName)
                 renderText = renderText..debug.private.colors[2]..debug.private.padding..debug.private.padding.."• "..assetName.." ━│  ("
                 renderText = renderText.."Progress: "..math.floor(progress or 0).."%"
-                if eta then renderText = renderText.."  |  ETA: "..string.formatTime(eta) end
                 renderText = renderText..")\n"
             end
         end

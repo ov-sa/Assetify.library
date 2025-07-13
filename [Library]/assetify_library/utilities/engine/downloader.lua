@@ -44,29 +44,24 @@ if localPlayer then
 
     local function updateStatus(pointer, rawStatus)
         if not pointer or pointer.bandwidth.isDownloaded then return false end
-        local prevTotalETA, prevTotalSize = pointer.bandwidth.status.eta or 0, pointer.bandwidth.status.total or 0
+        local prevTotalSize = pointer.bandwidth.status.total or 0
         for file, status in imports.pairs(rawStatus) do
             pointer.bandwidth.status.file[file] = pointer.bandwidth.status.file[file] or {}
-            local currentETA, currentSize = status.tickEnd, status.percentComplete*0.01*pointer.bandwidth.file[file]
-            local prevETA, prevSize = pointer.bandwidth.status.file[file].eta or 0, pointer.bandwidth.status.file[file].size or 0
-            pointer.bandwidth.status.eta = pointer.bandwidth.status.eta - prevETA + currentETA
-            pointer.bandwidth.status.eta_count = pointer.bandwidth.status.eta_count + ((not pointer.bandwidth.status.file[file].eta and 1) or 0)
+            local currentSize = status.percentComplete*0.01*pointer.bandwidth.file[file]
+            local prevSize = pointer.bandwidth.status.file[file].size or 0
             pointer.bandwidth.status.total = pointer.bandwidth.status.total - prevSize + currentSize
-            pointer.bandwidth.status.file[file].eta, pointer.bandwidth.status.file[file].size = currentETA, currentSize
+            pointer.bandwidth.status.file[file].size = currentSize
         end
-        syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - prevTotalETA + pointer.bandwidth.status.eta
-        syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count + ((not pointer.bandwidth.status.isLibraryETACounted and 1) or 0)
         syncer.public.libraryBandwidth.status.total = syncer.public.libraryBandwidth.status.total - prevTotalSize + pointer.bandwidth.status.total
-        pointer.bandwidth.status.isLibraryETACounted = true
         return true
     end
 
-    --TODO: DISABLED FOR NOW TEMPORARILY
+    --TODO: DISABLED FOR NOW TEMPORARILY, latent events are not used anymore post introduction of fetchremote webserver based downloads, utilize 'getRemoteRequestInfo' instead on client side + clear up all bandwidth storage/sync - unncessary
     network:create("Assetify:Downloader:syncProgress"):on(function(status, bandwidth)
         if bandwidth then
             syncer.public.libraryBandwidth = {
                 total = bandwidth,
-                status = {total = 0, eta = 0, eta_count = 0}
+                status = {total = 0}
             }
             return true
         end
@@ -82,7 +77,7 @@ if localPlayer then
         syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {bandwidth = 0}
         thread:create(function(self)
             local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cPointer.bandwidth.status = {total = 0, eta = 0, eta_count = 0, file = {}}
+            cPointer.bandwidth.status = {total = 0, file = {}}
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local data = file:read(i)
@@ -105,12 +100,8 @@ if localPlayer then
             end, function()
                 for i, j in pairs(fetchFiles) do
                     try({
-                        exec = function(self)
-                            file:write(i, string.decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)), "base64"))
-                        end,
-                        catch = function()
-                            imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...")
-                        end
+                        exec = function(self) file:write(i, string.decode(self:await(rest:get(syncer.public.libraryWebserver.."/onFetchContent?token="..accessTokens[1].."&peer="..accessTokens[2].."&path="..i)), "base64")) end,
+                        catch = function() imports.outputConsole("Assetify: Webserver ━│  Failed to download file: "..i.."...") end
                     })
                 end
                 network:emit("Assetify:Downloader:syncData", true, true, localPlayer, assetType, assetName, fetchFiles)
@@ -143,10 +134,6 @@ if localPlayer then
         local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
         cPointer.bandwidth.isDownloaded = true
         local isPackVoid = true
-        if cPointer.bandwidth.status and cPointer.bandwidth.status.isLibraryETACounted then
-            syncer.public.libraryBandwidth.status.eta = syncer.public.libraryBandwidth.status.eta - cPointer.bandwidth.status.eta
-            syncer.public.libraryBandwidth.status.eta_count = syncer.public.libraryBandwidth.status.eta_count - 1
-        end
         cPointer.bandwidth.status = nil
         syncer.private.scheduledAssets[assetType][assetName] = nil
         for i, j in imports.pairs(syncer.private.scheduledAssets[assetType]) do
@@ -199,7 +186,9 @@ else
             local isModule = packName == "module"
             for i, j in imports.pairs(cPack) do
                 if i ~= "rwDatas" then
-                    if isModule or syncModules then syncer.private:syncData(player, packName, i, false, j) end
+                    if isModule or syncModules then
+                        syncer.private:syncData(player, packName, i, false, j)
+                    end
                 else
                     for k, v in imports.pairs(j) do
                         isPackVoid = false
@@ -217,7 +206,9 @@ else
                 local isLibraryVoid = true
                 for i, j in imports.pairs(settings.assetPacks) do
                     if i ~= "module" then
-                        if syncer.private:syncPack(player, _, syncModules, i) then isLibraryVoid = false end
+                        if syncer.private:syncPack(player, _, syncModules, i) then
+                            isLibraryVoid = false
+                        end
                     end
                 end
                 if syncModules then
@@ -227,15 +218,17 @@ else
                         network:emit("Assetify:onModuleLoad", true, true, player)
                         network:emit("Assetify:Downloader:syncPack", false, player)
                     end
-                else
-                    if isLibraryVoid then network:emit("Assetify:onLoad", true, false, player) end
+                elseif isLibraryVoid then
+                    network:emit("Assetify:onLoad", true, false, player)
                 end
             end):resume({executions = settings.downloader.syncRate, frames = 1})
         else
             thread:create(function(self)
-                local cAsset = settings.assetPacks[(assetDatas.type)].assetPack.rwDatas[(assetDatas.name)]
+                local cAsset = settings.assetPacks[assetDatas.type].assetPack.rwDatas[assetDatas.name]
                 for i, j in imports.pairs(cAsset.synced) do
-                    if i ~= "bandwidth" then syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j) end
+                    if i ~= "bandwidth" then
+                        syncer.private:syncData(player, assetDatas.type, "rwDatas", {assetDatas.name, i}, j)
+                    end
                     thread:pause()
                 end
                 syncer.private:syncState(player, assetDatas.type, assetDatas.name)
