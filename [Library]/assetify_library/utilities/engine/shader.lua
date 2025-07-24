@@ -163,7 +163,7 @@ if localPlayer then
         standalone = (standalone and true) or false
         overlay = (overlay and true) or false
         self.isPreLoaded = (shader.public.preLoaded[name] and true) or false
-        self.cShader = (self.isPreLoaded and shader.public.preLoaded[name]) or imports.dxCreateShader(shaderRW.buffer[name].exec(maps), priority, distance, overlay, "all")
+        self.cShader = (self.isPreLoaded and shader.public.preLoaded[name].cShader) or imports.dxCreateShader(shaderRW.buffer[name].exec(maps), priority, distance, overlay, "all")
         shader.public.buffer.shader[self] = true
         self.data = {
             element = element,
@@ -232,7 +232,7 @@ if localPlayer then
         return imports.dxSetShaderValue(self.cShader, i, j or false)
     end
 
-    shader.public.preLoaded["Assetify_Tex_Clear"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clear", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.priority + 1, shader.public.distance, true)
+    shader.public.preLoaded["Assetify_Tex_Clear"] = shader.public:create(_, "Assetify:PreLoad", "Assetify_Tex_Clear", _, {}, {baseTexture = shader.public.preLoadedTex.invisibleMap}, {}, _, _, shader.public.priority + 1, shader.public.distance, false)
 end
 
 
