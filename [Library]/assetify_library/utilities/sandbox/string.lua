@@ -75,7 +75,7 @@ for i, j in pairs(module) do
         local minutes = math.floor(totalSeconds/60)
         local hours = math.floor(minutes/60)
         minutes = minutes%60
-        return imports.j.format("%02d:%02d:%02d", hours, minutes, seconds)
+        return j.format("%02d:%02d:%02d", hours, minutes, seconds)
     end
     
     function j.public.encode(baseString, type, options)

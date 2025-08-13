@@ -85,25 +85,25 @@ end
 
 function file.public:parseURL(path)
     if not path or (imports.type(path) ~= "string") then return false end
-    local extension = string.match(path, "^.+%.(.+)$")
-    extension = (extension and string.match(extension, "%w") and extension) or false
+    local extension = stringn.match(path, "^.+%.(.+)$")
+    extension = (extension and stringn.match(extension, "%w") and extension) or false
     local pointer, pointerEndN = nil, nil
     for i, j in imports.pairs(file.public.validPointers) do
-        local startN, endN = string.find(path, j)
+        local startN, endN = stringn.find(path, j)
         if startN and endN and (startN == 1) then
             pointer, pointerEndN = i, endN + 1
             break
         end
     end
-    local url = string.sub(path, pointerEndN or 1, string.len(path) - ((extension and (string.len(extension) + 1)) or 0))
-    if string.match(url, "%w") then
+    local url = stringn.sub(path, pointerEndN or 1, stringn.len(path) - ((extension and (stringn.len(extension) + 1)) or 0))
+    if stringn.match(url, "%w") then
         local result = {
             pointer = pointer or false,
             url = (extension and (url.."."..extension)) or url,
             extension = extension,
-            directory = string.match(url, "(.*[/\\])") or false
+            directory = stringn.match(url, "(.*[/\\])") or false
         }
-        result.file = (result.extension and string.sub(result.url, (result.directory and (string.len(result.directory) + 1)) or 1)) or false
+        result.file = (result.extension and stringn.sub(result.url, (result.directory and (stringn.len(result.directory) + 1)) or 1)) or false
         return result
     end
     return false
@@ -113,12 +113,12 @@ function file.public:resolveURL(path, chroot)
     if not path or (imports.type(path) ~= "string") or (chroot and (imports.type(chroot) ~= "string")) then return false end
     local result = file.public:parseURL(path)
     if not result then return false end
-    result.url = (result.pointer and string.gsub(result.url, file.public.validPointers[(result.pointer)], "")) or result.url
-    local dirs = string.split(result.url, "/")
+    result.url = (result.pointer and stringn.gsub(result.url, file.public.validPointers[(result.pointer)], "")) or result.url
+    local dirs = stringn.split(result.url, "/")
     if table.length(dirs) > 0 then
         if chroot then
-            chroot = file.public:parseURL(((string.sub(chroot, string.len(chroot)) ~= "/") and chroot.."/") or chroot)
-            chroot = (chroot and chroot.pointer and string.gsub(chroot.url, file.public.validPointers[(chroot.pointer)], "")) or chroot
+            chroot = file.public:parseURL(((stringn.sub(chroot, stringn.len(chroot)) ~= "/") and chroot.."/") or chroot)
+            chroot = (chroot and chroot.pointer and stringn.gsub(chroot.url, file.public.validPointers[chroot.pointer], "")) or chroot
         end
         result.url = false
         local __dirs = {}

@@ -269,7 +269,7 @@ if localPlayer then
         for i = 0, 23, 1 do
             renderer.public.timecycle[i] = renderer.public.timecycle[i] or {}
             for k = 1, 2, 1 do
-                renderer.public.timecycle[i][k] = {string.parseHex(renderer.public.timecycle[i][k] or "#ffffff")}
+                renderer.public.timecycle[i][k] = {stringn.parseHex(renderer.public.timecycle[i][k] or "#ffffff")}
             end
         end
         return true

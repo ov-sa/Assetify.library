@@ -89,12 +89,12 @@ function table.private.inspect(baseTable, showHidden, limit, level, buffer, skip
     local dataType = imports.type(baseTable)
     showHidden, limit, level, buffer = (showHidden and true) or false, math.max(1, imports.tonumber(limit) or 0) + 1, math.max(1, imports.tonumber(level) or 0), buffer or table.public.pack()
     if dataType ~= "table" then
-        table.public.insert(buffer, ((table.private.inspectTypes.raw[dataType] and (((dataType == "string") and string.format("%q", baseTable)) or imports.tostring(baseTable))) or ("<"..imports.tostring(baseTable)..">")).."\n")
+        table.public.insert(buffer, ((table.private.inspectTypes.raw[dataType] and (((dataType == "string") and stringn.format("%q", baseTable)) or imports.tostring(baseTable))) or ("<"..imports.tostring(baseTable)..">")).."\n")
     elseif level > limit then
         table.public.insert(buffer, "{...}\n")
     else
         table.public.insert(buffer, "{\n")
-        local indent = string.rep(" ", 2*level)
+        local indent = stringn.rep(" ", 2*level)
         for k, v in imports.pairs(baseTable) do
             table.public.insert(buffer, indent..imports.tostring(k)..": ")
             table.private.inspect(v, showHidden, limit, level + 1, buffer, true)
@@ -106,7 +106,7 @@ function table.private.inspect(baseTable, showHidden, limit, level, buffer, skip
                 table.private.inspect(metadata, showHidden, limit, level + 1, buffer, true)
             end
         end
-        indent = string.rep(" ", 2*(level - 1))
+        indent = stringn.rep(" ", 2*(level - 1))
         table.public.insert(buffer, indent.."}\n")
     end
     if not skipTrim then table.public.remove(buffer) end

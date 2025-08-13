@@ -90,8 +90,8 @@ function asset.public:readFile(cAsset, path, ...)
     if not cAsset or not path or (imports.type(path) ~= "string") or not cAsset.hash[path] or not file:exists(path) then return false end
     local result = file:read(path)
     if not result then return false end
-    local result = (not cAsset.manifest.encryptOptions and result) or string.decode(result, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and string.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...)
-    return (result and string.decode(result, "zlib")) or false
+    local result = (not cAsset.manifest.encryptOptions and result) or stringn.decode(result, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = (cAsset.manifest.encryptOptions.iv and stringn.decode(cAsset.manifest.encryptOptions.iv[imports.sha256(path)], "base64")) or nil}, ...)
+    return (result and stringn.decode(result, "zlib")) or false
 end
 
 function asset.private:validateMap(filePointer, filePath, mapPointer)
@@ -343,28 +343,28 @@ else
             local builtData, builtSize = file:read(path)
             if builtData then
                 if not skipSync then
-                    builtData = string.encode(builtData, "zlib")
+                    builtData = stringn.encode(builtData, "zlib")
                     cAsset.rw.synced.bandwidth.file[path] = builtSize
                     cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[path]
                     syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[path]
-                    cAsset.rw.unsynced.data[path] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {string.encode(builtData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtData
+                    cAsset.rw.unsynced.data[path] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {stringn.encode(builtData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtData
                     if imports.type(cAsset.rw.unsynced.data[path]) == "table" then
                         if cAsset.manifest.encryptOptions.iv then
                             local builtCachePath = cAsset.manifest.encryptOptions.path..asset.public.reference.cache.."/"..builtPathHash..".rw"
-                            cAsset.manifest.encryptOptions.iv[builtPathHash] = (cAsset.manifest.encryptOptions.iv[builtPathHash] and (not asset.public.encryption[cAsset.manifest.encryptOptions.mode].ivlength or (#string.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64") == asset.public.encryption[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtPathHash]) or nil
+                            cAsset.manifest.encryptOptions.iv[builtPathHash] = (cAsset.manifest.encryptOptions.iv[builtPathHash] and (not asset.public.encryption[cAsset.manifest.encryptOptions.mode].ivlength or (#stringn.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64") == asset.public.encryption[cAsset.manifest.encryptOptions.mode].ivlength)) and cAsset.manifest.encryptOptions.iv[builtPathHash]) or nil
                             if cAsset.manifest.encryptOptions.iv[builtPathHash] then
                                 local builtCacheContent = file:read(builtCachePath)
-                                local builtCacheData = string.decode(builtCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = string.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64")})
+                                local builtCacheData = stringn.decode(builtCacheContent, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key, iv = stringn.decode(cAsset.manifest.encryptOptions.iv[builtPathHash], "base64")})
                                 if not builtCacheData or (imports.sha256(builtCacheData) ~= imports.sha256(builtData)) then cAsset.manifest.encryptOptions.iv[builtPathHash] = nil end
                                 cAsset.rw.unsynced.data[path][1] = (cAsset.manifest.encryptOptions.iv[builtPathHash] and builtCacheContent) or cAsset.rw.unsynced.data[path][1]
                             end
-                            cAsset.manifest.encryptOptions.iv[builtPathHash] = cAsset.manifest.encryptOptions.iv[builtPathHash] or string.encode(cAsset.rw.unsynced.data[path][2], "base64")
+                            cAsset.manifest.encryptOptions.iv[builtPathHash] = cAsset.manifest.encryptOptions.iv[builtPathHash] or stringn.encode(cAsset.rw.unsynced.data[path][2], "base64")
                             file:write(builtCachePath, cAsset.rw.unsynced.data[path][1])
                         end
                         cAsset.rw.unsynced.data[path] = cAsset.rw.unsynced.data[path][1]
                     end
                     cAsset.rw.synced.hash[path] = imports.sha256(cAsset.rw.unsynced.data[path])
-                    local builtContent = string.encode(cAsset.rw.unsynced.data[path], "base64")
+                    local builtContent = stringn.encode(cAsset.rw.unsynced.data[path], "base64")
                     if thread:getThread():await(rest:post(syncer.libraryWebserver.."/onVerifyContent?token="..syncer.libraryToken, {path = path, hash = imports.sha256(builtContent)})) ~= "true" then
                         thread:getThread():await(rest:post(syncer.libraryWebserver.."/onSyncContent?token="..syncer.libraryToken, {path = path, content = builtContent}))
                         imports.outputServerLog("Assetify: Webserver ━│  Syncing content: "..path)
@@ -442,7 +442,7 @@ else
     function asset.public:buildPack(assetType, assetPack, callback)
         if not assetType or not assetPack or not callback or (imports.type(callback) ~= "function") then return false end
         local cAssetPack = table.clone(assetPack, true)
-        local manifestPath = asset.public.reference.root..string.lower(assetType).."/"..asset.public.reference.manifest..".vcl"
+        local manifestPath = asset.public.reference.root..stringn.lower(assetType).."/"..asset.public.reference.manifest..".vcl"
         cAssetPack.manifest = file:read(manifestPath)
         cAssetPack.manifest = (cAssetPack.manifest and table.decode(cAssetPack.manifest)) or {}
         thread:create(function(self)
@@ -450,15 +450,15 @@ else
             for i = 1, table.length(cAssetPack.manifest), 1 do
                 local cAsset = {}
                 cAsset.name = cAssetPack.manifest[i]
-                cAsset.path = asset.public.reference.root..string.lower(assetType).."/"..cAsset.name.."/"
+                cAsset.path = asset.public.reference.root..stringn.lower(assetType).."/"..cAsset.name.."/"
                 cAsset.manifest = asset.public:buildManifest(cAsset.path, _, asset.public.reference.asset..".vcl")
                 if cAsset.manifest then
                     for k, v in imports.pairs(asset.private.property.reserved) do
                         cAsset.manifest[k] = ((asset.private.property.whitelist[assetType] or asset.private.property.whitelist["*"])[k] and cAsset.manifest[k]) or false
                     end
                     cAsset.manifest.encryptMode = (cAsset.manifest.encryptKey and cAsset.manifest.encryptMode and asset.public.encryption[cAsset.manifest.encryptMode] and cAsset.manifest.encryptMode) or false
-                    cAsset.manifest.encryptKey = (cAsset.manifest.encryptMode and cAsset.manifest.encryptKey and string.sub(imports.sha256(imports.tostring(cAsset.manifest.encryptKey)), 1, asset.public.encryption[cAsset.manifest.encryptMode].keylength or nil)) or false
-                    cAsset.manifest.encryptIV = (cAsset.manifest.encryptMode and cAsset.manifest.encryptKey and asset.public.encryption[cAsset.manifest.encryptMode].ivlength and (table.decode(string.decode(file:read(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
+                    cAsset.manifest.encryptKey = (cAsset.manifest.encryptMode and cAsset.manifest.encryptKey and stringn.sub(imports.sha256(imports.tostring(cAsset.manifest.encryptKey)), 1, asset.public.encryption[cAsset.manifest.encryptMode].keylength or nil)) or false
+                    cAsset.manifest.encryptIV = (cAsset.manifest.encryptMode and cAsset.manifest.encryptKey and asset.public.encryption[cAsset.manifest.encryptMode].ivlength and (table.decode(stringn.decode(file:read(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw"), "base64")) or {})) or nil
                     cAsset.manifest.encryptOptions = (cAsset.manifest.encryptKey and {path = cAsset.path, mode = cAsset.manifest.encryptMode, key = cAsset.manifest.encryptKey, iv = cAsset.manifest.encryptIV}) or nil
                     cAsset.manifest.encryptMode, cAsset.manifest.encryptKey, cAsset.manifest.encryptIV = nil, nil, nil
                     cAsset.manifest.streamRange = imports.tonumber(cAsset.manifest.streamRange) or asset.public.range.stream
@@ -572,7 +572,7 @@ else
                     asset.public:buildReplacement(cAsset)
                     asset.public:buildDep(cAsset)
                     if cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.iv then
-                        file:write(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw", string.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64"))
+                        file:write(cAsset.path..asset.public.reference.cache.."/"..imports.sha256("asset.iv")..".rw", stringn.encode(table.encode(cAsset.manifest.encryptOptions.iv), "base64"))
                     end
                 end
             end

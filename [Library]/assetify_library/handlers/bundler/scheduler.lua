@@ -55,7 +55,7 @@ function bundler.private:createScheduler()
             return true
         end  
         for i, j in assetify.imports.pairs(assetify.scheduler.buffer.schedule) do
-            assetify.scheduler[(assetify.imports.string.gsub(i, "exec", "execSchedule", 1))] = function(...) return scheduleExec(i, ...) end
+            assetify.scheduler[(assetify.imports.stringn.gsub(i, "exec", "execSchedule", 1))] = function(...) return scheduleExec(i, ...) end
         end
         ]]
         for i, j in imports.pairs(bundler.private.schedulers) do

@@ -29,7 +29,7 @@ local imports = {
 local updateResources = nil
 updateResources = {
     updateTags = {"file", "script"},
-    fetchSource = function(base, version, ...) return (base and version and string.format(base, version, ...)) or false end,
+    fetchSource = function(base, version, ...) return (base and version and stringn.format(base, version, ...)) or false end,
     onUpdateCallback = function(state, notify)
         if state then
             syncer.libraryVersion = updateResources.updateCache.libraryVersion
@@ -108,8 +108,8 @@ function cli.private:update(resourcePointer, responsePointer, isUpdateStatus)
                 updateResources.updateThread:pause()
                 local isLastIndex = false
                 for i = 1, table.length(updateResources.updateTags), 1 do
-                    for j in string.gmatch(resourceResponse, "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
-                        if not string.isVoid(j) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
+                    for j in stringn.gmatch(resourceResponse, "<".. updateResources.updateTags[i].." src=\"(.-)\"(.-)/>") do
+                        if not stringn.isVoid(j) and (not updateResources.updateCache.isBackwardCompatible or not resourcePointer.resourceBackup or not resourcePointer.resourceBackup[j]) then
                             cli.private:update(resourcePointer, {updateResources.updateCache.libraryVersionSource..(resourcePointer.resourceName).."/"..j, j})
                             timer:create(function()
                                 if isLastIndex then
@@ -173,7 +173,7 @@ function cli.public:update(isAction)
                     isAutoUpdate = isAutoUpdate,
                     libraryVersion = response.tag_name,
                     libraryVersionSource = updateResources.fetchSource(updateResources[1].resourceSource, response.tag_name),
-                    isBackwardCompatible = string.match(syncer.libraryVersion, "(%d+)%.") == string.match(response.tag_name, "(%d+)%.")
+                    isBackwardCompatible = stringn.match(syncer.libraryVersion, "(%d+)%.") == stringn.match(response.tag_name, "(%d+)%.")
                 }
                 self:await(cli.private:update())
             end,

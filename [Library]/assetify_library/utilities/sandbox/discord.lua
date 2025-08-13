@@ -46,7 +46,7 @@ if localPlayer then
             settings.discord.userID = false
             if imports.isDiscordRichPresenceConnected() then
                 settings.discord.userID = imports.getDiscordRichPresenceUserID()
-                settings.discord.userID = (settings.discord.userID and (string.len(settings.discord.userID) > 0) and settings.discord.userID) or false
+                settings.discord.userID = (settings.discord.userID and (stringn.len(settings.discord.userID) > 0) and settings.discord.userID) or false
                 if settings.discord.buttons then
                     for i = 1, #settings.discord.buttons, 1 do
                         local j = settings.discord.buttons[i]
@@ -58,7 +58,7 @@ if localPlayer then
                 if not syncer.isLibraryLoaded then imports.setDiscordRichPresenceState((syncer.isLibraryLoaded and "Downloading") or "Playing") end
                 local info = thread:getThread():await(network:emitCallback("Assetify:Discord:onFetchUserInfo", true, false, "780426807739678740"))
                 if info and ((imports.os.time() - info.createdAt) < (settings.discord.minAge*30*24*60*60)) then
-                    network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, string.format("Discord account must be at least %s month(s) old", settings.discord.minAge))
+                    network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, stringn.format("Discord account must be at least %s month(s) old", settings.discord.minAge))
                 end
             else
                 network:emit("Assetify:Discord:onKickPlayer", true, false, localPlayer, "Allow Discord rich presence")
@@ -76,7 +76,7 @@ else
     network:create("Assetify:Discord:onFetchUserInfo", true):on(function(self, uid)
         local env = self:await(rest:get("https://raw.githubusercontent.com/ov-sa/Assetify.library/refs/heads/env/global.vcl"))
         env = (env and table.decode(env)) or false
-        local result = (env and self:await(rest:get(string.format("https://discord.com/api/v10/users/%s", uid), false, {["Authorization"] = string.format("Bot %s", string.decode(env.discord, "base64"))}))) or false
+        local result = (env and self:await(rest:get(stringn.format("https://discord.com/api/v10/users/%s", uid), false, {["Authorization"] = stringn.format("Bot %s", stringn.decode(env.discord, "base64"))}))) or false
         result = (result and table.decode(result, "json")) or false
         if result then result.createdAt = discord.private:snowflakeToTick(uid)/1000 end
         return result

@@ -51,7 +51,7 @@ function bundler.private:createUtils()
         for i = 1, table.length(bundler.private.utils), 1 do
             local j = file:read(bundler.private.utils[i])
             for k, v in imports.pairs(bundler.private.modules) do
-                j = string.gsub(j, "%f[^(%z%s]"..k.."%f[.:)%z%s]", v.namespace)
+                j = stringn.gsub(j, "%f[^(%z%s]"..k.."%f[.:)%z%s]", v.namespace)
             end
             rw = rw..[[
             if true then
@@ -87,9 +87,9 @@ function bundler.private:createModule(name)
                     break
                 end
             end
-            if not isBlacklisted then rw = string.gsub(rw, "%f[^(%z%s]"..i.."%f[.:)%z%s]", j.namespace) end
+            if not isBlacklisted then rw = stringn.gsub(rw, "%f[^(%z%s]"..i.."%f[.:)%z%s]", j.namespace) end
         end
-        rw = ((name == "namespace") and string.gsub(rw, "class = {}", "local class = {}")) or rw
+        rw = ((name == "namespace") and stringn.gsub(rw, "class = {}", "local class = {}")) or rw
         for i = 1, table.length(module.endpoints), 1 do
             local j = module.endpoints[i]
             rw = rw..[[

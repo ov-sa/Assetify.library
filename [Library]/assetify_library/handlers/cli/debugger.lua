@@ -63,7 +63,7 @@ end
 ---------------------
 
 imports.addCommandHandler("assetify", function(_, isAction, ...)
-    isAction = (isAction and ((string.sub(isAction, 0, 2) == "--") and string.sub(isAction, 3, string.len(isAction)))) or false
+    isAction = (isAction and ((stringn.sub(isAction, 0, 2) == "--") and stringn.sub(isAction, 3, stringn.len(isAction)))) or false
     if not isAction or (isAction ~= "debug") then return false end
     debug.public:toggle(not debug.private.state)
 end)

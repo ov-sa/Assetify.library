@@ -52,13 +52,13 @@ function scene.private:createEntity(...)
 end
 
 function scene.public:parseIDE(rw)
-    rw = (rw and string.split(rw, "\n")) or rw
+    rw = (rw and stringn.split(rw, "\n")) or rw
     if not rw then return false end
     local result = {}
     for i = 1, table.length(rw), 1 do
-        local data = string.split(rw[i], ",")
+        local data = stringn.split(rw[i], ",")
         for k = 1, table.length(data), 1 do
-            data[k] = string.gsub(data[k], "%s", "")
+            data[k] = stringn.gsub(data[k], "%s", "")
         end
         if data[2] then
             result[(data[2])] = {
@@ -71,13 +71,13 @@ function scene.public:parseIDE(rw)
 end
 
 function scene.public:parseIPL(rw, isNativeModelsEnabled)
-    rw = (rw and string.split(rw, "\n")) or rw
+    rw = (rw and stringn.split(rw, "\n")) or rw
     if not rw then return false end
     local result = {}
     for i = 1, table.length(rw), 1 do
-        local data = string.split(rw[i], ",")
+        local data = stringn.split(rw[i], ",")
         for k = 1, table.length(data), 1 do
-            data[k] = string.gsub(data[k], "%s", "")
+            data[k] = stringn.gsub(data[k], "%s", "")
         end
         if data[2] then
             local validated = true
