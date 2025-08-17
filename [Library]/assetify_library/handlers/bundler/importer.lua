@@ -40,7 +40,8 @@ bundler.private:createBuffer("imports", false, [[
             getThisResource = getThisResource,
             getResourceFromName = getResourceFromName,
             table = table,
-            string = string
+            string = string,
+            stringn = stringn
         }
     end
 ]])
