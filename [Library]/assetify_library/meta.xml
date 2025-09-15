@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.4"/>
+    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.5"/>
     <min_mta_version server="1.6.0-9.22470" client="1.6.0-9.22470"/>
     <download_priority_group>1000</download_priority_group>
     <aclrequest>
@@ -119,6 +119,9 @@
     <export function="animation_unload" type="client"/>
     <export function="sound_play" type="client"/>
     <export function="sound_play3D" type="client"/>
+
+    <export function="interface_isCursorVisible" type="client"/>
+    <export function="interface_setCursorVisible" type="client"/>
     <export function="interface_getCursorPosition" type="client"/>
     <export function="interface_isCursorAtPosition" type="client"/>
     <export function="interface_createFont" type="client"/>

@@ -33,12 +33,39 @@ local imports = {
 local interface = class:create("interface")
 interface.public.tick = imports.getTickCount()
 interface.private.cache = {}
+interface.private.cache.cursor = {}
 interface.private.cache.font = {}
 interface.private.cache.key = {}
 interface.private.cache.scroll = {}
 
+function interface.public.isCursorVisible()
+    return imports.isCursorShowing()
+end
+
+function interface.public.setCursorVisible(resource, ref, state)
+    if not resource then return false end
+    interface.private.cache.cursor[resource] = interface.private.cache.cursor[resource] or {}
+    interface.private.cache.cursor[resource][ref] = (state and true) or nil
+    local valid = false
+    for i, j in pairs(interface.private.cache.cursor[resource]) do
+        valid = true
+        break
+    end
+    interface.private.cache.cursor[resource] = (valid and interface.private.cache.cursor[resource]) or nil
+    local visible = false
+    for i, j in pairs(interface.private.cache.cursor) do
+        for k, v in pairs(j) do
+            visible = true
+            break
+        end
+    end
+    iprint(interface.private.cache.cursor)
+    showCursor(visible)
+    return true
+end
+
 function interface.public.getCursorPosition()
-    if not imports.isCursorShowing() then return false end
+    if not interface.public.isCursorVisible() then return false end
     local x, y, world_x, world_y, world_z = imports.getCursorPosition()
     return x*renderer.resolution[1], y*renderer.resolution[2], world_x, world_y, world_z
 end
