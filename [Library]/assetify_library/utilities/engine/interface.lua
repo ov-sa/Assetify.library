@@ -42,27 +42,35 @@ function interface.public.isCursorVisible()
     return imports.isCursorShowing()
 end
 
-function interface.public.setCursorVisible(resource, ref, state)
-    if not resource then return false end
+function interface.public.setCursorVisible(resource, ref, state, reset)
+    ref = (not reset and ref) or nil
+    if not resource or (state and not ref) then return false end
     interface.private.cache.cursor[resource] = interface.private.cache.cursor[resource] or {}
-    interface.private.cache.cursor[resource][ref] = (state and true) or nil
-    local valid = false
-    for i, j in pairs(interface.private.cache.cursor[resource]) do
-        valid = true
-        break
-    end
-    interface.private.cache.cursor[resource] = (valid and interface.private.cache.cursor[resource]) or nil
-    local visible = false
-    for i, j in pairs(interface.private.cache.cursor) do
-        for k, v in pairs(j) do
-            visible = true
+    if reset then
+        for i, j in pairs(interface.private.cache.cursor[resource]) do
+            interface.public.setCursorVisible(resource, i, false)
+        end
+    else
+        interface.private.cache.cursor[resource][ref] = (state and true) or nil
+        local valid = false
+        for i, j in pairs(interface.private.cache.cursor[resource]) do
+            valid = true
             break
         end
+        interface.private.cache.cursor[resource] = (valid and interface.private.cache.cursor[resource]) or nil
+        local visible = false
+        for i, j in pairs(interface.private.cache.cursor) do
+            for k, v in pairs(j) do
+                visible = true
+                break
+            end
+        end
+        iprint(interface.private.cache.cursor)
+        showCursor(visible)
     end
-    iprint(interface.private.cache.cursor)
-    showCursor(visible)
     return true
 end
+addEventHandler("onClientResourceStop", root, function(resource) interface.public.setCursorVisible(getResourceName(resource), false, false, true) end)
 
 function interface.public.getCursorPosition()
     if not interface.public.isCursorVisible() then return false end
