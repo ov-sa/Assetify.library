@@ -65,7 +65,6 @@ function interface.public.setCursorVisible(resource, ref, state, reset)
                 break
             end
         end
-        iprint(interface.private.cache.cursor)
         showCursor(visible)
     end
     return true
