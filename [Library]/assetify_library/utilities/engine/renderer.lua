@@ -293,7 +293,7 @@ if localPlayer then
                 renderer.private.sky.rt[renderer.private.sky.depth.rt] = true
                 renderer.private.sky.depth.shader = shader:create(renderer.private.sky.depth.object, "Assetify:Sky", "Assetify_Sky_Tex_Depth", "*", {}, {
                     ["vDepth0"] = renderer.private.sky.depth.rt
-                }, {}, false, shader.priority + 1, false, false, syncer.librarySerial)
+                }, {}, false, shader.priority + 1, false, false, false, syncer.librarySerial)
                 renderer.private.sky.cloud.rt = imports.dxCreateRenderTarget(renderer.public.resolution[1], renderer.public.resolution[2], false)
                 renderer.private.sky.rt[renderer.private.sky.cloud.rt] = true
                 renderer.private.sky.cloud.object = createObject(asset.rw.sky.modelID, 0, 0, 0, 0, 0, 0, true)

@@ -85,6 +85,11 @@ shaderRW.buffer[identity] = {
 
         Export PSHandler(PSInput PS) : COLOR0 {
             Export Output;
+            if (!vRenderingEnabled) {
+                Output.World = 0;
+                Output.Color = 0;
+                return Output;
+            }
             float3 skyGradient = GetSkyGradient(PS.TexCoord);
             float2 cloudUV = PS.TexCoord;
             float cloudDepth = lerp(0, 1, 0.9 - cloudUV.y);
