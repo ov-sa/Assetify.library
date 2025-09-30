@@ -38,7 +38,7 @@ function debug.private.render()
         renderText = renderText..debug.private.colors[1]..debug.private.padding.."━ "..assetType.."\n"
         if settings.assetPacks[assetType].rwDatas then
             for assetName, _ in imports.pairs(settings.assetPacks[assetType].rwDatas) do
-                renderText = renderText..debug.private.colors[2]..debug.private.padding..debug.private.padding.."• "..assetName
+                renderText = renderText..debug.private.colors[2]..debug.private.padding..debug.private.padding.."• "..assetName.." ("..((manager:isAssetLoaded(assetType, assetName) and "Loaded") or "Unloaded")..")\n"
             end
         end
     end

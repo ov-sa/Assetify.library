@@ -46,7 +46,6 @@ if localPlayer then
         syncer.private.scheduledAssets[assetType] = syncer.private.scheduledAssets[assetType] or {}
         syncer.private.scheduledAssets[assetType][assetName] = syncer.private.scheduledAssets[assetType][assetName] or {}
         thread:create(function(self)
-            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
             local fetchFiles = {}
             for i, j in imports.pairs(hashes) do
                 local data = file:read(i)
@@ -96,7 +95,6 @@ if localPlayer then
     end)
 
     network:create("Assetify:Downloader:syncState"):on(function(assetType, assetName)
-        local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
         local isPackVoid = true
         syncer.private.scheduledAssets[assetType][assetName] = nil
         for i, j in imports.pairs(syncer.private.scheduledAssets[assetType]) do
