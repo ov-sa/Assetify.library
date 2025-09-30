@@ -38,7 +38,6 @@ local imports = {
 
 local syncer = class:create("syncer", {
     libraryResource = imports.getThisResource(),
-    libraryBandwidth = 0,
     isLibraryBooted = false,
     isLibraryLoaded = false,
     isModuleLoaded = false,

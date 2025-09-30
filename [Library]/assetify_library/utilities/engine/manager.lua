@@ -149,20 +149,6 @@ if localPlayer then
         return true
     end
 
-    function manager.public:getDownloadProgress(assetType, assetName)
-        local cDownloaded, cBandwidth = nil, nil
-        if assetType and assetName then
-            if not settings.assetPacks[assetType] or not settings.assetPacks[assetType].rwDatas[assetName] then return false end
-            local cPointer = settings.assetPacks[assetType].rwDatas[assetName]
-            cBandwidth = cPointer.bandwidth.total
-            cDownloaded = (cPointer.bandwidth.isDownloaded and cBandwidth) or (cPointer.bandwidth.status and cPointer.bandwidth.status.total) or 0
-        else
-            cBandwidth = syncer.libraryBandwidth.total
-            cDownloaded = ((syncer.libraryBandwidth.isDownloaded or syncer.isLibraryLoaded) and cBandwidth) or (syncer.libraryBandwidth.status and syncer.libraryBandwidth.status.total) or 0
-        end
-        return cDownloaded, cBandwidth, (cDownloaded/math.max(1, cBandwidth))*100
-    end
-
     function manager.public:isAssetLoaded(assetType, assetName)
         local cAsset, isLoaded = manager.public:getAssetData(assetType, assetName)
         return (cAsset and isLoaded and true) or false

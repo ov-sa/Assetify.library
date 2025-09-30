@@ -344,9 +344,6 @@ else
             if builtData then
                 if not skipSync then
                     builtData = stringn.encode(builtData, "zlib")
-                    cAsset.rw.synced.bandwidth.file[path] = builtSize
-                    cAsset.rw.synced.bandwidth.total = cAsset.rw.synced.bandwidth.total + cAsset.rw.synced.bandwidth.file[path]
-                    syncer.libraryBandwidth = syncer.libraryBandwidth + cAsset.rw.synced.bandwidth.file[path]
                     cAsset.rw.unsynced.data[path] = (cAsset.manifest.encryptOptions and cAsset.manifest.encryptOptions.mode and cAsset.manifest.encryptOptions.key and {stringn.encode(builtData, cAsset.manifest.encryptOptions.mode, {key = cAsset.manifest.encryptOptions.key})}) or builtData
                     if imports.type(cAsset.rw.unsynced.data[path]) == "table" then
                         if cAsset.manifest.encryptOptions.iv then
@@ -471,10 +468,6 @@ else
                     cAsset.rw = {
                         synced = {
                             manifest = cAsset.manifest,
-                            bandwidth = {
-                                total = 0,
-                                file = {}
-                            },
                             hash = {}
                         },
                         unsynced = {

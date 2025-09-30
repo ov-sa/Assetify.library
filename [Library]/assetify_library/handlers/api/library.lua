@@ -33,7 +33,6 @@ manager:exportAPI("library", "createDummy", function(...)
 end)
 
 if localPlayer then
-    manager:exportAPI("library", "getDownloadProgress", function(...) return manager:getDownloadProgress(...) end)
     manager:exportAPI("library", "isAssetLoaded", function(...) return manager:isAssetLoaded(...) end)
     manager:exportAPI("library", "getAssetID", function(...) return manager:getAssetID(...) end)
     manager:exportAPI("library", "loadAsset", function(...) return manager:loadAsset(...) end)

@@ -1,6 +1,6 @@
 <meta>
 
-    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.6"/>
+    <info author="vStudio" name="Assetify.library" type="Library" version="11.2.7"/>
     <min_mta_version server="1.6.0-9.22470" client="1.6.0-9.22470"/>
     <download_priority_group>1000</download_priority_group>
     <aclrequest>
@@ -90,7 +90,6 @@
     <export function="library_setElementAsset" type="shared"/>
     <export function="library_getElementAsset" type="shared"/>
     <export function="library_createDummy" type="shared"/>
-    <export function="library_getDownloadProgress" type="client"/>
     <export function="library_isAssetLoaded" type="client"/>
     <export function="library_getAssetID" type="client"/>
     <export function="library_loadAsset" type="client"/>
