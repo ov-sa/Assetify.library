@@ -129,7 +129,7 @@ function interface.public.registerMouseScroll()
     return true
 end
 
-addEventHandler("onClientRender", root, function()
+timer:create(function()
     interface.public.tick = imports.getTickCount()
     for i, j in imports.pairs(interface.private.cache.key) do
         local state = imports.getKeyState(i)
@@ -143,7 +143,7 @@ addEventHandler("onClientRender", root, function()
             interface.public.registerMouseScroll()
         end
     end
-end)
+end, 30, 0)
 
 addEventHandler("onClientKey", root, function(key)
     if ((key ~= "mouse_wheel_up") and (key ~= "mouse_wheel_down")) then return false end
