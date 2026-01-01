@@ -99,9 +99,9 @@ function attacher.private.updateAttachments(parent, element, parentMatrix)
                     0
                 },
                 {
-                    (offZ*parentMatrix[1][1]) + (offY*parentMatrix[2][1]) - (offX*parentMatrix[3][1]) + parentMatrix[4][1],
-                    (offZ*parentMatrix[1][2]) + (offY*parentMatrix[2][2]) - (offX*parentMatrix[3][2]) + parentMatrix[4][2],
-                    (offZ*parentMatrix[1][3]) + (offY*parentMatrix[2][3]) - (offX*parentMatrix[3][3]) + parentMatrix[4][3],
+                    (offX*parentMatrix[1][1]) + (offY*parentMatrix[2][1]) + (offZ*parentMatrix[3][1]) + parentMatrix[4][1],
+                    (offX*parentMatrix[1][2]) + (offY*parentMatrix[2][2]) + (offZ*parentMatrix[3][2]) + parentMatrix[4][2],
+                    (offX*parentMatrix[1][3]) + (offY*parentMatrix[2][3]) + (offZ*parentMatrix[3][3]) + parentMatrix[4][3],
                     1
                 }
             })
